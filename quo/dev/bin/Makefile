@@ -10,6 +10,7 @@ LINKS += ComboNode
 LINKS += FutileNode
 LINKS += MulticastNode
 LINKS += NoisyNode
+LINKS += PreSerializeNode
 LINKS += RemoteSSLNode
 LINKS += SecureNode
 LINKS += SeqNode
@@ -44,6 +45,10 @@ MulticastNode:
 
 NoisyNode:
 	ln -s wrapper NoisyNode
+
+PreSerializeNode:
+	ln -s wrapper PreSerializeNode
+
 
 RemoteSSLNode:
 	ln -s wrapper RemoteSSLNode
