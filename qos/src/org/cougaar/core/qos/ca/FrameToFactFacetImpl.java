@@ -30,7 +30,6 @@ import java.util.Collection;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
@@ -40,6 +39,7 @@ abstract public class FrameToFactFacetImpl
     extends FacetImpl
 {
 
+    // This should check the frameset!!!
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
 		return (o instanceof Frame);
@@ -47,6 +47,7 @@ abstract public class FrameToFactFacetImpl
 	};
     private IncrementalSubscription sub;
     private LoggingService log;
+    private String xml_filename;
 
     protected FrameToFactFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -56,6 +57,7 @@ abstract public class FrameToFactFacetImpl
 	super(owner, sb, spec, player);
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
+	this.xml_filename = spec.role_parameters.getProperty("frame-set");
 	linkPlayer();
     }
 

@@ -83,7 +83,7 @@ public class FrameSetTesterPlugin
     private FrameSet frameSet;
     private MyAlarm alarm;
     private Frame host1;
-    private int delayCycles = 10;
+    private int delayCycles = 5;
 
     public void load()
     {

@@ -36,6 +36,8 @@ abstract public class FrameCoordinationArtifactProvider
 {
 
     private static final String FrameCA = "FrameCA";
+    private static final String ConsumerRole = "Consumer";
+    private static final String ProducerRole = "Producer";
 
     public FrameCoordinationArtifactProvider(ServiceBroker sb) 
     {
@@ -47,7 +49,6 @@ abstract public class FrameCoordinationArtifactProvider
 	extends CoordinationArtifactImpl
 	implements CoordArtConstants
     {
-	private static final String ConsumerRole = "Consumer";
 	private String artifactId;
 
 
@@ -63,6 +64,11 @@ abstract public class FrameCoordinationArtifactProvider
 				 ConnectionSpec spec, 
 				 RolePlayer player);
 
+	abstract protected FactToFrameFacetImpl
+	    makeFactToFrameFacet(ServiceBroker sb,
+				 ConnectionSpec spec, 
+				 RolePlayer player);
+
 	public String getArtifactId()
 	{
 	    return artifactId;
@@ -74,6 +80,8 @@ abstract public class FrameCoordinationArtifactProvider
 	    ServiceBroker sb = getServiceBroker();
 	    if (spec.role.equals(ConsumerRole)) {
 		return makeFrameToFactFacet(sb, spec, player);
+	    } else if (spec.role.equals(ProducerRole)) {
+		return makeFactToFrameFacet(sb, spec, player);
 	    } else {
 		throw new RuntimeException("Bogus role in spec: " + spec);
 	    }
