@@ -54,6 +54,10 @@ public class AgentDS
 	return false;
     }
 
+    String getAgentName() {
+	return (String) getSymbolValue(AGENTNAME);
+    }
+
     // Node DataScopes can be the first element in a path.  They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
