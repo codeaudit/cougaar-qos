@@ -54,6 +54,14 @@ import org.cougaar.mts.base.DestinationLinkDelegateImplBase;
 import org.cougaar.mts.base.SendLinkDelegateImplBase;
 import org.cougaar.mts.base.StandardAspect;
 
+/** 
+ * Central Aspect for transfering Metrics between Nodes. When a
+ * message is sent to a Node, Gossip is piggybacked in the
+ * message. The GossipAspect sends requests for metrics to the remote Node, and
+ * sends its own Metrics back for request by the remote node. Gossip
+ * is only sent when forwarding messages and is not sent with the
+ * RPC reply.
+ */
 public class GossipAspect 
     extends StandardAspect
 {

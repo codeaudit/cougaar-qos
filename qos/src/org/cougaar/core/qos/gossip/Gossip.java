@@ -29,7 +29,9 @@ package org.cougaar.core.qos.gossip;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
-
+/*
+ * A bundle of metrics to be sent between nodes. 
+ */
 class Gossip implements Serializable
 {
     private HashMap map = new HashMap();

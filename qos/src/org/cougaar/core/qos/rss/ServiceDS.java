@@ -40,9 +40,12 @@ import com.bbn.rss.ResourceContext;
 import com.bbn.ResourceStatus.ResourceNode;
 
 /**
- * This RSS ResourcContext represents ???? Its parent in the RSS
- * hierarchy tree is a Node.  It's identified by the name of the
- * service and defines two local formulas for CPU load.
+ * This RSS ResourcContext represents subsystems in a Node, other than
+ * agents.  Its parent in the RSS hierarchy tree is a Node.  It's
+ * identified by the name of the service and defines two local
+ * formulas for CPU load.  <p> The currently supported "services" are
+ * defined by the metrics and mts containers.  Other subsystems like
+ * servlet management and persistence might be supported later.
  *
  * @see NodeDS
  */
