@@ -13,9 +13,11 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.cougaar.core.mts.Debug;
+import org.cougaar.core.mts.DebugFlags;
 import org.cougaar.core.mts.MessageTransportRegistry;
 
-public class Utils 
+public class Utils implements DebugFlags
 {
 
 
@@ -46,6 +48,9 @@ public class Utils
 	if (Boolean.getBoolean("org.cougaar.lib.quo.kernel.gui")) {
 	    try {
 		kernel.newFrame();
+		if (Debug.debug(QUO)) {
+		    kernel.setDebug(com.bbn.quo.corba.QuoKernel.DEBUG_ALL);
+		}
 	    } catch (java.rmi.RemoteException ex) {
 		ex.printStackTrace();
 	    }

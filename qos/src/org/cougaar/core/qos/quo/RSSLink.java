@@ -50,7 +50,7 @@ import java.util.Observable;
 public class RSSLink extends ResourceMonitorServiceImpl
 {
     public static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
-    private static final int PERIOD = 5000;
+    private static final int PERIOD = 30000;
     private static String local_host;
 
     static {
