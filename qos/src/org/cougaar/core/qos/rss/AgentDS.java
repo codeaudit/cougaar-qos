@@ -59,7 +59,12 @@ public class AgentDS
 	TopologyReaderService svc = (TopologyReaderService)
 	    sb.getService(this,TopologyReaderService.class, null);
 	String agentname = (String) getSymbolValue(AGENTNAME);
-	TopologyEntry entry = svc.getEntryForAgent(agentname);
+	TopologyEntry entry = null;
+	try {
+	    entry = svc.getEntryForAgent(agentname);
+	} catch (Exception no_such_agent) {
+	    //  print a message?
+	}
         String node = entry != null ? entry.getNode() : null;
 
 	// What do we do if the node isn't known?

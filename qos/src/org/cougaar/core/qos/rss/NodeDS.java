@@ -58,9 +58,14 @@ public class NodeDS extends DataScope
 	TopologyReaderService svc = (TopologyReaderService)
 	    sb.getService(this,TopologyReaderService.class, null);
 	String nodename = (String) getSymbolValue(NODENAME);
-	String host = svc.getParentForChild(TopologyReaderService.HOST, 
-					    TopologyReaderService.NODE, 
-					    nodename);
+	String host = null;
+	try {
+	    host = svc.getParentForChild(TopologyReaderService.HOST, 
+					 TopologyReaderService.NODE, 
+					 nodename);
+	} catch (Exception no_such_node) {
+	    // print message?
+	}
 
 	// What do we do if the host isn't known?
 	if (host == null) {
