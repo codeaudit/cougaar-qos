@@ -69,13 +69,18 @@ public class Fact implements Serializable
 	return "<Fact " +type+ " [" +attributes.size()+ "]>";
     }
 
+    public Iterator attributes()
+    {
+	return attributes.entrySet().iterator();
+    }
+
     public String debugString()
     {
 	StringBuffer buffer = new StringBuffer();
 	buffer.append("Fact ");
 	buffer.append(type);
 	buffer.append('\n');
-	Iterator itr = attributes.entrySet().iterator();
+	Iterator itr = attributes();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    buffer.append(entry.getKey());
