@@ -198,8 +198,14 @@ public final class SyscondFactory
 
 	public void run() {
 	    // Loop over all Agents, seeing if the Host has changed,
-	    Set matches = topologyService.getAllEntries(null, null, null, null,
+	    Set matches = null;
+	    try {
+		matches = topologyService.getAllEntries(null, null, null, null,
 							null);
+	    } catch (Exception ex) {
+		// Node hasn't finished initializing yet
+		return;
+	    }
 	    if (matches == null) return;
 	    Iterator itr = matches.iterator();
 	    while (itr.hasNext()) {
