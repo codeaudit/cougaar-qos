@@ -65,7 +65,8 @@ public class TrivialDataFeed
 	ThreadService threadService = (ThreadService)
 	    sb.getService(this, ThreadService.class, null);
 	Runnable notifier = getNotifier();
-	thread = threadService.getThread(this, notifier, "TrivialDataFeed");
+	thread = threadService.getThread(this, notifier, "TrivialDataFeed",
+					 ThreadService.WELL_BEHAVED_LANE);
 	sb.releaseService(this, ThreadService.class, threadService);
     }
 

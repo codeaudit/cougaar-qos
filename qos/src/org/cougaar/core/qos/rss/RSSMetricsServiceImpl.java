@@ -136,7 +136,7 @@ public class RSSMetricsServiceImpl
 	threadService = (ThreadService)
 	    sb.getService(this, ThreadService.class, null);
 
-	subscriptionQueue = new RunnableQueue(threadService, "xxxx");
+	subscriptionQueue = new RunnableQueue(threadService, "SubscriptionQueue");
 
 	MetricsUpdateService mus = (MetricsUpdateService)
 	    sb.getService(this, MetricsUpdateService.class, null);
