@@ -22,6 +22,7 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
+import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.component.ServiceBroker;
@@ -30,6 +31,7 @@ import com.bbn.quo.event.Connector;
 import org.omg.CORBA.ORB;
 
 import java.net.InetAddress;
+import java.util.TimerTask;
 
 public class STECMetricsUpdateServiceImpl
     implements MetricsUpdateService
@@ -60,6 +62,12 @@ public class STECMetricsUpdateServiceImpl
 	String url = System.getProperty(STEC_URL_PROPERTY);
 
 	sender = new STECSender(url, host, Connector.poa());
+
+	Heartbeater beater = new Heartbeater(sender);
+	ThreadService threadService = (ThreadService)
+	    sb.getService(this, ThreadService.class, null);
+	TimerTask task = threadService.getTimerTask(this, beater, "Beater");
+	threadService.schedule(task, 0, 1000);
     }
 
 
