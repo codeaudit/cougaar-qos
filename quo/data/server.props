@@ -94,7 +94,7 @@ javax.net.ssl.keyStorePassword=<my_password>
 org.cougaar.properties.url=file:/opt/cougaar/quo/data/adaptdemo.props
 
 # traffic generation
-# Default is set to trust everyone (10). To run in comprimised mode
+# Default is set to trust everyone (10). To run in compromised mode
 # uncomment the line below (use this for the assessment)
 #org.cougaar.node.trustStatus=0
 
