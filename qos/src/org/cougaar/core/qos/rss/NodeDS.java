@@ -184,6 +184,8 @@ public class NodeDS
     }
 
     private class VMSize extends DataFormula {
+	Runtime rt;
+
 	protected DataValue defaultValue() {
 	    return DataValue.NO_VALUE;
 	}
@@ -192,6 +194,7 @@ public class NodeDS
 	protected void initialize(ResourceContext context) {
 	    super.initialize(context);
 
+	    rt = Runtime.getRuntime();
 	    ResourceNode node = new ResourceNode();
 	    node.kind = "Alarm";
 	    node.parameters = new String[0];
@@ -205,8 +208,16 @@ public class NodeDS
 
 	protected DataValue doCalculation(DataFormula.Values vals)
 	{
-	    long size = Runtime.getRuntime().totalMemory();
-	    return new DataValue(size, Constants.SECOND_MEAS_CREDIBILITY,
+	    long total = rt.totalMemory(); // code size? never
+					   // changes in Linux
+	    if (logger.isDebugEnabled()) {
+		long free = rt.freeMemory();
+		long max = rt.maxMemory();
+		logger.debug(" totalMemory=" +total+
+			     " maxMemory=" +max+
+			     " freeMemory=" +free);
+	    }
+	    return new DataValue(total, Constants.SECOND_MEAS_CREDIBILITY,
 				 "bytes", 
 				 "Runtime.getRuntime().totalMemory()");
 	}
