@@ -26,6 +26,7 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -147,8 +148,8 @@ public class Frame
     {
 	if (properties.containsKey(attribute)) return this;
 
-	Frame prototype = frameSet.getPrototype(this);
 	Frame result = null;
+	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) {
 	    result = prototype.getSource(attribute);
 	    if (result != null) return result;
@@ -158,6 +159,22 @@ public class Frame
 	    return parent.getSource(attribute);
 	}
 	return null;
+    }
+
+    private void addSlotNames(Set set)
+    {
+	set.addAll(properties.entrySet());
+	Frame prototype = frameSet.getPrototype(this);
+	if (prototype != null) prototype.addSlotNames(set);
+	Frame parent =  frameSet.getParent(this);
+	if (parent != null) parent.addSlotNames(set);
+    }
+
+    public Set getAllSlotNames()
+    {
+	Set result = new HashSet();
+	addSlotNames(result);
+	return result;
     }
     
     public Set findParents(String relation_prototype)
