@@ -238,7 +238,7 @@ public class SingleInheritanceFrameSet
 	}
 	Frame prototype = getPrototype(frame);
 	if (prototype != null) {
-	    return prototype.getValue(attribute);
+	    return getFrameValue(prototype, attribute);
 	}
 
 	return null;
