@@ -51,6 +51,7 @@ public class CoordinationArtifactBrokerPlugin
     private static final String[] StandardProviders = 
     {
 	"org.cougaar.ca.artifacts.JessAlarmArtifactProvider",
+	"org.cougaar.ca.artifacts.JessMetricsServiceCoordinationArtifactProvider",
     };
 
     private static final String ProvidersParam = "providers";
