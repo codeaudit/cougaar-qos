@@ -203,7 +203,7 @@ abstract public class ResponseFacet
 	Object fact = query.getQuery();
 	if (log.isDebugEnabled())
 	    log.debug("Updated Fact" +fact);
-	getPlayer().assertFact(fact, getReceptacle());
+	getPlayer().assertFact(fact);
     }
 
 

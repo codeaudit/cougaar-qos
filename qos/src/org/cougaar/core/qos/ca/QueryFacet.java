@@ -216,7 +216,7 @@ abstract public class QueryFacet
 	if (log.isDebugEnabled())
 	    log.debug("Tranformed " +response+ " into " +responseFact);
 	if (responseFact != null) 
-	    getPlayer().assertFact(responseFact, getReceptacle());
+	    getPlayer().assertFact(responseFact);
     }
 
 
