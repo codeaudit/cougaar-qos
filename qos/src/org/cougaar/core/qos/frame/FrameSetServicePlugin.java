@@ -127,17 +127,17 @@ public class FrameSetServicePlugin
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String name = (String) entry.getKey();
-	    FrameSet set = (FrameSet) entry.getValue();
-	    HashSet callbacks = (HashSet) pending.get(name);
-	    if (callbacks != null) {
-		Iterator sub_itr = callbacks.iterator();
-		while (sub_itr.hasNext()) {
-		    FrameSetService.Callback cb = (FrameSetService.Callback)
-			sub_itr.next();
-		    doCallback(cb, name, set);
-		}
-		pending.remove(name);
+	    HashSet callbacks = (HashSet) entry.getValue();
+	    FrameSet set = (FrameSet) sets.get(name);
+	    if (set == null || callbacks == null) continue;
+
+	    Iterator sub_itr = callbacks.iterator();
+	    while (sub_itr.hasNext()) {
+		FrameSetService.Callback cb = (FrameSetService.Callback)
+		    sub_itr.next();
+		doCallback(cb, name, set);
 	    }
+	    itr.remove();
 	}
     }
 
