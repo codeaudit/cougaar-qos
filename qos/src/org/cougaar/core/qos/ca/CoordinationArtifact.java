@@ -29,20 +29,17 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * See xxx for more detailes on CoordinationArtifacts.  At the most
- * abstract level it has three jobs.  It must be able to identity its
- * kind, it must be able to decide whether or not it can handle any
- * given {@link ConnectionSpec}, and it if it can, it must handle the
- * linkage to a {@link RolePlayer} for that spec.
+ * See the package javadoc for more details on CoordinationArtifacts.
+ * The primary job of the Artifact is to link {@link Facet}s to {@link
+ * RolePlayer}s, as specified by a {@link ConnectionSpec}.
  */
 public interface CoordinationArtifact
 {
     /**
      * Returns true iff the Artifact can handle the given spec.  This
-     * will only be called with specs whose ca_kind field is already
-     * known to match the Artifact's kind.  The default implementation
-     * in {@link CoordinationArtifactImpl} therefore returns true
-     * for all specs.
+     * will only be called with specs that the Artifact's template has
+     * already said it supports.  The default implementation in {@link
+     * CoordinationArtifactImpl} therefore returns true for all specs.
     */
     public boolean matches(ConnectionSpec spec);
 
@@ -58,8 +55,7 @@ public interface CoordinationArtifact
 
 
     /**
-     * Signals that the Artifact should execute in a blackboard
-     * transaction.
+     * This method is used to request a Blackboard execution.
     */
     public void triggerExecute();
 
@@ -71,6 +67,10 @@ public interface CoordinationArtifact
      */
     public void execute(BlackboardService service);
 
+    /**
+     * Returns the Artifact's id (not to be confused with the
+     * Template's kind).
+    */
     public String getArtifactId();
 
 }

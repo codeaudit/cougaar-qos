@@ -48,13 +48,12 @@ public interface CoordinationArtifactTemplate
     public boolean supports(ConnectionSpec spec);
 
     /**
-     * Does the linkage between a {@link Facet} and a {@link
-     * CoordinationArtifact}, which is generally created on the fly
-     * based on the spec and the player. The default implementation in
-     * {@link CoordinationArtifactTemplatePlugin} looks for an
-     * existing artifact that matches.  If it can't find one it
-     * handles this by deferring the creation of a new
-     * CoordinationArtifact to an abstract method.
+     *  This method is used by the {@link CoordinationArtifactBroker}
+     * to request the Template to provide a {@link Facet} for the
+     * given {@link RolePlayer}.  The job of the template is to find
+     * or make an appropriate {@link CoordinationArtifact}, given the
+     * spec.  The artifact itself will do the actual linkage between
+     * the Facet and the RolePlayer.
      * 
     */
     public void provideFacet(ConnectionSpec spec, RolePlayer player);

@@ -45,11 +45,11 @@ public interface CoordinationArtifactBroker
 
 
     /**
-     * This is an asynchronous that binds a RolePlayer to a Facet.
-     * The desired Facet is described by the spec.  When a
-     * CoordinationArtifact is available, the facetAvailable callback
-     * will be invoked on the rolePlayer.  This callback could happen
-     * inline.
+     * This is an asynchronous call that binds a RolePlayer to a
+     * Facet.  The desired Facet is described by the spec.  When a
+     * CoordinationArtifact that can provide the Facet is available,
+     * the facetAvailable callback will be invoked on the RolePlayer.
+     * This callback could happen inline.
     */
     public void requestFacet(ConnectionSpec spec, RolePlayer rolePlayer);
 

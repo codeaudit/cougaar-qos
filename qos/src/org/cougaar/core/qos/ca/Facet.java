@@ -35,6 +35,7 @@ import org.cougaar.core.service.BlackboardService;
  */
 public interface Facet
 {
+    // These are upcalls from the RolePlyaer
     /**
      * Used by clients to assert a new fact into the Facet's
      * fact-base. 
@@ -48,8 +49,19 @@ public interface Facet
     public void retractFact(Fact fact);
 
     /**
+     * Returns the id of the specific {@link CoordinationArtifact}
+     * (not to be confused with the Template kind) which owns this
+     * Facet.
+    */
+    public String getArtifactId();
+
+
+
+    // These are downcalls from the CoordinationArtifact
+
+    /**
      * Process any queued facts.  This should be run in a blackboard
-     * transacion.  Usually invoked by the {@link
+     * transaction.  Usually invoked by the {@link
      * CoordinationArtifact} that owns the facet.
     */
     public void processFactBase(BlackboardService blackboard);
@@ -57,7 +69,7 @@ public interface Facet
 
     /**
      * Handle subscription updates. This should be run in a blackboard
-     * transacion.  Usually invoked by the {@link
+     * transaction.  Usually invoked by the {@link
      * CoordinationArtifact} that owns the Facet.
      */
     public void execute(BlackboardService blackboard);
@@ -65,10 +77,9 @@ public interface Facet
 
     /**
      * Handle blackboard subscriptions.  This should be run in a
-     * blackboard transacion.  Usually invoked by the FacetProvider.
+     * blackboard transaction.  Usually invoked by the FacetProvider.
     */
     public void setupSubscriptions(BlackboardService blackboard);
 
 
-    public String getArtifactId();
 }
