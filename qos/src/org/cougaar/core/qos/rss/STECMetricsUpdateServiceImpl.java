@@ -76,10 +76,13 @@ import javax.naming.directory.BasicAttributes;
  *
  * @property org.cougaar.metrics.probes If provided, this should be a
  * comma-separated list of host probes, as understood by the QuO
- * StatusTEC.  The possible choices are Bogomips, Cache, Clock,
- * FreeMemory, TotalMemory, LoadAverage, TCPInUse, UDPInUse, Jips, and
- * CPUCount.  By default, all choices for which a platform-specific
- * implementation is available are used.
+ * StatusTEC; or 'all'; or 'none'.  The list of possible probes is as
+ * follows: Bogomips, Cache, Clock, FreeMemory, TotalMemory,
+ * LoadAverage, TCPInUse, UDPInUse, Jips, and CPUCount.  If the
+ * property is not provided, or is provided with the value 'all', all
+ * probes are run.  If the property is provided with the value 'none',
+ * the probe task will not be started.  Note that some probes are only
+ * available in Linux.
  *
  * @property org.cougaar.metrics.topology.iorfile If present, and if
  * event channels are in use, the ior of the channel topology manager
@@ -123,14 +126,28 @@ public class STECMetricsUpdateServiceImpl
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();
+
 	String kinds_string = System.getProperty(SYSSTAT_KINDS_PROPERTY);
+	// kinds_string absent or 'all' for all probes
+	// kinds_string empty or 'none' for no probes
+	// Otherwise it should be a comma-separated list
+
 	String[] kinds = null;
+	// kinds == null for all probes
+	// kinds == zero-length array for no probes
+	// kinds == true array of strings for specified probes
+
 	if (kinds_string != null) {
-	    StringTokenizer tokenizer = new StringTokenizer(kinds_string, ",");
-	    kinds = new String[tokenizer.countTokens()];
-	    int i = 0;
-	    while (tokenizer.hasMoreElements()) {
-		kinds[i] = tokenizer.nextToken();
+	    if (kinds_string.equalsIgnoreCase("none")) {
+		kinds = new String[0];
+	    } else if (!kinds_string.equalsIgnoreCase("all")) {
+		StringTokenizer tokenizer = 
+		    new StringTokenizer(kinds_string, ",");
+		kinds = new String[tokenizer.countTokens()];
+		int i = 0;
+		while (tokenizer.hasMoreElements()) {
+		    kinds[i] = tokenizer.nextToken();
+		}
 	    }
 	}
 
@@ -144,9 +161,11 @@ public class STECMetricsUpdateServiceImpl
 
 	    channel = makeChannel(id);
 
-	    StatusSupplierSysStat sysstat =
-		new StatusSupplierSysStat(kinds, channel);
-	    sysstat.schedule(3000);
+	    if (kinds == null || kinds.length > 0) {
+		StatusSupplierSysStat sysstat =
+		    new StatusSupplierSysStat(kinds, channel);
+		sysstat.schedule(3000);
+	    }
 
 
 	    sender = new STECSender(sb, channel, Connector.poa());
@@ -154,9 +173,11 @@ public class STECMetricsUpdateServiceImpl
 	} else {
 	    dataFeed = new TrivialDataFeed(sb);
 	    interpreter = new MetricInterpreter();
-	    DirectSysStatSupplier supplier = 
-		new DirectSysStatSupplier(kinds, dataFeed);
-	    supplier.schedule(3000);
+	    if (kinds == null || kinds.length > 0) {
+		DirectSysStatSupplier supplier = 
+		    new DirectSysStatSupplier(kinds, dataFeed);
+		supplier.schedule(3000);
+	    }
 	}
 
     }
