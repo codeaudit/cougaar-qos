@@ -313,6 +313,83 @@ module Cougaar
     end     # CreateSrcToMultSinkPing
     
     ##
+    # Multiple sink nodes/agents to one node/agent
+    ## 
+    class CreateMultSrcToSinkPing < Cougaar::Action
+      numSrcs=0
+      PRIOR_STATE = "SocietyLoaded"
+      RESULTANT_STATE = "SocietyLoaded"      
+      DOCUMENTATION = Cougaar.document {
+	@description = "Create multiple src-to-single-sink ping society definition."
+	@parameters = [
+	  {:numSrcs => "required, The number of srcs in this single-sink ping society configuration"},
+          {:security => "optional, boolean to mark security loaded"},
+	  {:hosts => "boolean to split up srcs on their own hosts"}
+	]
+	@example = "do_action 'CreateMultSrcToSinkPing', numSrcs, 'security', 'hosts'"
+      }
+      def initialize(run, numSrcs, security="false", hosts="false")
+	super(run)
+	@numSrcs = numSrcs
+	@security = security
+	@hosts = hosts
+      end
+      def perform
+	if @hosts=="true"
+	  puts "Splitting up srcs on multiple hosts"
+	  # Add sink
+	  @run.society.add_host('HOST1') do |host|
+	    puts "Adding SinkNode"
+	    host.add_node("SinkNode") do |node|
+	      # Add src agent
+	      node.add_agent("sink")
+	    end
+	  end
+	  # Add srcs and pings
+	  # Index HOST# to be 1+i
+	  i=0
+	  tmp=0
+	  while i < @numSrcs
+	    tmp=i+2
+	    @run.society.add_host("HOST#{tmp}") do |host|
+	      puts "Adding SrcNode#{i}"
+	      host.add_node("SrcNode#{i}") do |node|
+		node.add_agent("src#{i}")
+		# Add pings here
+		addPing("src#{i}", "sink")
+		# wake once every second to check ping timeouts
+		managePings('1000')
+		i+=1
+	      end
+	    end
+	  end
+	else
+	  @run.society.add_host('HOST1') do |host|  
+	    host.add_node("SinkNode") do |node|
+	      node.add_agent("sink")
+	    end
+	  end
+	  @run.society.add_host('HOST2') do |host|  
+	    # Add pings here
+	    i=0
+	    while i < @numSrcs
+	      puts "Adding SrcNode#{i}"
+	      host.add_node("SrcNode#{i}") do |node|
+		node.add_agent("src#{i}")
+		addPing("src#{i}", "sink")
+		# wake once every second to check ping timeouts
+		managePings('1000')
+		i+=1
+	      end
+	    end
+	  end
+	end
+	# Add Manager Node / Agent & Nameserver
+	addMgntNode("HOST2", "false")
+      end   # perform
+    end    # CreateMultSrcToSinkPing
+    
+    ##
     # Multiple Pinger Pairs per hosts
     ## 
     class CreateMultPingPairsPerHost < Cougaar::Action
