@@ -132,8 +132,6 @@ abstract public class QueryFacet
 	    }		    
 		    
 	    // Assert the data to the RolePlayer
-	    blackboard.publishRemove(response);
-	    responseSub.remove(response);
 	    processResponse(response);
 	}
 		
@@ -203,8 +201,6 @@ abstract public class QueryFacet
     {
 	blackboard.publishAdd(query);
 	reclaimer.add(query, blackboard);
-	// ******** !!!!!!
-	blackboard.signalClientActivity();
     }
 
 
