@@ -26,7 +26,9 @@
 
 package org.cougaar.core.qos.ca;
 
+import org.cougaar.core.agent.service.alarm.Alarm;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.AlarmService;
 import org.cougaar.core.service.BlackboardService;
 
 /**
@@ -34,38 +36,31 @@ import org.cougaar.core.service.BlackboardService;
  * particular, it schedules cougaar Alarms with the
  * AlarmService. Subclasses are responsible for creating the Alarm.
  */
-abstract public class SleeperFacet 
-    extends FacetImpl
+abstract public class AlarmServiceSleeperFacet 
+    extends  SleeperFacet
 {
-    protected SleeperFacet(CoordinationArtifact owner,
-			   ServiceBroker sb,
-			   ConnectionSpec spec, 
-			   RolePlayer player)
+
+    private AlarmService alarmService;
+
+    protected AlarmServiceSleeperFacet(CoordinationArtifact owner,
+				       ServiceBroker sb,
+				       ConnectionSpec spec, 
+				       RolePlayer player)
     {
 	super(owner, sb, spec, player);
+ 	alarmService = (AlarmService)
+	    sb.getService(this, AlarmService.class, null);
+	linkPlayer();
     }
 
-    public void setupSubscriptions(BlackboardService blackboard)
-    {
-    }
+    abstract protected Alarm makeAlarm(Object fact);
 
-    public void execute(BlackboardService blackboard)
-    {
-    }
 
-    protected abstract void processFactAssertion(Object fact);
 
-    public void processFactBase(BlackboardService blackboard)
+    protected void processFactAssertion(Object fact)
     {
-	if (!factsHaveChanged()) return;
-	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {
-	    if (frev instanceof FactAssertion) {
-		Object fact = frev.getFact();
-		processFactAssertion(fact);
-	    } else {
-		// cancel the alarm?
-	    }
-	}
+	Alarm alarm = makeAlarm(fact);
+	alarmService.addRealTimeAlarm(alarm);
     }
 
 

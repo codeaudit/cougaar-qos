@@ -36,6 +36,7 @@ abstract public class AlarmCoordinationArtifactProvider
 {
 
     private static final String AlarmCA = "AlarmCA";
+    public static final String USE_THREADS = "UseThreads";
 
     public AlarmCoordinationArtifactProvider(ServiceBroker sb) 
     {
@@ -60,9 +61,15 @@ abstract public class AlarmCoordinationArtifactProvider
 	    this.artifactId = spec.ca_parameters.getProperty(ArtifactIdAttr);
 	}
 	
-	abstract protected SleeperFacet makeSleeperFacet(ServiceBroker sb,
-							 ConnectionSpec spec, 
-							 RolePlayer player);
+	abstract protected SleeperFacet 
+	    makeThreadSleeperFacet(ServiceBroker sb,
+				   ConnectionSpec spec, 
+				   RolePlayer player);
+
+	abstract protected SleeperFacet 
+	    makeAlarmSleeperFacet(ServiceBroker sb,
+				  ConnectionSpec spec, 
+				  RolePlayer player);
 
 
 	public String getArtifactId()
@@ -71,14 +78,18 @@ abstract public class AlarmCoordinationArtifactProvider
 	}
 
 
-   
 	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
 	{
 	    ServiceBroker sb = getServiceBroker();
-	    if (spec.role.equals(SleeperRole))
-		return makeSleeperFacet(sb, spec, player);
-	    else
+	    if (spec.role.equals(SleeperRole)) {
+		String useThreadsP =spec.ca_parameters.getProperty(USE_THREADS);
+		if (useThreadsP.equalsIgnoreCase("true"))
+		    return makeThreadSleeperFacet(sb, spec, player);
+		else
+		    return makeAlarmSleeperFacet(sb, spec, player);
+	    } else {
 		throw new RuntimeException("Bogus role in spec: " + spec);
+	    }
 	}
     }
 
