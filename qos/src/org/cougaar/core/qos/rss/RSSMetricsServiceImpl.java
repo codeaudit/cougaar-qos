@@ -214,11 +214,11 @@ public class RSSMetricsServiceImpl
 		InputStream stream = finder.open(path);
 		db.populate(stream);
 	    } else {
-		    URL sitesURL = new URL(sitesURLString);
-		    db.populate(sitesURL);
+		URL sitesURL = new URL(sitesURLString);
+		db.populate(sitesURL);
 	    }
 	} catch (Exception ex) {
-	    loggingService.error(null, ex);
+	    loggingService.error("No Sites file loaded: "+ex.toString());
 	}
     }
 

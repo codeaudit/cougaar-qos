@@ -114,8 +114,7 @@ public class ConfigFinderDataFeedComponent
 		    return finder.open(path);
 		} catch (java.io.IOException io_ex) {
 		    if (logging.isErrorEnabled())
-			logging.error("Could not open Config URL=" +urlString,
-				      io_ex);
+			logging.error("Could not open Config URL=" +urlString);
 		    return null;
 		}
 	    } else {
