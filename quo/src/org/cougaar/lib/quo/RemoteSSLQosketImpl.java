@@ -24,20 +24,8 @@ import java.util.TimerTask;
 public class RemoteSSLQosketImpl
     extends RemoteSSLQosketSkel
 {
-
-    private static String local_host;
-    private static Timer timer = new Timer(true);
-
 	    
     private static ValueSC USE_SSL;
-
-    static {
-	try {
-	    local_host = java.net.InetAddress.getLocalHost().getHostAddress();
-	} catch (java.net.UnknownHostException ex) {
-	    local_host = "127.0.0.1";
-	}
-    }
 
     private static synchronized ValueSC Get_USE_SSL (QuoKernel kernel) 
 	throws java.rmi.RemoteException
@@ -82,34 +70,6 @@ public class RemoteSSLQosketImpl
     }
 
 
-
-    private class ExpectedCapacityUpdater extends TimerTask {
-	private MessageAddress agent;
-	private String host;
-	private ExpectedCapacitySC syscond;
-
-	ExpectedCapacityUpdater(MessageAddress agent,
-				ExpectedCapacitySC syscond)
-	{
-	    this.agent = agent;
-	    this.syscond = syscond;
-	}
-
-	public void run() {
-	    String new_host = rms.getHostForAgent(agent);
-	    if (new_host == null) return;
-	    if (host == null || !host.equals(new_host)) {
-		host = new_host;
-		System.out.println("===== New host " + host +
-				   " for agent " + agent);
-		try {
-		    syscond.setHosts(local_host, host);
-		} catch (java.rmi.RemoteException ex) {
-		    ex.printStackTrace();
-		}
-	    }
-	}
-    }
 	    
 
     public void initSysconds(QuoKernel kernel) 
@@ -117,29 +77,9 @@ public class RemoteSSLQosketImpl
     {
 
 	MessageAddress destination = link.getDestination();
-
-
-
 	UseSSL = Get_USE_SSL(kernel);
-
-	SysCond syscond = kernel.bindSysCond("Bandwidth from " + local_host +
-					     " to " + destination,
-				     "com.bbn.quo.rmi.ExpectedCapacitySC",
-				     "com.bbn.quo.data.ExpectedCapacitySCImpl");
-	System.out.println("Created Bandwidth syscond");
-
-	Bandwidth = (ExpectedCapacitySC) syscond;
-	//force bandwidth to be low, incase host is not known yet
-	try {
-	    Bandwidth.setLong(1);
-	} catch (java.rmi.RemoteException ex) {
-	    ex.printStackTrace();	
-	}
-
-	TimerTask task1 = new ExpectedCapacityUpdater(destination, Bandwidth);
-	timer.schedule(task1, 0, 5000);
-	
-
+	Bandwidth = 
+	    (ExpectedCapacitySC) rms.getExpectedCapacityForAgentSyscond(destination);
     }
 
 }
