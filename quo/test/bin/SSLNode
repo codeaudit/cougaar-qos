@@ -1,13 +1,14 @@
 #!/bin/sh
 
-#  -Djavax.net.debug=all
-ssl_args="-Djavax.net.ssl.trustStore=/home/rshapiro/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=/home/rshapiro/keystore -Djavax.net.ssl.keyStorePassword=password"
+ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password"
+
+
+protocols="-Dorg.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol"
 
 #debug="-Djavax.net.debug=ssl"
+debug="-Dorg.cougaar.message.transport.debug=policy"
 
-aspects="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.SSLAspect"
-
-COUGAAR_JAVA_ARGS="-Xbootclasspath/a: $aspects $ssl_args"
+COUGAAR_JAVA_ARGS="$protocols $ssl $debug"
 export COUGAAR_JAVA_ARGS
 
 
