@@ -143,13 +143,15 @@ public final class RSSMetricsServiceImpl
 	if (mus instanceof STECMetricsUpdateServiceImpl) {
 	    TypedEventChannel channel =
 		((STECMetricsUpdateServiceImpl) mus).getChannel();
-	    String ior = Connector.orb().object_to_string(channel);
-	    String feeds = properties.getProperty("rss.DataFeeds", "");
-	    feeds += " STEC_Channel";
-	    properties.put("rss.DataFeeds", feeds);
-	    properties.put("STEC_Channel.class", 
-			   "com.bbn.quo.event.data.StatusConsumerFeed");
-	    properties.put("STEC_Channel.args", "-ior " +ior);
+	    if (channel != null) {
+		String ior = Connector.orb().object_to_string(channel);
+		String feeds = properties.getProperty("rss.DataFeeds", "");
+		feeds += " STEC_Channel";
+		properties.put("rss.DataFeeds", feeds);
+		properties.put("STEC_Channel.class", 
+			       "com.bbn.quo.event.data.StatusConsumerFeed");
+		properties.put("STEC_Channel.args", "-ior " +ior);
+	    }
 	}
 	RSS.makeInstance(properties);
     }
