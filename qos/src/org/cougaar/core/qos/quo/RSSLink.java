@@ -31,21 +31,20 @@ import com.bbn.quo.data.RSS;
 import org.cougaar.core.mts.RMILinkProtocol;
 import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
-import org.cougaar.core.qos.monitor.ResourceMonitorService;
+import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
 
 import java.rmi.Remote;
 import java.util.Observable;
 
-public class RSSLink implements ResourceMonitorService
+public class RSSLink extends ResourceMonitorServiceImpl
 {
     private static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
     private RSS rss;
-    private NameSupport nameSupport;
     
     public RSSLink(NameSupport nameSupport) {
+	super(nameSupport);
 	String propfile = System.getProperty(RSS_PROPFILE);
 	rss = RSS.makeInstance(propfile);
-	this.nameSupport = nameSupport;
     }
 
     private String extractHost (String string) {
