@@ -360,13 +360,13 @@ public class FrameViewerServlet extends ComponentServlet {
               i2.hasNext();
               ) {
             String k = (String) i2.next();
-            Set set = fs.findFrames(k, slot_value_pairs);
+            Set set = fs.findFrames(k, slot_value_pairs, false);
             if (set == null) continue;
             frames.addAll(set);
           }
         }
       } else {
-        frames = fs.findFrames(kind, slot_value_pairs);
+        frames = fs.findFrames(kind, slot_value_pairs, false);
       }
 
       int nframes = (frames == null ? 0 : frames.size());
@@ -449,7 +449,7 @@ public class FrameViewerServlet extends ComponentServlet {
             en.hasMoreElements();
             ) {
           String key = (String) en.nextElement();
-          String val = vp.getProperty(key); // must be string!
+          Object val = vp.get(key);
           j++;
           out.print(
               "<tr><td>&nbsp;&nbsp;"+j+":&nbsp;</td>"+

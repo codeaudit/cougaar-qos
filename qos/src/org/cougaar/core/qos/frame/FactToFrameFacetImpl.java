@@ -117,13 +117,21 @@ abstract public class FactToFrameFacetImpl
 	UID uid = getUID(fact);
 	Collection changes = getModifications(fact);
 	Frame frame = frameSet.findFrame(uid);
-	if (frame == null) return;
+	if (frame == null) {
+	    if (log.isInfoEnabled())
+		log.info("No match for uid " +uid);
+	    return;
+	}
+	if (log.isInfoEnabled())
+	    log.info("Processing " + changes.size() + " changes");
 
 	Iterator itr = changes.iterator();
 	while (itr.hasNext()) {
 	    Frame.Change change = (Frame.Change) itr.next();
 	    String attr = change.getSlot();
 	    Object val = change.getValue();
+	    if (log.isInfoEnabled())
+		log.info("Changing " +attr+ " to " +val);
 	    frame.setValue(attr, val);
 	}
 	

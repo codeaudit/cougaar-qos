@@ -45,7 +45,9 @@ public interface FrameSet
 
     public Path findPath(UID uid);
 
-    public Set findFrames(String kind, Properties slot_value_pairs);
+    public Set findFrames(String kind, 
+			  Properties slot_value_pairs,
+			  boolean includePrototypes);
 
     public Set findRelations(Frame root, String role, String relation);
 

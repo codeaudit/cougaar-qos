@@ -312,6 +312,7 @@ public class SingleInheritanceFrameSet
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
 		if (!(raw instanceof Frame)) continue;
+		if (raw instanceof PrototypeFrame) continue;
 		Frame frame = (Frame) raw;
 		// Check only local value [?]
 		if (descendsFrom(frame, proto)) {
@@ -326,7 +327,9 @@ public class SingleInheritanceFrameSet
 
 
 
-    public Set findFrames(String proto, Properties slot_value_pairs)
+    public Set findFrames(String proto, 
+			  Properties slot_value_pairs,
+			  boolean includePrototypes)
     {
 	HashSet results = new HashSet();
 	synchronized (kb) {
@@ -334,6 +337,8 @@ public class SingleInheritanceFrameSet
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
 		if (!(raw instanceof Frame)) continue;
+		if (!includePrototypes && raw instanceof PrototypeFrame)
+		    continue;
 		Frame frame = (Frame) raw;
 		// Check only local value [?]
 		if (descendsFrom(frame, proto) &&
