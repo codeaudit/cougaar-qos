@@ -48,7 +48,7 @@ abstract public class Frame
     private transient FrameSet frameSet;
     private transient Logger log = Logging.getLogger(getClass().getName());
 
-    public Frame(FrameSet frameSet, String kind, UID uid, Properties properties)
+    Frame(FrameSet frameSet, String kind, UID uid, Properties properties)
     {
 	this.frameSet = frameSet;
 	this.uid = uid;
