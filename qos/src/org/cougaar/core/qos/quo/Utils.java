@@ -9,24 +9,30 @@ package org.cougaar.core.qos.quo;
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.impl.KernelImpl;
 
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.util.Properties;
+
 public class Utils 
 {
 
 
     public synchronized static QuoKernel getKernel() {
-	java.util.Properties props = new java.util.Properties();
+	return getKernel(new Properties());
+    }
+
+    public synchronized static QuoKernel getKernel(Properties props) {
 	String kconf = System.getProperty(RSSLink.RSS_PROPFILE);
 	if (kconf != null) {
 	    try {
-		java.io.InputStream is = 
-		    new java.io.FileInputStream(kconf);
+		InputStream is = new FileInputStream(kconf);
 		props.load(is);
 		is.close();
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
 	}
-	props.put("EvaluatorThread", "false");
+	props.put("quoKernel.EvaluatorThread", "false");
 	QuoKernel kernel = KernelImpl.getKernelReference(props);
 
 
