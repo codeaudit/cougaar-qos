@@ -1,0 +1,13 @@
+#!/bin/sh
+
+orb="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB -Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton -Djacorb.verbosity=0"
+logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_INSTALL_PATH/quo/bin/props/cougaar/logging.props
+#aspects="-Dorg.cougaar.message.transport.aspects=org.cougaar.lib.mquo.QuoGuiAspect"
+topology="-Dorg.cougaar.metrics.stec.mesh=true -Dorg.cougaar.metrics.topology.iorfile=${TOPOLOGY_IOR:-topology.ior}"
+
+COUGAAR_JAVA_ARGS="$logging $aspects $orb $topology"
+
+export COUGAAR_JAVA_ARGS
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+

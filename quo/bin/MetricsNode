@@ -16,7 +16,7 @@ stec=" -Dorg.cougaar.metrics.properties=http://stout/~statusquo/Metrics-Stec.con
 test="-Dorg.cougaar.metrics.test=$metric -Dorg.cougaar.metrics.key=$key -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MetricsTestAspect"
 
 
-COUGAAR_JAVA_ARGS="$orb $stec $test"
+COUGAAR_JAVA_ARGS="$orb "
 export COUGAAR_JAVA_ARGS
 
 
