@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>QuO Support Configuration</title>
+</head>
+
+<body>
+<h1>Configuration</h1>
+
+<p> The SyscondFactory is the only component supplied by this module.
+It needs to be loaded with the AgentHostUpdaterComponent. These
+modules are loaded as part of the basic Metric Service rules and will
+be part of the "Standard" node.xsl template.
+<p>
+The Acme rule is:
+<code><pre>
+agentHostUpdaterComponent = "org.cougaar.core.qos.rss.AgentHostUpdaterComponent"
+syscondFactory = "org.cougaar.lib.mquo.SyscondFactory"
+
+metrics_service_components_to_add = [agentHostUpdaterComponent, syscondFactory]
+
+society.each_node_agent() do |node_agent|
+   metrics_service_components_to_add.each { |comp|
+     node_agent.add_component do |c|
+     c.classname = comp
+     c.insertionpoint = "Node.AgentManager.Agent.MetricsServices.Component"
+     end
+    }
+end
+</pre></code>
+
+
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Thu Oct 28 15:43:29 EDT 2004
+<!-- hhmts end -->
+</body> </html>
