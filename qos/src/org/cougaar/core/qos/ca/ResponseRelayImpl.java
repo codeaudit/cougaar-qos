@@ -27,200 +27,40 @@
 package org.cougaar.core.qos.ca;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Set;
 
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.relay.Relay;
 import org.cougaar.core.util.UID;
-import org.cougaar.core.persist.NotPersistable;
 
-/**
- * Implementation of ResponseRelay.
- * <p>
- * Members in a community subscribe to Relays and respond with
- * snapshots of their own node-level matrices with a ResposneRelay. 
- */
-public final class ResponseRelayImpl
-implements ResponseRelay, Relay.Source, Relay.Target, 
-	   Serializable, NotPersistable 
+final public class ResponseRelayImpl
+    extends SimplestRelayImpl
 {
-
-    private final UID uid;
-    private final MessageAddress source;
-    // the target is transient to avoid resend on rehydration
-    private transient final MessageAddress target;
-
-    private Object reply;
-
-    private transient Set _targets;
-    private transient Relay.TargetFactory _factory;
-
-    private long timestamp;
-
-    /**
-     * Create an instance.
-     *
-     * @param uid unique object id from the UIDService 
-     * @param source the local agent's address 
-     * @param target the remote agent's address 
-     * @param reply optional initial value, which can be null
-     */
-    public ResponseRelayImpl(UID uid,
-			     MessageAddress source,
-			     MessageAddress target,
-			     Object reply,
-			     long timestamp) 
+    ResponseRelayImpl(UID uid,
+		      MessageAddress source, 
+		      MessageAddress target,
+		      Object query)
     {
-	this.uid = uid;
-	this.source = source;
-	this.target = target;
-	this.reply = reply;
-	this.timestamp = timestamp;
-	cacheTargets();
-    }
-    
-
-    public UID getUID() 
-    {
-	return uid;
+	super(uid, source, target, query);
     }
 
-    public void setUID(UID uid) 
+    Relay.TargetFactory makeFactory(MessageAddress target)
     {
-	throw new UnsupportedOperationException();
-    }
-    
-    public MessageAddress getSource() 
-    {
-	return source;
+	return new ResponseRelayImplFactory(target);
     }
 
-    public MessageAddress getTarget() 
-    {
-	return target;
-    }
-
-    public Object getReply() 
-    {
-	return reply;
-    }
-
-    public void setReply(Object reply) 
-    {
-	this.reply = reply;
-    }
-
-    // Relay.Source:
-
-    private void cacheTargets() 
-    {
-	_targets = Collections.singleton(target);
-	_factory = new ResponseRelayImplFactory(target, timestamp);
-    }
-
-    public Set getTargets() 
-    {
-	return _targets;
-    }
-
-    public Object getContent() 
-    {
-	return reply;
-    }
-
-    public Relay.TargetFactory getTargetFactory()
-    {
-	return _factory;
-    }
-    
-    public int updateResponse(MessageAddress target, Object response) 
-    {
-	if (response == null ? reply == null : response.equals(reply)) {
-	    return Relay.NO_CHANGE;
-	}
-	this.reply = response;
-	return Relay.RESPONSE_CHANGE;
-    }
-
-    // Relay.Target:
-
-    public Object getResponse() 
-    {
-        // don't respond to a response relay, let the
-        // plugin send a separate QueryRelay
-	return null;
-    }
-    public int updateContent(Object content, Token token) 
-    {
-        // set reply field, don't respond to a response relay
-	this.reply = content;
-	return Relay.NO_CHANGE;
-    }
-
-
-    // Object:
-
-    public boolean equals(Object o) 
-    {
-	if (o == this) {
-	    return true;
-	} else if (o instanceof ResponseRelayImpl) { 
-	    UID u = ((ResponseRelayImpl) o).uid;
-	    return uid.equals(u);
-	} else {
-	    return false;
-	}
-    }
-
-    public int hashCode() 
-    {
-	return uid.hashCode();
-    }
-
-    private void readObject(java.io.ObjectInputStream os) 
-	throws ClassNotFoundException, java.io.IOException 
-    {
-	os.defaultReadObject();
-	cacheTargets();
-    }
-
-    public String toString() 
-    {
-	return 
-	    "(ResponseRelayImpl"+
-	    " uid="+uid+
-	    " source="+source+
-	    " target="+target+
-	    " reply="+reply+
-	    " timestamp="+timestamp+
-	    ")";
-    }
-
-    public long getTimestamp() 
-    {
-	return timestamp;
-    }
-
-    // factory method:
 
     private static class ResponseRelayImplFactory 
 	implements Relay.TargetFactory, Serializable {
 	private final MessageAddress target;
-	private final long timestamp;
-	public ResponseRelayImplFactory(MessageAddress target,
-					long timestamp) 
-	{
+	public ResponseRelayImplFactory(MessageAddress target) {
 	    this.target = target;
-	    this.timestamp = timestamp;
 	}
 	public Relay.Target create(
 				   UID uid, MessageAddress source, Object content,
 				   Relay.Token token) {
-	    // 	long timestamp = System.currentTimeMillis();
-	    // 	UID origUID = null;
-	    // bug 3824, pass null aba-target to avoid n^2 peer copies
-	    return new ResponseRelayImpl(uid, source, null, content, timestamp);
+	    return new ResponseRelayImpl(uid, source, target, content);
 	}
     }
+
+
 }

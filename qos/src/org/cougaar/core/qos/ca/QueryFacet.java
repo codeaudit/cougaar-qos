@@ -36,6 +36,7 @@ import javax.naming.directory.Attributes;
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.relay.Relay;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.community.Community;
 import org.cougaar.core.service.community.Entity;
@@ -56,7 +57,7 @@ abstract public class QueryFacet
 {
     private String managerAttr;
     private String communityRole;
-    private QueryRelay lastQuery; // for cleaning up
+    private Relay lastQuery; // for cleaning up
     private IncrementalSubscription responseSub;
 
     protected QueryFacet(CoordinationArtifact owner,
@@ -106,9 +107,6 @@ abstract public class QueryFacet
 
 
 
-    /*
-     * 	subscribe to ResponseRelays from yourself & all DOSNODEs
-     */
     public void setupSubscriptions(BlackboardService blackboard) 
     {
 	responseSub = (IncrementalSubscription)
@@ -124,7 +122,7 @@ abstract public class QueryFacet
 	// observe added relays
 	en = responseSub.getAddedList();
 	while (en.hasMoreElements()) {
-	    ResponseRelay response = (ResponseRelay) 
+	    Relay.Source response = (Relay.Source) 
 		en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed added ResponseSub"+response);
@@ -138,7 +136,7 @@ abstract public class QueryFacet
 	// observe changed relays
 	en = responseSub.getChangedList();
 	while (en.hasMoreElements()) {
-	    ResponseRelay tr = (ResponseRelay)
+	    Relay tr = (Relay)
 		en.nextElement();
 	    // Should not happen
 	    if (log.isDebugEnabled()) {
@@ -149,7 +147,7 @@ abstract public class QueryFacet
 	// removed relays
 	en = responseSub.getRemovedList();
 	while (en.hasMoreElements()) {
-	    ResponseRelay tr = (ResponseRelay) 
+	    Relay tr = (Relay) 
 		en.nextElement();
 	    if (log.isDebugEnabled()) {			
 		log.debug("Observed removed ResponseSub"+tr);
@@ -186,9 +184,7 @@ abstract public class QueryFacet
 	// too early, but this shouldn't happen
 
 	UID uid = nextUID();
-	long timestamp = System.currentTimeMillis();
-	QueryRelay qr = 
-	    new QueryRelayImpl(uid, getAgentID(), aba, fact, timestamp);
+	Relay qr = new QueryRelayImpl(uid, getAgentID(), aba, fact);
 	if (log.isInfoEnabled()) {
 	    log.info("Sending QueryRelay from " +getAgentID() +
 		      " to all nodes in community: " + getCommunity());
@@ -196,7 +192,7 @@ abstract public class QueryFacet
 	publishQuery(qr, blackboard);
     }
 
-    protected void publishQuery(QueryRelay query, BlackboardService blackboard)
+    protected void publishQuery(Relay query, BlackboardService blackboard)
     {
         if (lastQuery != null) {
            blackboard.publishRemove(lastQuery);
@@ -212,9 +208,9 @@ abstract public class QueryFacet
      * Handle a single response.  The default is to assert it
      * immediately to the player.  Subclasses can override.
      */
-    protected void processResponse(ResponseRelay response)
+    protected void processResponse(Relay.Source response)
     {
-	Object responseFact = response.getReply();
+	Object responseFact = response.getContent();
 	if (log.isDebugEnabled())
 	    log.debug("Tranformed " +response+ " into " +responseFact);
 	if (responseFact != null) 
@@ -256,16 +252,11 @@ abstract public class QueryFacet
 
 
 
-    /**
-     * ResponseRelay subscription predicate, which matches QueryRelays where 
-     * local manager address matches either the source or target.
-     */ 
-    
     
     private UnaryPredicate ResponsePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
-		if (o instanceof ResponseRelay) {
-		    Object fact = ((ResponseRelay) o).getReply();
+		if (o instanceof ResponseRelayImpl) {
+		    Object fact = ((Relay.Source) o).getContent();
 		    return acceptFact(fact);
 		} else {
 		    return false;

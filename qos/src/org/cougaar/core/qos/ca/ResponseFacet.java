@@ -34,6 +34,7 @@ import java.util.Properties;
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.relay.Relay;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.util.UID;
 import org.cougaar.multicast.AttributeBasedAddress;
@@ -53,7 +54,7 @@ abstract public class ResponseFacet
 {
     private String managerRole;
     private HashSet completedUIDs;
-    private ResponseRelay lastResponse; // for cleaning up
+    private Relay lastResponse; // for cleaning up
     private IncrementalSubscription querySub;
 
     protected ResponseFacet(CoordinationArtifact owner,
@@ -102,7 +103,7 @@ abstract public class ResponseFacet
 	// observe added relays
 	en = querySub.getAddedList();
 	while (en.hasMoreElements()) {
-	    QueryRelay relay = (QueryRelay) en.nextElement();
+	    Relay.Source relay = (Relay.Source) en.nextElement();
 	    processQuery(relay);
 	}
 	
@@ -110,7 +111,7 @@ abstract public class ResponseFacet
 	// manager should remove them when received log seen
 	en = querySub.getChangedList();
 	while (en.hasMoreElements()) {
-	    QueryRelay tr = (QueryRelay) en.nextElement();
+	    Relay tr = (Relay) en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed changed "+tr);
 	    }
@@ -121,7 +122,7 @@ abstract public class ResponseFacet
 	// removed relays
 	en = querySub.getRemovedList();
 	while (en.hasMoreElements()) {
-	    QueryRelay tr = (QueryRelay) en.nextElement();
+	    Relay tr = (Relay) en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed removed relay: "+tr);
 	    }
@@ -158,10 +159,8 @@ abstract public class ResponseFacet
 	    blackboard.publishRemove(lastResponse);
 	}
 
-	ResponseRelay response = 
-	    new ResponseRelayImpl(uid, getAgentID(), getABA(), 
-				  reply,
-				  timestamp);
+	Relay response = 
+	    new ResponseRelayImpl(uid, getAgentID(), getABA(), reply);
 	    
 	    
 	if (log.isDebugEnabled()) {
@@ -178,7 +177,7 @@ abstract public class ResponseFacet
 
 
     // process relays
-    void processQuery(QueryRelay query)
+    void processQuery(Relay.Source query)
     {
 	UID query_id = query.getUID();
 	// check cache
@@ -200,23 +199,18 @@ abstract public class ResponseFacet
 	    log.debug("Observed added relay"+query);
 	}
 
-	Object fact = query.getQuery();
+	Object fact = query.getContent();
 	if (log.isDebugEnabled())
 	    log.debug("Updated Fact" +fact);
 	getPlayer().assertFact(fact);
     }
 
 
-    /**
-     * QueryRelay subscription predicate, which matches QueryRelays where 
-     * local manager address matches either the source or target.
-     */ 
-    
     
     private UnaryPredicate QueryPred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
-		if (o instanceof QueryRelay) {
-		    Object fact = ((QueryRelay) o).getQuery();
+		if (o instanceof QueryRelayImpl) {
+		    Object fact = ((Relay.Source) o).getContent();
 		    return acceptFact(fact);
 		} else {
 		    return false;
