@@ -13,6 +13,7 @@ import org.cougaar.lib.quo.*;
 import java.io.*;
 import java.net.URL;
 import java.util.Properties;
+import java.util.TimerTask;
 
 
 import com.bbn.quo.rmi.QuoKernel;
@@ -69,15 +70,13 @@ public class Utils
     {
 	UnixUtils.ensureLib(); // load jni lib
 	lastUsage.update();
-	Runnable logger = new Runnable() {
+	TimerTask logger = new TimerTask() {
 		public void run() {
 		    logProcessorUsage();
 		    logThreadCount();
 		}
 	    };
-	java.util.TimerTask task = threadService.getTimerTask(who, logger,
-							      "StatsLogger");
-	threadService.schedule(task, 0, 1000);
+	threadService.schedule(logger, 0, 1000);
     }
 
     public static synchronized void logMessageWithLength(long startTime, 

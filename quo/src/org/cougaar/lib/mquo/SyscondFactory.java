@@ -163,7 +163,7 @@ public final class SyscondFactory
 
 
     private class AgentHostUpdater 
-	implements Runnable
+	extends TimerTask
     {
 	private HashMap listeners;
 	private HashMap hosts;
@@ -249,10 +249,6 @@ public final class SyscondFactory
 
 	ThreadService threadService = (ThreadService)
 	    sb.getService(this, ThreadService.class, null);
-	updater = new AgentHostUpdater();
-	TimerTask task = threadService.getTimerTask(this, updater, 
-						    "AgentHostUpdater");
-	threadService.schedule(task, 0, PERIOD);
 
 	loggingService = (LoggingService) 
 	    sb.getService(this, LoggingService.class, null);
@@ -262,6 +258,9 @@ public final class SyscondFactory
 
 
 	factory = this;
+
+	updater = new AgentHostUpdater();
+	threadService.schedule(updater, 0, PERIOD);
     }
 
 
