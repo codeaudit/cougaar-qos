@@ -63,8 +63,8 @@ behavior MTInst ()
 
 	    inplaceof METHODCALL {
 		java_code #{
-		    org.cougaar.core.society.Message msg = 
-			(org.cougaar.core.society.Message) compressedMessage.getData();
+		    org.cougaar.core.mts.Message msg = 
+			(org.cougaar.core.mts.Message) compressedMessage.getData();
 		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		}#;
 	    }
@@ -82,8 +82,8 @@ behavior MTInst ()
 	    }
 	    inplaceof METHODCALL {
 		java_code #{
-		    org.cougaar.core.society.Message msg = 
-			(org.cougaar.core.society.Message) compressedMessage.getData();
+		    org.cougaar.core.mts.Message msg = 
+			(org.cougaar.core.mts.Message) compressedMessage.getData();
 		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		}#;
 	    }
@@ -98,8 +98,8 @@ behavior MTInst ()
 
 	    inplaceof METHODCALL {
 		java_code #{
-		    org.cougaar.core.society.Message msg = 
-		      (org.cougaar.core.society.Message) 
+		    org.cougaar.core.mts.Message msg = 
+		      (org.cougaar.core.mts.Message) 
 		      Zippy.unzip(compressedMessage);
 		    ((org.cougaar.core.mts.MT) 
 		     qk.getServer()).rerouteMessage(msg);
@@ -113,8 +113,8 @@ behavior MTInst ()
 	}
 	inplaceof METHODCALL {
 	    java_code #{
-		org.cougaar.core.society.Message msg = 
-		    (org.cougaar.core.society.Message) 
+		org.cougaar.core.mts.Message msg = 
+		    (org.cougaar.core.mts.Message) 
 		    Zippy.fromByteArray(message);
 		((org.cougaar.core.mts.MT) 
 		 qk.getServer()).rerouteMessage(msg);

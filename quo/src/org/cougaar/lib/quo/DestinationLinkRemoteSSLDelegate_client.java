@@ -62,10 +62,10 @@ public class DestinationLinkRemoteSSLDelegate_client implements org.cougaar.core
   final static int REMOTESSLADAPTIVESSLCAREFREE__SAMELAN = 1;
   final static int REMOTESSLADAPTIVESSLCAREFREE__WAN = 2;
 
-  public void forwardMessage(org.cougaar.core.society.Message message)  throws org.cougaar.core.mts.UnregisteredNameException, org.cougaar.core.mts.NameLookupException, org.cougaar.core.mts.CommFailureException, org.cougaar.core.mts.MisdeliveredMessageException {
+  public void forwardMessage(org.cougaar.core.mts.Message message)  throws org.cougaar.core.mts.UnregisteredNameException, org.cougaar.core.mts.NameLookupException, org.cougaar.core.mts.CommFailureException, org.cougaar.core.mts.MisdeliveredMessageException {
     remote.forwardMessage(message);
   }
-  public int cost(org.cougaar.core.society.Message message) {
+  public int cost(org.cougaar.core.mts.Message message) {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_RemoteSSL = null;
     int cost;
@@ -138,10 +138,10 @@ quo_curRegs_RemoteSSL = quo_RemoteSSL.signalAndEvalAndGetCurrentRegion(quo_sig1)
     public java.lang.Class getProtocolClass() {
     return(remote.getProtocolClass());
   }
-    public boolean retryFailedMessage(org.cougaar.core.society.Message message, int retryCount) {
+    public boolean retryFailedMessage(org.cougaar.core.mts.Message message, int retryCount) {
     return(remote.retryFailedMessage(message, retryCount));
   }
-    public org.cougaar.core.society.MessageAddress getDestination() {
+    public org.cougaar.core.mts.MessageAddress getDestination() {
     return(remote.getDestination());
   }
     public java.lang.Object getRemoteReference() {

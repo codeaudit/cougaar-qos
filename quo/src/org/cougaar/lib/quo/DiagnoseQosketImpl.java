@@ -24,7 +24,7 @@ public class DiagnoseQosketImpl
     }
 
 
-    public void runDiagnostic(org.cougaar.core.society.Message m, 
+    public void runDiagnostic(org.cougaar.core.mts.Message m, 
 			      org.cougaar.core.mts.MT remoteObj)
     {
 	try {

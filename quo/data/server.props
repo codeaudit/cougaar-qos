@@ -22,7 +22,7 @@ org.cougaar.install.path=/opt/cougaar
 # Enable or disable persistence.
 #
 # By default persistence is disabled.
-#org.cougaar.core.cluster.persistence.enabled=true
+#org.cougaar.core.persistence.enabled=true
 
 # Add the "java-io-patch" to allow Cougaar persistence.
 #
@@ -59,9 +59,9 @@ java.Xmx300m
 #
 # These are not usually modified.
 user.timezone=GMT
-org.cougaar.core.cluster.startTime=08/10/2005
+org.cougaar.core.agent.startTime=08/10/2005
 csmart.log.severity=PROBLEM
-org.cougaar.domain.planning.ldm.lps.ComplainingLP.level=0
+org.cougaar.planning.ldm.lps.ComplainingLP.level=0
 #org.cougaar.message.transport.aspects=org.cougaar.core.mts.StatisticsAspect
 
 # Default to localhost popups, which also requires that localhost

@@ -35,7 +35,7 @@ import com.bbn.quo.data.HostDS;
 import com.bbn.quo.data.RSS;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.society.MessageAddress;
+import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.mts.Debug;
 import org.cougaar.core.mts.DebugFlags;

@@ -7,7 +7,7 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
     implements java.rmi.server.Skeleton
 {
     private static final java.rmi.server.Operation[] operations = {
-	new java.rmi.server.Operation("org.cougaar.core.society.MessageAddress getMessageAddress()"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAddress getMessageAddress()"),
 	new java.rmi.server.Operation("void ignoreBytes(byte[])"),
 	new java.rmi.server.Operation("void ignoreCompressedBytes(byte[])"),
 	new java.rmi.server.Operation("void ignoreCompressedMessage(org.cougaar.lib.quo.Zippy)"),
@@ -15,7 +15,7 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 	new java.rmi.server.Operation("void receiveOnlyBytes(byte[])"),
 	new java.rmi.server.Operation("void receiveOnlyCompressedBytes(byte[])"),
 	new java.rmi.server.Operation("void receiveOnlyCompressedMessage(org.cougaar.lib.quo.Zippy)"),
-	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.core.society.Message)")
+	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.core.mts.Message)")
     };
     
     private static final long interfaceHash = 697412853093013106L;
@@ -59,7 +59,7 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 	case 0: // getMessageAddress()
 	{
 	    call.releaseInputStream();
-	    org.cougaar.core.society.MessageAddress $result = server.getMessageAddress();
+	    org.cougaar.core.mts.MessageAddress $result = server.getMessageAddress();
 	    try {
 		java.io.ObjectOutput out = call.getResultStream(true);
 		out.writeObject($result);
@@ -229,11 +229,11 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 	case 8: // rerouteMessage(Trace_rec, Message)
 	{
 	    com.bbn.quo.instr.corba.Trace_rec $param_Trace_rec_1;
-	    org.cougaar.core.society.Message $param_Message_2;
+	    org.cougaar.core.mts.Message $param_Message_2;
 	    try {
 		java.io.ObjectInput in = call.getInputStream();
 		$param_Trace_rec_1 = (com.bbn.quo.instr.corba.Trace_rec) in.readObject();
-		$param_Message_2 = (org.cougaar.core.society.Message) in.readObject();
+		$param_Message_2 = (org.cougaar.core.mts.Message) in.readObject();
 	    } catch (java.io.IOException e) {
 		throw new java.rmi.UnmarshalException("error unmarshalling arguments", e);
 	    } catch (java.lang.ClassNotFoundException e) {

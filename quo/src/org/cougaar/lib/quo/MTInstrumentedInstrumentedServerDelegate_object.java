@@ -53,10 +53,10 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
       super(port, server_sockfac, client_sockfac); 
   }
 
-  public org.cougaar.core.society.MessageAddress getMessageAddress() throws RemoteException   {
+  public org.cougaar.core.mts.MessageAddress getMessageAddress() throws RemoteException   {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_InstrumentedServer;
-    org.cougaar.core.society.MessageAddress addr;
+    org.cougaar.core.mts.MessageAddress addr;
     com.bbn.quo.corba.Association[] signal =
         new com.bbn.quo.corba.Association[0];
     com.bbn.quo.corba.SignalEvent quo_sig1;
@@ -69,7 +69,7 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
 		
     return(addr);
   }
-  public com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec record, org.cougaar.core.society.Message m) throws RemoteException   {
+  public com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec record, org.cougaar.core.mts.Message m) throws RemoteException   {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_InstrumentedServer;
     com.bbn.quo.corba.Association [] sig;
@@ -127,8 +127,8 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
     qk.serverRequestOut1(rec, length);
     // Adaptive code for inplaceof methodcall
     
-		    org.cougaar.core.society.Message msg = 
-			(org.cougaar.core.society.Message) compressedMessage.getData();
+		    org.cougaar.core.mts.Message msg = 
+			(org.cougaar.core.mts.Message) compressedMessage.getData();
 		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		
     // Adaptive code for after methodcall
@@ -154,8 +154,8 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
     // Adaptive code for inplaceof premethodcontracteval
     // Adaptive code for inplaceof methodcall
     
-		    org.cougaar.core.society.Message msg = 
-			(org.cougaar.core.society.Message) compressedMessage.getData();
+		    org.cougaar.core.mts.Message msg = 
+			(org.cougaar.core.mts.Message) compressedMessage.getData();
 		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		
     return;
@@ -171,8 +171,8 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
     // Adaptive code for inplaceof premethodcontracteval
     // Adaptive code for inplaceof methodcall
     
-		    org.cougaar.core.society.Message msg = 
-		      (org.cougaar.core.society.Message) 
+		    org.cougaar.core.mts.Message msg = 
+		      (org.cougaar.core.mts.Message) 
 		      Zippy.unzip(compressedMessage);
 		    ((org.cougaar.core.mts.MT) 
 		     qk.getServer()).rerouteMessage(msg);
@@ -190,8 +190,8 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
     // Adaptive code for inplaceof premethodcontracteval
     // Adaptive code for inplaceof methodcall
     
-		org.cougaar.core.society.Message msg = 
-		    (org.cougaar.core.society.Message) 
+		org.cougaar.core.mts.Message msg = 
+		    (org.cougaar.core.mts.Message) 
 		    Zippy.fromByteArray(message);
 		((org.cougaar.core.mts.MT) 
 		 qk.getServer()).rerouteMessage(msg);

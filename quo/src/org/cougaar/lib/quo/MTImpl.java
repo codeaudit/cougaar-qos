@@ -18,8 +18,8 @@ package org.cougaar.lib.quo;
 
 import org.cougaar.core.mts.MessageDeliverer;
 import org.cougaar.core.mts.MisdeliveredMessageException;
-import org.cougaar.core.society.Message;
-import org.cougaar.core.society.MessageAddress;
+import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.MessageAddress;
 
 public class MTImpl extends MTPOA
 {

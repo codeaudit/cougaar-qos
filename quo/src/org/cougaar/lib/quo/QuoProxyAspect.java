@@ -22,8 +22,8 @@ import org.cougaar.core.mts.MT;
 import org.cougaar.core.mts.MTImpl;
 import org.cougaar.core.mts.SocketFactory;
 import org.cougaar.core.mts.StandardAspect;
-import org.cougaar.core.society.Message;
-import org.cougaar.core.society.MessageAddress;
+import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.MessageAddress;
 
 import java.rmi.server.RMISocketFactory;
 

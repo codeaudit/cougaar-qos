@@ -45,7 +45,7 @@ public class MTDiagnoseDelegate_client implements org.cougaar.core.mts.MT {
   }
   final static int DIAGNOSE__NORMAL = 0;
 
-  public void rerouteMessage(org.cougaar.core.society.Message m) throws RemoteException {
+  public void rerouteMessage(org.cougaar.core.mts.Message m) throws RemoteException {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_Diagnose = null;
     com.bbn.quo.corba.Association [] sig;
@@ -86,12 +86,12 @@ quo_curRegs_Diagnose = quo_Diagnose.signalAndEvalAndGetCurrentRegion(quo_sig2);
         qk.registerCall(rec);
         return;
       }
-      public org.cougaar.core.society.MessageAddress getMessageAddress() throws RemoteException {
+      public org.cougaar.core.mts.MessageAddress getMessageAddress() throws RemoteException {
         // Default declarations and setup of quo introduced variables local to method:
         int[] quo_curRegs_Diagnose = null;
         com.bbn.quo.corba.Association[] sig =
             new com.bbn.quo.corba.Association[0];
-        org.cougaar.core.society.MessageAddress quo_retval;
+        org.cougaar.core.mts.MessageAddress quo_retval;
         com.bbn.quo.corba.SignalEvent quo_sig1;
         com.bbn.quo.corba.SignalEvent quo_sig2;
 

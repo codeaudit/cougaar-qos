@@ -8,7 +8,7 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
     implements org.cougaar.lib.quo.MTInstrumented, java.rmi.Remote
 {
     private static final java.rmi.server.Operation[] operations = {
-	new java.rmi.server.Operation("org.cougaar.core.society.MessageAddress getMessageAddress()"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAddress getMessageAddress()"),
 	new java.rmi.server.Operation("void ignoreBytes(byte[])"),
 	new java.rmi.server.Operation("void ignoreCompressedBytes(byte[])"),
 	new java.rmi.server.Operation("void ignoreCompressedMessage(org.cougaar.lib.quo.Zippy)"),
@@ -16,7 +16,7 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
 	new java.rmi.server.Operation("void receiveOnlyBytes(byte[])"),
 	new java.rmi.server.Operation("void receiveOnlyCompressedBytes(byte[])"),
 	new java.rmi.server.Operation("void receiveOnlyCompressedMessage(org.cougaar.lib.quo.Zippy)"),
-	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.core.society.Message)")
+	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.core.mts.Message)")
     };
     
     private static final long interfaceHash = 697412853093013106L;
@@ -52,7 +52,7 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
 	    $method_receiveOnlyBytes_5 = org.cougaar.lib.quo.MTInstrumented.class.getMethod("receiveOnlyBytes", new java.lang.Class[] {byte[].class});
 	    $method_receiveOnlyCompressedBytes_6 = org.cougaar.lib.quo.MTInstrumented.class.getMethod("receiveOnlyCompressedBytes", new java.lang.Class[] {byte[].class});
 	    $method_receiveOnlyCompressedMessage_7 = org.cougaar.lib.quo.MTInstrumented.class.getMethod("receiveOnlyCompressedMessage", new java.lang.Class[] {org.cougaar.lib.quo.Zippy.class});
-	    $method_rerouteMessage_8 = org.cougaar.lib.quo.MTInstrumented.class.getMethod("rerouteMessage", new java.lang.Class[] {com.bbn.quo.instr.corba.Trace_rec.class, org.cougaar.core.society.Message.class});
+	    $method_rerouteMessage_8 = org.cougaar.lib.quo.MTInstrumented.class.getMethod("rerouteMessage", new java.lang.Class[] {com.bbn.quo.instr.corba.Trace_rec.class, org.cougaar.core.mts.Message.class});
 	} catch (java.lang.NoSuchMethodException e) {
 	    useNewInvoke = false;
 	}
@@ -69,20 +69,20 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
     // methods from remote interfaces
     
     // implementation of getMessageAddress()
-    public org.cougaar.core.society.MessageAddress getMessageAddress()
+    public org.cougaar.core.mts.MessageAddress getMessageAddress()
 	throws java.rmi.RemoteException
     {
 	try {
 	    if (useNewInvoke) {
 		Object $result = ref.invoke(this, $method_getMessageAddress_0, null, -3927034548767378042L);
-		return ((org.cougaar.core.society.MessageAddress) $result);
+		return ((org.cougaar.core.mts.MessageAddress) $result);
 	    } else {
 		java.rmi.server.RemoteCall call = ref.newCall((java.rmi.server.RemoteObject) this, operations, 0, interfaceHash);
 		ref.invoke(call);
-		org.cougaar.core.society.MessageAddress $result;
+		org.cougaar.core.mts.MessageAddress $result;
 		try {
 		    java.io.ObjectInput in = call.getInputStream();
-		    $result = (org.cougaar.core.society.MessageAddress) in.readObject();
+		    $result = (org.cougaar.core.mts.MessageAddress) in.readObject();
 		} catch (java.io.IOException e) {
 		    throw new java.rmi.UnmarshalException("error unmarshalling return", e);
 		} catch (java.lang.ClassNotFoundException e) {
@@ -304,7 +304,7 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
     }
     
     // implementation of rerouteMessage(Trace_rec, Message)
-    public com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec $param_Trace_rec_1, org.cougaar.core.society.Message $param_Message_2)
+    public com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec $param_Trace_rec_1, org.cougaar.core.mts.Message $param_Message_2)
 	throws java.rmi.RemoteException
     {
 	try {

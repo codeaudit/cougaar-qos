@@ -46,7 +46,7 @@ public class MTCompressDelegate_client implements org.cougaar.core.mts.MT {
   final static int COMPRESS__COMPRESS = 0;
   final static int COMPRESS__NORMAL = 1;
 
-  public void rerouteMessage(org.cougaar.core.society.Message m) throws RemoteException {
+  public void rerouteMessage(org.cougaar.core.mts.Message m) throws RemoteException {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_Compress = null;
     com.bbn.quo.corba.Association[] signal =
@@ -77,12 +77,12 @@ quo_curRegs_Compress = quo_Compress.signalAndEvalAndGetCurrentRegion(quo_sig2);
              } catch( java.rmi.RemoteException post_meth_ceval_ex) {} 
         return;
       }
-      public org.cougaar.core.society.MessageAddress getMessageAddress() throws RemoteException {
+      public org.cougaar.core.mts.MessageAddress getMessageAddress() throws RemoteException {
         // Default declarations and setup of quo introduced variables local to method:
         int[] quo_curRegs_Compress = null;
         com.bbn.quo.corba.Association[] signal =
             new com.bbn.quo.corba.Association[0];
-        org.cougaar.core.society.MessageAddress quo_retval;
+        org.cougaar.core.mts.MessageAddress quo_retval;
         com.bbn.quo.corba.SignalEvent quo_sig1;
         com.bbn.quo.corba.SignalEvent quo_sig2;
 

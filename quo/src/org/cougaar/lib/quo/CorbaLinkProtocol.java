@@ -29,8 +29,8 @@ import org.cougaar.core.mts.NameLookupException;
 import org.cougaar.core.mts.UnregisteredNameException;
 import org.cougaar.core.mts.CommFailureException;
 import org.cougaar.core.mts.MisdeliveredMessageException;
-import org.cougaar.core.society.Message;
-import org.cougaar.core.society.MessageAddress;
+import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.MessageAddress;
 
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;

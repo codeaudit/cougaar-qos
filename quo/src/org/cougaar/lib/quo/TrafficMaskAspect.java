@@ -20,8 +20,8 @@ import com.bbn.quo.rmi.ValueSC;
 import com.bbn.quo.rmi.SysCond;
 import com.bbn.quo.rmi.ExpectedBandwidthSC;
 
-import org.cougaar.core.society.MessageAddress;
-import org.cougaar.core.society.MulticastMessageAddress;
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.mts.MulticastMessageAddress;
 import org.cougaar.core.mts.MessageTransportRegistry;
 
 import java.util.HashMap;

@@ -9,11 +9,11 @@ package org.cougaar.lib.quo;
 
 import java.io.*;
 
-import org.cougaar.core.society.UID;
-import org.cougaar.core.society.Message;
-import org.cougaar.core.cluster.DirectiveMessage;
-import org.cougaar.domain.planning.ldm.plan.Directive;
-import org.cougaar.domain.planning.ldm.plan.Notification;
+import org.cougaar.core.util.UID;
+import org.cougaar.core.mts.Message;
+import org.cougaar.core.blackboard.DirectiveMessage;
+import org.cougaar.planning.ldm.plan.Directive;
+import org.cougaar.planning.ldm.plan.Notification;
 
 import unix.Rusage;
 import unix.Process;

@@ -16,7 +16,7 @@ import com.bbn.quo.rmi.SysCond;
 import com.bbn.quo.rmi.DataSC;
 import com.bbn.quo.rmi.impl.RmiUtilities;
 
-import org.cougaar.core.society.Message;
+import org.cougaar.core.mts.Message;
 
 import java.rmi.Remote;
 import java.util.zip.Deflater;

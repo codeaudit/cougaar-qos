@@ -7,8 +7,8 @@ package org.cougaar.lib.quo;
 
 import org.cougaar.core.mts.DestinationLink;
 import org.cougaar.core.mts.SSLRMILinkProtocol;
-import org.cougaar.core.society.Message;
-import org.cougaar.core.society.MessageAddress;
+import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
 
 import com.bbn.quo.rmi.QuoKernel;

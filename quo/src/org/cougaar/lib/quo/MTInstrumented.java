@@ -11,8 +11,8 @@ import com.bbn.quo.instr.corba.Trace_rec;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import org.cougaar.core.society.Message;
-import org.cougaar.core.society.MessageAddress;
+import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.MessageAddress;
 
 public interface MTInstrumented extends Remote 
 {
