@@ -9,6 +9,14 @@ tag=.tag
 
 super=$(qosketroot)/instrumentation
 
+traffic_idl=Traffic.idl
+traffic_files=$(src)/$(srcdir)/TrafficMaskControl.java
+traffic_flags := -rmi
+traffic_flags += -ifdef TRAFFIC_IDL
+traffic_flags += $(idl2pkg)
+traffic_flags += -idl $(traffic_idl)
+traffic_flags += -include "quo.idl"
+
 dl_idl=DestinationLink.idl
 dl_files=$(COUGAAR_SRC_PATH)/core/src/org/cougaar/core/mts/DestinationLink.java
 dl_flags := -rmi
@@ -77,14 +85,29 @@ $(mt_inst_idl): $(mt_inst_files)
 $(dl_idl): $(dl_files)
 	$(IDLGEN) $(dl_flags) $(dl_files)
 
+$(traffic_idl): $(traffic_files)
+	$(IDLGEN) $(traffic_flags) $(traffic_files)
+
 
 # arbitrary generated files, one per csl
-compress := $(src)/$(srcdir)/Compress.java
-diagnose := $(src)/$(srcdir)/Diagnose.java
-logging := $(src)/$(srcdir)/Logging.java
-instserver := $(src)/$(srcdir)/MTInstrumentedServerAdapter.java
-
+compress=$(src)/$(srcdir)/Compress.java
+diagnose=$(src)/$(srcdir)/Diagnose.java
+logging=$(src)/$(srcdir)/Logging.java
+instserver=$(src)/$(srcdir)/MTInstrumentedServerAdapter.java
+traffic=$(src)/$(srcdir)/TrafficMask.java
 remotessl=$(src)/$(srcdir)/RemoteSSL.java
+
+# Qosket and contract
+$(traffic): RemoteSSL.idl TrafficMask.cdl $(traffic_idl)
+	$(QUOGEN) \
+	--target=client \
+	--cdl=TrafficMask.cdl \
+	--idl=$(traffic_idl) \
+	--idl=RemoteSSL.idl \
+	--idl=quo.idl \
+	--adapterqosket=org::cougaar::lib::quo::TrafficMaskQosket \
+	$(rmi_qdl_flags)
+
 
 # Qosket and contract
 $(remotessl): RemoteSSL.idl RemoteSSL.cdl $(mt_idl) $(dl_idl) RemoteSSL.asl
@@ -175,7 +198,7 @@ $(instserver): $(mt_idl) $(mt_inst_idl) Qosket.idl InstrumentedServer.asl Server
 
 
 
-$(tag): $(logging) $(diagnose)  $(compress) $(instserver) $(remotessl)
+$(tag): $(traffic) $(logging) $(diagnose)  $(compress) $(instserver) $(remotessl)
 	touch $(tag)
 
 clean:

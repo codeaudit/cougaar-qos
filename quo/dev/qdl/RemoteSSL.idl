@@ -19,6 +19,9 @@ module org {
 
 	module lib {
 	    module quo {
+		interface TrafficMaskQosket {
+		};
+
 		interface RemoteSSLQosket {
 		    void setDestinationLink(in org::cougaar::core::mts::DestinationLink link);
 		    void setServices(in org::cougaar::core::qos::monitor::ResourceMonitorService rms,

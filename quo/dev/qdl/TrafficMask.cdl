@@ -1,0 +1,80 @@
+/*
+ * =====================================================================
+ * (c) Copyright 2001  BBNT Solutions, LLC
+ * =====================================================================
+ */
+
+contract TrafficMask
+    (
+     syscond quo::ExpectedCapacitySC quo_data::ExpectedCapacitySCImpl Bandwidth,
+     syscond quo::ValueSC ValueSCImpl useMask,
+
+     syscond quo::ValueSC ValueSCImpl trust,
+
+     callback org::cougaar::lib::quo::TrafficMaskControl trafficControl
+     
+     )
+{
+  region ForceTrafficMask (useMask )
+    {}
+  region AdaptiveTrafficMask (true) {
+    region Compromised (trust == 0) {
+
+      region SameHost (Bandwidth >= 1000000)
+	{}
+      region SameLan  (Bandwidth >= 10000)
+	{}
+      region Wan  (true)  
+	{}
+   
+      transition any -> SameLan {
+	synchronous { trafficControl.turnOn(); }
+      }
+
+      transition any -> Wan {
+	synchronous { trafficControl.turnOn(); }
+      }
+
+      transition SameLan -> any {
+	synchronous { trafficControl.turnOff(); }
+      }
+
+      transition Wan -> any {
+	synchronous { trafficControl.turnOff(); }
+      }
+
+    }
+    region Suspect (trust <= 2) {
+      region SameHost (Bandwidth >= 10000000)
+	{}
+      region SameLan  (Bandwidth >= 10000)
+	{}
+      region Wan  (true)  
+	{}
+    }
+    region Normal (trust <= 5) {
+      region SameHost (Bandwidth >= 10000000)
+	{}
+      region SameLan  (Bandwidth >= 10000)
+	{}
+      region Wan  (true)  
+	{}
+      transition Wan -> any {
+	synchronous { trafficControl.turnOff(); }
+      }
+
+      transition any -> Wan {
+	synchronous { trafficControl.turnOn(); }
+      }
+
+    }
+    region CareFree (trust <= 10) {
+      region SameHost (Bandwidth >= 10000000)
+	{}
+      region SameLan  (Bandwidth >= 10000)
+	{}
+      region Wan  (true)  
+	{}
+    }
+  }
+};

@@ -1,4 +1,4 @@
-org.cougaar.lib.quo.kernel.config=/home/jzinky/cougaar/cougaar_HEAD/quo/test/configs/kernel.conf
+org.cougaar.rss.propfile=/home/jzinky/cougaar/cougaar_HEAD/quo/test/configs/kernel.conf
 org.cougaar.lib.quo.kernel.gui=true
 org.cougaar.message.transport.aspects=org.cougaar.lib.quo.RemoteSSLAspect
 org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol

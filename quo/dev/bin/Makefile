@@ -18,6 +18,7 @@ LINKS += SerializeNode
 LINKS += SimpleNode
 LINKS += StatNode
 LINKS += TraceNode
+LINKS += TrafficMaskNode
 
 
 install: $(LINKS)
@@ -70,6 +71,9 @@ StatNode:
 
 TraceNode:
 	ln -s wrapper TraceNode
+
+TrafficMaskNode:
+	ln -s wrapper TrafficMaskNode
 
 clean:
 	rm -f $(LINKS)
