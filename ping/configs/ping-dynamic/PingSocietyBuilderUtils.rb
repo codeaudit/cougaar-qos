@@ -176,15 +176,13 @@ module Cougaar
         @parameters = [
           {:numAgents => "required, The number of agents in this corset-style society configuration"},
           {:security => "optional, boolean to mark security loaded"},
-	  {:hosts => "optional, boolean to split up sinks on their own hosts"}
         ]
-        @example = "do_action 'CreateOneToOnePing', 'numAgents', 'security', 'hosts'"
+        @example = "do_action 'CreateOneToOnePing', 'numAgents', 'security'
       }
-      def initialize(run, numAgents, security="false", hosts="false")
+      def initialize(run, numAgents, security="false")
         super(run)
         @numAgents = numAgents
         @security = security
-        @hosts = hosts
       end
       def perform
 	@run.society.add_host('HOST1') do |host|
@@ -339,15 +337,22 @@ module Cougaar
 	  end
 	else
 	  @run.society.add_host('HOST2') do |host|  
+	    puts "Not Running With Hosts Enabled"
 	    host.add_node("SinkNode") do |node|
 	      node.add_agent("sink")
 	      # Add pings here
 	      i=0
-	      while i < @numSrcs
-		addPing("src#{i}", "sink")
-		# wake once every second to check ping timeouts
-		managePings('1000')
-		i+=1
+	      @run.society.add_host('HOST1') do |host2|
+	        while i < @numSrcs               
+	        puts "Adding SrcNode#{i}"
+	        host2.add_node("SrcNode#{i}") do |node|
+		  node.add_agent("src#{i}")
+		  # Add pings here
+		  addPing("src#{i}", "sink")
+		  # wake once every second to check ping timeouts
+		  managePings('1000')
+		  i+=1
+	        end
 	      end
 	    end
 	  end
