@@ -101,11 +101,12 @@ abstract public class QuoAspect extends StandardAspect
     {
 	if (TRUST == null) {
 	    try {
-		SysCond sc = kernel.bindSysCond("TrustObserver",
-						"com.bbn.quo.rmi.ValueSC",
-						"com.bbn.quo.ValueSCImpl");
-		TRUST = (ValueSC) sc;
-		TRUST.longValue(10);
+              SysCond sc = kernel.bindSysCond("TrustObserver",
+                                              "com.bbn.quo.rmi.ValueSC",
+                                              "com.bbn.quo.ValueSCImpl");
+              TRUST = (ValueSC) sc;
+              //TRUST.longValue(10);
+              TRUST.longValue(tss.getSocietyTrust());
 
 		new TrustObserver();
 	    } catch (java.rmi.RemoteException remote_ex) {
