@@ -51,6 +51,11 @@ public interface Receptacle
 
 
     /**
+     * Returns the kind of the {@link CoordinationArtifactTemplate}
+    */
+    public String getArtifactKind();
+
+    /**
      * Returns the id of the specific {@link CoordinationArtifact}
      * (not to be confused with the Template kind) which owns this
      * Facet.

@@ -67,6 +67,12 @@ public interface CoordinationArtifact
      */
     public void execute(BlackboardService service);
 
+
+    /**
+     * Returns the {@link CoordinationArtifactTemplate} kind.
+     */
+    public String getArtifactKind();
+
     /**
      * Returns the Artifact's id (not to be confused with the
      * Template's kind).

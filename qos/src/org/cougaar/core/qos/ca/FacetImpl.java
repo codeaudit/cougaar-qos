@@ -139,6 +139,11 @@ abstract public class FacetImpl
 	return owner.getArtifactId();
     }
 
+    public String getArtifactKind()
+    {
+	return owner.getArtifactKind();
+    }
+
 
 
     // Accessors
@@ -273,6 +278,11 @@ abstract public class FacetImpl
 	public String getArtifactId()
 	{
 	    return FacetImpl.this.getArtifactId();
+	}
+
+	public String getArtifactKind()
+	{
+	    return FacetImpl.this.getArtifactKind();
 	}
 
     }

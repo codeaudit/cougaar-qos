@@ -68,6 +68,12 @@ abstract public class CoordinationArtifactImpl
 
 
     // CoordinartionArtifact
+
+    public String getArtifactKind()
+    {
+	return owner.getArtifactKind();
+    }
+
     public boolean matches(ConnectionSpec spec)
     {
 	if (spec.ca_parameters == null && parameters == null) return true;
