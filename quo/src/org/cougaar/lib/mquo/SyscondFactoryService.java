@@ -20,24 +20,17 @@
  */
 package org.cougaar.lib.mquo;
 
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.component.ServiceProvider;
-import org.cougaar.core.node.NodeControlService;
-import org.cougaar.core.qos.metrics.QosComponent;
+import org.cougaar.core.component.Service;
+import org.cougaar.core.mts.MessageAddress;
 
-public final class SyscondFactory
-    extends QosComponent
+public interface SyscondFactoryService extends Service
 {
-    public void load() {
-	super.load();
 
-	ServiceBroker sb = getServiceBroker();
-	ServiceProvider sp = new SyscondFactoryServiceProvider(sb);
-
-	NodeControlService ncs = (NodeControlService)
-	    sb.getService(this, NodeControlService.class, null);
-	ServiceBroker rootsb = ncs.getRootServiceBroker();
-	rootsb.addService(SyscondFactoryService.class, sp);
-    }
+    public MetricSC getExpectedMaxMJipsForAgentSyscond(MessageAddress addr);
+    public MetricSC getExpectedEffectiveMJipsForAgentSyscond(MessageAddress addr);
+    public MetricSC getExpectedEffectiveMJipsForHostSyscond(String host);
+    public MetricSC getExpectedBandwidthForAgentSyscond(MessageAddress addr);
+    public MetricSC getExpectedBandwidthForHostSyscond(String host);
+    public MetricSC getExpectedCapacityForAgentSyscond(MessageAddress addr);
 
 }

@@ -22,22 +22,33 @@ package org.cougaar.lib.mquo;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
-import org.cougaar.core.node.NodeControlService;
-import org.cougaar.core.qos.metrics.QosComponent;
 
-public final class SyscondFactory
-    extends QosComponent
+final class SyscondFactoryServiceProvider implements ServiceProvider
 {
-    public void load() {
-	super.load();
+    private SyscondFactoryImpl impl;
 
-	ServiceBroker sb = getServiceBroker();
-	ServiceProvider sp = new SyscondFactoryServiceProvider(sb);
-
-	NodeControlService ncs = (NodeControlService)
-	    sb.getService(this, NodeControlService.class, null);
-	ServiceBroker rootsb = ncs.getRootServiceBroker();
-	rootsb.addService(SyscondFactoryService.class, sp);
+    SyscondFactoryServiceProvider(ServiceBroker sb) {
+	impl = new SyscondFactoryImpl(sb);
     }
+
+    public Object getService(ServiceBroker sb, 
+			     Object requestor, 
+			     Class serviceClass) 
+    {
+	if (serviceClass == SyscondFactoryService.class) {
+	    return impl;
+	} else {
+	    return null;
+	}
+    }
+
+    public void releaseService(ServiceBroker sb, 
+			       Object requestor, 
+			       Class serviceClass, 
+			       Object service)
+    {
+    }
+
+
 
 }
