@@ -29,6 +29,7 @@ import org.cougaar.core.qos.metrics.GossipKeyDistributionService;
 import org.cougaar.core.qos.metrics.GossipUpdateService;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.QosComponent;
+import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
@@ -41,16 +42,23 @@ import com.bbn.quo.data.DataFeedListener;
 public class GossipFeedComponent
     extends QosComponent
 {
+    public static final int PROPAGATION = 1;
+
     private GossipFeed feed;
     private ServiceBroker sb;
+    private LoggingService loggingService;
     private GossipUpdateService updateService;
     private GossipKeyDistributionService keyService;
     private MetricInterpreter interpreter = new MetricInterpreter();
+    private int propagation;
 
     public void load() {
 	super.load();
-	
 	sb = getServiceBroker();
+	loggingService = (LoggingService)
+	    sb.getService(this, LoggingService.class, null);
+
+	propagation = (int) getParameter("propagation", PROPAGATION);
 
 	feed = new GossipFeed(sb);
 
@@ -133,7 +141,7 @@ public class GossipFeedComponent
 	    super.addListenerForKey(listener, key);
 	    if (listener instanceof GossipIntegraterDS.GossipFormula) return;
 	    ensureKeyService();
-	    if (keyService != null) keyService.addKey(key);
+	    if (keyService != null) keyService.addKey(key, propagation);
 	}
     }
 

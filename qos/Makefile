@@ -1,4 +1,4 @@
-core=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
+core=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_SRC_PATH}/util/newutil.jar
 rss=${COUGAAR_SRC_PATH}/quo/dev/3rdparty/quoSumo.jar
 
 CLASSPATH=$(core):$(rss)
