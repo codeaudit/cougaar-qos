@@ -97,10 +97,10 @@ public class AgentDS
 	throws DataScope.ParameterError
     {
 	if (parameters == null || parameters.length != 1) {
-	    throw new DataScope.ParameterError("NodeDS: wrong number of parameters");
+	    throw new DataScope.ParameterError("AgentDS: wrong number of parameters");
 	}
 	if (!(parameters[0] instanceof String)) {
-	    throw new DataScope.ParameterError("NodeDS: wrong parameter type");
+	    throw new DataScope.ParameterError("AgentDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
 	    String agentname = (String) parameters[0];
@@ -215,7 +215,13 @@ public class AgentDS
 	}
     }
 
-    // Both HeardTime and SpokeTime need to be Monotonic, and they
+    public static class LastSpokeError extends AlarmFormula {
+	String getKey() {
+	    return "SpokeErrorTime";
+	}
+    }
+
+    // HeardTime, SpokeTime and SpokeErrorTime need to be Monotonic, and they
     // need to be hooked into LastHeard and LastSpoke
 
     //The raw integrater values can not be used because there is no
@@ -230,6 +236,12 @@ public class AgentDS
     public static class SpokeTime extends MonotonicLongFormula {
 	String getKey() {
 	    return "SpokeTime";
+	}
+    }	
+
+    public static class SpokeErrorTime extends MonotonicLongFormula {
+	String getKey() {
+	    return "SpokeErrorTime";
 	}
     }	
 
