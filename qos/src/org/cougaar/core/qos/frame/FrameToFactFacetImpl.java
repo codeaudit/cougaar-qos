@@ -43,7 +43,7 @@ abstract public class FrameToFactFacetImpl
     extends FacetImpl
 {
 
-    // This should check the frameset!!!
+    // This should check the frameset_name!!!
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
 		return (o instanceof Frame);
@@ -51,7 +51,7 @@ abstract public class FrameToFactFacetImpl
 	};
     private IncrementalSubscription sub;
     private LoggingService log;
-    private String xml_filename;
+    private String frameset_name;
 
     protected FrameToFactFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -61,7 +61,7 @@ abstract public class FrameToFactFacetImpl
 	super(owner, sb, spec, player);
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
-	this.xml_filename = spec.role_parameters.getProperty("frame-set");
+	this.frameset_name = spec.ca_parameters.getProperty("frame-set");
 	linkPlayer();
     }
 

@@ -104,7 +104,7 @@ public class FrameSetServicePlugin
     {
 	FrameSetParser parser = new FrameSetParser(sb, bbs);
 	FrameSet set = parser.parseFrameSetFile(xml_filename);
-	sets.put(xml_filename, set);
+	sets.put(set.getName(), set);
 
 	BlackboardService my_bbs = getBlackboardService();
 	my_bbs.signalClientActivity();
@@ -113,12 +113,12 @@ public class FrameSetServicePlugin
     }
 
     private void doCallback(FrameSetService.Callback cb,
-			    String xml_filename,
+			    String name,
 			    FrameSet set)
     {
 	// Should give the callback a read-only proxy, since writes
 	// will invoke operations on the creator's BBS.
-	cb.frameSetAvailable(xml_filename, new ReadOnlyFrameSetProxy(set));
+	cb.frameSetAvailable(name, new ReadOnlyFrameSetProxy(set));
     }
 
     private synchronized void handleCallbacks()
@@ -126,46 +126,47 @@ public class FrameSetServicePlugin
 	Iterator itr = pending.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
-	    String xml_filename = (String) entry.getKey();
+	    String name = (String) entry.getKey();
 	    FrameSet set = (FrameSet) entry.getValue();
-	    HashSet callbacks = (HashSet) pending.get(xml_filename);
+	    HashSet callbacks = (HashSet) pending.get(name);
 	    if (callbacks != null) {
 		Iterator sub_itr = callbacks.iterator();
 		while (sub_itr.hasNext()) {
 		    FrameSetService.Callback cb = (FrameSetService.Callback)
 			sub_itr.next();
-		    doCallback(cb, xml_filename, set);
+		    doCallback(cb, name, set);
 		}
-		pending.remove(xml_filename);
+		pending.remove(name);
 	    }
 	}
     }
 
 
-    private synchronized void doRequest(String xml_filename, 
-					FrameSetService.Callback cb)
+    private synchronized FrameSet doRequest(String name, 
+					    FrameSetService.Callback cb)
     {
-	FrameSet set = (FrameSet) sets.get(xml_filename);
+	FrameSet set = (FrameSet) sets.get(name);
 	if (set != null) {
-	    doCallback(cb, xml_filename, set);
+	    return new ReadOnlyFrameSetProxy(set);
 	} else {
-	    HashSet callbacks = (HashSet) pending.get(xml_filename);
+	    HashSet callbacks = (HashSet) pending.get(name);
 	    if (callbacks == null) {
 		callbacks = new HashSet();
-		pending.put(xml_filename, callbacks);
+		pending.put(name, callbacks);
 	    }
 	    callbacks.add(cb);
+	    return null;
  	}
     }
 
     private class Impl implements FrameSetService
     {
-	public void findFrameSet(String xml_filename, Callback cb)
+	public FrameSet findFrameSet(String name, Callback cb)
 	{
-	    doRequest(xml_filename, cb);
+	    return doRequest(name, cb);
 	}
 
-	public FrameSet makeFrameSet(String xml_filename, 
+	public FrameSet loadFrameSet(String xml_filename, 
 				     ServiceBroker sb,
 				     BlackboardService bbs)
 	{

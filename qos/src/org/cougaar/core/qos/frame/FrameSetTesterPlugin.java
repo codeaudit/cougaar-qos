@@ -133,7 +133,7 @@ public class FrameSetTesterPlugin
 	    BlackboardService bbs = getBlackboardService();
 	    FrameSetService fss = (FrameSetService)
 		sb.getService(this, FrameSetService.class, null);
-	    frameSet = fss.makeFrameSet(xml_filename, sb, bbs);
+	    frameSet = fss.loadFrameSet(xml_filename, sb, bbs);
 	    host1 = frameSet.findFrame("host", "name", "host1");
 	    sb.releaseService(this, FrameSetService.class, fss);
 	} else {

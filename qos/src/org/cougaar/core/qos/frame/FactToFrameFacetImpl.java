@@ -60,7 +60,7 @@ abstract public class FactToFrameFacetImpl
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
 	this.sb = sb;
-	this.xml_filename = spec.role_parameters.getProperty("frame-set");
+	this.xml_filename = spec.ca_parameters.getProperty("frame-set-file");
 	linkPlayer();
     }
 
@@ -85,7 +85,7 @@ abstract public class FactToFrameFacetImpl
 	if (frameSet != null) return;
 	FrameSetService	fss = (FrameSetService)
 	    sb.getService(this, FrameSetService.class, null);
-	frameSet = fss.makeFrameSet(xml_filename, sb, bbs);
+	frameSet = fss.loadFrameSet(xml_filename, sb, bbs);
 	sb.releaseService(this, FrameSetService.class, fss);
     }
 

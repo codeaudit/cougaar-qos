@@ -36,9 +36,9 @@ public interface FrameSetService extends Service
 	public void frameSetAvailable(String xml_filename, FrameSet set);
     }
 
-    public void findFrameSet(String xml_filename, Callback callback);
+    public FrameSet findFrameSet(String name, Callback callback);
 
-    public FrameSet makeFrameSet(String xml_filename, 
+    public FrameSet loadFrameSet(String xml_filename, 
 				 ServiceBroker sb,
 				 BlackboardService bbs);
 }
