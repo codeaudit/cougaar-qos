@@ -28,9 +28,6 @@ public class DataWrapper implements Metric, java.io.Serializable
 {
     private DataValue data;
 
-    public DataWrapper() {
-    }
-
     public DataWrapper(DataValue data) {
 	this.data = data;
     }

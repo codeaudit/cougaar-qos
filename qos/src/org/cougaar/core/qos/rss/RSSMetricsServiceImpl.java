@@ -28,6 +28,7 @@ import com.bbn.quo.data.DataFormula;
 import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
+import com.bbn.quo.data.NotificationQualifier;
 import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.SitesDB;
 import com.bbn.quo.data.RSSUtils;
@@ -36,6 +37,7 @@ import com.bbn.quo.data.RSSUtils;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.DataProvider;
 import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.qos.metrics.MetricNotificationQualifier;
 import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
 import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
@@ -101,6 +103,21 @@ public class RSSMetricsServiceImpl
 	public String getPath() {
 	    return bdf.getPath();
 	}
+    }
+
+
+    private static class Qualifier implements NotificationQualifier
+    {
+	MetricNotificationQualifier qualifier;
+
+	Qualifier(MetricNotificationQualifier qualifier) {
+	    this.qualifier = qualifier;
+	}
+
+	public synchronized boolean shouldNotify(DataValue value) {
+	    return qualifier.shouldNotify(new DataWrapper(value));
+	}
+
     }
 
     public RSSMetricsServiceImpl() {
@@ -203,10 +220,19 @@ public class RSSMetricsServiceImpl
     }
 
     public Object subscribeToValue(String path, Observer observer) {
+	return subscribeToValue(path, observer, null);
+    }
+
+    public Object subscribeToValue(String path, 
+				   Observer observer,
+				   MetricNotificationQualifier qualifier) 
+    {
 	try {
+	    Qualifier qual = 
+		qualifier == null ? null : new Qualifier(qualifier);
 	    // Defer the formula creation, since it might result in a
 	    // 'dns' lookup.
-	    BoundDataFormula bdf = new BoundDataFormula(path, true);
+	    BoundDataFormula bdf = new BoundDataFormula(path, true, qual);
 	    Runnable binder = bdf.getDelayedFormulaCreator();
 	    Schedulable bdr = threadService.getThread(this, binder, 
 						      "BoundDataFormula");
