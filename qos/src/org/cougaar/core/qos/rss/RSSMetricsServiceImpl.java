@@ -128,7 +128,6 @@ public final class RSSMetricsServiceImpl
     }
 
     public RSSMetricsServiceImpl(ServiceBroker sb, 
-				 NodeIdentifier id,
 				 MetricsUpdateService mus) 
     {
 	Properties properties = new Properties();

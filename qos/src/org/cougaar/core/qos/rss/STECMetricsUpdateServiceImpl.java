@@ -24,6 +24,7 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.naming.NS;
+import org.cougaar.core.node.NodeIdentificationService;
 import org.cougaar.core.node.NodeIdentifier;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
@@ -58,7 +59,7 @@ public class STECMetricsUpdateServiceImpl
     private TypedEventChannel channel;
     private TrivialDataFeed dataFeed;
 
-    public STECMetricsUpdateServiceImpl(ServiceBroker sb, NodeIdentifier id) {
+    public STECMetricsUpdateServiceImpl(ServiceBroker sb) {
 	this.sb = sb;
 
 	// make sure jacorb is configured
@@ -68,6 +69,10 @@ public class STECMetricsUpdateServiceImpl
 	} else {
 	    namingService = (NamingService)
 		sb.getService(this, NamingService.class, null);
+
+	    NodeIdentificationService nis = (NodeIdentificationService)
+		sb.getService(this, NodeIdentificationService.class, null);
+	    NodeIdentifier id = nis.getNodeIdentifier();
 
 	    channel = makeChannel(id);
 
