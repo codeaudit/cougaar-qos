@@ -15,11 +15,13 @@ import com.bbn.quo.*;
 
 public class Compress extends com.bbn.quo.rmi.impl.ContractImpl
 {
-  static ConstantSF constInt500;
+  static ConstantSF constDouble2_5;
+  static ConstantSF constDouble2_0;
   static ConstantSF constBooleantrue;
 
   static {
-    constInt500 = new ConstantSF(new Integer(500));
+    constDouble2_5 = new ConstantSF(new Double(2.5));
+    constDouble2_0 = new ConstantSF(new Double(2.0));
     constBooleantrue = new ConstantSF(new Boolean(true));
   }
 
@@ -93,7 +95,7 @@ public class Compress extends com.bbn.quo.rmi.impl.ContractImpl
     region.children[0].predicate =
       new DisjPairSF(
         UseCompressionSF, 
-        new LessThanSF(expectedNetworkCapacitySF, constInt500));
+        new LessThanSF(expectedNetworkCapacitySF, new MultiplySF(constDouble2_5, new DivideSF(new AddSF(expectedServerEffectiveMJipsSF, expectedClientEffectiveMJipsSF), constDouble2_0))));
 
     // subregions of Compress
     region.children[0].children = null;

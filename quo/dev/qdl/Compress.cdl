@@ -13,8 +13,16 @@ contract Compress
 
      )
 {
+  //The Threshold for when to use compression depends on the MJIPs of
+  //the client and server and the relative effectiveness of
+  //compression for reducing latency. The constant (2.5) was
+  //determined through experimentation with the Performance Society
+  //for Cougaar 8.6.1
     region Compress (UseCompression or
-		     expectedNetworkCapacity < 500 )
+		     expectedNetworkCapacity < 
+		     2.5 * ( (expectedServerEffectiveMJips +
+			      expectedClientEffectiveMJips)
+			     / 2.0))
 	{}
     region Normal (true ) 
 	{}
