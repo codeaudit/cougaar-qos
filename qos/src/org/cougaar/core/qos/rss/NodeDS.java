@@ -24,7 +24,6 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.wp.AddressEntry;
-import org.cougaar.core.service.wp.Application;
 import org.cougaar.core.service.wp.WhitePagesService;
 
 
@@ -38,8 +37,7 @@ import java.util.Set;
 public class NodeDS extends DataScope
 {
     static final String NODENAME = "nodename".intern();
-    static final Application TOPOLOGY = Application.getApplication("topology");
-    static final String SCHEME = "node";
+    static final String TOPOLOGY = "topology";
 
     public NodeDS(Object[] parameters, DataScope parent) 
 	throws DataScope.ParameterError
@@ -62,12 +60,12 @@ public class NodeDS extends DataScope
 	String nodename = (String) getSymbolValue(NODENAME);
 	String host = null;
 	try {
-	    AddressEntry entry = svc.get(nodename, TOPOLOGY, SCHEME);
+	    AddressEntry entry = svc.get(nodename, TOPOLOGY);
 	    if (entry == null) {
 		System.err.println("# Can't find host for node " +nodename);
 		host = "10.0.0.0"; // nice
 	    } else {
-		host = entry.getAddress().getHost();
+		host = entry.getURI().getHost();
 	    }
 	} catch (Exception ex) {
 	    ex.printStackTrace();

@@ -40,7 +40,6 @@ import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.service.wp.AddressEntry;
-import org.cougaar.core.service.wp.Application;
 import org.cougaar.core.service.wp.WhitePagesService;
 
 public final class AgentHostUpdaterComponent
@@ -91,9 +90,7 @@ public final class AgentHostUpdaterComponent
 	extends TimerTask 
 	implements AgentHostUpdater, EventSubscriber
     {
-	private static final Application TOPOLOGY = 
-	    Application.getApplication("topology");
-	private static final String SCHEME = "node";
+	private static final String TOPOLOGY = "topology";
 	private HashMap listeners;
 	private HashSet agents;
 	private HashMap agent_hosts;
@@ -171,8 +168,8 @@ public final class AgentHostUpdaterComponent
 	    while (itr.hasNext()) {
 		String agent = (String) itr.next();
 		try {
-		    AddressEntry entry = wpService.get(agent, TOPOLOGY,SCHEME);
-		    if (entry != null) checkHost(agent,entry.getAddress());
+		    AddressEntry entry = wpService.get(agent, TOPOLOGY);
+		    if (entry != null) checkHost(agent,entry.getURI());
 		} catch (Exception ex) {
 		}
 	    }

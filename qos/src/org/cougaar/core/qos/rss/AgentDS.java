@@ -26,7 +26,6 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Constants;
 import org.cougaar.core.service.wp.AddressEntry;
-import org.cougaar.core.service.wp.Application;
 import org.cougaar.core.service.wp.WhitePagesService;
 
 import com.bbn.quo.data.DataFormula;
@@ -40,8 +39,7 @@ public class AgentDS
     extends DataScope 
 {
     private static final String AGENTNAME = "agentname".intern();
-    static final Application TOPOLOGY = Application.getApplication("topology");
-    static final String SCHEME = "node";
+    static final String TOPOLOGY = "topology";
 
 
     public AgentDS(Object[] parameters, DataScope parent) 
@@ -68,12 +66,12 @@ public class AgentDS
 	String agentname = (String) getSymbolValue(AGENTNAME);
         String node = null;
 	try {
-	    AddressEntry entry = svc.get(agentname, TOPOLOGY, SCHEME);
+	    AddressEntry entry = svc.get(agentname, TOPOLOGY);
 	    if (entry == null) {
 		System.err.println("# Can't find node for agent " +agentname);
 		node = "FosterNode";
 	    } else {
-		node = entry.getAddress().getPath().substring(1);
+		node = entry.getURI().getPath().substring(1);
 	    }
 	} catch (Exception ex) {
 	    ex.printStackTrace();

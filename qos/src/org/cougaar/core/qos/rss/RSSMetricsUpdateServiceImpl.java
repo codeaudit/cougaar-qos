@@ -28,10 +28,6 @@ import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
-import org.cougaar.core.service.wp.AddressEntry;
-import org.cougaar.core.service.wp.Application;
-import org.cougaar.core.service.wp.Cert;
-import org.cougaar.core.service.wp.WhitePagesService;
 import org.cougaar.core.service.ThreadService;
 
 import com.bbn.quo.sysstat.DirectSysStatSupplier;
@@ -64,10 +60,6 @@ public class RSSMetricsUpdateServiceImpl
     private static final String SYSSTAT_KINDS_PROPERTY = 
 	"org.cougaar.metrics.probes";
     
-    private static final long TTL = Long.MAX_VALUE;
-    private static final Cert CERT = Cert.NULL;
-
-    private WhitePagesService wpService;
     private TrivialDataFeed dataFeed;
     private com.bbn.quo.data.DataInterpreter interpreter;
 
