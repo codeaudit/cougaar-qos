@@ -53,7 +53,7 @@ public final class SyscondFactory
     extends QosComponent
     implements DebugFlags
 {
-    private static final int PERIOD = 30000;
+    private static final int PERIOD = 3000;
     private static String local_host;
 
 
