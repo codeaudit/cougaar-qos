@@ -9,15 +9,15 @@ tag=.tag
 
 super=$(qosketroot)/instrumentation
 
-traffic_idl=Traffic.idl
-traffic_files=$(src)/$(srcdir)/TrafficMaskControl.java
+traffic_idl=gen/Traffic.idl
+traffic_files=$(src)/$(msrcdir)/TrafficMaskControl.java
 traffic_flags := -rmi
 traffic_flags += -ifdef TRAFFIC_IDL
 traffic_flags += $(idl2pkg)
 traffic_flags += -idl $(traffic_idl)
 traffic_flags += -include "quo.idl"
 
-dl_idl=DestinationLink.idl
+dl_idl=gen/DestinationLink.idl
 dl_files=$(COUGAAR_SRC_PATH)/core/src/org/cougaar/core/mts/DestinationLink.java
 dl_flags := -rmi
 dl_flags += -ifdef COUGAAR_DL
@@ -29,7 +29,7 @@ dl_flags += -interface java.lang.Class
 dl_flags += -interface java.lang.Object
 
 
-mt_idl=MT.idl
+mt_idl=gen/MT.idl
 
 mt_files=$(COUGAAR_SRC_PATH)/core/src/org/cougaar/core/mts/MT.java
 
@@ -42,9 +42,9 @@ mt_flags += -interface org.cougaar.core.mts.MessageAddress
 
 
 
-mt_inst_idl=MTInstrumented.idl
+mt_inst_idl=gen/MTInstrumented.idl
 
-mt_inst_files=$(src)/$(srcdir)/MTInstrumented.java
+mt_inst_files=$(src)/$(msrcdir)/MTInstrumented.java
 #mt_inst_files=$(COUGAAR_SRC_PATH)/$(module)/$(srcdir)/MTInstrumented.java
 
 mt_inst_flags := -rmi
@@ -55,7 +55,7 @@ mt_inst_flags += -include "quo_instr.idl"
 mt_inst_flags += -idl $(mt_inst_idl)
 mt_inst_flags += -interface org.cougaar.core.mts.Message
 mt_inst_flags += -interface org.cougaar.core.mts.MessageAddress
-mt_inst_flags += -interface org.cougaar.lib.quo.Zippy
+mt_inst_flags += -interface org.cougaar.lib.mquo.Zippy
 
 
 qdl_flags := --debuglevel=warnings
@@ -79,15 +79,19 @@ build: $(tag)
 
 
 $(mt_idl): $(mt_files)
+	mkdir -p gen
 	$(IDLGEN) $(mt_flags) $(mt_files)
 
 $(mt_inst_idl): $(mt_inst_files)
+	mkdir -p gen
 	$(IDLGEN) $(mt_inst_flags) $(mt_inst_files)
 
 $(dl_idl): $(dl_files)
+	mkdir -p gen
 	$(IDLGEN) $(dl_flags) $(dl_files)
 
 $(traffic_idl): $(traffic_files)
+	mkdir -p gen
 	$(IDLGEN) $(traffic_flags) $(traffic_files)
 
 
@@ -124,7 +128,7 @@ $(remotessl): RemoteSSL.idl RemoteSSL.cdl $(mt_idl) $(dl_idl) RemoteSSL.asl
 	--adapterqosket=org::cougaar::lib::quo::RemoteSSLQosket \
 	--delegateqosket=org::cougaar::lib::quo::RemoteSSLDelegateQosket \
 	--business=org::cougaar::core::mts::DestinationLink \
-	--qosketimpl=org.cougaar.lib.quo.RemoteSSLQosketImpl \
+	--qosketimpl=org.cougaar.lib.mquo.RemoteSSLQosketImpl \
 	--adapter=DestinationLinkRemoteSSLAdapter \
 	--asl=RemoteSSL.asl \
 	$(aspect_qdl_flags)
@@ -140,7 +144,7 @@ $(diagnose): $(mt_idl) $(mt_inst_idl)  Qosket.idl Diagnose.asl
 	--idl=quo_corba.idl \
 	--business=org::cougaar::core::mts::MT \
 	--adapter=MTDiagnoseAdapter \
-	--qosketimpl=org.cougaar.lib.quo.DiagnoseQosketImpl \
+	--qosketimpl=org.cougaar.lib.mquo.DiagnoseQosketImpl \
 	--adapterqosket=org::cougaar::lib::quo::DiagnoseQosket \
 	--delegateqosket=org::cougaar::lib::quo::DiagnoseDelegateQosket \
 	--asl=$(qosketroot)/instrumentation/qdl/InstrumentationTemplate.asl \
@@ -158,7 +162,7 @@ $(compress): $(mt_idl) $(mt_inst_idl)  Qosket.idl Compress.asl Compress.cdl
 	--idl=$(mt_idl) \
 	--business=org::cougaar::core::mts::MT \
 	--adapter=MTCompressAdapter \
-	--qosketimpl=org.cougaar.lib.quo.CompressQosketImpl \
+	--qosketimpl=org.cougaar.lib.mquo.CompressQosketImpl \
 	--adapterqosket=org::cougaar::lib::quo::CompressQosket \
 	--delegateqosket=org::cougaar::lib::quo::CompressDelegateQosket \
 	--asl=Compress.asl \
@@ -174,7 +178,7 @@ $(logging):$(mt_idl) $(mt_inst_idl)  Qosket.idl Logging.asl
 	--idl=$(mt_idl) \
 	--business=org::cougaar::core::mts::MT \
 	--adapter=MTLoggingAdapter \
-	--qosketimpl=org.cougaar.lib.quo.LoggingQosketImpl \
+	--qosketimpl=org.cougaar.lib.mquo.LoggingQosketImpl \
 	--adapterqosket=org::cougaar::lib::quo::LoggingQosket \
 	--asl=Logging.asl \
 	${rmi_qdl_flags}
@@ -188,7 +192,7 @@ $(instserver): $(mt_idl) $(mt_inst_idl) Qosket.idl InstrumentedServer.asl Server
 	--idl=$(qosketroot)/instrumentation/qdl/Instrumentation.idl \
 	--idl=$(mt_inst_idl) \
 	--idl=quo_corba.idl \
-	--business=org::cougaar::lib::quo::MTInstrumented \
+	--business=org::cougaar::lib::mquo::MTInstrumented \
 	--adapter=MTInstrumentedServerAdapter \
 	--adapterqosket=qosket::instrumentation::ServerInstrumentationQosket \
 	--delegateqosket=qosket::instrumentation::ServerInstrumentationDelegateQosket \
@@ -200,21 +204,10 @@ $(instserver): $(mt_idl) $(mt_inst_idl) Qosket.idl InstrumentedServer.asl Server
 
 
 
-$(tag): $(traffic) $(logging) $(diagnose)  $(compress) $(instserver) $(remotessl)
+$(tag): $(mt_idl) $(mt_inst_idl) $(traffic) $(logging) $(diagnose)  $(compress) $(instserver) $(remotessl)
 	touch $(tag)
 
 clean:
-	rm -rf $(tag)  $(mt_idl) $(mt_inst_idl)
-
-realclean: clean
-
-
-
-
-
-
-
-
-
+	rm -rf $(tag)  gen $(src)/$(srcdir)/*.java
 
 

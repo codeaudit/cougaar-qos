@@ -5,11 +5,12 @@
 src=$(COUGAAR_SRC_PATH)/quo/src
 root=$(COUGAAR_SRC_PATH)/quo/dev
 qosketroot=$(QUO_ROOT)/qosket
+newcore=$(COUGAAR_SRC_PATH)/core/src/org/cougaar/core/newcore.jar
 
 # COUGAAR_INSTALL_PATH and $COUGAAR_SRC_PATH should be set in the
 # $USER's environment
 
-CLASSPATH = $(classes):${newcore}:${COUGAAR_INSTALL_PATH}/lib/build.jar:${COUGAAR_INSTALL_PATH}/lib/glm.jar:${COUGAAR_INSTALL_PATH}/lib/planserver.jar:${QUO_ROOT}/lib/QuoKernel.jar:${QUO_ROOT}/lib/QuoInstr.jar:$(root):${QUO_ROOT}/lib/UnixUtils.jar:${qosketroot}/instrumentation/instrumentation.jar:${jsse}/jsse.jar:${jsse}/jnet.jar:${jsse}/jcert.jar
+CLASSPATH = $(src):${newcore}:${COUGAAR_INSTALL_PATH}/lib/build.jar:${COUGAAR_INSTALL_PATH}/lib/glm.jar:${COUGAAR_INSTALL_PATH}/lib/planserver.jar:${QUO_ROOT}/lib/QuoKernel.jar:${QUO_ROOT}/lib/QuoInstr.jar:$(root):${QUO_ROOT}/lib/UnixUtils.jar:${qosketroot}/instrumentation/instrumentation.jar
 export CLASSPATH
 
 IDL2JAVA=${JACORB_DIR}/bin/idl
@@ -18,6 +19,10 @@ IDLGEN=${QUO_ROOT}/bin/quoIdlgen
 
 srcdir=org/cougaar/lib/quo
 pkg=org.cougaar.lib.quo
+
+
+msrcdir=org/cougaar/lib/mquo
+mpkg=org.cougaar.lib.mquo
 
 
 

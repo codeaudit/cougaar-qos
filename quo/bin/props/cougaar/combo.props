@@ -1,4 +1,4 @@
-org.cougaar.message.protocol.classes=org.cougaar.core.mts.LoopbackLinkProtocol,org.cougaar.lib.quo.CorbaLinkProtocol
+org.cougaar.message.protocol.classes=org.cougaar.core.mts.LoopbackLinkProtocol,org.cougaar.lib.mquo.CorbaLinkProtocol
 
 org.cougaar.message.security=org.cougaar.core.node.DummyMessageSecurityManager
 

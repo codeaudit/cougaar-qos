@@ -7,7 +7,7 @@
 behavior InstrumentedServer ()
 {
   
-  SimpleInstrumentedServer<org::cougaar::lib::quo::MTInstrumented::rerouteMessage>;
-  SimpleInstrumentedServer<org::cougaar::lib::quo::MTInstrumented::receiveCompressedMessage>;
+  SimpleInstrumentedServer<org::cougaar::lib::mquo::MTInstrumented::rerouteMessage>;
+  SimpleInstrumentedServer<org::cougaar::lib::mquo::MTInstrumented::receiveCompressedMessage>;
 
 };

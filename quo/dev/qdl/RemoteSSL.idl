@@ -2,8 +2,8 @@
 #define REMOTESSL_IDL
 
 #include "quo.idl"
-#include "MT.idl"
-#include "DestinationLink.idl"
+#include "gen/MT.idl"
+#include "gen/DestinationLink.idl"
 
 
 module org {

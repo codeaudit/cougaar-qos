@@ -9,12 +9,11 @@ depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoRSS.jar:$(thirdparty)/QuoIn
 
 pkg=org.cougaar.lib.quo
 srcdir=org/cougaar/lib/quo
+msrcdir=org/cougaar/lib/mquo
 
 rmic_class=$(pkg).MTInstrumentedInstrumentedServerDelegate_object
-rmic_classfile=$(classes)/$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object.class
-rmic_javafile=$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object.java
 
-CLASSPATH=$(cougaar):${qos}:$(depends)
+CLASSPATH=$(cougaar):$(qos):$(depends):$(classes)
 export CLASSPATH
 
 
@@ -37,14 +36,9 @@ gen:
 	mkdir -p $(classes)
 
 
-$(rmic_classfile): $(srcdir)/MTInstrumented.java
-	rm -f $(rmic_classfile) $(rmic_javafile)
-	rmic $(rmic_class) -keep -d $(classes)
-	mv $(classes)/$(rmic_javafile) $(rmic_javafile)
-
 $(jar): $(src) 
 	javac  -d $(classes) $(src)
-	make $(rmic_classfile)
+	rmic $(rmic_class) -d $(classes)
 	jar cf $(jar) -C $(classes) .
 
 
@@ -52,7 +46,6 @@ $(jar): $(src)
 
 clean:
 	rm -rf $(jar) $(classes)
-
-
+	cd ../dev; make clean
 
 

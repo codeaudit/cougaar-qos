@@ -11,7 +11,7 @@ contract TrafficMask
 
      syscond quo::ValueSC ValueSCImpl trust,
 
-     callback org::cougaar::lib::quo::TrafficMaskControl trafficControl
+     callback org::cougaar::lib::mquo::TrafficMaskControl trafficControl
      
      )
 {

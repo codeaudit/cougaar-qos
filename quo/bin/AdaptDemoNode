@@ -8,7 +8,7 @@ firewall=-Djava.rmi.server.hostname=`hostname`.bbn.com
 
 naming="-Dorg.cougaar.core.naming.useSSL=true"
 
-quo="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/adaptdemo.props"
+quo="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/quo/bin/props/cougaar/adaptdemo.props"
 
 rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
 

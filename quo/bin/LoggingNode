@@ -1,7 +1,7 @@
 #!/bin/sh
 
 logfile=${LOGFILE:-$1.trace}
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.lib.quo.LoggingAspect -Dorg.cougaar.lib.quo.logfile=$logfile"
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.lib.mquo.LoggingAspect -Dorg.cougaar.lib.quo.logfile=$logfile"
 export COUGAAR_JAVA_ARGS
 
 # The field-separator can be set in org.cougaar.lib.quo.separator

@@ -14,7 +14,10 @@
  * </copyright>
  */
 
-package org.cougaar.lib.quo;
+package org.cougaar.lib.mquo;
+
+
+import org.cougaar.lib.quo.*;
 
 import org.cougaar.core.mts.MessageDeliverer;
 import org.cougaar.core.mts.MisdeliveredMessageException;

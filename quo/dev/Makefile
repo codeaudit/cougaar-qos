@@ -19,9 +19,5 @@ gen:
 	cd qdl; make
 
 
-
-
-
-
-
-
+clean:
+	cd qdl; make clean

@@ -1,8 +1,8 @@
 #if !defined(COUGAAR_QOSKETS)
 #define COUGAAR_QOSKETS
 
-#include "MT.idl"
-#include "MTInstrumented.idl"
+#include "gen/MT.idl"
+#include "gen/MTInstrumented.idl"
 #include "instrumentation/qdl/Instrumentation.idl"
 
 module org {
@@ -19,7 +19,7 @@ module org {
                     void runDiagnostic (in org::cougaar::core::mts::Message m, in org::cougaar::core::mts::MT mt);
                 };
                 interface CompressQosket {
-                    void setInstrumentedServer (in org::cougaar::lib::quo::MTInstrumented object);
+                    void setInstrumentedServer (in org::cougaar::lib::mquo::MTInstrumented object);
                     void setLoggingService (in org::cougaar::core::service::LoggingService log);
                 };
                 interface CompressDelegateQosket {

@@ -13,7 +13,9 @@ behavior Logging ()
 	  local long long startTime;
 	  startTime = System.currentTimeMillis();
 	  remote.rerouteMessage(m);
-	  Utils.logMessage(startTime,m); 
+	  java_code #{
+	    org.cougaar.lib.mquo.Utils.logMessage(startTime,m); 
+	  }#;
 	}
 
 

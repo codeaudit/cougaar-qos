@@ -4,7 +4,10 @@
  * =====================================================================
  */
 
-package org.cougaar.lib.quo;
+package org.cougaar.lib.mquo;
+
+
+import org.cougaar.lib.quo.*;
 
 
 import java.io.*;
@@ -21,7 +24,7 @@ import unix.Rusage;
 import unix.Process;
 import unix.UnixUtils;
 
-class Utils 
+public class Utils 
 {
     private static PrintWriter LogFile = null;
     private static char SEPR;
@@ -66,7 +69,7 @@ class Utils
 	timer.schedule(task, 0, 1000);
     }
 
-    static synchronized void logMessageWithLength(long startTime, 
+    public static synchronized void logMessageWithLength(long startTime, 
 						  Message m,
 						  int inLength,
 						  int outLength) 
@@ -81,13 +84,13 @@ class Utils
     }
 	
 
-    static synchronized void logMessage(long startTime, Message m) {
+    public static synchronized void logMessage(long startTime, Message m) {
 	if (LogFile == null) return;
 	beginLogMessage(startTime, "message", m);
 	endLogMessage(m);
     }
 
-    static synchronized void logMessage(long startTime, 
+    public static synchronized void logMessage(long startTime, 
 					long endTime,
 					Message m) 
     {
