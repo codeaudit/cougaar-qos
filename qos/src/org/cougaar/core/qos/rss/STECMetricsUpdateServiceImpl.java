@@ -40,6 +40,7 @@ import com.bbn.quo.event.sysstat.DirectSysStatSupplier;
 
 import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
+import java.util.StringTokenizer;
 import java.util.TimerTask;
 import javax.naming.Name;
 import javax.naming.NamingException;
@@ -73,6 +74,13 @@ import javax.naming.directory.BasicAttributes;
  * org.cougaar.metrics.stec.mesh is true, org.cougaar.metrics.stec is
  * ignored.
  *
+ * @property org.cougaar.metrics.probes If provided, this should be a
+ * comma-separated list of host probes, as understood by the QuO
+ * StatusTEC.  The possible choices are Bogomips, Cache, Clock,
+ * FreeMemory, TotalMemory, LoadAverage, TCPInUse, UDPInUse, Jips, and
+ * CPUCount.  By default, all choices for which a platform-specific
+ * implementation is available are used.
+ *
  * @property org.cougaar.metrics.topology.iorfile If present, and if
  * event channels are in use, the ior of the channel topology manager
  * will be written to the given file.  This allows external
@@ -84,6 +92,8 @@ public class STECMetricsUpdateServiceImpl
     implements MetricsUpdateService
 {
     private static final String RSS_DIR = "RSS";
+    private static final String SYSSTAT_KINDS_PROPERTY = 
+	"org.cougaar.metrics.probes";
     private static final String USE_TEC_PROPERTY = 
 	"org.cougaar.metrics.stec";
     private static final String USE_TOPOLOGY_PROPERTY = 
@@ -113,6 +123,16 @@ public class STECMetricsUpdateServiceImpl
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();
+	String kinds_string = System.getProperty(SYSSTAT_KINDS_PROPERTY);
+	String[] kinds = null;
+	if (kinds_string != null) {
+	    StringTokenizer tokenizer = new StringTokenizer(kinds_string, ",");
+	    kinds = new String[tokenizer.countTokens()];
+	    int i = 0;
+	    while (tokenizer.hasMoreElements()) {
+		kinds[i] = tokenizer.nextToken();
+	    }
+	}
 
 	if (use_tec()) {
 	    namingService = (NamingService)
@@ -125,7 +145,7 @@ public class STECMetricsUpdateServiceImpl
 	    channel = makeChannel(id);
 
 	    StatusSupplierSysStat sysstat =
-		new StatusSupplierSysStat(channel);
+		new StatusSupplierSysStat(kinds, channel);
 	    sysstat.schedule(3000);
 
 
@@ -135,7 +155,7 @@ public class STECMetricsUpdateServiceImpl
 	    dataFeed = new TrivialDataFeed(sb);
 	    interpreter = new MetricInterpreter();
 	    DirectSysStatSupplier supplier = 
-		new DirectSysStatSupplier(dataFeed);
+		new DirectSysStatSupplier(kinds, dataFeed);
 	    supplier.schedule(3000);
 	}
 
