@@ -8,11 +8,11 @@ jacorb.verbosity=0
 org.cougaar.core.naming.useSSL=true
 
 #Aspects
-#org.cougaar.core.mts.StepperAspect
+#org.cougaar.mts.std.StepperAspect
 org.cougaar.message.transport.aspects=org.cougaar.lib.mquo.RemoteSSLAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect
 
 #Protocols
-org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
+org.cougaar.message.protocol.classes=org.cougaar.mts.std.SSLRMILinkProtocol,org.cougaar.mts.std.RMILinkProtocol,org.cougaar.mts.std.LoopbackLinkProtocol
 
 #Debugging
 org.cougaar.message.transport.debug=policy,comm,service

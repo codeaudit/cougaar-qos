@@ -2,7 +2,7 @@
 org.cougaar.core.naming.useSSL=true
 
 # Link Protocols
-org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
+org.cougaar.message.protocol.classes=org.cougaar.mts.std.SSLRMILinkProtocol,org.cougaar.mts.std.RMILinkProtocol,org.cougaar.mts.std.LoopbackLinkProtocol
 
 # Corba ORB
 # Enables STEC
@@ -11,7 +11,7 @@ org.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton
 jacorb.verbosity=0
 
 # Aspects
-#org.cougaar.core.mts.ForwardMessageLoggingAspect
+#org.cougaar.mts.std.ForwardMessageLoggingAspect
 org.cougaar.message.transport.aspects=org.cougaar.core.mts.TrafficMaskingGeneratorAspect,org.cougaar.lib.mquo.RemoteSSLAspect,org.cougaar.lib.mquo.TrafficMaskAspect
 
 # STEC Mesh or Local

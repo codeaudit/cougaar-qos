@@ -20,7 +20,7 @@
 # </copyright>
 
 
-lp="-Dorg.cougaar.message.protocol.classes=org.cougaar.core.mts.LoopbackLinkProtocol,org.cougaar.lib.mquo.CorbaLinkProtocol"
+lp="-Dorg.cougaar.message.protocol.classes=org.cougaar.mts.std.LoopbackLinkProtocol,org.cougaar.lib.mquo.CorbaLinkProtocol"
 orb="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB -Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton -Djacorb.verbosity=0"
 
 

@@ -62,7 +62,7 @@ user.timezone=GMT
 org.cougaar.core.agent.startTime=08/10/2005
 csmart.log.severity=PROBLEM
 org.cougaar.planning.ldm.lps.ComplainingLP.level=0
-#org.cougaar.message.transport.aspects=org.cougaar.core.mts.StatisticsAspect
+#org.cougaar.message.transport.aspects=org.cougaar.mts.std.StatisticsAspect
 
 # Default to localhost popups, which also requires that localhost
 #   have "xhost +localhost" for local X authorization.
