@@ -9,14 +9,18 @@ package org.cougaar.lib.quo;
 import org.cougaar.core.mts.MT;
 import com.bbn.quo.rmi.QuoKernel;
 
+import java.rmi.server.RMISocketFactory;
 
 public class ServerWrapper
   extends MTInstrumentedServerAdapter
 {
 
-    ServerWrapper () 
+    ServerWrapper (int server_port,
+		   RMISocketFactory client_socfac, 
+		   RMISocketFactory server_socfac) 
 	throws java.rmi.RemoteException
     {
+	super(server_port, client_socfac, server_socfac);
     }	
 
 

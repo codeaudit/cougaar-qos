@@ -45,6 +45,14 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
 
   public MTInstrumentedInstrumentedServerDelegate_object() throws RemoteException {} 
 
+  public MTInstrumentedInstrumentedServerDelegate_object(
+       int port, 
+       java.rmi.server.RMISocketFactory server_sockfac,
+       java.rmi.server.RMISocketFactory client_sockfac 
+      ) throws RemoteException {
+      super(port, server_sockfac, client_sockfac); 
+  }
+
   public org.cougaar.core.society.MessageAddress getMessageAddress() throws RemoteException   {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_InstrumentedServer;

@@ -23,6 +23,7 @@ public class MTLoggingAdapter
      this.qosket  = new org.cougaar.lib.quo.LoggingQosketImpl();
   }
 
+
   public void initSysconds (com.bbn.quo.rmi.QuoKernel kernel)
   throws java.rmi.RemoteException 
   {

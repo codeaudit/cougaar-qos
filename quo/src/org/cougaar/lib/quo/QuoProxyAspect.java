@@ -20,9 +20,12 @@ package org.cougaar.lib.quo;
 import org.cougaar.core.qos.quo.Utils;
 import org.cougaar.core.mts.MT;
 import org.cougaar.core.mts.MTImpl;
+import org.cougaar.core.mts.SocketFactory;
 import org.cougaar.core.mts.StandardAspect;
 import org.cougaar.core.society.Message;
 import org.cougaar.core.society.MessageAddress;
+
+import java.rmi.server.RMISocketFactory;
 
 public class QuoProxyAspect extends StandardAspect
 {
@@ -136,9 +139,13 @@ public class QuoProxyAspect extends StandardAspect
     protected Object makeServerSideQuoProxy(MT mt)
     {
 	ServerWrapper wrapper = null;
+	RMISocketFactory socfac =
+	    (mt instanceof MTImpl) ?
+	    ((MTImpl) mt).getSocketFactory() :
+	    RMISocketFactory.getDefaultSocketFactory();
 	com.bbn.quo.rmi.QuoKernel kernel = Utils.getKernel();
 	try {
-	    wrapper = new ServerWrapper();
+	    wrapper = new ServerWrapper(0, socfac, socfac);
 	    wrapper.connect(kernel, mt);
 	    return new QuoProxy(mt, wrapper);
 	} catch (java.rmi.RemoteException ex) {

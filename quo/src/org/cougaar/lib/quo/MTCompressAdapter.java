@@ -24,6 +24,7 @@ public class MTCompressAdapter
      set_qosket (qosket);
   }
 
+
   public void initSysconds (com.bbn.quo.rmi.QuoKernel kernel)
   throws java.rmi.RemoteException 
   {

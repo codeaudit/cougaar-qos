@@ -25,6 +25,18 @@ public class MTInstrumentedServerAdapter
      set_qosket (qosket);
   }
 
+  // BQAdapter constructor for RMI, Serverside to handle socket factory 
+  public MTInstrumentedServerAdapter( 
+     int port, 
+     java.rmi.server.RMISocketFactory client_sockfac, 
+     java.rmi.server.RMISocketFactory server_sockfac
+   ) throws java.rmi.RemoteException 
+  {
+     super(port, client_sockfac,server_sockfac); 
+     this.qosket  = new com.bbn.quo.qosket.instrumentation.rmi.ServerInstrumentationQosketImpl();
+     set_qosket (qosket);
+  }
+
   public void initSysconds (com.bbn.quo.rmi.QuoKernel kernel)
   throws java.rmi.RemoteException 
   {

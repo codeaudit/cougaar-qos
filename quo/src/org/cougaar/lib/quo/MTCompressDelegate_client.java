@@ -61,10 +61,7 @@ quo_curRegs_Compress = quo_Compress.signalAndEvalAndGetCurrentRegion(quo_sig1);
       // Adaptive code for inplaceof methodcall
       switch (quo_curRegs_Compress[0]) {
       case COMPRESS__NORMAL:
-        long startTime;
-        startTime = System.currentTimeMillis();
-        qk.runSerializeOnly(m);
-        Utils.logMessage(startTime, m);
+        remote.rerouteMessage(m);
         break;
       case COMPRESS__COMPRESS:
         qk.runSerializeAndCompress(m);
