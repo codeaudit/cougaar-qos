@@ -64,7 +64,7 @@ implements ResponseRelay, Relay.Source, Relay.Target,
      * @param uid unique object id from the UIDService 
      * @param source the local agent's address 
      * @param target the remote agent's address 
-     * @param query optional initial value, which can be null
+     * @param reply optional initial value, which can be null
      */
     public ResponseRelayImpl(UID uid,
 			     MessageAddress source,
