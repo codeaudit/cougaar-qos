@@ -28,11 +28,17 @@ package org.cougaar.core.qos.ca;
 
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Iterator;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.BlackboardService;
+import org.cougaar.core.service.community.Community;
+import org.cougaar.core.service.community.Entity;
 import org.cougaar.core.util.UID;
 import org.cougaar.multicast.AttributeBasedAddress;
 import org.cougaar.util.UnaryPredicate;
@@ -201,6 +207,32 @@ public class QueryFacet
 	    log.debug("Tranformed " +response+ " into " +responseFact);
 	if (responseFact != null) 
 	    getPlayer().factAsserted(responseFact, getReceptacle());
+    }
+
+
+    protected Receptacle makeReceptacle()
+    {
+	return new QueryReceptacleImpl();
+    }
+
+
+    private class QueryReceptacleImpl 
+	extends ReceptacleImpl
+	implements QueryReceptacle
+    {
+	public int getReceiverCount()
+	{
+	    Community community = getCommunity();
+	    int count = 0;
+	    Iterator itr = community.getEntities().iterator();
+	    while (itr.hasNext()) {
+		Entity entity = (Entity) itr.next();
+		Attributes attrs = entity.getAttributes();
+		Attribute attr = attrs.get("Role");
+		if (attr != null && attr.contains(communityRole)) ++count;
+	    }
+	    return count;
+	}
     }
 
 
