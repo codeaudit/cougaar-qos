@@ -35,13 +35,11 @@ import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This class represents the piece of a Coordination Artifact that
- * exists in one particular jvm (the full artifact is distributed).
- * In the general case it's nothing but a set of parameters that are
- * used to distinguish this one from others of the same kind, and a
- * set of roles, each of which can be linked to one or more
- * RolePlayers through facets.  Subclasses can provide domain-specific
- * state.
+ * This class represents the base implementation of a {@link
+ * CoordinationArtifact}. It registers the Artifact with the broker
+ * and provides basic bookkeepiing for the {@link FacetProvider}s.
+ * Instantiation of FacetProviders must be handled in subclasses, via
+ * the makeFacetProvider method.
  *
  */
 abstract public class AbstractArtifactPlugin
@@ -51,6 +49,10 @@ abstract public class AbstractArtifactPlugin
 
     private ArrayList artifacts;
 
+    /**
+     *  Instantiable subclasses must provide this method.  Its job is
+     *  to create new FacetProviders, given a ConnectionSpec.
+     */
     abstract public FacetProvider makeFacetProvider(CoordinationArtifact owner, 
 						    ConnectionSpec spec);
 

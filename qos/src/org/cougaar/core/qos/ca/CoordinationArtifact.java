@@ -26,20 +26,33 @@
 
 package org.cougaar.core.qos.ca;
 
+/**
+ * See xxx for more detailes on CoordinationArtifacts.  At the most
+ * abstract level it has three jobs.  It must be able to identity its
+ * kind, it must be able to decide whether or not it can handle any
+ * given {@link ConnectionSpec}, and it if it can, it must handle the
+ * linkage to a {@link RolePlayer} for that spec.
+ */
 public interface CoordinationArtifact
 {
+    /**
+     * Returns the logical kind/type of the Artifact (not to be
+     * confused with the class).
+    */
     public String getArtifactKind();
 
     /**
-     * Returns true iff the FacetProvider can provided the requested
-     * Facet.  Ordinarily this depends only on the kind field of the
-     * spec.
+     * Returns true iff the Artifact can handle the given spec.  This
+     * will only be called with specs whose ca_kind field is already
+     * known to match the Artifact's kind.  The default implementation
+     * therefore returns true for all specs.
     */
     public boolean matches(ConnectionSpec spec);
 
     /**
-     * Does the linkage between the Facet and the RolePlayer for the
-     * specified role.
+     * Does the linkage between a {@link Facet}, which is generally
+     * created on the fly based on the spec and the player.
+     * .
     */
     public void provideFacet(ConnectionSpec spec, RolePlayer player);
 

@@ -35,13 +35,10 @@ import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This class represents the piece of a Coordination Artifact that
- * exists in one particular jvm (the full artifact is distributed).
- * In the general case it's nothing but a set of parameters that are
- * used to distinguish this one from others of the same kind, and a
- * set of roles, each of which can be linked to one or more
- * RolePlayers through facets.  Subclasses can provide domain-specific
- * state.
+ * This class represents the state of a particular parameterizarion of
+ * some {@link CoordinationArtifact}.  It acts an intermediary between
+ * a stateful collection of {@link Facet}s and the Artifact they
+ * 'implement' (conceptually, not in the Java sense).
  *
  */
 abstract public class FacetProviderImpl

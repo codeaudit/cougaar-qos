@@ -32,19 +32,21 @@ import org.cougaar.core.component.ServiceBroker;
 
 /**
  * This interface describes the broker service that finds artifact
- * facets for RolePlayers.
+ * facets for {@link RolePlayer}s.
  */
 public interface FacetBroker
 {
     /**
-     * When a FacetProvider plugin is avaliable for use, it should
-     * call this.  The kind is the Coordinarion Artifact kind.
+     * When an Artifact plugin is avaliable for use, it should call
+     * this. This is handled automatically for Artifacts that extend
+     * {@link AbstractArtifactPlugin}, which for now, all Artifacts
+     * are required to do,
     */
     public void registerCoordinationArtifact(CoordinationArtifact artifact);
 
 
     /**
-     * Thisi is an asynchronous that binds a RolePlayer to a Facet.
+     * This is an asynchronous that binds a RolePlayer to a Facet.
      * The desired Facet is described by the spec.  When a
      * FacetProvider is available, the facetAvailable callback will be
      * invoked on the rolePlayer.  This callback could happen inline.

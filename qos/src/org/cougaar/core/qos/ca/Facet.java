@@ -29,9 +29,9 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * A Facet represents a linkage between a specific RolePlayer role and
- * an Coordination Artifact.  This is the player's only interface to
- * the artifact.
+ * A Facet represents a {@link RolePlayer}'s viewport into a {@link
+ * CoordinationArtifact}.  This is the player's only interface to the
+ * artifact.
  */
 public interface Facet
 {

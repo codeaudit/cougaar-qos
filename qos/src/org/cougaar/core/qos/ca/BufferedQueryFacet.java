@@ -43,17 +43,18 @@ import org.cougaar.core.service.community.Entity;
 import org.cougaar.core.util.UID;
 
 /**
- * This extension of {@link QueryCoordArtPlugin} buffers replies until
- * all active members have responded, finally transforming the
- * collection responses rather than each response as it arrives.  The
- * number of expected responses is derived by counting the number of
- * Community members that match a given role.  The role itself is
- * domain specific and must therefore be provided by instantiable
- * extensions.  Similarly, the transformation is domain specific and
- * must also be provided by instantiable extensions.  The
- * transformResponse method is therefore implemented here and handles
- * the buffering, while domain specific extensions support a new
- * method to transform the entire collection.
+ * Part of the {@link QueryResponseCoordinationArtifact}, this
+ * extension of {@link QueryFacet} buffers replies until all active
+ * members have responded, finally transforming the collection
+ * responses rather than each response as it arrives.  The number of
+ * expected responses is derived by counting the number of Community
+ * members that match a given role.  The role itself is domain
+ * specific and must therefore be provided by instantiable extensions.
+ * Similarly, the transformation is domain specific and must also be
+ * provided by instantiable extensions.  The transformResponse method
+ * is therefore implemented here and handles the buffering, while
+ * domain specific extensions support a new method to transform the
+ * entire collection.
  */
 abstract public class BufferedQueryFacet
     extends QueryFacet 

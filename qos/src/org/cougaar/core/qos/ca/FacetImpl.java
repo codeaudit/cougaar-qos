@@ -43,7 +43,8 @@ import org.cougaar.multicast.AttributeBasedAddress;
 
 
 /**
- * Default implementation for the client Facet.
+ * Default implementation for Facet.  For now all Facet
+ * implementations must extend this class.
  */
 abstract public class FacetImpl // should be abstract
     implements Facet,  Observer
@@ -69,6 +70,13 @@ abstract public class FacetImpl // should be abstract
 	    return removeFirst();
 	}
     }
+
+    /**
+     * Hook for domain-specific Facet implementations to construct an
+     * ABA given a community.
+     */
+    public abstract AttributeBasedAddress makeABA(String communityName);
+
 
     protected FacetImpl(FacetProviderImpl owner, 
 			ServiceBroker sb,
@@ -175,7 +183,6 @@ abstract public class FacetImpl // should be abstract
 	finder.addObserver(this);
     }
 
-    public abstract AttributeBasedAddress makeABA(String communityName);
 
     // Observer.
     //
