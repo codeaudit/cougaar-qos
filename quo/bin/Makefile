@@ -11,6 +11,7 @@ LINKS += ComboNode.dev
 LINKS += FutileNode.dev
 LINKS += LoggingNode.dev
 LINKS += MulticastNode.dev
+LINKS += MetricsNode.dev
 LINKS += NoisyNode.dev
 LINKS += PreSerializeNode.dev
 LINKS += RemoteSSLNode.dev
@@ -53,6 +54,9 @@ LoggingNode.dev:
 	ln -s devwrapper LoggingNode.dev
 
 MulticastNode.dev:
+	ln -s devwrapper MulticastNode.dev
+
+MetricsNode.dev:
 	ln -s devwrapper MulticastNode.dev
 
 NoisyNode.dev:

@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # Word too long!  Put lots of stuff in the property file...
-
 ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password"
 
 firewall=-Djava.rmi.server.hostname=`hostname`.bbn.com
@@ -11,8 +10,9 @@ naming="-Dorg.cougaar.core.naming.useSSL=true"
 quo="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/quo/bin/props/cougaar/adaptdemo.props"
 
 rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
+iorfile=${IORFILE:-topology.ior}
 
-rss="-Dorg.cougaar.metrics.properties=$rssurl"
+rss="-Dorg.cougaar.metrics.properties=$rssurl -Dorg.cougaar.metrics.topology.iorfile=$iorfile"
 
 COUGAAR_JAVA_ARGS="$quo $rss $ssl $naming $firewall"
 export COUGAAR_JAVA_ARGS

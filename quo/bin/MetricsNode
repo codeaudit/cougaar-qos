@@ -1,0 +1,24 @@
+#!/bin/sh
+
+#  $COUGAAR_INSTALL_PATH/bin/eventgenerator.sh generates multicast traffic
+
+# The standard Node script should do this:
+orb="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB -Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton "
+
+iorfile=${IORFILE:-topology.ior}
+key=${KEY:-Host_128.89.72.1_CPU_Jips}
+metric=${METRIC:-"Host(128.89.72.1):Jips"}
+#metric=${METRIC:-"Host(`hostname`):Jips"}
+
+
+stec=" -Dorg.cougaar.metrics.properties=http://stout/~statusquo/Metrics-Stec.conf -Dorg.cougaar.metrics.topology.iorfile=$iorfile"
+
+test="-Dorg.cougaar.metrics.test=$metric -Dorg.cougaar.metrics.key=$key -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MetricsTestAspect"
+
+
+COUGAAR_JAVA_ARGS="$orb $stec $test"
+export COUGAAR_JAVA_ARGS
+
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+
