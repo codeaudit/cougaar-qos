@@ -1,0 +1,22 @@
+#!/bin/sh
+
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${QUO_ROOT}/lib
+export LD_LIBRARY_PATH
+# export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${QUO_ROOT}/lib
+
+shared="-Dorg.cougaar.thread.running.max=1 -Dorg.cougaar.message.transport.debug=thread "
+
+#aspects=" -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.PrioritizedThreadsAspect,org.cougaar.core.mts.WasteCPUAspect  -Dorg.cougaar.lib.quo.priorities=${COUGAAR_SRC_PATH}/quo/bin/props/cougaar/performance-priorities.props"
+
+
+#aspects=" -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.PercentageCPUThreadsAspect,org.cougaar.core.mts.WasteCPUAspect  -Dorg.cougaar.lib.quo.percentages=${COUGAAR_SRC_PATH}/quo/bin/props/cougaar/performance-percentages.props"
+
+
+aspects=" -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.WasteCPUAspect"
+
+COUGAAR_JAVA_ARGS="$shared $aspects"
+
+export COUGAAR_JAVA_ARGS
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+
