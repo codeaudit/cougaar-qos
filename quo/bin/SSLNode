@@ -1,17 +1,28 @@
 #!/bin/sh
+#
+#Allways use SSL and not RMI
+#
+# Testing for TCPDUMP 3.6
+# if RMI is in the clear the string "cougaar can be seen in the raw packets
+#sudo tcpdump -X -s300 host holodeck and host carob-l | grep -i cougaar
 
+#Setup the SSL Key stores
+#
+keystore="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password "
 
-ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password -Dorg.cougaar.core.naming.useSSL=true"
+#Debug
+# -Djavax.net.debug=all"
+# "-Dorg.cougaar.nameserver.verbosity=2"
+# -Dorg.cougaar.message.transport.debug=policy,comm,service"
+debug=""
 
+#Naming
+sslnaming="-Dorg.cougaar.core.naming.useSSL=true"
 
-rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
+#LinkProtocols
+sslonly="-Dorg.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol"
 
-rss="-Dorg.cougaar.metrics.properties=$rssurl"
-
-ray=" -Dorg.cougaar.nameserver.verbosity=2 -Djavax.net.debug=all"
-
-quo="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/ssl.props"
-COUGAAR_JAVA_ARGS="$quo $rss $ssl"
+COUGAAR_JAVA_ARGS="$keystore $sslonly  $debug"
 export COUGAAR_JAVA_ARGS
 
 exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*

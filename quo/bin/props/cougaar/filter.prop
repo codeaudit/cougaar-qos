@@ -1,0 +1,3 @@
+org.cougaar.message.transport.aspects=org.cougaar.core.mts.CompressingStreamsAspect,org.cougaar.core.mts.ChecksumStreamsAspect
+
+compression-level=2

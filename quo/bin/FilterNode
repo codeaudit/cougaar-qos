@@ -3,21 +3,36 @@
 #Debug
 #debug=" -Dorg.cougaar.message.transport.debug=service,comm"
 
-#logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_SRC_PATH/quo/bin/props/cougaar/logging.props
+#logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_INSTALL_PATH/quo/bin/props/cougaar/logging.props
 
 
 #Compression only
+#
 #COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.CompressingStreamsAspect -Dcompression-level=2"
 
 #Checksum only
+#
 #COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.ChecksumStreamsAspect"
 
-# Combined Compression and checksum
-# THIS DOES NOT WORK, compression must be the last stream filtering aspect
+
+# Combined Compression and checksum THIS DOES NOT WORK, compression
+# must be the last stream filtering aspect that writes anything
+#
 #COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.CompressingStreamsAspect,org.cougaar.core.mts.ChecksumStreamsAspect -Dcompression-level=2 -Dorg.cougaar.message.transport.debug=service,comm $logging"
 
 
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.ChecksumStreamsAspect,org.cougaar.core.mts.CompressingStreamsAspect -Dcompression-level=2"
+#COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MessageProtectionAspect,org.cougaar.core.mts.ChecksumStreamsAspect,org.cougaar.core.mts.CompressingStreamsAspect -Dcompression-level=2"
+
+# Protection Compression and prototype Statistics
+# This is ok with Compression, since CountBytesStreamsAspect doesn't
+# read or write anything.  
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MessageProtectionAspect,org.cougaar.core.mts.CompressingStreamsAspect,org.cougaar.core.mts.CountBytesStreamsAspect -Dcompression-level=2"
+
+
+# Measure latency
+#
+#COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.CountBytesStreamsAspect"
+
 
 
 export COUGAAR_JAVA_ARGS

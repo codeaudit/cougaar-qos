@@ -6,7 +6,7 @@ rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
 
 rss="-Dorg.cougaar.metrics.properties=$rssurl"
 
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/quo/bin/props/cougaar/compression.props -Dorg.cougaar.lib.quo.logfile=${cougaar_quo_log} -Dorg.cougaar.useBootstrapper=true $rss -Dorg.cougaar.metrics.test=${METRIC:-"Host(`hostname`):Jips"}"
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/compression.props -Dorg.cougaar.lib.quo.logfile=${cougaar_quo_log} -Dorg.cougaar.useBootstrapper=true $rss -Dorg.cougaar.metrics.test=${METRIC:-"Host(`hostname`):Jips"}"
 export COUGAAR_JAVA_ARGS
 
 # needed for JNI calls, such as thread monitoring
@@ -14,7 +14,7 @@ export COUGAAR_JAVA_ARGS
 #export LD_LIBRARY_PATH
 
 
-exec ${COUGAAR_SRC_PATH}/core/bin/Node $*
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
 
 
 
