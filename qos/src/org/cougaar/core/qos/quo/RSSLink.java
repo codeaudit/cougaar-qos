@@ -61,7 +61,6 @@ public class RSSLink extends ResourceMonitorServiceImpl
 	DataFormula jips = jips(agentAddress);
 	if (jips != null) {
 	    DataValue value = jips.query();
-	    System.out.println("===== jips DataValue=" + value);
 	    return value.getDoubleValue();
 	} else {
 	    return 0.0;
