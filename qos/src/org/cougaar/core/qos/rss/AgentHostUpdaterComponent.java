@@ -34,14 +34,19 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
-import org.cougaar.core.service.TopologyReaderService;
-import org.cougaar.core.service.TopologyEntry;
 import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.service.wp.Application;
+import org.cougaar.core.service.wp.AddressEntry;
+import org.cougaar.core.service.wp.WhitePagesService;
+import org.cougaar.core.wp.ListAllAgents;
 
 public final class AgentHostUpdaterComponent
     extends QosComponent
     implements ServiceProvider
 {
+    private static final Application TOPOLOGY = 
+	Application.getApplication("topology");
+    private static final String SCHEME = "node";
     private static final int PERIOD = 3000;
 
     private AgentHostUpdaterImpl updater;
@@ -90,7 +95,7 @@ public final class AgentHostUpdaterComponent
 	private HashMap agent_hosts;
 	private HashMap node_hosts;
 	private LoggingService loggingService;
-	private TopologyReaderService topologyService;
+	private WhitePagesService wps;
 
 	AgentHostUpdaterImpl(ServiceBroker sb) {
 	    this.listeners = new HashMap();
@@ -100,8 +105,8 @@ public final class AgentHostUpdaterComponent
 	    loggingService = (LoggingService) 
 		sb.getService(this, LoggingService.class, null);
 
-	    topologyService = (TopologyReaderService) 
-		sb.getService(this, TopologyReaderService.class, null);
+	    wps = (WhitePagesService) 
+		sb.getService(this, WhitePagesService.class, null);
 	}
 
 	public void addListener(AgentHostUpdaterListener listener,
@@ -136,23 +141,38 @@ public final class AgentHostUpdaterComponent
 
 	public void run() {
 	    // Loop over all Agents, seeing if the Host has changed,
-	    Set matches = null;
+	    Set allAgents = null;
 	    try {
-		matches = topologyService.getAllEntries(null, null, null, null,
-							null);
+		allAgents = ListAllAgents.listAllAgents(wps); // not scalable!
 	    } catch (Exception ex) {
 		// Node hasn't finished initializing yet
 		return;
 	    }
-	    if (matches == null) return;
-	    Iterator itr = matches.iterator();
-	    while (itr.hasNext()) {
-		TopologyEntry entry = (TopologyEntry) itr.next();
+	    if (allAgents == null) return;
+	    for (Iterator itr = allAgents.iterator(); itr.hasNext(); ) {
+		String agentName = (String) itr.next();
+
+                // Lookup the agent's host & node
+                String nodeName = null;
+		String new_host = null;
+                try {
+                    AddressEntry entry = wps.get(agentName, TOPOLOGY, SCHEME);
+                    if (entry != null) {
+                        new_host = entry.getAddress().getHost();
+                        nodeName = entry.getAddress().getPath().substring(1);
+                    }
+                } catch (Exception ex) {
+		    if (loggingService.isDebugEnabled())
+                        loggingService.debug("Failed lookup("+agentName+")", ex);
+                }
+                if (nodeName == null || new_host == null) {
+                    // Ignore and continue to the next agent?
+                    continue;
+                }
+		String new_node_host = new_host;
 
 		// See if the Node has moved
-		String nodeName = entry.getNode();
 		String old_node_host = (String) node_hosts.get(nodeName);
-		String new_node_host = entry.getHost();
 		if (old_node_host == null || !old_node_host.equals(new_node_host)) {
 		    // node has moved. 
 		    Object[] params = { nodeName };
@@ -163,11 +183,6 @@ public final class AgentHostUpdaterComponent
 		    node_hosts.put(nodeName, new_node_host);
 		}
 
-		String agentName = entry.getAgent();
-		//  		System.out.print("Agent " +agent);
-		// Should we restrict this to ACTIVE Agents?
-		if (entry.getStatus() != TopologyEntry.ACTIVE) continue;
-		String new_host = entry.getHost();
 		String host = (String) agent_hosts.get(agentName);
 
 		//  		System.out.println(" Old host: " +host+
