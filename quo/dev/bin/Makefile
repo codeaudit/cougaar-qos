@@ -7,6 +7,7 @@ LINKS += QuoNode
 LINKS += SSLNode
 LINKS += CorbaNode
 LINKS += ComboNode
+LINKS += FutileNode
 LINKS += NoisyNode
 LINKS += SecureNode
 LINKS += SeqNode
@@ -31,6 +32,9 @@ CorbaNode:
 
 ComboNode:
 	ln -s wrapper ComboNode
+
+FutileNode:
+	ln -s wrapper FutileNode
 
 NoisyNode:
 	ln -s wrapper NoisyNode

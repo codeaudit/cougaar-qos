@@ -10,12 +10,16 @@ export COUGAAR3RDPARTY
 
 newcore=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
 newquo=${COUGAAR_SRC_PATH}/${module}/dev/newquo.jar
+perf=${COUGAAR_SRC_PATH}/${module}/test/src/perf-society.jar
 
-COUGAAR_DEV_PATH=${newcore}:${newquo}
+#Putting perf-jar temporarily perf-society.jar
+COUGAAR_DEV_PATH=${newcore}:${newquo}:${perf}
 export COUGAAR_DEV_PATH
 
-Gets the last word of the command separated by /.  e.g QuoNode in this case
-command=`echo $0 | awk 'BEGIN { FS = "/" }; { print $NF }'`
+   
+#Gets the last word of the command separated by /.  e.g QuoNode in this case
+#command=`echo $0 | awk 'BEGIN { FS = "/" }; { print $NF }'`
+command=`basename $0`
 
 echo  ${COUGAAR_SRC_PATH}/${module}/test/bin/${command} $*
 exec ${COUGAAR_SRC_PATH}/${module}/test/bin/${command} $*
