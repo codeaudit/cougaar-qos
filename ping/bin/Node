@@ -24,22 +24,29 @@
 COUGAAR_JAVA_ARGS="
 -Dorg.cougaar.planning.ldm.lps.ComplainingLP.level=0 
 -Dorg.cougaar.core.load.planning=false
+-Dorg.cougaar.society.xsl.param.planning=false
 -Dorg.cougaar.core.agent.showtraffic=false 
 -Dorg.cougaar.core.agent.quiet=true
 -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping=DEBUG
--Dorg.cougaar.core.load.community=false
--Dorg.cougaar.core.mts.singlenode=true
--Dorg.cougaar.thread.service.type=single
--Dorg.cougaar.core.load.servlet=false
--Dorg.cougaar.metrics.trivial=true
+-Dorg.cougaar.society.xsl.param.communities=false
 -Dorg.cougaar.class.path=/home/jzinky/cougaar/HEAD/core/newcore.jar:/home/jzinky/cougaar/HEAD/mtsstd/newmts.jar:/home/jzinky/cougaar/HEAD/qos/newqos.jar:/home/jzinky/cougaar/HEAD/quo/newquo.jar:/home/jzinky/cougaar/HEAD/util/newutil.jar:/home/jzinky/cougaar/robustness/bbn/robustness.jar:/home/jzinky/cougaar/robustness/bbn/dev/3rdparty/deconfliction.jar:/home/jzinky/cougaar/HEAD/quo/dev/3rdparty/quoSumo.jar:/home/jzinky/cougaar/HEAD/ping/newping.jar
 "
+#### now Minimal Options 
+#-Dorg.cougaar.society.xsl.param.communities=false
+#-Dorg.cougaar.society.xsl.param.metrics=trivial
+#-Dorg.cougaar.society.xsl.param.servlets=false
+#-Dorg.cougaar.society.xsl.param.mts=singlenode
+#-Dorg.cougaar.thread.service.type=single
 
-#-Dorg.cougaar.thread.service.type=trivial
-#-Dorg.cougaar.core.persistence.enable=false 
-#-Dorg.cougaar.core.persistence.clear=false 
+### Persistance enable
+#-Dorg.cougaar.core.persistence.enable=true
+#-Dorg.cougaar.core.persistence.clear=true
+#-Dorg.cougaar.core.persistence.lazyInterval=10000
 
-
+## Society defination:
+# Metrics instrumentation (thread, MTS)
+# Metrics differencators (rate)
+# 
 
 export COUGAAR_JAVA_ARGS
 

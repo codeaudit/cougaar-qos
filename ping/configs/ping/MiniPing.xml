@@ -95,7 +95,7 @@ for additional usage and testing notes.
       </component>
 
       <!-- "AgentA", which sends pings to "AgentB" -->
-      <agent name='AgentA' class='org.cougaar.core.agent.SimpleAgent'>
+      <agent name='AgentA'>
         <!-- optional agent mobility support -->
 	<!--
         <component
@@ -187,7 +187,7 @@ for additional usage and testing notes.
       To make run a multi-node test, copy the "<node ..>..</node>" information
       from above and create a second node.
       -->
-      <agent name='AgentB' class='org.cougaar.core.agent.SimpleAgent'>
+      <agent name='AgentB' >
         <!-- optional agent mobility support -->
         <component
           name='mobility'

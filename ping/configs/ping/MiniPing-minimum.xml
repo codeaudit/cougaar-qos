@@ -56,7 +56,7 @@ for additional usage and testing notes.
       <vm_parameter>-Xbootclasspath/p:$COUGAAR_INSTALL_PATH/lib/javaiopatch.jar</vm_parameter>
 
       <!-- "AgentA", which sends pings to "AgentB" -->
-      <agent name='AgentA' class='org.cougaar.core.agent.SimpleAgent'>
+      <agent name='AgentA' >
         <!-- 
         Ping specific plugins.
 
@@ -89,6 +89,12 @@ for additional usage and testing notes.
           <argument>target=AgentB</argument>
           <argument>delayMillis=0</argument>
 	  <argument>eventMillis=10000</argument>
+        <!--
+	  <argument>sendFillerSize=10000</argument>
+	  <argument>sendRand=false</argument>
+	  <argument>echoFillerSize=10000</argument>
+	  <argument>echoRand=false</argument>
+        -->
         </component>
       </agent>
 
@@ -98,7 +104,7 @@ for additional usage and testing notes.
       To make run a multi-node test, copy the "<node ..>..</node>" information
       from above and create a second node.
       -->
-      <agent name='AgentB' class='org.cougaar.core.agent.SimpleAgent'>
+      <agent name='AgentB'>
         <!-- no ping plugins needed on the target agent -->
       </agent>
     </node>

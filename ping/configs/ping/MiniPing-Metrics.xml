@@ -256,7 +256,7 @@
           args=-url http://stout.bbn.com/~statusquo/QuoTestbed-Hosts.conf
         </argument>
       </component>
-      <agent name='AgentA' class='org.cougaar.core.agent.SimpleAgent'>
+      <agent name='AgentA' >
         <component
           name='mobility'
           class='org.cougaar.core.mobility.ldm.MobilityDomain'
@@ -322,15 +322,15 @@
           class='org.cougaar.ping.PingAdderPlugin'
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>
-            target=AgentB
-          </argument>
-          <argument>
-            delayMillis=0
-          </argument>
-          <argument>
-            eventMillis=10000
-          </argument>
+          <argument> target=AgentB</argument>
+          <argument> delayMillis=0 </argument>
+          <argument> eventMillis=10000 </argument>
+	  <!--
+	  <argument>sendFillerSize=10000</argument>
+	  <argument>sendRand=false</argument>
+	  <argument>echoFillerSize=10000</argument>
+	  <argument>echoRand=false</argument>
+          -->
         </component>
         <component
           name='org.cougaar.core.qos.metrics.PersistenceAdapterPlugin'
@@ -339,7 +339,7 @@
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
         </component>
       </agent>
-      <agent name='AgentB' class='org.cougaar.core.agent.SimpleAgent'>
+      <agent name='AgentB'>
         <component
           name='mobility'
           class='org.cougaar.core.mobility.ldm.MobilityDomain'
