@@ -1,27 +1,22 @@
 ##
 #  <copyright>
-#   
-#   Copyright 2002-2004 InfoEther, LLC
-#   under sponsorship of the Defense Advanced Research Projects
-#   Agency (DARPA).
-#  
-#   You can redistribute this software and/or modify it under the
-#   terms of the Cougaar Open Source License as published on the
-#   Cougaar Open Source Website (www.cougaar.org).
-#  
-#   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-#   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-#   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-#   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-#   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-#   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-#   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-#   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#   
-#  </copyright>
+#  Copyright 2002 InfoEther, LLC
+#  under sponsorship of the Defense Advanced Research Projects Agency (DARPA).
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the Cougaar Open Source License as published by
+#  DARPA on the Cougaar Open Source Website (www.cougaar.org).
+#
+#  THE COUGAAR SOFTWARE AND ANY DERIVATIVE SUPPLIED BY LICENSOR IS
+#  PROVIDED 'AS IS' WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR
+#  IMPLIED, INCLUDING (BUT NOT LIMITED TO) ALL IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, AND WITHOUT
+#  ANY WARRANTIES AS TO NON-INFRINGEMENT.  IN NO EVENT SHALL COPYRIGHT
+#  HOLDER BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT OR CONSEQUENTIAL
+#  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE OF DATA OR PROFITS,
+#  TORTIOUS CONDUCT, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+#  PERFORMANCE OF THE COUGAAR SOFTWARE.
+# </copyright>
 #
 
 require 'cougaar/communities'
@@ -318,84 +313,68 @@ module Cougaar
     end     # CreateSrcToMultSinkPing
     
     ##
-    # Two hosts multiple sink nodes/agents to one node/agent
+    # Multiple Pinger Pairs per hosts
     ## 
-    class CreateMultSrcToSinkPing < Cougaar::Action
-      numSrcs=0
+    class CreateMultPingPairsPerHost < Cougaar::Action
+      numPingers=[]
       PRIOR_STATE = "SocietyLoaded"
       RESULTANT_STATE = "SocietyLoaded"      
       DOCUMENTATION = Cougaar.document {
-	@description = "Create multiple src-to-single-sink ping society definition."
+	@description = "Create multiple pinger-pair per host society definition."
 	@parameters = [
-	  {:numSrcs => "required, The number of srcs in this single-sink ping society configuration"},
-          {:security => "optional, boolean to mark security loaded"},
-	  {:hosts => "boolean to split up srcs on their own hosts"}
+	  {:numPingers => "required, array with each cell defining the number of pinger pairs per host/node, default is one pair"}
 	]
-	@example = "do_action 'CreateMultSrcToSinkPing', numSrcs, 'security', 'hosts'"
+	@example = "do_action 'CreateMultPingPairsPerHost', 'numPingers'"
       }
-      def initialize(run, numSrcs, security="false", hosts="false")
+      def initialize(run, numPingers=[])
 	super(run)
-	@numSrcs = numSrcs
-	@security = security
-	@hosts = hosts
+	@numPingers = numPingers
       end
       def perform
-	if @hosts=="true"
-	  puts "Splitting up srcs on multiple hosts"
-	  # Add sink
-	  @run.society.add_host('HOST1') do |host|
-	    puts "Adding SinkNode"
-	    host.add_node("SinkNode") do |node|
-	      # Add src agent
-	      node.add_agent("sink")
-	    end
-	  end
-	  # Add srcs and pings
-	  # Index HOST# to be 1+i
-	  i=0
-	  tmp=0
-	  while i < @numSrcs
-	    tmp=i+2
-	    @run.society.add_host("HOST#{tmp}") do |host|
-	      puts "Adding SrcNode#{i}"
-	      host.add_node("SrcNode#{i}") do |node|
-		node.add_agent("src#{i}")
-		# Add pings here
-		addPing("src#{i}", "sink")
-		# wake once every second to check ping timeouts
-		managePings('1000')
-		i+=1
-	      end
-	    end
-	  end
+	if @numPingers.empty?
+	  puts "Can't create society with empty pinger array. Specify how you want the ping pairs distributed across hosts. \n"
+	  puts "e.g. [1,2,1]"
 	else
-	  @run.society.add_host('HOST2') do |host|  
-	    puts "Not Running With Hosts Enabled"
-            puts "Adding SinkNode"
-	    host.add_node("SinkNode") do |node|
-	      node.add_agent("sink")
-	      # Add pings here
-	      i=0
-	      @run.society.add_host('HOST1') do |host2|
-	        while i < @numSrcs               
-		  puts "Adding SrcNode#{i}"
-	          host2.add_node("SrcNode#{i}") do |node|
-		    node.add_agent("src#{i}")
-		    # Add pings here
-		    addPing("src#{i}", "sink")
-		    # wake once every second to check ping timeouts
-		    managePings('1000')
-		    i+=1
-	          end
-	        end
-	      end
+	  puts "Splitting up dest ping pairs on multiple hosts"
+	  
+	  # Add srcs
+	  @run.society.add_host('HOST1') do |host|
+	    puts "Adding SrcNode"
+	    host.add_node("SrcNode") do |node|
+	      # Add src agent
+	      node.add_agent("src")
 	    end
 	  end
-	end  
+	  
+	  # Add sinks
+	  # Index HOST# to be tmp+2 to start at 'HOST2' 
+	  tmp=2
+	  i=0
+	  while i < @numPingers.size
+	    @run.society.add_host("HOST#{tmp}") do |host|
+	      puts "Adding SinkNode#{i}"
+	      host.add_node("SinkNode#{i}") do |node|
+		
+		j=0
+		while j < @numPingers[i]
+		  node.add_agent("sink#{j}")
+		  # Add pings here
+		  addPing("src", "sink#{j}")
+		  # wake once every second to check ping timeouts
+		  managePings('1000')
+		  j+=1
+		end
+	      end
+	    end
+	    tmp+=1
+	    i+=1
+	  end	  
+	end
+	
 	# Add Manager Node / Agent & Nameserver
 	addMgntNode("HOST2", "false")
       end   # perform   
-    end  # CreateMultSrcToSinkPing 
+    end  # CreateMultPingPairsPerHost
     
   end   # Actions
 end # Cougaar

@@ -37,6 +37,7 @@ To do this, the user must uncomment & fill in one of the ping-builder actions in
   #do_action "CreateOneToOnePing", <numPairs:int>, <security:boolean>, <singlenode:boolean>
   #do_action "CreateSrcToMultSinkPing", <numsinks:int>, <security:boolean>, <hosts:boolean>
   #do_action "CreateMultSrcToSinkPing", <numsrcs:int>, <security:boolean>, <hosts:boolean>
+  #do_action "CreateMultPingPairsPerHost",<numPingers:array>
 
 The configuration options are:
 
@@ -68,6 +69,17 @@ parameters:
  <numsrcs> = # srcs in this configuration {1 sink is assumed}
  <security> = boolean in ""s to insert security mgmt node in society
  <hosts> = boolean in ""s to specify whether the multiple srcs to be split across unique hosts/nodes
+
+4. CreateMultPingPairsPerHost - Allows multiple ping pairs across multiple destination hosts. To use, supply the action an array which 
+describes how you want the ping pairs laid out across multiple destination hosts. There will be one SrcNode, one src agent which pings 
+either single or multiple pingees across multiple hosts. 
+
+For example: 
+ CreateMultPingPairsPerHost, [1,2]  will create one ping pair on an arbiturary 'HOST1', and the src agent will also ping two other sink 
+agents on another host, 'HOST2.
+
+parameters: 
+ <numPingers> = array specifying the layout of the distributed ping pairs
 
 =======
 To Run:

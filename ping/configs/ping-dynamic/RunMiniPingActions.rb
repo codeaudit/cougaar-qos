@@ -41,6 +41,7 @@ Cougaar.new_experiment("Mini-Ping").run(1) {
   #do_action "CreateOneToOnePing", <numPairs:int>, <security:boolean>
   #do_action "CreateSrcToMultSinkPing", <numsinks:int>, <security:boolean>, <hosts:boolean>
   #do_action "CreateMultSrcToSinkPing", <numsrcs:int>, <security:boolean>, <hosts:boolean>
+  #do_action "CreateMultPingPairsPerHost", <numPingers:array>
 
   do_action "MapHosts", HOSTS_FILE
 
