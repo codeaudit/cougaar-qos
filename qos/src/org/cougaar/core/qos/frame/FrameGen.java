@@ -199,6 +199,8 @@ public class FrameGen
     {
 	String accessor_name = fix_name(slot, true);
 	String fixed_name = fix_name(slot, false);
+
+	// Getter
 	writer.println("\n\n    public Object get" +accessor_name+ "()");
 	writer.println("    {");
 	writer.println("        if (" +fixed_name+ " != null)");
@@ -207,11 +209,20 @@ public class FrameGen
 	writer.println("            return getInheritedValue(this, \"" +slot+ "\");");
 	writer.println("    }");
 
+	// Setter
 	writer.println("\n\n    public void set" +accessor_name+
 		       "(Object new_value)");
 	writer.println("    {");
 	writer.println("        this." +fixed_name+ " = new_value;");
 	writer.println("        slotModified(\"" +slot+ "\", new_value);");
+	writer.println("    }");
+
+	// Initializer
+	writer.println("\n\n    public void initialize" +accessor_name+
+		       "(Object new_value)");
+	writer.println("    {");
+	writer.println("        this." +fixed_name+ " = new_value;");
+	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
 	writer.println("    }");
     }
 

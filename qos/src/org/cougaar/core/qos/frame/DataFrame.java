@@ -79,7 +79,7 @@ public class DataFrame
 	    log.error("Error making frame", ex);
 	    return null;
 	}
-	frame.setValues(values);
+	frame.initializeValues(values);
 	return frame;
     }
 

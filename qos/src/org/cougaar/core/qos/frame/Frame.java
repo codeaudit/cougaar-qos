@@ -71,6 +71,13 @@ abstract public class Frame
 	if (frameSet != null) frameSet.valueUpdated(this, slot, value);
     }
 
+    protected void slotInitialized(String slot, Object value)
+    {
+	synchronized (localSlots) {
+	    localSlots.add(slot);
+	}
+    }
+
     void copyToFrameSet(FrameSet frameSet)
     {
 	try {
@@ -243,6 +250,24 @@ abstract public class Frame
 	}
     }
 
+    private void initializeLocalValue(String slot, Object value)
+    {
+	// reflection
+	Class klass = getClass();
+	String mname = "initialize" + FrameGen.fix_name(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
+	    Object[] args1 = { value };
+	    meth.invoke(this, args1);
+	    if (log.isInfoEnabled())
+		log.info("Initializing slot " +slot+ " of " +this+ 
+			 " to " + value);
+	} catch (Exception ex) {
+	    log.error("Error initializing slot " +slot+ " of " +this+
+		      " via " +mname);
+	}
+    }
+
     protected Object getInheritedValue(Frame origin, String slot)
     {
 	if (frameSet == null) return null;
@@ -264,12 +289,12 @@ abstract public class Frame
 	setLocalValue(slot, value);
     }
 
-    public void setValues(Properties values)
+    public void initializeValues(Properties values)
     {
 	Iterator itr = values.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
-	    setLocalValue((String) entry.getKey(), entry.getValue());
+	    initializeLocalValue((String) entry.getKey(), entry.getValue());
 	}
     }
 

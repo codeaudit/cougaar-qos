@@ -462,16 +462,19 @@ public class SingleInheritanceFrameSet
     }
 
 
-    public void processQueue()
+    // Synchronized for a shorter time but doesn't work reliably.
+    // Sometimes items are added while this is in progress and
+    // execute doesn't run again.
+    public void processQueueSometimes()
     {
-	ArrayList copy = null;
+	ArrayList changes = null;
 	synchronized (change_queue_lock) {
-	    copy = change_queue;
+	    changes = new ArrayList(change_queue);
 	    change_queue = new ArrayList();
 	}
-	int count = copy.size();
+	int count = changes.size();
 	for (int i=0; i<count; i++) {
-	    Object change = copy.get(i);
+	    Object change = changes.get(i);
 	    if (change instanceof Change) {
 		Change chng = (Change) change;
 		bbs.publishChange(chng.object, chng.changes);
@@ -482,6 +485,27 @@ public class SingleInheritanceFrameSet
 		Remove rem = (Remove) change;
 		bbs.publishRemove(rem.object);
 	    }
+	}
+    }
+
+    public void processQueue()
+    {
+	synchronized (change_queue_lock) {
+	    int count = change_queue.size();
+	    for (int i=0; i<count; i++) {
+		Object change = change_queue.get(i);
+		if (change instanceof Change) {
+		    Change chng = (Change) change;
+		    bbs.publishChange(chng.object, chng.changes);
+		} else  if (change instanceof Add) {
+		    Add add = (Add) change;
+		    bbs.publishAdd(add.object);
+		} else  if (change instanceof Remove) {
+		    Remove rem = (Remove) change;
+		    bbs.publishRemove(rem.object);
+		}
+	    }
+	    change_queue.clear();
 	}
     }
 	
