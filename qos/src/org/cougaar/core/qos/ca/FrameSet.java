@@ -26,6 +26,7 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.util.Properties;
 
 public interface FrameSet
 {
@@ -37,7 +38,9 @@ public interface FrameSet
 
     public void setFrameValue(Frame frame, String attribute, Object value);
 
-    public void addFrame(Frame frame);
+    public Frame makeFrame(String kind, Properties attributes);
+
+    public Frame makePrototype(Properties properties);
 
     public void removeFrame(Frame frame);
 

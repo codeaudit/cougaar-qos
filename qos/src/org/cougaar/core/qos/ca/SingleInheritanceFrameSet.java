@@ -28,50 +28,60 @@ package org.cougaar.core.qos.ca;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Properties;
+
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.UIDService;
+import org.cougaar.core.util.UID;
 
 
 public class SingleInheritanceFrameSet
     implements FrameSet
 {
+    private UIDService uids;
     private HashSet kb;
-    private Frame parent_relation;
     private HashMap prototypes, parents;
-    private String parent_relation_name,
-	parent_slot,
-	child_slot,
-	parent_kind,
-	child_kind,
-	parent_id_slot,
-	child_id_slot;
+    private String 
+	parent_relation,
+	parent_kind_slot,
+	parent_slot_slot,
+	parent_value_slot,
+	child_kind_slot,
+	child_slot_slot,
+	child_value_slot;
+    
 
-    public SingleInheritanceFrameSet(Frame parent_relation)
+    public SingleInheritanceFrameSet(ServiceBroker sb,
+				     String parent_relation,
+				     String parent_slot,
+				     String child_slot,
+				     String parent_kind,
+				     String child_kind,
+				     String parent_id_slot,
+				     String child_id_slot)
     {
+	uids = (UIDService)
+	    sb.getService(this, UIDService.class, null);
+
 	this.kb = new HashSet();
 	this.prototypes = new HashMap();
 	this.parents = new HashMap();
+
+	// The kind tag of Frames representing a parent-child relationship
 	this.parent_relation = parent_relation;
-	// The parent_relation frame must look like this:
-	// (parent-relation (name <relationship-name>)
-	//                  (parent-slot-name <slot-name>)
-	//                  (child-slot-name <slot-name>)
-	//                  (parent-kind <kind-name>)
-	//                  (child-kind <kind-name>)
-	//                  (parent-identifier-slot-name <slot-name>)
-	//                  (child-identifier-slot-name <slot-name>))
-	// 
-	// Cache these values for faster access
-	this.parent_relation_name = (String)
-	    parent_relation.getValue("name");
-	this.parent_slot = (String)
-	    parent_relation.getValue("parent-slot-name");
-	this.child_slot = (String)
-	    parent_relation.getValue("child-slot-name");
-	this.parent_kind = (String) parent_relation.getValue("parent-kind");
-	this.child_kind = (String) parent_relation.getValue("child-kind");
-	this.parent_id_slot = (String)
-	    parent_relation.getValue("parent-identifier-slot-name");
-	this.child_id_slot = (String)
-	    parent_relation.getValue("parent-identifier-slot-name");
+
+	// Any given Frame of this kind will have three slots each,
+	// for the parent and child respectively: a kind, a slot, and
+	// value.  The names of these six slots in the relation Frame
+	// are given here
+
+	this.parent_kind_slot = parent_kind_slot;
+	this.parent_slot_slot = parent_slot_slot;
+	this.parent_value_slot = parent_value_slot;
+
+	this.child_kind_slot = child_kind_slot;
+	this.child_slot_slot = child_slot_slot;
+	this.child_value_slot = child_value_slot;
     }
 
     public Frame findFrame(String kind, String slot, Object value)
@@ -99,27 +109,53 @@ public class SingleInheritanceFrameSet
     public void setFrameValue(Frame frame, String attribute, Object value)
     {
 	frame.setValue(attribute, value);
+	// **** TBD ****
 	// handle the modification of parent-child relationship frames
     }
 
-    public void addFrame(Frame frame)
+    public Frame makeFrame(String kind, Properties values)
     {
-	synchronized (kb) {
-	    kb.add(frame);
-	}
-	if (frame.getKind().equals(PROTOTYPE)) {
-	    // cache a prototype
-	    String name = (String) frame.getValue("name");
-	    synchronized (prototypes) { prototypes.put(name, frame); }
-	} else if (frame.getKind().equals(parent_relation_name)) {
+	UID uid = uids.nextUID();
+	Frame result = new Frame(kind, uid, values);
+
+	if (kind.equals(parent_relation)) {
 	    // cache a parent-child relationship
-	    Object parent_id = frame.getValue(parent_slot);
-	    Object child_id = frame.getValue(child_slot);
-	    Frame parent = findFrame(parent_kind, parent_id_slot, parent_id);
-	    Frame child = findFrame(child_kind, child_id_slot, child_id);
+	    String parent_kind = (String)
+		result.getValue(parent_kind_slot);
+	    String parent_slot = (String)
+		result.getValue(parent_slot_slot);
+	    Object parent_value = result.getValue(parent_value_slot);
+
+	    String child_kind = (String)
+		result.getValue(child_kind_slot);
+	    String child_slot = (String)
+		result.getValue(child_slot_slot);
+	    Object child_value = result.getValue(child_value_slot);
+
+	    Frame parent = findFrame(parent_kind, parent_slot, parent_value);
+	    Frame child = findFrame(child_kind, child_slot, child_value);
 	    synchronized (parents) {
 		parents.put(child, parent);
 	    }
+	}
+	addFrame(result);
+	return result;
+    }
+
+    public Frame makePrototype(Properties values)
+    {
+	UID uid = uids.nextUID();
+	Frame result = new Frame(PROTOTYPE, uid, values);
+	String name = (String) result.getValue("name");
+	synchronized (prototypes) { prototypes.put(name, result); }
+	addFrame(result);
+	return result;
+    }
+
+    private void addFrame(Frame frame)
+    {
+	synchronized (kb) {
+	    kb.add(frame);
 	}
     }
 
@@ -132,10 +168,11 @@ public class SingleInheritanceFrameSet
 	    String name = (String) frame.getValue("name");
 	    synchronized (prototypes) { prototypes.remove(name); }
 	}
-	// handle the removal of parent-child relationship frames
+	// ***** TBD *****
+	// Handle the removal of parent-child relationship frames
     }
 
-    public Frame getParent(Frame frame)
+    private Frame getParent(Frame frame)
     {
 	synchronized (parents) {
 	    return (Frame) parents.get(frame);

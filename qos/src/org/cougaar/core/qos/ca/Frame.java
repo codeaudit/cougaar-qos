@@ -38,11 +38,11 @@ public final class Frame
     private final String kind;
     private Properties properties;
 
-    public Frame(String kind, UID uid)
+    public Frame(String kind, UID uid, Properties properties)
     {
 	this.uid = uid;
 	this.kind = kind;
-	this.properties = new Properties();
+	this.properties = new Properties(properties); // ?
     }
 
 
