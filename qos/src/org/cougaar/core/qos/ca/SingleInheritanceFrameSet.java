@@ -276,30 +276,6 @@ public class SingleInheritanceFrameSet
 	if (bbs != null) bbs.publishChange(frame, changes);
     }
 
-    public void replaceFrame(Frame frame)
-    {
-	UID uid = frame.getUID();
-	HashMap kb = frameKB(frame);
-	Frame old = null;
-	synchronized (kb) {
-	    old = (Frame) kb.get(frame.getUID());
-	    if (old != null) {
-		old.mergeValues(frame);
-		if (log.isInfoEnabled())
-		    log.info("Replacing frame " +old+ " with " +frame);
-		// publish changes!
-	    } else {
-		addFrame(frame);
-		if (bbs != null) bbs.publishAdd(frame);
-	    }
-	}
-	if (frame.getKind().equals(parent_relation)) {
-	    // ???
-	    establishParentage(old == null ? frame : old);
-	}
-
-    }
-
     public Frame makeFrame(String kind, Properties values)
     {
 	UID uid = uids.nextUID();

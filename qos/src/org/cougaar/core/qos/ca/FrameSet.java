@@ -40,8 +40,6 @@ public interface FrameSet
 
     public void setFrameValue(Frame frame, String attribute, Object value);
 
-    public void replaceFrame(Frame frame);
-
     public Frame makeFrame(String kind, Properties attributes);
 
     public Frame makePrototype(String kind, Properties properties);

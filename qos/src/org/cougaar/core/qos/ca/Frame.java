@@ -69,11 +69,6 @@ public final class Frame
     // These should only be called from the FrameSet owning the
     // frame. 
 
-    void mergeValues(Frame frame)
-    {
-	properties.putAll(frame.properties);
-    }
-
     void setValue(String attribute, Object object)
     {
 	properties.put(attribute, object);

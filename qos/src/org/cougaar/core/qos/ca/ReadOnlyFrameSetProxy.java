@@ -61,11 +61,6 @@ final class ReadOnlyFrameSetProxy
 	throw new RuntimeException("Write operation on read-only object");
     }
 
-    public void replaceFrame(Frame frame)
-    {
-	throw new RuntimeException("Write operation on read-only object");
-    }
-
     public Frame makeFrame(String kind, Properties attributes)
     {
 	throw new RuntimeException("Write operation on read-only object");
