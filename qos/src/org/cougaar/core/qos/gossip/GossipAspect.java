@@ -114,7 +114,7 @@ public class GossipAspect
     public Object getDelegate(Object delegatee, Class type) 
     {
 	if (type == DestinationLink.class) {
-	    // RMI only!
+	    // RPC Links  only!
 	    DestinationLink link = (DestinationLink) delegatee;
 	    Class cl = link.getProtocolClass();
 	    if (RPCLinkProtocol.class.isAssignableFrom(cl)) {
