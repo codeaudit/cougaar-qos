@@ -200,6 +200,7 @@ public final class SyscondFactory
 	    // Loop over all Agents, seeing if the Host has changed,
 	    Set matches = topologyService.getAllEntries(null, null, null, null,
 							null);
+	    if (matches == null) return;
 	    Iterator itr = matches.iterator();
 	    while (itr.hasNext()) {
 		TopologyEntry entry = (TopologyEntry) itr.next();
