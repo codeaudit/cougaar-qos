@@ -94,7 +94,8 @@ abstract public class FactToFrameFacetImpl
 	Frame frame = getFrame(fact);
 	String kind = frame.getKind();
 	Properties props = frame.getProperties();
-	frameSet.makeFrame(kind, props);
+	UID uid = frame.getUID();
+	frameSet.makeFrame(kind, props, uid);
     }
 
     private void processModifiedFrame(Object fact)

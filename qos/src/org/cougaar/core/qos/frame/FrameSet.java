@@ -38,6 +38,8 @@ public interface FrameSet
 
     public Frame makeFrame(String kind, Properties attributes);
 
+    public Frame makeFrame(String kind, Properties attributes, UID uid);
+
     public Frame makePrototype(String kind, Properties properties);
 
     public void removeFrame(Frame frame);

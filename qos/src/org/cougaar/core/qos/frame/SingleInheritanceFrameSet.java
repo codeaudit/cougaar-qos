@@ -232,8 +232,6 @@ public class SingleInheritanceFrameSet
 
     public void valueUpdated(Frame frame, String attribute, Object value)
     {
-	frame.setValue(attribute, value);
-
 	// handle the modification of parent-child relationship frames
 	if (frame.getKind().equals(parent_relation)) establishParentage(frame);
 
@@ -248,6 +246,11 @@ public class SingleInheritanceFrameSet
     public Frame makeFrame(String kind, Properties values)
     {
 	UID uid = uids.nextUID();
+	return makeFrame(kind, values, uid);
+    }
+
+    public Frame makeFrame(String kind, Properties values, UID uid)
+    {
 	Frame frame = new Frame(this, kind, uid, values);
 
 	if (kind.equals(parent_relation)) establishParentage(frame);
