@@ -24,9 +24,12 @@ package org.cougaar.core.qos.rss;
 import com.bbn.quo.data.DataValue;
 import org.cougaar.core.qos.metrics.Metric;
 
-public class DataWrapper implements Metric 
+public class DataWrapper implements Metric, java.io.Serializable
 {
     private DataValue data;
+
+    public DataWrapper() {
+    }
 
     public DataWrapper(DataValue data) {
 	this.data = data;
