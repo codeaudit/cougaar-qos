@@ -1,0 +1,12 @@
+#!/bin/sh
+
+rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
+
+rss="-Dorg.cougaar.rss.properties=$rssurl"
+
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/traffic.props $rss"
+export COUGAAR_JAVA_ARGS
+
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+
+ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password -Dorg.cougaar.core.naming.useSSL=true -Dorg.cougaar.nameserver.verbosity=2"
+
+
+rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
+
+rss="-Dorg.cougaar.rss.properties=$rssurl"
+
+quo="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/ssl.props"
+COUGAAR_JAVA_ARGS="$quo $rss $ssl"
+export COUGAAR_JAVA_ARGS
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+
+
+

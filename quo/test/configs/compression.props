@@ -1,6 +1,0 @@
-org.cougaar.lib.quo.wrapper=org.cougaar.lib.quo.CompressWrapper
-org.cougaar.lib.quo.UseCompression=true
-org.cougaar.rss.propfile=/home/jzinky/cougaar/cougaar_HEAD/quo/test/configs/kernel.conf
-org.cougaar.lib.quo.kernel.gui=false
-# org.cougaar.message.useLocalDelivery=false
-org.cougaar.message.transport.aspects=org.cougaar.lib.quo.QuoProxyAspect

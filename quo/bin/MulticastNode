@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#  $COUGAAR_INSTALL_PATH/bin/eventgenerator.sh generates multicast traffic
+
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.debug=multicast"
+export COUGAAR_JAVA_ARGS
+
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+

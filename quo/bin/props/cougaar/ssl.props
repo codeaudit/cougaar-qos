@@ -1,0 +1,7 @@
+org.cougaar.lib.quo.kernel.gui=false
+org.cougaar.message.transport.aspects=org.cougaar.lib.quo.RemoteSSLAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect,org.cougaar.core.mts.StepperAspect
+org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
+org.cougaar.message.transport.debug=policy,comm,service
+org.cougaar.lib.quo.UseSSL=true
+
+

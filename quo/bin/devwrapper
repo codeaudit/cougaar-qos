@@ -1,0 +1,27 @@
+#!/bin/sh
+# =====================================================================
+# (c) Copyright 2001  BBNT Solutions, LLC
+# =====================================================================
+#!/bin/sh
+
+COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/quo/dev/3rdparty
+export COUGAAR3RDPARTY
+
+newcore=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
+newquo=${COUGAAR_SRC_PATH}/quo/src/newquo.jar
+newqos=${COUGAAR_SRC_PATH}/qos/src/org/cougaar/core/qos.jar
+perf=${COUGAAR_SRC_PATH}/glm/src/performance.jar
+
+#Putting perf-jar temporarily perf-society.jar
+COUGAAR_DEV_PATH=${newcore}:${newquo}:${newqos}:${perf}
+export COUGAAR_DEV_PATH
+
+   
+# Assume all the dev scripts end with .dev
+command=`basename $0 .dev`
+
+echo  ${COUGAAR_SRC_PATH}/quo/bin/${command} $*
+exec  ${COUGAAR_SRC_PATH}/quo/bin/${command} $*
+
+
+

@@ -1,0 +1,30 @@
+# RSS/QuO
+# org.cougaar.rss.properties=http://stout.bbn.com/~statusquo/RSS-Property.conf
+org.cougaar.lib.quo.kernel.gui=true
+
+#Default Trust
+org.cougaar.node.trustStatus=0
+
+# Link Protocols
+org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
+
+# Aspects
+org.cougaar.message.transport.aspects=org.cougaar.core.mts.TrafficMaskingGeneratorAspect,org.cougaar.lib.quo.QuoProxyAspect,org.cougaar.lib.quo.RemoteSSLAspect,org.cougaar.lib.quo.TrafficMaskAspect,org.cougaar.core.mts.ForwardMessageLoggingAspect
+
+# Debug
+#org.cougaar.message.transport.debug=traffic_masking_generator
+org.cougaar.message.transport.debug=service
+
+
+# Compression
+#org.cougaar.lib.quo.UseCompression=true
+org.cougaar.lib.quo.wrapper=org.cougaar.lib.quo.CompressWrapper
+
+
+# RemoteSSL
+#org.cougaar.lib.quo.UseSSL=true
+
+#Traffic Masking
+# org.cougaar.lib.quo.UseMasking=true
+
+
