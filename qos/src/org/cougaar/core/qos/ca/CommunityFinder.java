@@ -111,8 +111,8 @@ abstract public class CommunityFinder
 	return predicate == null || predicate.execute(community);
     }
 
-    private synchronized void foundCommunity(String community_name,
-					     Community community) 
+    private synchronized boolean foundCommunity(String community_name,
+						Community community) 
     {
 	if (logger.isDebugEnabled())
 	    logger.debug("Community = " + community_name);
@@ -121,7 +121,7 @@ abstract public class CommunityFinder
 	    getCommunity(community_name, community); 
 	    if (!shouldNotify(this.community)) {
 		this.community = null;
-		return;
+		return false;
 	    }
 	    
 	    this.community_name = community_name;
@@ -133,23 +133,27 @@ abstract public class CommunityFinder
 			     " observers notified that community=" 
 			     +community_name);
 	}
+	return true;
+
     }
 
     protected void handleResponse(Object candidate)
     {
 	if (logger.isDebugEnabled())
 		    logger.debug("Response was candidate "+ candidate);
-	svc.removeListener(this);
+	boolean remove = false;
 	if (candidate instanceof Community) {
 	    Community comm = (Community) candidate;
-	    foundCommunity(comm.getName(), comm);
+	    remove = foundCommunity(comm.getName(), comm);
 	} else if (candidate instanceof String) {
-	    foundCommunity((String) candidate, null);
+	    remove = foundCommunity((String) candidate, null);
 	} else {
 	    if (logger.isErrorEnabled())
 		logger.error("Response was " +candidate+
 			     " of class " +candidate.getClass());
 	}
+	if (remove) svc.removeListener(this);
+
     }
 
     protected void handleCollectionResponse(Collection result) 
