@@ -4,6 +4,7 @@
 COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.debug=flush"
 export COUGAAR_JAVA_ARGS
 
+module=quo
 
-exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
-
+#exec ${COUGAAR_SRC_PATH}/core/bin/Node $*
+exec ${COUGAAR_SRC_PATH}/${module}/test/bin/Node $*
