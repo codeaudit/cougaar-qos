@@ -45,6 +45,8 @@ import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.thread.Schedulable;
 
 import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
@@ -75,6 +77,7 @@ public class RSSMetricsServiceImpl
 	"org.cougaar.metrics.properties";
     
     private LoggingService loggingService;
+    private ThreadService threadService;
     private STECMetricsUpdateServiceImpl metricsUpdateService;
 
     private static class DataValueObserver 
@@ -114,6 +117,8 @@ public class RSSMetricsServiceImpl
 	ServiceBroker sb = getServiceBroker();
 	loggingService = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
+	threadService = (ThreadService)
+	    sb.getService(this, ThreadService.class, null);
 
 	MetricsUpdateService mus = (MetricsUpdateService)
 	    sb.getService(this, MetricsUpdateService.class, null);
@@ -220,7 +225,13 @@ public class RSSMetricsServiceImpl
 
     public Object subscribeToValue(String path, Observer observer) {
 	try {
-	    BoundDataFormula bdf = new BoundDataFormula(path);
+	    // Defer the formula creation, since it might result in a
+	    // 'dns' lookup.
+	    BoundDataFormula bdf = new BoundDataFormula(path, true);
+	    Runnable binder = bdf.getDelayedFormulaCreator();
+	    Schedulable bdr = threadService.getThread(this, binder, 
+						      "BoundDataFormula");
+	    bdr.start();
 	    return new DataValueObserver(observer, bdf);
 	} catch (com.bbn.quo.data.NullFormulaException ex) {
 	    loggingService.error(path+ " is not valid");
