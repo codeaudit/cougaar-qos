@@ -66,7 +66,7 @@ abstract public class CoordinationArtifactTemplatePlugin
     
     protected void execute() 
     {
-	impl.execute();
+	if (impl != null) impl.execute();
     }
 
 
