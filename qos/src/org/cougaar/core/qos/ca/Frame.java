@@ -58,6 +58,10 @@ public final class Frame
 	return kind;
     }
 
+    public Properties getAttributes()
+    {
+	return properties;
+    }
 
     // These should only be called from the FrameSet owning the
     // frame. 

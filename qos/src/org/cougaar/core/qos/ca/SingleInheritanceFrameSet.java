@@ -269,6 +269,7 @@ public class SingleInheritanceFrameSet
 		    log.info("Replacing frame " +old+ " with " +frame);
 	    } else {
 		addFrame(frame);
+		if (bbs != null) bbs.publishAdd(frame);
 	    }
 	}
 	if (frame.getKind().equals(parent_relation)) {
