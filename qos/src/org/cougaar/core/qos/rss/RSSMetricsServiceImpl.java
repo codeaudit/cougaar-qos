@@ -166,6 +166,9 @@ public class RSSMetricsServiceImpl
 	    feed.setName(feedName);
 	    RSS.instance().registerFeed(feed, feedName);
 	}
+
+	// start the updater
+	new AgentHostUpdaterServiceProvider(sb);
     }
 
     //Data Feed Registration Service
