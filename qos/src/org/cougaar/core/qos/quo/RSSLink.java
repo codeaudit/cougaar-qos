@@ -44,6 +44,7 @@ import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Observable;
@@ -54,7 +55,6 @@ import javax.naming.directory.BasicAttributes;
 
 public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 {
-    public static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
     private static final int PERIOD = 30000;
     private static String local_host;
 
@@ -246,9 +246,10 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	    
     public RSSLink(NameSupport nameSupport, ServiceBroker sb) {
 	super(nameSupport, sb);
-	String propfile = System.getProperty(RSS_PROPFILE);
-	rss = RSS.makeInstance(propfile);
-	kernel = Utils.getKernel();
+	Properties props = new Properties();
+	Utils.readRSSProperties(props);
+	rss = RSS.makeInstance(props);
+	kernel = Utils.getKernel(props);
 	updater = new AgentHostUpdater();
 	timer.schedule(updater, 0, PERIOD);
     }

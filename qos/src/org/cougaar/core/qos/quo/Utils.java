@@ -11,6 +11,7 @@ import com.bbn.quo.rmi.impl.KernelImpl;
 
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import org.cougaar.core.mts.Debug;
@@ -21,28 +22,43 @@ public class Utils implements DebugFlags
 {
 
 
+    private static final String RSS_PROPERTIES = "org.cougaar.rss.properties";
+
+    public static void readRSSProperties(Properties props) {
+	String kconf = System.getProperty(RSS_PROPERTIES);
+	if (kconf != null) {
+	    InputStream is = null;
+	    try {
+		try {
+		    URL url = new URL(kconf);
+		    is = url.openStream();
+		} catch (java.net.MalformedURLException mal) {
+		    // try it as a filename
+		    is = new FileInputStream(kconf);
+		}
+		
+		props.load(is);
+		is.close();
+	    } catch (java.io.IOException e) {
+		e.printStackTrace();
+	    }
+	}
+
+    }
+
     public synchronized static QuoKernel getKernel() {
 	Properties kprops = new Properties();
+	readRSSProperties(kprops);
+	return getKernel(kprops);
+    }
+
+    public synchronized static QuoKernel getKernel(Properties kprops) {
+	kprops.put("quoKernel.EvaluatorThread", "false");
 	MessageTransportRegistry registry = 
 	    MessageTransportRegistry.getRegistry();
 	String name = "QuO Kernel: " + registry.getLocalAddress().toString();
 	kprops.put("quoKernel.Title", name);
-	return getKernel(kprops);
-    }
-
-    public synchronized static QuoKernel getKernel(Properties props) {
-	String kconf = System.getProperty(RSSLink.RSS_PROPFILE);
-	if (kconf != null) {
-	    try {
-		InputStream is = new FileInputStream(kconf);
-		props.load(is);
-		is.close();
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
-	}
-	props.put("quoKernel.EvaluatorThread", "false");
-	QuoKernel kernel = KernelImpl.getKernelReference(props);
+	QuoKernel kernel = KernelImpl.getKernelReference(kprops);
 
 
 	if (Boolean.getBoolean("org.cougaar.lib.quo.kernel.gui")) {
