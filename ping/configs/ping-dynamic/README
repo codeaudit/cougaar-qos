@@ -2,49 +2,88 @@
 #
 # READEME for dynamic ping society configuration
 # Resides in BBNCommons overlay in $CIP/configs/ping-dynamic/
+# ***Note this will soon be moving to $CIP/ping/configs/ping-dynamic/
 #######
 
+===============
 Included files: 
-this README
+===============
+README
 Empty.xml
-CollectPingStats.rb
 PingSocietyBuilderUtils.rb
 scripting.rb
 RunMiniPingActions.rb
 
+& some stressor utils: 
+upload_network_metrics.rb
+networkXMLtoMetricParser.rb
+RunMiniPingActions-Security-uc1.rb
+stressors.rb
+socC-network.xml
+socVMiniPing-network.xml
+
+& some post processing utils:
+postprocess.sh
+network
+
+========================
 Description & Operation: 
-This collection of files will allow one to specify a miniping society at run-time, from one of three
+========================
+This collection of files will allow one to specify a highly-dynanic miniping society at run-time, from one of three
 standard configurations, allowing the user to also specify the number of agents/nodes in the society. 
-To do this, the user must uncomment one of the ping-builder actions in the RunMiniPingActions.rb:
+To do this, the user must uncomment & fill in one of the ping-builder actions in the RunMiniPingActions.rb:
 
-  #do_action "CreateOneToOnePing", 3
-  #do_action "CreateSrcToMultSinkPing", 3
-  #do_action "CreateMultSrcToSinkPing", 3
-
+  ## Example Usage
+  #do_action "CreateOneToOnePing", <numPairs:int>, <security:boolean>, <singlenode:boolean>
+  #do_action "CreateSrcToMultSinkPing", <numsinks:int>, <security:boolean>, <hosts:boolean>
+  #do_action "CreateMultSrcToSinkPing", <numsrcs:int>, <security:boolean>, <hosts:boolean>
 
 The configuration options are:
 
-1. CreateOneToOnePing - Like the name insinuates, this is a pair-wise configuration, (src-to-sink), where all pingers(srcs) reside
-on one node and host, and all the pingees(sinks) reside on a separate single node/host.
-The argument to the action is the number of pairs of srcs&sinks. 
+1. CreateOneToOnePing - Like the name insinuates, this is a pair-wise configuration, (src-to-sink), where the default option places
+all pingers(srcs) to reside on one node and host, and all the pingees(sinks) reside on a separate single node/host.
+
+parameters: 
+ <numPairs> = # of pinger-pingee pairs
+ <security> = boolean in ""s to insert security mgmt node in society
+ <singlenode> = boolean in ""s to specify society to be run on one host only
 
 2. CreateSrcToMultSinkPing - Creates multiple sinks to one src in the society configuration. The src resides on one node on one host, 
 while the multiple sinks reside on separate nodes on another host. The argument to the action is the number of sinks desired in configuration.
+However, if the <hosts> is not specified or as "false", there will only be two hosts, the destination host with the numerous sink nodes will 
+residing there. 
+
+parameters: 
+ <numsinks> = # of sinks in this configuration {1 src is assumed}
+ <security> = boolean in ""s to insert security mgmt node in society
+ <hosts> = boolean in ""s to specify whether the multiple sinks to be split across unique hosts/nodes
 
 3. CreateMultSrcToSinkPing - Similar named action to create multiple srcs to one sink the society configuration. The srcs reside on distinct
 nodes on one host, while the one sink resides on it's own node on a separate host. The argument to the action is the number of srcs desired 
 in the configuration. 
+However, if the <hosts> is not specified or as "false", there will only be two hosts, the src host with the numerous src nodes will 
+residing there.
+ 
+parameters:
+ <numsrcs> = # srcs in this configuration {1 sink is assumed}
+ <security> = boolean in ""s to insert security mgmt node in society
+ <hosts> = boolean in ""s to specify whether the multiple srcs to be split across unique hosts/nodes
 
+=======
 To Run:
-move RunMiniPingActions.rb from $CIP/configs/ping-dynamic/ to $CIP/csmart/scripts
-cd to $CIP/csmart/scripts/
-run with $ruby RunMiniPingActions.rb
+=======
+1.move RunMiniPingActions.rb from $CIP/configs/ping-dynamic/ to $CIP/csmart/scripts
+2.cd to $CIP/csmart/scripts/
+3.configure RunMiniPingActions are you like
+4.$ruby RunMiniPingActions.rb
 
-Notes on configuration: 
-Currently the specification of multiple hosts is not implemented.  The nameserver node is specified in a the createPingManager rule 
-$PING_HOME. This is meant to create a manager node for the ping society, and assign it as the nameserver. If this rule is not applied, 
-the nameserver will be assigned randomly. 
+====================
+Additional Comments:
+====================
+* An ARManager Agent is inserted on a standard FWD-MGMT-NODE, usually on the src host, there is no separate host for the MGMT nodes/agents. 
 
-To Add Additional Configuration: 
+* To Add Additional Configuration: 
 Include your rules in the TransformSociety action, add a similar rule to add another manager node/agent, assigning any facets
 or roles you wish. 
+
+* In the works are options for multiple pinger-pairs to be implemented on the CreateSrcToMultSinkPing & CreateMultSrcToSinkPing configurations. 
