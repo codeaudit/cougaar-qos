@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.debug.flush=true"
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.debug=flush"
 export COUGAAR_JAVA_ARGS
 
 
