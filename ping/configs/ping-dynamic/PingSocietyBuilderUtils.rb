@@ -413,58 +413,99 @@ module Cougaar
     ## 
     class CreateMultPingPairsPerHost < Cougaar::Action
       numPingers=[]
+      anchor="src"
       PRIOR_STATE = "SocietyLoaded"
       RESULTANT_STATE = "SocietyLoaded"      
       DOCUMENTATION = Cougaar.document {
 	@description = "Create multiple pinger-pair per host society definition."
 	@parameters = [
-	  {:numPingers => "required, array with each cell defining the number of pinger pairs per host/node, default is one pair"}
+	  {:numPingers => "required, array with each cell defining the number of pinger pairs per host/node, default is one pair"},
+	  {:anchor => "optional, specifies a src or destination anchor"}	
 	]
-	@example = "do_action 'CreateMultPingPairsPerHost', 'numPingers'"
+	@example = "do_action 'CreateMultPingPairsPerHost', 'numPingers', 'anchor'"
       }
-      def initialize(run, numPingers=[])
+      def initialize(run, numPingers=[], anchor="src")
 	super(run)
 	@numPingers = numPingers
+	@anchor = anchor
       end
       def perform
 	if @numPingers.empty?
 	  puts "Can't create society with empty pinger array. Specify how you want the ping pairs distributed across hosts. \n"
 	  puts "e.g. [1,2,1]"
-	else
-	  puts "Splitting up dest ping pairs on multiple hosts"
-	  
-	  # Add srcs
-	  @run.society.add_host('HOST1') do |host|
-	    puts "Adding SrcNode"
-	    host.add_node("SrcNode") do |node|
-	      # Add src agent
-	      node.add_agent("src")
-	    end
-	  end
-	  
-	  # Add sinks
-	  # Index HOST# to be tmp+2 to start at 'HOST2' 
-	  tmp=2
-	  i=0
-	  while i < @numPingers.size
-	    @run.society.add_host("HOST#{tmp}") do |host|
-	      puts "Adding SinkNode#{i}"
-	      host.add_node("SinkNode#{i}") do |node|
-		
-		j=0
-		while j < @numPingers[i]
-		  node.add_agent("sink#{i}_#{j}")
-		  # Add pings here
-		  addPing("src", "sink#{i}_#{j}")
-		  # wake once every second to check ping timeouts
-		  managePings('1000')
-		  j+=1
-		end
+	else	  
+	  # determine whether sink or src is the anchor
+	  if @anchor=="src" 
+	    puts "Splitting up src-anchor ping pairs on multiple hosts"
+	    
+	    # Add srcs
+	    @run.society.add_host('HOST1') do |host|
+	      puts "Adding SrcNode"
+	      host.add_node("SrcNode") do |node|
+		# Add src agent
+		node.add_agent("src")
 	      end
 	    end
-	    tmp+=1
-	    i+=1
-	  end	  
+	    
+	    # Add sinks
+	    # Index HOST# to be tmp+2 to start at 'HOST2' 
+	    tmp=2
+	    i=0
+	    while i < @numPingers.size
+	      @run.society.add_host("HOST#{tmp}") do |host|
+		puts "Adding SinkNode#{i}"
+		host.add_node("SinkNode#{i}") do |node|
+		  
+		  j=0
+		  while j < @numPingers[i]
+		    node.add_agent("sink#{i}_#{j}")
+		    # Add pings here
+		    addPing("src", "sink#{i}_#{j}")
+		    # wake once every second to check ping timeouts
+		    managePings('1000')
+		    j+=1
+		  end
+		end
+	      end
+	      tmp+=1
+	      i+=1
+	    end
+	  else
+	    puts "Splitting up dest-anchor ping pairs on multiple hosts"
+	    
+	    # Add sink
+	    @run.society.add_host('HOST1') do |host|
+	      puts "Adding SinkNode"
+	      host.add_node("SinkNode") do |node|
+		# Add sink agent
+		node.add_agent("sink")
+	      end
+	    end
+	    
+	    # Add srcs
+	    # Index HOST# to be tmp+2 to start at 'HOST2' 
+	    tmp=2
+	    i=0
+	    while i < @numPingers.size
+	      @run.society.add_host("HOST#{tmp}") do |host|
+		puts "Adding SrcNode#{i}"
+		host.add_node("SrcNode#{i}") do |node|
+		  
+		  j=0
+		  while j < @numPingers[i]
+		    node.add_agent("src#{i}_#{j}")
+		    # Add pings here
+		    addPing("sink", "src#{i}_#{j}")
+		    # wake once every second to check ping timeouts
+		    managePings('1000')
+		    j+=1
+		  end
+		end
+	      end
+	      tmp+=1
+	      i+=1
+	    end	  
+	  end
 	end
 	
 	# Add Manager Node / Agent & Nameserver
