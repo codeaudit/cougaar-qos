@@ -1,0 +1,19 @@
+#!/bin/sh
+# =====================================================================
+# (c) Copyright 2001  BBNT Solutions, LLC
+# =====================================================================
+#!/bin/sh
+
+module=quo
+newcore=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
+newquo=${COUGAAR_SRC_PATH}/${module}/dev/newquo.jar
+
+COUGAAR_DEV_PATH=${newcore}:${newquo}
+export COUGAAR_DEV_PATH
+
+Gets the last word of the command separated by /.  e.g QuoNode in this case
+command=`echo $0 | awk 'BEGIN { FS = "/" }; { print $NF }'`
+
+exec ${COUGAAR_SRC_PATH}/${module}/test/bin/${command} $*
+
+
