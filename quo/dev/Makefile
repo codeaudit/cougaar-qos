@@ -7,7 +7,7 @@ include include.mk
 
 idl=$(src)/$(srcdir)/MT.java
 
-all: $(idl) gen thirdparty
+all: $(idl) thirdparty
 
 thirdparty:
 	cd 3rdparty; make
@@ -15,9 +15,3 @@ thirdparty:
 $(idl): idl/MT.idl
 	$(IDL2JAVA) -i2jpackage cougaar:$(pkg) -d $(src) idl/MT.idl
 
-gen:
-	cd qdl; make
-
-
-clean:
-	cd qdl; make clean

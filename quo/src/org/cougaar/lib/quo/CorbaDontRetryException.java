@@ -1,4 +1,5 @@
 package org.cougaar.lib.quo;
+
 /**
  *	Generated from IDL definition of exception "CorbaDontRetryException"
  *	@author JacORB IDL compiler 

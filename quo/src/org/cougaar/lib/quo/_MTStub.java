@@ -1,5 +1,6 @@
 package org.cougaar.lib.quo;
 
+
 /**
  *	Generated from IDL definition of interface "MT"
  *	@author JacORB IDL compiler 

@@ -5,6 +5,7 @@ package org.cougaar.lib.quo;
  *	@author JacORB IDL compiler 
  */
 
+
 public abstract class MTPOA
 	extends org.omg.PortableServer.Servant
 	implements org.omg.CORBA.portable.InvokeHandler, org.cougaar.lib.quo.MTOperations

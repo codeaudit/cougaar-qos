@@ -79,6 +79,7 @@ public class CorbaLinkProtocol
     private MT lookupObject(MessageAddress address) throws Exception {
 	Object object = 
 	    getNameSupport().lookupAddressInNameServer(address, PROTOCOL_TYPE);
+	System.out.println("Found IOR "+ object);
 
 	if (object == null) {
 	    return null;
@@ -109,6 +110,7 @@ public class CorbaLinkProtocol
 	makeMT();
 	try {
 	    Object proxy = orb.object_to_string(myProxy);
+	    System.out.println("Registering IOR "+ proxy);
 	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
 	    loggingService.error("Error registering MessageTransport", e);
@@ -120,6 +122,7 @@ public class CorbaLinkProtocol
 	try {
 	    // Assume node-redirect
 	    Object proxy = orb.object_to_string(myProxy);
+	    System.out.println("Registering IOR "+ proxy);
 	    MessageAddress addr = client.getMessageAddress();
 	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {

@@ -5,25 +5,25 @@ package org.cougaar.lib.quo;
  *	@author JacORB IDL compiler 
  */
 
-public class MTHolder	implements org.omg.CORBA.portable.Streamable{
+public final class MTHolder	implements org.omg.CORBA.portable.Streamable{
 	 public MT value;
-	public MTHolder()
+	public MTHolder ()
 	{
 	}
-	public MTHolder(MT initial)
+	public MTHolder (final MT initial)
 	{
 		value = initial;
 	}
-	public org.omg.CORBA.TypeCode _type()
+	public org.omg.CORBA.TypeCode _type ()
 	{
-		return MTHelper.type();
+		return MTHelper.type ();
 	}
-	public void _read(org.omg.CORBA.portable.InputStream in)
+	public void _read (final org.omg.CORBA.portable.InputStream in)
 	{
-		value = MTHelper.read(in);
+		value = MTHelper.read (in);
 	}
-	public void _write(org.omg.CORBA.portable.OutputStream _out)
+	public void _write (final org.omg.CORBA.portable.OutputStream _out)
 	{
-		MTHelper.write(_out,value);
+		MTHelper.write (_out,value);
 	}
 }

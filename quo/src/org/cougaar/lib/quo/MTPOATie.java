@@ -1,6 +1,7 @@
 package org.cougaar.lib.quo;
 
 import org.omg.PortableServer.POA;
+
 /**
  *	Generated from IDL definition of interface "MT"
  *	@author JacORB IDL compiler 
