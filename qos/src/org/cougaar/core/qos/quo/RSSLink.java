@@ -37,6 +37,8 @@ import com.bbn.quo.data.RSS;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
+import org.cougaar.core.mts.Debug;
+import org.cougaar.core.mts.DebugFlags;
 import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
 
 import java.util.HashMap;
@@ -47,7 +49,7 @@ import java.util.TimerTask;
 import java.util.Observable;
 
 
-public class RSSLink extends ResourceMonitorServiceImpl
+public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 {
     public static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
     private static final int PERIOD = 30000;
@@ -183,8 +185,9 @@ public class RSSLink extends ResourceMonitorServiceImpl
 	    if (new_host == null) return;
 	    if (host == null || !host.equals(new_host)) {
 		host = new_host;
-		System.out.println("===== New host " + host +
-				   " for agent " + agent);
+		if (Debug.debug(RMS))
+		    System.out.println("===== New host " + host +
+				       " for agent " + agent);
 		Iterator itr = listeners.iterator();
 		while (itr.hasNext()) {
 		    AgentHostUpdaterListener listener =
