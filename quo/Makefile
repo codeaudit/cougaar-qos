@@ -4,7 +4,7 @@ jar=newquo.jar
 cougaar=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
 qos=${COUGAAR_SRC_PATH}/qos/src/org/cougaar/core/qos.jar
 src=$(shell find .  -name "*.java")
-thirdparty=../dev/3rdparty
+thirdparty=dev/3rdparty
 depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoRSS.jar:$(thirdparty)/QuoInstr.jar:$(thirdparty)/UnixUtils.jar:$(thirdparty)/instrumentation.jar:$(thirdparty)/jacorb.jar
 
 pkg=org.cougaar.lib.quo
@@ -32,7 +32,7 @@ compile: $(src)
 developers: gen $(jar)
 
 gen:
-	cd ../dev; make
+	cd dev; make
 	mkdir -p $(classes)
 
 
@@ -46,6 +46,6 @@ $(jar): $(src)
 
 clean:
 	rm -rf $(jar) $(classes)
-	cd ../dev; make clean
+	cd dev; make clean
 
 

@@ -33,7 +33,7 @@ public class DestinationLinkRemoteSSLDelegate_client implements org.cougaar.core
     return(remote);
   }
   protected com.bbn.quo.rmi.Contract quo_RemoteSSL;
-  void set_contract_RemoteSSL(com.bbn.quo.rmi.Contract arg1){
+  public void set_contract_RemoteSSL(com.bbn.quo.rmi.Contract arg1){
     quo_RemoteSSL = arg1;
   }
   com.bbn.quo.rmi.Contract get_contract_RemoteSSL() {

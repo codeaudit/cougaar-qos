@@ -33,7 +33,7 @@ public class MTCompressDelegate_client implements org.cougaar.core.mts.MT {
     return(remote);
   }
   protected com.bbn.quo.rmi.Contract quo_Compress;
-  void set_contract_Compress(com.bbn.quo.rmi.Contract arg1){
+  public void set_contract_Compress(com.bbn.quo.rmi.Contract arg1){
     quo_Compress = arg1;
   }
   com.bbn.quo.rmi.Contract get_contract_Compress() {

@@ -132,6 +132,10 @@ $(remotessl): RemoteSSL.idl RemoteSSL.cdl $(mt_idl) $(dl_idl) RemoteSSL.asl
 	--adapter=DestinationLinkRemoteSSLAdapter \
 	--asl=RemoteSSL.asl \
 	$(aspect_qdl_flags)
+	sed "s/void set_contract_RemoteSSL/public void set_contract_RemoteSSL/" \
+		$(src)/$(srcdir)/DestinationLinkRemoteSSLDelegate_client.java \
+		> DestinationLinkRemoteSSLDelegate_client.java
+	mv DestinationLinkRemoteSSLDelegate_client.java $(src)/$(srcdir)
 
 
 $(diagnose): $(mt_idl) $(mt_inst_idl)  Qosket.idl Diagnose.asl
@@ -167,6 +171,10 @@ $(compress): $(mt_idl) $(mt_inst_idl)  Qosket.idl Compress.asl Compress.cdl
 	--delegateqosket=org::cougaar::lib::quo::CompressDelegateQosket \
 	--asl=Compress.asl \
 	${rmi_qdl_flags}
+	sed "s/void set_contract_Compress/public void set_contract_Compress/" \
+		$(src)/$(srcdir)/MTCompressDelegate_client.java \
+		> MTCompressDelegate_client.java
+	mv MTCompressDelegate_client.java $(src)/$(srcdir)
 
 
 $(logging):$(mt_idl) $(mt_inst_idl)  Qosket.idl Logging.asl 
