@@ -37,7 +37,6 @@ public class MetricSCImpl
 
     private String path;
     private MetricsService svc;
-    private Metric value;
     private Object key;
 
     public void update(Observable obs, Object val) {
