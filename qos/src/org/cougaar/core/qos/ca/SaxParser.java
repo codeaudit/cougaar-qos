@@ -28,8 +28,6 @@ package org.cougaar.core.qos.ca;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.xml.sax.Attributes;
@@ -40,6 +38,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.util.ConfigFinder;
 
 
 public class SaxParser
@@ -115,7 +114,6 @@ public class SaxParser
 
     }
 
-    private List frame_sets;
     private FrameSet frame_set;
     private FrameSetSpec frame_set_spec;
     private FrameSpec frame_spec;
@@ -132,17 +130,25 @@ public class SaxParser
 	    sb.getService(this, LoggingService.class, null);
     }
 
-    public List parseFramesets(File xml_file)
-	throws org.xml.sax.SAXException, java.io.IOException
+    public FrameSet parseFrameSetFile(String xml_filename)
     {
-	frame_sets = new ArrayList();
-	XMLReader producer = XMLReaderFactory.createXMLReader();
-	DefaultHandler consumer = this; 
-	producer.setContentHandler(consumer);
-	producer.setErrorHandler(consumer);
-	URL url = xml_file.toURL();
-	producer.parse(url.toString());
-	return frame_sets;
+	File xml_file = ConfigFinder.getInstance().locateFile(xml_filename);
+	if (xml_file == null) {
+	    if (log.isWarnEnabled())
+		log.warn("Can't find FrameSet file " + xml_filename);
+	    return null;
+	}
+	try {
+	    XMLReader producer = XMLReaderFactory.createXMLReader();
+	    DefaultHandler consumer = this; 
+	    producer.setContentHandler(consumer);
+	    producer.setErrorHandler(consumer);
+	    URL url = xml_file.toURL();
+	    producer.parse(url.toString());
+	} catch (Exception ex) {
+	    log.error("Error parsing FrameSet file " + xml_file, ex);
+	}
+	return frame_set;
     }
 
 
@@ -254,8 +260,7 @@ public class SaxParser
 
     private void endFrameset()
     {
-	frame_sets.add(frame_set);
-	frame_set = null;
+	// no-op
     }
 
 }

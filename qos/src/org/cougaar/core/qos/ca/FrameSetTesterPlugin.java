@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.ca;
 
-import java.util.List;
 import java.util.Properties;
 
 import org.cougaar.core.agent.service.alarm.Alarm;
@@ -34,7 +33,6 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
-import org.cougaar.util.ConfigFinder;
 
 /**
  * Simple tester for FrameSets
@@ -127,27 +125,15 @@ public class FrameSetTesterPlugin
 	BlackboardService bbs = getBlackboardService();
 	ServiceBroker sb = getServiceBroker();
 
-	String xmlfile = (String) getParameter("frame-sets");
-	if (xmlfile != null) {
-	    java.io.File file = 
-		ConfigFinder.getInstance().locateFile(xmlfile);
-	    if (file != null) {
-		SaxParser parser = new SaxParser(sb, bbs);
-		try {
-		    List framesets = parser.parseFramesets(file);
-		    frameSet = (FrameSet) framesets.get(0);
-		    host1 = frameSet.findFrame("host", "name", "host1");
-		} catch (Exception ex) {
-		    ex.printStackTrace();
-		}
-	    } else {
-		if (log.isWarnEnabled())
-		    log.warn("ConfigFinder failed to find " + xmlfile);
-	    }
+	String xml_filename = (String) getParameter("frame-set");
+	if (xml_filename != null) {
+	    SaxParser parser = new SaxParser(sb, bbs);
+	    frameSet = parser.parseFrameSetFile(xml_filename);
+	    if (frameSet == null) return;
+	    host1 = frameSet.findFrame("host", "name", "host1");
 	} else {
-		if (log.isWarnEnabled())
-		    log.warn("No FrameSet XML file was specified");
-	    
+	    if (log.isWarnEnabled())
+		log.warn("No FrameSet XML file was specified");
 	}
 
     }
