@@ -33,10 +33,10 @@ public class MTDiagnoseDelegate_client implements org.cougaar.core.mts.MT {
     return(remote);
   }
   protected com.bbn.quo.rmi.Contract quo_Diagnose;
-  void set_contract_Diagnose(com.bbn.quo.rmi.Contract arg1){
+  public void set_contract_Diagnose(com.bbn.quo.rmi.Contract arg1){
     quo_Diagnose = arg1;
   }
-  com.bbn.quo.rmi.Contract get_contract_Diagnose() {
+  public com.bbn.quo.rmi.Contract get_contract_Diagnose() {
     return quo_Diagnose;
   }
 

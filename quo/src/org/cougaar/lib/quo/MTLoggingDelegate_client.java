@@ -29,10 +29,10 @@ public class MTLoggingDelegate_client implements org.cougaar.core.mts.MT {
     return(remote);
   }
   protected com.bbn.quo.rmi.Contract quo_Logging;
-  void set_contract_Logging(com.bbn.quo.rmi.Contract arg1){
+  public void set_contract_Logging(com.bbn.quo.rmi.Contract arg1){
     quo_Logging = arg1;
   }
-  com.bbn.quo.rmi.Contract get_contract_Logging() {
+  public com.bbn.quo.rmi.Contract get_contract_Logging() {
     return quo_Logging;
   }
 

@@ -30,10 +30,10 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
     return(quo_remoteObj);
   }
   protected com.bbn.quo.rmi.Contract quo_InstrumentedServer;
-  void set_contract_InstrumentedServer(com.bbn.quo.rmi.Contract arg1){
+  public void set_contract_InstrumentedServer(com.bbn.quo.rmi.Contract arg1){
     quo_InstrumentedServer = arg1;
   }
-  com.bbn.quo.rmi.Contract get_contract_InstrumentedServer() {
+  public com.bbn.quo.rmi.Contract get_contract_InstrumentedServer() {
     return quo_InstrumentedServer;
   }
   void set_qosket(com.bbn.quo.qosket.instrumentation.ServerInstrumentationDelegateQosket qs){
