@@ -222,6 +222,6 @@ $(tag): $(mt_idl) $(mt_inst_idl) $(traffic) $(logging) $(diagnose)  $(compress) 
 	touch $(tag)
 
 clean:
-	rm -rf $(tag)  gen $(src)/$(srcdir)/*.java
+	rm -rf $(tag)  gen 
 
 

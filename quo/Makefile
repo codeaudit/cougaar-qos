@@ -38,10 +38,10 @@ gen:
 	mkdir -p $(classes)
 
 
-$(stub_file): $(rmic_file)
-	javac  -d $(classes) $(rmic_file)
-	rmic $(rmic_class) -d $(classes) -keep
-	mv $(classes)/$(pathdir)/*.java $(srcdir)
+#$(stub_file): $(rmic_file)
+#	javac  -d $(classes) $(rmic_file)
+#	rmic $(rmic_class) -d $(classes) -keep
+#	mv $(classes)/$(pathdir)/*.java $(srcdir)
 
 $(jar): $(src) 
 	javac  -d $(classes) $(src)
