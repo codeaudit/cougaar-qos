@@ -33,6 +33,7 @@ import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.Debug;
 import org.cougaar.core.mts.DebugFlags;
 import org.cougaar.core.qos.metrics.MetricsService;
+import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.qos.rss.MetricSC;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
@@ -49,6 +50,7 @@ import java.util.Set;
 
 
 public final class SyscondFactory
+    extends QosComponent
     implements DebugFlags
 {
     private static final int PERIOD = 30000;
@@ -282,8 +284,10 @@ public final class SyscondFactory
 
 	    
 
-    public SyscondFactory(ServiceBroker sb) {
+    public void load() {
+	super.load();
 
+	ServiceBroker sb = getServiceBroker();
 	kernel = Utils.getKernel();
 
 	metricsService = (MetricsService)
