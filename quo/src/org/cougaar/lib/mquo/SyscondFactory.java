@@ -168,11 +168,13 @@ public final class SyscondFactory
 	extends TimerTask
     {
 	private HashMap listeners;
-	private HashMap hosts;
+	private HashMap agent_hosts;
+	private HashMap node_hosts;
 
 	AgentHostUpdater() {
 	    this.listeners = new HashMap();
-	    this.hosts = new HashMap();
+	    this.agent_hosts = new HashMap();
+	    this.node_hosts = new HashMap();
 	}
 
 	public synchronized void addListener(AgentHostUpdaterListener listener,
@@ -184,7 +186,7 @@ public final class SyscondFactory
 		listeners.put(agent.toString(), agentListeners);
 	    }
 	    agentListeners.add(listener);
-	    String host = (String) hosts.get(agent.toString());
+	    String host = (String) agent_hosts.get(agent.toString());
 	    if (host != null) listener.newHost(host);
 	}
 
@@ -212,30 +214,55 @@ public final class SyscondFactory
 	    Iterator itr = matches.iterator();
 	    while (itr.hasNext()) {
 		TopologyEntry entry = (TopologyEntry) itr.next();
+
+		// See if the Node has moved
+		String node = entry.getNode();
+		String old_node_host = (String) node_hosts.get(node);
+		String new_node_host =
+		    topologyService.getParentForChild(TopologyReaderService.HOST, 
+						      TopologyReaderService.NODE, 
+						      node);
+		if (old_node_host == null || !old_node_host.equals(new_node_host)) {
+		    // node has moved. 
+		    Object[] params = { node };
+		    Class cls = org.cougaar.core.qos.rss.NodeDS.class;
+		    RSS.instance().deleteScope(cls, params);
+// 		    System.err.println("===== Deleted Node " +node+
+// 				       " scope");
+		    node_hosts.put(node, new_node_host);
+		}
+
 		String agent = entry.getAgent();
-//  		System.out.print("Agent " +agent);
+		//  		System.out.print("Agent " +agent);
 		// Should we restrict this to ACTIVE Agents?
 		if (entry.getStatus() != TopologyEntry.ACTIVE) continue;
 		String new_host = entry.getHost();
-		String host = (String) hosts.get(agent);
+		String host = (String) agent_hosts.get(agent);
 
-//  		System.out.println(" Old host: " +host+
-//  				   " New host: " +new_host);
+		//  		System.out.println(" Old host: " +host+
+		//  				   " New host: " +new_host);
 
 		if (host == null || !host.equals(new_host)) {
-		    if (host != null) {
-			// Agent has moved to a new host.  Delete the
-			// old DataScope.
-			Object[] params = { agent };
-			Class cls = org.cougaar.core.qos.rss.AgentDS.class;
-			RSS.instance().deleteScope(cls, params);
-		    }
-		    hosts.put(agent, new_host);
+		    // Agent has moved to a new host.  Delete the
+		    // old DataScope.
+		    Object[] params = { agent };
+		    Class cls = org.cougaar.core.qos.rss.AgentDS.class;
+		    RSS.instance().deleteScope(cls, params);
+// 		    System.err.println("===== Deleted Agent " +agent+
+// 				       " scope");
+		    agent_hosts.put(agent, new_host);
 		    if (Debug.isDebugEnabled(loggingService,RMS))
 			loggingService.debug("===== New host " 
 					     +new_host+
 					     " for agent " 
 					     +agent);
+
+
+		    // We still need to update these sysconds, since
+		    // they're not subscribed to an Agent formula (if
+		    // they were, the rest of this would be
+		    // unnecessary).  They're subscribed to a Host
+		    // formula.
 		    ArrayList agentListeners = 
 			(ArrayList) listeners.get(agent);
 		    if (agentListeners == null) continue;

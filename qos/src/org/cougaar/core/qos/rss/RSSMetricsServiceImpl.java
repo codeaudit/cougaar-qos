@@ -197,10 +197,7 @@ public final class RSSMetricsServiceImpl
     }
 
     public Object subscribeToValue(String path, Observer observer) {
-	DataFormula formula = RSSUtils.getPathFormula(path);
-	if (formula == null) return null;
-
-	BoundDataFormula bdf = new BoundDataFormula(formula);
+	BoundDataFormula bdf = new BoundDataFormula(path);
 	return new DataValueObserver(observer, bdf);
     }
 

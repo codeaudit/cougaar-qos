@@ -45,6 +45,11 @@ public class NodeDS extends DataScope
 	super(parameters, parent);
     }
 
+
+    protected boolean useParentPath() {
+	return false;
+    }
+
     // Node DataScopes can be the first element in a path.  They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.

@@ -36,7 +36,6 @@ import com.bbn.quo.data.RSS;
 
 public class AgentDS 
     extends DataScope 
-    implements Constants
 {
     private static final String AGENTNAME = "agentname".intern();
 
@@ -45,6 +44,10 @@ public class AgentDS
 	throws DataScope.ParameterError
     {
 	super(parameters, parent);
+    }
+
+    protected boolean useParentPath() {
+	return false;
     }
 
     // Node DataScopes can be the first element in a path.  They must
@@ -60,7 +63,7 @@ public class AgentDS
 
 	// What do we do if the node isn't known?
 	if (node == null) {
-	    node = ""; // nice
+	    node = "FosterNode"; // nice
 	}
 
 	// System.err.println("### Node of " +agentname+ "=" +node);
@@ -94,7 +97,7 @@ public class AgentDS
 
 
     abstract static class Formula 
-	extends DataFormula implements Constants
+	extends DataFormula
     {
 
 	private DataFormula feedMerger;
@@ -127,10 +130,9 @@ public class AgentDS
 
     }
 
-
     public static class OneSecondLoadAvg extends Formula {
 	String getKey() {
-	    return ONE_SEC_LOAD_AVG;
+	    return Constants.ONE_SEC_LOAD_AVG;
 	}
 
 	DataValue defaultValue() {
