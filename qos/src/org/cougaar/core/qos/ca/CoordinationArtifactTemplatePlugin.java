@@ -32,7 +32,6 @@ import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
-import org.cougaar.core.service.BlackboardService;
 
 /**
  * This class represents the base implementation of a {@link
@@ -44,96 +43,28 @@ import org.cougaar.core.service.BlackboardService;
  */
 abstract public class CoordinationArtifactTemplatePlugin
     extends ParameterizedPlugin
-    implements CoordinationArtifactTemplate
 {
 
-    private ArrayList artifacts;
-    /**
-     *  Instantiable subclasses must provide this method.  Its job is
-     *  to create new CoordinationArtifacts, given a ConnectionSpec.
-     */
-    abstract public CoordinationArtifact makeArtifact(ConnectionSpec spec);
+    protected abstract CoordinationArtifactTemplateImpl
+	makeTemplate(ServiceBroker sb);
 
-    protected CoordinationArtifactTemplatePlugin()
-    {
-	this.artifacts = new ArrayList();
-    }
-
-    // By default handle all specs of the right kind
-    public boolean supports(ConnectionSpec spec)
-    {
-	return spec.ca_kind.equals(getArtifactKind());
-    }
-
-
-    public void provideFacet(ConnectionSpec spec, RolePlayer player)
-    {
-	CoordinationArtifact artifact = findOrMakeArtifact(spec);
-	if (artifact != null) artifact.provideFacet(spec, player, blackboard);
-    }
-
-    private CoordinationArtifact findOrMakeArtifact(ConnectionSpec spec)
-    {
-	synchronized (artifacts) {
-	    for (int i=0; i<artifacts.size(); i++) {
-		CoordinationArtifact ca = (CoordinationArtifact) 
-		    artifacts.get(i);
-		if (ca.matches(spec)) return ca;
-	    }
-	    
-	    // None around yet; make a new one
-	    CoordinationArtifact ca = makeArtifact(spec);
-	    artifacts.add(ca);
-	    return ca;
-	}
-    }
+    private CoordinationArtifactTemplateImpl impl;
 
     public void start()
     {
 	super.start();
 
 	ServiceBroker sb = getServiceBroker();
-	CoordinationArtifactBroker cab = (CoordinationArtifactBroker) 
-	    sb.getService(this, CoordinationArtifactBroker.class, null);
-	String kind = getArtifactKind();
-	cab.registerCoordinationArtifactTemplate(this);
-	sb.releaseService(this, CoordinationArtifactBroker.class, cab);
-    }
-
-    public void triggerExecute()
-    {
-	BlackboardService bbs = getBlackboardService();
-	if (bbs != null) {
-	    bbs.signalClientActivity();
-	} else {
-	}
+	impl = makeTemplate(sb);
     }
 
     protected void setupSubscriptions() 
     {
     }
     
-    // Two circumstances in which this runs:
-    // (1) subscription (ResponsePred)
-    // (2) new fact assertion or retraction in our fact base
     protected void execute() 
     {
-	List copy = null;
-	synchronized (artifacts) {
-	    copy = new ArrayList(artifacts);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.execute(blackboard);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.runRuleEngine(blackboard);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.processFactBase(blackboard);
-	}
+	impl.execute();
     }
 
 

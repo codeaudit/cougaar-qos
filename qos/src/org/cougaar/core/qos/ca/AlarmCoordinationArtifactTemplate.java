@@ -27,24 +27,22 @@
 package org.cougaar.core.qos.ca;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.BlackboardService;
 
 /**
  * CA interface to Alarms
  */
 abstract public class AlarmCoordinationArtifactTemplate
-    extends CoordinationArtifactTemplatePlugin
+    extends CoordinationArtifactTemplateImpl
 {
+
     private static final String AlarmCA = "AlarmCA";
 
-    public AlarmCoordinationArtifactTemplate() 
+    public AlarmCoordinationArtifactTemplate(ServiceBroker sb) 
     {
+	super(AlarmCA, sb);
     }
     
-    public String getArtifactKind()
-    {
-	return AlarmCA;
-    }
-
 
     abstract protected class AlarmCA 
 	extends CoordinationArtifactImpl

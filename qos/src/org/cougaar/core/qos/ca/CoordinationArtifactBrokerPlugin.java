@@ -26,9 +26,12 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.lang.reflect.Constructor;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
@@ -45,6 +48,12 @@ public class CoordinationArtifactBrokerPlugin
     extends ParameterizedPlugin
     implements ServiceProvider
 {
+    private static final String[] StandardTemplates = 
+    {
+	"org.cougaar.robustness.dos.ca.JessAlarmArtifactTemplate",
+    };
+
+    private static final String TemplatesParam = "templates";
     private CoordinationArtifactBroker impl;
     private LoggingService log;
 
@@ -58,8 +67,40 @@ public class CoordinationArtifactBrokerPlugin
 
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
+
+	for (int i=0; i<StandardTemplates.length; i++) {
+	    makeTemplate(StandardTemplates[i], sb);
+	}
+
+	String templates = getParameter(TemplatesParam);
+	if (templates != null) {
+	    StringTokenizer tk = new StringTokenizer(templates, ",");
+	    while (tk.hasMoreTokens()) {
+		String klass = tk.nextToken();
+		makeTemplate(klass, sb);
+	    }
+	}
+
     }
 
+
+    private void makeTemplate(String klass, ServiceBroker sb)
+    {
+	try {
+	    Class cl = Class.forName(klass);
+	    Class[] ptypes = { ServiceBroker.class };
+	    Object[] args = { sb };
+	    Constructor cons = cl.getConstructor(ptypes);
+	    CoordinationArtifactTemplate template = 
+		(CoordinationArtifactTemplate) cons.newInstance(args);
+	    if (log.isInfoEnabled())
+		log.info("Created template " +template);
+	} catch (Exception ex) {
+	    if (log.isWarnEnabled())
+		log.warn("Couldn't instantiate CoordinationArtifactTemplate " 
+			 +klass);
+	}
+    }
 
     // plugin
     protected void execute()
