@@ -8,6 +8,8 @@ package org.cougaar.lib.quo;
 
 
 import java.io.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.cougaar.core.util.UID;
 import org.cougaar.core.mts.Message;
@@ -21,14 +23,15 @@ import unix.UnixUtils;
 
 class Utils 
 {
-    static private PrintWriter LogFile = null;
-    static private char SEPR;
-    static private String TAG;
-    static Rusage lastUsage = new Rusage();
-    static long lastThreadTime = System.currentTimeMillis();;
+    private static PrintWriter LogFile = null;
+    private static char SEPR;
+    private static String TAG;
+    private static Rusage lastUsage = new Rusage();
+    private static long lastThreadTime = System.currentTimeMillis();;
+    private static Timer timer = new Timer();
 
     static {
-	TAG = System.getProperty("org.cougaar.lib.quo.TAG", "COUGAAR");
+	TAG = System.getProperty("org.cougaar.lib.quo.tag", "COUGAAR");
 	String sepr = System.getProperty("org.cougaar.lib.quo.separator", "");
 	if (sepr.equals("") || sepr.equalsIgnoreCase("space") )
 	    SEPR = ' ';
@@ -50,20 +53,17 @@ class Utils
 
     }
 
-    static public void StartProcessStatistics (){
-
+    // Nobody calls this anymore.  
+    public static void StartProcessStatistics () {
 	UnixUtils.ensureLib(); // load jni lib
 	lastUsage.update();
-	Thread updater = new Thread () {
+	TimerTask task = new TimerTask() {
 		public void run() {
-		    while (true) {
-			logProcessorUsage();
-			logThreadCount();
-			try { sleep(1000); } catch (InterruptedException ex){}
-		    }
+		    logProcessorUsage();
+		    logThreadCount();
 		}
 	    };
-	updater.start();
+	timer.schedule(task, 0, 1000);
     }
 
     static synchronized void logMessageWithLength(long startTime, 
@@ -249,8 +249,7 @@ class Utils
 
 
 
-    static synchronized void logThreadCount() 
-    {
+    static synchronized void logThreadCount() {
 	if (LogFile == null) return;
 
 	long now = System.currentTimeMillis();
