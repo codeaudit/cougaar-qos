@@ -39,12 +39,12 @@ gen:
 
 $(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
 	javac -d . $(srcdir)/MetricSCTie.java
-	rmic -d . -keep org.cougaar.lib.mquo.MetricSCTie
+	rmic -v1.2 -d .  -keep org.cougaar.lib.mquo.MetricSCTie
 	mv $(pathdir)/*.java $(srcdir)
 
 
 $(jar): $(src) 
-	javac  -d $(classes) $(src)
+	javac -deprecation -d $(classes) $(src)
 	jar cf $(jar) -C $(classes) .
 
 
