@@ -60,6 +60,7 @@ abstract public class FacetImpl // should be abstract
     private CommunityService commService;
     private UIDService uids;
     private MessageAddress agentId;
+    private Receptacle receptacle;
 
     protected LoggingService log;
 
@@ -203,17 +204,21 @@ abstract public class FacetImpl // should be abstract
 
 
 
-    private Receptacle receptacle;
     protected Receptacle getReceptacle()
     {
 	return receptacle;
+    }
+
+    protected Receptacle makeReceptacle()
+    {
+	return new ReceptacleImpl();
     }
 
     protected void linkPlayer()
     {
 	if (log.isInfoEnabled())
 	    log.info("Linking " +player+ " to " +this);
-	receptacle = new ReceptacleImpl();
+	receptacle = makeReceptacle();
 	player.facetAvailable(spec, receptacle);
     }
 
@@ -253,7 +258,7 @@ abstract public class FacetImpl // should be abstract
     }
 
     // Receptacle
-    private class ReceptacleImpl implements Receptacle {
+    protected class ReceptacleImpl implements Receptacle {
 	public void assertFact(Fact fact)
 	{
 	    FactRevision entry = new FactAssertion(fact);
