@@ -1,0 +1,21 @@
+/*
+ * =====================================================================
+ * (c) Copyright 2001  BBNT Solutions, LLC
+ * =====================================================================
+ */
+
+contract RemoteSSL
+    (
+     syscond quo::ExpectedCapacitySC quo_data::ExpectedCapacitySCImpl Bandwidth,
+     syscond quo::ValueSC ValueSCImpl UseSSL
+     
+     )
+{
+  region SSL (UseSSL  or 
+	      ( Bandwidth < 10000000 ))
+	{}
+    region Normal (true ) 
+	{}
+
+};
+

@@ -26,6 +26,7 @@ includes += -I$(root)
 includes += -I$(qosketroot)
 
 idl2pkg := -i2jpackage quo:com.bbn.quo.rmi
+idl2pkg += -i2jpackage quo_data:com.bbn.quo.data
 idl2pkg += -i2jpackage quo_corba:com.bbn.quo.corba
 idl2pkg += -i2jpackage qosket:com.bbn.quo.qosket
 idl2pkg += -i2jpackage instr:com.bbn.quo.instr.corba

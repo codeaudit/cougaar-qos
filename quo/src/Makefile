@@ -1,6 +1,7 @@
 classes=.classes
 jar=newquo.jar
-cougaar=${COUGAAR_INSTALL_PATH}/lib/core.jar
+#cougaar=${COUGAAR_INSTALL_PATH}/lib/core.jar
+cougaar=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
 src=$(shell find .  -name "*.java")
 thirdparty=../dev/3rdparty
 depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoInstr.jar:$(thirdparty)/UnixUtils.jar:$(thirdparty)/instrumentation.jar:$(thirdparty)/jacorb.jar
@@ -32,7 +33,7 @@ developers: gen $(jar)
 
 gen:
 	cd ../dev; make
-	install -m 777 -d $(classes)
+	mkdir -p $(classes)
 
 
 $(rmic_classfile): $(srcdir)/MTInstrumented.java

@@ -15,6 +15,7 @@ LINKS += SerializeNode
 LINKS += SimpleNode
 LINKS += StatNode
 LINKS += TraceNode
+LINKS += RemoteSSLNode
 
 install: $(LINKS)
 
@@ -38,6 +39,9 @@ FutileNode:
 
 NoisyNode:
 	ln -s wrapper NoisyNode
+
+RemoteSSLNode:
+	ln -s wrapper RemoteSSLNode
 
 SecureNode:
 	ln -s wrapper SecureNode

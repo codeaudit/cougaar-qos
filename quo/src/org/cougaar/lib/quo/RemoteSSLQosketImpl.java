@@ -1,0 +1,132 @@
+/* =====================================================================
+ * (c) Copyright 2001  BBNT Solutions, LLC
+ * =====================================================================
+ */
+
+package org.cougaar.lib.quo;
+
+import org.cougaar.core.mts.DestinationLink;
+import org.cougaar.core.mts.SSLRMILinkProtocol;
+import org.cougaar.core.society.Message;
+import org.cougaar.core.society.MessageAddress;
+import org.cougaar.core.qos.monitor.ResourceMonitorService;
+import org.cougaar.core.qos.monitor.QosMonitorService;
+
+import com.bbn.quo.rmi.QuoKernel;
+import com.bbn.quo.rmi.ValueSC;
+import com.bbn.quo.rmi.SysCond;
+import com.bbn.quo.rmi.ExpectedBandwidthSC;
+import com.bbn.quo.rmi.ExpectedCapacitySC;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class RemoteSSLQosketImpl
+    extends RemoteSSLQosketSkel
+{
+
+    private static String local_host;
+
+    static {
+	try {
+	    local_host = java.net.InetAddress.getLocalHost().getHostAddress();
+	} catch (java.net.UnknownHostException ex) {
+	    local_host = "127.0.0.1";
+	}
+    }
+
+    private DestinationLink link;
+    private ResourceMonitorService rms;
+    private QosMonitorService qms;
+    private Timer timer = new Timer(true);
+
+
+    public void setDestinationLink(DestinationLink link) {
+	this.link = link;
+    }
+
+    public void setServices(ResourceMonitorService rms,
+			    QosMonitorService qms) 
+    {
+	this.rms = rms;
+	this.qms = qms;
+    }
+
+    public int computeCost(Message message) 
+    {
+	if (link.getProtocolClass() == SSLRMILinkProtocol.class) {
+	    return 1;
+	} else {
+	    return link.cost(message);
+	}
+    }
+
+
+
+    private class ExpectedCapacityUpdater extends TimerTask {
+	private MessageAddress agent;
+	private String host;
+	private ExpectedCapacitySC syscond;
+
+	ExpectedCapacityUpdater(MessageAddress agent,
+				ExpectedCapacitySC syscond)
+	{
+	    this.agent = agent;
+	    this.syscond = syscond;
+	}
+
+	public void run() {
+	    String new_host = rms.getHostForAgent(agent);
+	    if (new_host == null) return;
+	    if (host == null || !host.equals(new_host)) {
+		host = new_host;
+		System.out.println("===== New host " + host +
+				   " for agent " + agent);
+		try {
+		    syscond.setHosts(local_host, host);
+		} catch (java.rmi.RemoteException ex) {
+		    ex.printStackTrace();
+		}
+	    }
+	}
+    }
+	    
+	    
+
+    public void initSysconds(QuoKernel kernel) 
+	throws java.rmi.RemoteException
+    {
+
+	MessageAddress destination = link.getDestination();
+
+
+
+	SysCond syscond =  kernel.bindSysCond("UseSSL",
+					      "com.bbn.quo.rmi.ValueSC",
+					      "com.bbn.quo.ValueSCImpl");
+	System.out.println("Created UseSSL syscond");
+
+	UseSSL = (ValueSC) syscond;
+	boolean useSSL = Boolean.getBoolean("org.cougaar.lib.quo.UseSSL");
+	UseSSL.booleanValue(useSSL);
+
+	syscond = kernel.bindSysCond("Bandwidth",
+				     "com.bbn.quo.rmi.ExpectedCapacitySC",
+				     "com.bbn.quo.data.ExpectedCapacitySCImpl");
+	System.out.println("Created Bandwidth syscond");
+
+	Bandwidth = (ExpectedCapacitySC) syscond;
+	//force bandwidth to be low, incase host is not known yet
+	try {
+	    Bandwidth.setLong(1);
+	} catch (java.rmi.RemoteException ex) {
+	    ex.printStackTrace();	
+	}
+
+	TimerTask task1 = new ExpectedCapacityUpdater(destination, Bandwidth);
+	timer.schedule(task1, 0, 5000);
+	
+
+    }
+
+}

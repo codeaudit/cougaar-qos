@@ -225,6 +225,10 @@ public class CorbaLinkProtocol
 	    }
 	}
 
+	public MessageAddress getDestination() {
+	    return target;
+	}
+
 
 	public void forwardMessage(Message message) 
 	    throws NameLookupException, 

@@ -1,0 +1,35 @@
+#if !defined(REMOTESSL_IDL)
+#define REMOTESSL_IDL
+
+#include "MT.idl"
+#include "DestinationLink.idl"
+
+
+module org {
+    module cougaar {
+	module core {
+	    module qos {
+		module monitor {
+		    interface ResourceMonitorService;
+		    interface QosMonitorService;
+		};
+	    };
+	};
+
+	module lib {
+	    module quo {
+		interface RemoteSSLQosket {
+		    void setDestinationLink(in org::cougaar::core::mts::DestinationLink link);
+		    void setServices(in org::cougaar::core::qos::monitor::ResourceMonitorService rms,
+				     in org::cougaar::core::qos::monitor::QosMonitorService qms);
+		};
+
+		interface RemoteSSLDelegateQosket {
+		    long computeCost(in org::cougaar::core::society::Message msg);
+		};
+	    };
+	};
+    };
+};
+
+#endif

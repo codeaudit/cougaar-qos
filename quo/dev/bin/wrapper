@@ -5,8 +5,8 @@
 #!/bin/sh
 
 module=quo
-#COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/${module}/dev/3rdparty
-#export COUGAAR3RDPARTY
+COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/${module}/dev/3rdparty
+export COUGAAR3RDPARTY
 
 newcore=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
 newquo=${COUGAAR_SRC_PATH}/${module}/src/newquo.jar
