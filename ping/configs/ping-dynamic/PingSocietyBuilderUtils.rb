@@ -44,7 +44,7 @@ def addPing(source, dest, numAgents=1, args=nil)
       
     else  # We have LOTS of pingers, i.e. >=101, lengthen times
       args =
-	{'eventMillis' => '100000',    # delay between cougaar events
+	{'eventMillis' => '10000',    # delay between cougaar events
 	'delayMillis' => '0',        # delay between pings
 	'sendFillerSize' => '1000',     # extra bytes on send
 	'sendFillerRand' => 'false',  # randomize send bytes
