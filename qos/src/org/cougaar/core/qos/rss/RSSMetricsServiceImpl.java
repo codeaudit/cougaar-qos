@@ -29,6 +29,7 @@ import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
+import com.bbn.quo.data.SitesDB;
 import com.bbn.quo.data.RSSUtils;
 import com.bbn.quo.event.Connector;
 import com.bbn.quo.event.EventUtils;
@@ -38,6 +39,7 @@ import com.bbn.quo.event.data.StatusConsumerFeed;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.DataProvider;
 import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
 import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
@@ -62,7 +64,7 @@ import java.util.Timer;
  */
 public class RSSMetricsServiceImpl 
     extends QosComponent
-    implements MetricsService 
+    implements MetricsService, DataFeedRegistrationService
 {
 
     // Setup name->class mappings
@@ -198,8 +200,30 @@ public class RSSMetricsServiceImpl
 	}
     }
 
+    //Data Feed Registration Service
+    public boolean registerFeed(Object feed, String name) {
+	if (feed instanceof DataFeed) {
+	    RSS.instance().registerFeed((DataFeed) feed, name);
+	    return true;
+	} else {
+	    return false;
+	}
+    }
 
+    public void populateSites(String sitesURLString) {
+	java.net.URL sitesURL =null;
+	try {
+	    sitesURL = new java.net.URL(sitesURLString);
+	} catch (java.net.MalformedURLException ex) {
+	    ex.printStackTrace();
+	}
+	SitesDB db = RSS.instance().getSitesDB();
+	if (sitesURL !=null && db != null) {
+	    db.populate(sitesURL);
+	}
+    }
 
+    // Metric Service
     public Metric getValue(String path) {
 	Object rawValue = RSSUtils.getPathValue(path);
 	
