@@ -29,12 +29,17 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This interface is the common base between {@link Receptacle}s and
- * {@link Facet}s.  These are always paired, with the former
- * acccessible only to a {@link RolePlayer} and the latter
- * accessible only to a {@link CoordinationArtifact}.
+ * This interface is the common base of {@link Receptacle}s and {@link
+ * Facet}s.  The processing of these two interfaces are identical, but
+ * the accessibility is not: the methods here will be invoked on a
+ * Facet by a {@link CoordinationArtifact}, with its Blackboard, while
+ * the methods will be invoked on a Receptacle by a {@link
+ * RolePlayer}, with its Blackboard.  Note that, unlike 'Facet' and
+ * 'Receptacle', this interface is <i>not</i> analagous to the
+ * 'Executor' entity in the CORBA Componeny Model,  But it seemed like
+ * a good name anyway.
  */
-public interface Executor
+public interface BlackboardExecutor
 {
     /**
      * Process any queued facts.  This should be run in a blackboard
