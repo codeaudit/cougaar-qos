@@ -28,9 +28,13 @@ package org.cougaar.core.qos.ca;
 
 import java.util.Properties;
 
+import org.cougaar.core.util.UID;
+
 public interface FrameSet
 {
     public Frame findFrame(String kind, String slot, Object value);
+
+    public Frame findFrame(UID uid);
 
     public Object getFrameValue(Frame frame, String attribute);
 

@@ -212,7 +212,22 @@ public class SingleInheritanceFrameSet
     }
 
 
-
+    public Frame findFrame(UID uid)
+    {
+	Frame frame = null;
+	HashMap kb = null;
+	synchronized (kbs) {
+	    Iterator itr = kbs.values().iterator();
+	    while (itr.hasNext()) {
+		kb = (HashMap) itr.next();
+		synchronized (kb) {
+		    frame = (Frame) kb.get(uid);
+		    if (frame != null) return frame;
+		}
+	    }
+	}
+	return null;
+    }
 
     public Frame findFrame(String kind, String slot, Object value)
     {
