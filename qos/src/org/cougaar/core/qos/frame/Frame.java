@@ -75,7 +75,9 @@ public class Frame
 	return properties;
     }
 
-    public Frame getPrototype()
+
+
+    Frame getPrototype()
     {
 	Frame result = frameSet.getPrototype(this);
 	if (result == null) {
@@ -84,7 +86,7 @@ public class Frame
 	return result;
     }
 
-    public Frame getParent()
+    Frame getParent()
     {
 	Frame result = frameSet.getParent(this);
 	if (result == null) {
@@ -92,8 +94,6 @@ public class Frame
 	}
 	return result;
     }
-
-
 
     FrameSet getFrameSet()
     {
@@ -121,42 +121,42 @@ public class Frame
     // These should only be called from the FrameSet owning the
     // frame. 
 
-    public void setValue(String attribute, Object object)
+    public void setValue(String slot, Object object)
     {
-	properties.put(attribute, object);
-	frameSet.valueUpdated(this, attribute, object);
+	properties.put(slot, object);
+	frameSet.valueUpdated(this, slot, object);
     }
 
 
-    public Object getValue(String attribute)
+    public Object getValue(String slot)
     {
-	Object result = properties.get(attribute);
+	Object result = properties.get(slot);
 	if (result != null) return result;
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) {
-	    result = prototype.getValue(attribute);
+	    result = prototype.getValue(slot);
 	    if (result != null) return result;
 	}
 	Frame parent = frameSet.getParent(this);
 	if (parent != null) {
-	    return parent.getValue(attribute);
+	    return parent.getValue(slot);
 	}
 	return null;
     }
 
-    public Frame getSource(String attribute)
+    public Frame getSource(String slot)
     {
-	if (properties.containsKey(attribute)) return this;
+	if (properties.containsKey(slot)) return this;
 
 	Frame result = null;
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) {
-	    result = prototype.getSource(attribute);
+	    result = prototype.getSource(slot);
 	    if (result != null) return result;
 	}
 	Frame parent = frameSet.getParent(this);
 	if (parent != null) {
-	    return parent.getSource(attribute);
+	    return parent.getSource(slot);
 	}
 	return null;
     }
@@ -230,15 +230,15 @@ public class Frame
 
 
     public static class Change implements ChangeReport {
-	public final String attribute;
+	public final String slot;
 	public final Object value;
 	public Change(String attr, Object val)
 	{
-	    this.attribute = attr;
+	    this.slot = attr;
 	    this.value = val;
 	}
 	
-	public String getAttribute() { return attribute; }
+	public String getSlot() { return slot; }
 
 	public Object getValue() { return value; }
 
@@ -248,12 +248,12 @@ public class Frame
 	    return
 		((o == this) ||
 		 ((o instanceof Change) &&
-		  attribute.equals(((Change) o).attribute)));
+		  slot.equals(((Change) o).slot)));
 	}
 
 	public int hashCode() 
 	{
-	    return attribute.hashCode();
+	    return slot.hashCode();
 	}
     }
 

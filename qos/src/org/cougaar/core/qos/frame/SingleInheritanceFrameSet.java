@@ -331,15 +331,15 @@ public class SingleInheritanceFrameSet
     }
 
 
-    public void valueUpdated(Frame frame, String attribute, Object value)
+    public void valueUpdated(Frame frame, String slot, Object value)
     {
 	// handle the modification of parent-child relationship frames
 	if (isParentageRelation(frame))  establishParentage(frame);
 
 	// Publish the frame itself as the change, or just a change
-	// record for the specific attribute?
+	// record for the specific slot?
 	ArrayList changes = new ArrayList(1);
-	Frame.Change change = new Frame.Change(attribute, value);
+	Frame.Change change = new Frame.Change(slot, value);
 	changes.add(change);
 	if (bbs != null) bbs.publishChange(frame, changes);
     }

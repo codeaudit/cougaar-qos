@@ -105,7 +105,7 @@ abstract public class FactToFrameFacetImpl
 	Iterator itr = changes.iterator();
 	while (itr.hasNext()) {
 	    Frame.Change change = (Frame.Change) itr.next();
-	    String attr = change.getAttribute();
+	    String attr = change.getSlot();
 	    Object val = change.getValue();
 	    frame.setValue(attr, val);
 	}

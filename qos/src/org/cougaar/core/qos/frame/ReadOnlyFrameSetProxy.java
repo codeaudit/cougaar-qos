@@ -83,17 +83,17 @@ final class ReadOnlyFrameSetProxy
 
 
     // The rest are disallowed
-    public void valueUpdated(Frame frame, String attribute, Object value)
+    public void valueUpdated(Frame frame, String slot, Object value)
     {
 	throw new RuntimeException("Write operation on read-only object");
     }
 
-    public Frame makeFrame(String kind, Properties attributes)
+    public Frame makeFrame(String kind, Properties slots)
     {
 	throw new RuntimeException("Write operation on read-only object");
     }
 
-    public Frame makeFrame(String kind, Properties attributes, UID uid)
+    public Frame makeFrame(String kind, Properties slots, UID uid)
     {
 	throw new RuntimeException("Write operation on read-only object");
     }

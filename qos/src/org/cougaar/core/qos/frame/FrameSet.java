@@ -45,9 +45,9 @@ public interface FrameSet
 
     public Set findParents(Frame child, String relation_prototype);
 
-    public Frame makeFrame(String kind, Properties attributes);
+    public Frame makeFrame(String kind, Properties slots);
 
-    public Frame makeFrame(String kind, Properties attributes, UID uid);
+    public Frame makeFrame(String kind, Properties slots, UID uid);
 
     public Frame makePrototype(String kind, String parent, 
 			       Properties properties);
@@ -61,5 +61,5 @@ public interface FrameSet
 
     public Frame getPrototype(Frame frame);
 
-    public void valueUpdated(Frame frame, String attribute, Object value);
+    public void valueUpdated(Frame frame, String slot, Object value);
 }

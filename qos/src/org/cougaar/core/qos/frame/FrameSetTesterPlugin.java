@@ -28,7 +28,6 @@ package org.cougaar.core.qos.frame;
 
 import java.util.Properties;
 
-import org.cougaar.core.agent.service.alarm.Alarm;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
@@ -40,50 +39,8 @@ import org.cougaar.core.service.LoggingService;
 public class FrameSetTesterPlugin
     extends ParameterizedPlugin
 {
-    private class MyAlarm implements Alarm {
-	long expiresAt;
-	boolean expired = false;
-
-	public MyAlarm (long expirationTime) 
-	{
-	    expiresAt = System.currentTimeMillis()+expirationTime;
-	}
-
-	public long getExpirationTime() 
-	{
-	    return expiresAt; 
-	}
-
-	public synchronized void expire() 
-	{
-	    if (!expired) {
-		expired = true;
-		{
-		    BlackboardService bbs = getBlackboardService();
-		    if (bbs != null) bbs.signalClientActivity();
-		}
-	    }
-	}
-	public boolean hasExpired()
-	{ 
-	    return expired; 
-	}
-
-	public synchronized boolean cancel() 
-	{
-	    boolean was = expired;
-	    expired = true;
-	    return was;
-	}
-	
-    }
-
-
     private LoggingService log;
     private FrameSet frameSet;
-    private MyAlarm alarm;
-    private Frame host1;
-    private int delayCycles = 5;
 
     public void load()
     {
@@ -95,38 +52,9 @@ public class FrameSetTesterPlugin
            sb.getService(this, LoggingService.class, null);
     }
 
-
-
-    // plugin
-    protected void execute()
+    public void start()
     {
-	if (alarm == null) {
-	    newAlarm();
-	} else if (alarm.hasExpired()) {
-	    if (delayCycles > 0) {
-		--delayCycles;
-	    } else if (delayCycles == 0) {
-		initializeBlackboard();
-		--delayCycles;
-	    } else if (frameSet != null && host1 != null) {
-		Long now = new Long(System.currentTimeMillis());
-		if (log.isDebugEnabled())
-		    log.debug("Updated host1 \"time\" slot");
-		host1.setValue("time", now);
-	    }
-	    newAlarm();
-	}
-    }
-
-    private void newAlarm()
-    {
-	alarm = new MyAlarm(5000);
-	alarmService.addRealTimeAlarm(alarm);
-    }
-    
-    private void initializeBlackboard()
-    {
-
+	super.start();
 	String xml_filename = (String) getParameter("frame-set");
 	if (xml_filename != null) {
 	    ServiceBroker sb = getServiceBroker();
@@ -134,13 +62,17 @@ public class FrameSetTesterPlugin
 	    FrameSetService fss = (FrameSetService)
 		sb.getService(this, FrameSetService.class, null);
 	    frameSet = fss.loadFrameSet(xml_filename, sb, bbs);
-	    host1 = frameSet.findFrame("host", "name", "host1");
 	    sb.releaseService(this, FrameSetService.class, fss);
 	} else {
 	    if (log.isWarnEnabled())
 		log.warn("No FrameSet XML file was specified");
 	}
 
+    }
+
+    // plugin
+    protected void execute()
+    {
     }
 
     protected void setupSubscriptions() 

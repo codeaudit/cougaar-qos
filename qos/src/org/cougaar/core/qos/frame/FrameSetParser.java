@@ -135,8 +135,8 @@ public class FrameSetParser
 	    // no-op
 	} else if (name.equals("prototype")) {
 	    startPrototype(attrs);
-	} else if (name.equals("attribute")) {
-	    attribute(attrs);
+	} else if (name.equals("slot")) {
+	    slot(attrs);
 	} else if (name.equals("frames")) {
 	    // no-op
 	} else if (name.equals("frame")) {
@@ -235,14 +235,14 @@ public class FrameSetParser
 	frame_spec = null;
     }
 
-    private void attribute(Attributes attrs)
+    private void slot(Attributes attrs)
     {
 	if (log.isDebugEnabled())
-	    log.debug("attribute");
+	    log.debug("slot");
 
-	String attr = attrs.getValue("name");
+	String slot = attrs.getValue("name");
 	String value = attrs.getValue("value");
-	frame_spec.put(attr, value);
+	frame_spec.put(slot, value);
     }
 
     private void endFrameset()
