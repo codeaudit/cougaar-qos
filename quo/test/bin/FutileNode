@@ -1,11 +1,13 @@
 #!/bin/sh
 
+module=quo
 lp="-Dorg.cougaar.message.protocol.classes=org.cougaar.core.mts.LoopbackLinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.FutileSerializingLinkProtocol"
 
 COUGAAR_JAVA_ARGS="$lp"
 export COUGAAR_JAVA_ARGS
 
 
-exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+#exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+exec ${COUGAAR_SRC_PATH}/${module}/test/bin/Node $*
 
 

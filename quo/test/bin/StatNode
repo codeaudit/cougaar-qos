@@ -1,8 +1,9 @@
 #!/bin/sh
 
+module=quo
 COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.StatisticsAspect -Dorg.cougaar.message.transport.debug=statistics"
 export COUGAAR_JAVA_ARGS
 
 
-exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
-
+#exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*A
+exec ${COUGAAR_SRC_PATH}/${module}/test/bin/Node $*

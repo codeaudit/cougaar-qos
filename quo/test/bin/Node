@@ -2,3 +2,4 @@
 
 exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
 
+

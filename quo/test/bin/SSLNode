@@ -1,18 +1,11 @@
 #!/bin/sh
 
-ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password"
-
-
-protocols="-Dorg.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol"
-
-#debug="-Djavax.net.debug=ssl"
-debug="-Dorg.cougaar.message.transport.debug=policy"
-
-COUGAAR_JAVA_ARGS="$protocols $ssl $debug"
+module=quo
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/${module}/test/configs/ssl.props"
 export COUGAAR_JAVA_ARGS
 
 
-exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
-
+#exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+exec ${COUGAAR_SRC_PATH}/${module}/test/bin/Node $*
 
 
