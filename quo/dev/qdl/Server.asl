@@ -9,9 +9,9 @@ behavior MTInst ()
     qosket qosket::instrumentation::ServerInstrumentationDelegateQosket qk;
 
     
-    org::cougaar::core::society::MessageAddress org::cougaar::lib::quo::MTInstrumented::getMessageAddress ()
+    org::cougaar::core::mts::MessageAddress org::cougaar::lib::quo::MTInstrumented::getMessageAddress ()
 	{
-	    return_value org::cougaar::core::society::MessageAddress addr;
+	    return_value org::cougaar::core::mts::MessageAddress addr;
 
 	    inplaceof PREMETHODCONTRACTEVAL {
 	    }
@@ -24,7 +24,7 @@ behavior MTInst ()
 	}
 
     instr::Trace_rec org::cougaar::lib::quo::MTInstrumented::rerouteMessage
-	(in instr::Trace_rec record,  in org::cougaar::core::society::Message m)
+	(in instr::Trace_rec record,  in org::cougaar::core::mts::Message m)
 	{
 	    extern instr::Trace_rec rec;
 	    extern long length;

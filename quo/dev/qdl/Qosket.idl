@@ -10,15 +10,15 @@ module org {
         module lib {
             module quo {
                 interface DiagnoseDelegateQosket : qosket::instrumentation::InstrumentationDelegateQosket {
-                    void runDiagnostic (in org::cougaar::core::society::Message m, in org::cougaar::core::mts::MT mt);
+                    void runDiagnostic (in org::cougaar::core::mts::Message m, in org::cougaar::core::mts::MT mt);
                 };
                 interface CompressQosket {
                     void setInstrumentedServer (in org::cougaar::lib::quo::MTInstrumented object);
                 };
                 interface CompressDelegateQosket {
-                    void runCompression (in org::cougaar::core::society::Message message);
-                    void runSerializeOnly (in org::cougaar::core::society::Message message);
-                    void runSerializeAndCompress (in org::cougaar::core::society::Message message);
+                    void runCompression (in org::cougaar::core::mts::Message message);
+                    void runSerializeOnly (in org::cougaar::core::mts::Message message);
+                    void runSerializeAndCompress (in org::cougaar::core::mts::Message message);
                 };
                 interface DiagnoseQosket : qosket::instrumentation::InstrumentationQosket {
                 };

@@ -29,8 +29,8 @@ module org {
         module lib {
             module quo {
                 interface MTInstrumented {
-                    org::cougaar::core::society::MessageAddress getMessageAddress ();
-                    instr::Trace_rec rerouteMessage (in instr::Trace_rec record, in org::cougaar::core::society::Message m);
+                    org::cougaar::core::mts::MessageAddress getMessageAddress ();
+                    instr::Trace_rec rerouteMessage (in instr::Trace_rec record, in org::cougaar::core::mts::Message m);
                     instr::Trace_rec receiveCompressedMessage (in instr::Trace_rec record, in org::cougaar::lib::quo::Zippy compressedMessage);
                     void receiveOnlyCompressedMessage (in org::cougaar::lib::quo::Zippy compressedMessage);
                     void receiveOnlyCompressedBytes (in byteSeq compressedMessage);

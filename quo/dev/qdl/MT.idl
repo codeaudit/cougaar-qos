@@ -21,8 +21,8 @@ module org {
         module core {
             module mts {
                 interface MT {
-                    void rerouteMessage (in org::cougaar::core::society::Message m);
-                    org::cougaar::core::society::MessageAddress getMessageAddress ();
+                    void rerouteMessage (in org::cougaar::core::mts::Message m);
+                    org::cougaar::core::mts::MessageAddress getMessageAddress ();
                 };
             };
         };

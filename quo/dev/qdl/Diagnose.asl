@@ -11,7 +11,7 @@ behavior Diagnose ()
     qosket org::cougaar::lib::quo::DiagnoseDelegateQosket qk;
     remote_object org::cougaar::core::mts::MT remote;
 
-    void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::society::Message m) {
+    void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::mts::Message m) {
 	extern long length;
 
 	after METHODENTRY {
@@ -32,7 +32,7 @@ behavior Diagnose ()
     }
 
   
-    org::cougaar::core::society::MessageAddress org::cougaar::core::mts::MT::getMessageAddress () {
+    org::cougaar::core::mts::MessageAddress org::cougaar::core::mts::MT::getMessageAddress () {
     }
 
 
