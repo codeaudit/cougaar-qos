@@ -1,0 +1,12 @@
+The ping/config/ping directory contains single node configuration
+ of the ping society. 
+
+MiniPing.xml is a basic defination with agent mobility enabled
+MiniPing-metric.xml is a full throttle single-ping with the metric
+  service loaded
+
+To run MiniPing 
+cd $CIP/ping/config/ping
+$CIP/bin/Node MiniPing.xml NodeA
+or
+$CIP/bin/Node MiniPing-Metrics.xml NODE1

@@ -26,13 +26,16 @@
         -Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.mobility.ping=INFO
       </vm_parameter>
       <vm_parameter>
+        -Dorg.cougaar.core.agent.showTraffic=false
+      </vm_parameter>
+      <vm_parameter>
         -Dorg.cougaar.core.load.planning=false
       </vm_parameter>
       <vm_parameter>
         -Dorg.cougaar.core.load.community=false
       </vm_parameter>
       <vm_parameter>
-        -Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/configs/ping
+        -Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/ping/configs/ping
       </vm_parameter>
       <vm_parameter>
         -XX:ThreadStackSize=256
@@ -323,7 +326,10 @@
             target=AgentB
           </argument>
           <argument>
-            delayMillis=1000
+            delayMillis=0
+          </argument>
+          <argument>
+            eventMillis=10000
           </argument>
         </component>
         <component

@@ -43,7 +43,7 @@ for additional usage and testing notes.
       <vm_parameter>-Dorg.cougaar.core.load.planning=false</vm_parameter>
       <vm_parameter>-Dorg.cougaar.core.load.community=false</vm_parameter>
       <!-- minimal config path, excludes "configs/common" -->
-      <vm_parameter>-Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/configs/ping</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/ping/configs/ping</vm_parameter>
       <!-- the rest is probably okay as-is -->
       <vm_parameter>-XX:ThreadStackSize=256</vm_parameter>
       <vm_parameter>-Xms16m</vm_parameter>
