@@ -92,10 +92,7 @@ abstract public class FactToFrameFacetImpl
     private void processNewFrame(Object fact)
     {
 	Frame frame = getFrame(fact);
-	String kind = frame.getKind();
-	Properties props = frame.getProperties();
-	UID uid = frame.getUID();
-	frameSet.makeFrame(kind, props, uid);
+	frame.copyToFrameSet(frameSet);
     }
 
     private void processModifiedFrame(Object fact)

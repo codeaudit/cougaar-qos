@@ -81,7 +81,13 @@ final class ReadOnlyFrameSetProxy
 	throw new RuntimeException("Write operation on read-only object");
     }
 
-    public Frame makePrototype(String kind, Properties properties)
+    public Frame makePrototype(String kind, String parent,Properties properties)
+    {
+	throw new RuntimeException("Write operation on read-only object");
+    }
+
+    public Frame makePrototype(String kind, String parent,
+			       Properties properties, UID uid)
     {
 	throw new RuntimeException("Write operation on read-only object");
     }

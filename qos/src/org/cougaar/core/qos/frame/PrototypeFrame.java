@@ -30,29 +30,33 @@ import java.util.Properties;
 
 import org.cougaar.core.util.UID;
 
-public interface FrameSet
+public class PrototypeFrame
+    extends Frame
 {
-    public String getName();
+    private String prototype_name;
 
-    public Frame findFrame(String kind, String slot, Object value);
+    PrototypeFrame(FrameSet frameSet, String prototype_name,
+		   String parent, UID uid, Properties properties)
+    {
+	super(frameSet, parent, uid, properties);
+	this.prototype_name = prototype_name;
+    }
 
-    public Frame findFrame(UID uid);
+    public String getPrototypeName()
+    {
+	return prototype_name;
+    }
 
-    public Frame makeFrame(String kind, Properties attributes);
 
-    public Frame makeFrame(String kind, Properties attributes, UID uid);
+    public String toString()
+    {
+	return "<Prototype " +prototype_name+ " " +getUID()+ ">";
+    }
 
-    public Frame makePrototype(String kind, String parent, 
-			       Properties properties);
+    void copyToFrameSet(FrameSet frameSet)
+    {
+	frameSet.makePrototype(prototype_name, getKind(), getProperties(), 
+			       getUID());
+    }
 
-    public Frame makePrototype(String kind, String parent, 
-			       Properties properties, UID uid);
-
-    public void removeFrame(Frame frame);
-
-    public Frame getParent(Frame frame);
-
-    public Frame getPrototype(Frame frame);
-
-    public void valueUpdated(Frame frame, String attribute, Object value);
 }

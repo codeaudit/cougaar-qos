@@ -58,17 +58,19 @@ public class FrameSetParser
     private static class FrameSpec
     {
 	String kind;
+	String parent;
 	Properties props;
 
-	FrameSpec(String kind)
+	FrameSpec(String kind, String parent)
 	{
 	    this.kind = kind;
+	    this.parent = parent;
 	    props = new Properties();
 	}
 
 	Frame makePrototype(FrameSet frameSet)
 	{
-	    return frameSet.makePrototype(kind, props);
+	    return frameSet.makePrototype(kind, parent, props);
 	}
 
 	Frame makeFrame(FrameSet frameSet)
@@ -196,7 +198,8 @@ public class FrameSetParser
     private void startPrototype(Attributes attrs)
     {
 	String kind = attrs.getValue("name");
-	frame_spec = new FrameSpec(kind);
+	String parent = attrs.getValue("prototype");
+	frame_spec = new FrameSpec(kind, parent);
     }
 
     private void endPrototype()
@@ -208,7 +211,7 @@ public class FrameSetParser
     private void startFrame(Attributes attrs)
     {
 	String kind = attrs.getValue("prototype");
-	frame_spec = new FrameSpec(kind);
+	frame_spec = new FrameSpec(kind, null);
     }
 
     private void endFrame()

@@ -32,14 +32,17 @@ import java.util.Properties;
 import org.cougaar.core.blackboard.ChangeReport;
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
-public final class Frame
+public class Frame
     implements UniqueObject
 {
     private final UID uid;
     private final String kind;
     private VisibleProperties properties;
     private transient FrameSet frameSet;
+    private transient Logger log = Logging.getLogger(getClass().getName());
 
     Frame(FrameSet frameSet, String kind, UID uid, Properties properties)
     {
@@ -68,10 +71,34 @@ public final class Frame
 	return properties;
     }
 
+    public Frame getPrototype()
+    {
+	Frame result = frameSet.getPrototype(this);
+	if (result == null) {
+	    if (log.isWarnEnabled()) log.warn(this + " has no prototype!");
+	}
+	return result;
+    }
+
+    public Frame getParent()
+    {
+	Frame result = frameSet.getParent(this);
+	if (result == null) {
+	    if (log.isDebugEnabled()) log.debug(this + " has no parent!");
+	}
+	return result;
+    }
+
+
 
     FrameSet getFrameSet()
     {
 	return frameSet;
+    }
+
+    void copyToFrameSet(FrameSet frameSet)
+    {
+	frameSet.makeFrame(kind, properties, uid);
     }
 
     // These should only be called from the FrameSet owning the
@@ -88,14 +115,14 @@ public final class Frame
     {
 	Object result = properties.get(attribute);
 	if (result != null) return result;
+	Frame prototype = frameSet.getPrototype(this);
+	if (prototype != null) {
+	    return prototype.getValue(attribute);
+	}
 	Frame parent = frameSet.getParent(this);
 	if (parent != null) {
 	    result = parent.getValue(attribute);
 	    if (result != null) return result;
-	}
-	Frame prototype = frameSet.getPrototype(this);
-	if (prototype != null) {
-	    return prototype.getValue(attribute);
 	}
 	return null;
     }
