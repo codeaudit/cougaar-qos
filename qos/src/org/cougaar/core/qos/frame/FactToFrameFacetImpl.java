@@ -109,7 +109,7 @@ abstract public class FactToFrameFacetImpl
 	    Frame.Change change = (Frame.Change) itr.next();
 	    String attr = change.getAttribute();
 	    Object val = change.getValue();
-	    frameSet.setFrameValue(frame, attr, val);
+	    frame.setValue(attr, val);
 	}
 	
     }

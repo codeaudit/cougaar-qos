@@ -112,7 +112,7 @@ public class FrameSetTesterPlugin
 		Long now = new Long(System.currentTimeMillis());
 		if (log.isDebugEnabled())
 		    log.debug("Updated host1 \"time\" slot");
-		frameSet.setFrameValue(host1, "time", now);
+		host1.setValue("time", now);
 	    }
 	    newAlarm();
 	}

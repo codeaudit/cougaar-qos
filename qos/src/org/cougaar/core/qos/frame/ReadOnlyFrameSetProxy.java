@@ -49,14 +49,19 @@ final class ReadOnlyFrameSetProxy
 	return frameSet.findFrame(uid);
     }
 
-    public Object getFrameValue(Frame frame, String attribute)
+    public Frame getParent(Frame frame)
     {
-	return frameSet.getFrameValue(frame, attribute);
+	return frameSet.getParent(frame);
+    }
+
+    public Frame getPrototype(Frame frame)
+    {
+	return frameSet.getPrototype(frame);
     }
 
 
     // The rest are disallowed
-    public void setFrameValue(Frame frame, String attribute, Object value)
+    public void valueUpdated(Frame frame, String attribute, Object value)
     {
 	throw new RuntimeException("Write operation on read-only object");
     }
