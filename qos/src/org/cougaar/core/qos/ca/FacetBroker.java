@@ -36,13 +36,19 @@ import org.cougaar.core.component.ServiceBroker;
  */
 public interface FacetBroker
 {
-    // A FacetProvider plugin has loaded
+    /**
+     * When a FacetProvider plugin is avaliable for use, it should
+     * call this.  The kind is the Coordinarion Artifact kind.
+    */
     public void registerFacetProvider(String kind, FacetProvider plugin);
 
 
-    // Asynchronous, no return value.  When the requested facet is
-    // available the facetAvailable callback will be invoked on the
-    // rolePlayer (could happen inline).
+    /**
+     * Thisi is an asynchronous that binds a RolePlayer to a Facet.
+     * The desired Facet is described by the spec.  When a
+     * FacetProvider is available, the facetAvailable callback will be
+     * invoked on the rolePlayer.  This callback could happen inline.
+    */
     public void requestFacet(ConnectionSpec spec, RolePlayer rolePlayer);
 
 }

@@ -26,6 +26,9 @@
 
 package org.cougaar.core.qos.ca;
 
+/**
+ * This class represents a queued assertion of a Fact.
+ */
 public class FactAssertion 
     extends FactRevision 
 {

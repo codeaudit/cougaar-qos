@@ -26,6 +26,10 @@
 
 package org.cougaar.core.qos.ca;
 
+/**
+ * This abstration represents a queued retraction or assertion of a
+ * Fact.
+ */
 public abstract class FactRevision  
 {
     private Fact fact;

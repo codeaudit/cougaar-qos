@@ -30,7 +30,7 @@ import java.util.Properties;
 
 /**
  * This simple struct provides a specification for a role in
- * particular CoodinationArtifact.  It's used by RolePlayers to get
+ * particular CoordinationArtifact.  It's used by RolePlayers to get
  * themselves connected.
  */
 public class ConnectionSpec

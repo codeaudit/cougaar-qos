@@ -32,6 +32,16 @@ package org.cougaar.core.qos.ca;
  */
 public interface FacetProvider
 {
+    /**
+     * Returns true iff the FacetProvider can provided the requested
+     * Facet.  Ordinarily this depends only on the kind field of the
+     * spec.
+    */
     public boolean matches(ConnectionSpec spec);
+
+    /**
+     * Does the linkage between the Facet and the RolePlayer for the
+     * specified role.
+    */
     public void provideFacet(ConnectionSpec spec, RolePlayer player);
 }

@@ -26,7 +26,9 @@
 
 package org.cougaar.core.qos.ca;
 
-
+/**
+ * This class represents a queued retraction of a Fact.
+ */
 public class FactRetraction extends FactRevision 
 {
     FactRetraction(Fact fact, Facet facet) {
