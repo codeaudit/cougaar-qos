@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.ca;
 
 import org.cougaar.core.service.BlackboardService;
+import org.cougaar.core.service.community.Community;
 
 /**
  * A Receptacle represents a {@link RolePlayer}'s viewport into some
@@ -62,5 +63,6 @@ public interface Receptacle
     */
     public String getArtifactId();
 
+    public Community getCommunity();
 
 }

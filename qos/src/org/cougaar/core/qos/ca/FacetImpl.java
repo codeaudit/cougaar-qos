@@ -285,6 +285,11 @@ abstract public class FacetImpl
 	    return FacetImpl.this.getArtifactKind();
 	}
 
+	public Community getCommunity()
+	{
+	    return community;
+	}
+
     }
 
 }
