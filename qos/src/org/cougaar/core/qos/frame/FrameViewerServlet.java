@@ -31,7 +31,9 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.servlet.http.HttpServlet;
@@ -40,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.cougaar.core.servlet.ComponentServlet;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.util.UID;
+import org.cougaar.util.Sortings;
 
 /**
  * This servlet displays {@link FrameSet}s and allows the user
@@ -48,15 +51,18 @@ import org.cougaar.core.util.UID;
  * To load this servlet, add the following to any agent's XML
  * configuration:<pre> 
  *    &lt;component
- *      class="org.cougaar.core.qos.frame.FrameViewerServlet"&gt;
- *      &lt;argument&gt;/color&lt;/argument&gt;
- *    &lt;/component&gt;
+ *      class="org.cougaar.core.qos.frame.FrameViewerServlet"/&gt;
  * </pre>
  */
 public class FrameViewerServlet extends ComponentServlet {
 
   private LoggingService log;
   private FrameSetService fss;
+
+  protected String getPath() {
+    String s = super.getPath();
+    return (s == null ? "/frames" : s);
+  }
 
   public void setLoggingService(LoggingService log) {
     this.log = log;
@@ -184,23 +190,103 @@ public class FrameViewerServlet extends ComponentServlet {
     }
 
     private void writeSearchPage() {
+      Set names = fss.getNames();
       out.print(
-          "<html><body>\n"+
-          "<form method=\"GET\" action=\""+
+          "<html><head>\n"+
+          "<script language=\"javascript\">\n"+
+          "<!--\n"+
+          "var names = new Array();\n"+
+          "var kinds = new Array();\n");
+      if (names != null && names.size() > 0) {
+        Set allKinds = new HashSet();
+        int i = 0;
+        for (Iterator itr = Sortings.sort(names).iterator();
+            itr.hasNext();
+            i++) {
+          String ni = (String) itr.next();
+          FrameSet fs = fss.findFrameSet(ni, null);
+          if (fs == null) continue;
+          out.print(
+              "names["+i+"] = '"+ni+"';\n"+
+              "kinds["+i+"] = [ '*'");
+          Set kinds = fs.getPrototypes();
+          if (kinds != null) {
+            allKinds.addAll(kinds);
+            for (Iterator i2 = Sortings.sort(kinds).iterator();
+                i2.hasNext();
+                ) {
+              out.print(", '"+((String) i2.next())+"'");
+            }
+          }
+          out.print(" ];\n");
+        }
+        out.print(
+            "names["+i+"] = '*';\n"+
+            "kinds["+i+"] = [ '*'");
+        for (Iterator i2 = Sortings.sort(allKinds).iterator();
+            i2.hasNext();
+            ) {
+          out.print(", '"+((String) i2.next())+"'");
+        }
+        out.print(" ];\n");
+      }
+      out.print(
+          "\n"+
+          "function init() {\n"+
+          "  var box = document.myform."+NAME_PARAM+";\n"+
+          "  for (var i = 0; i < names.length; i++) {\n"+
+          "    box.options[i] = new Option(names[i], names[i]);\n"+
+          "  }\n"+
+          "  box.options[0].selected = true;\n"+
+          "  setKinds();\n"+
+          "}\n"+
+          "\n"+
+          "function setKinds() {\n"+
+          "  var nameIdx = document.myform."+NAME_PARAM+
+          ".selectedIndex;\n"+
+          "  var vals = kinds[nameIdx]\n"+
+          "  var box = document.myform."+KIND_PARAM+";\n"+
+          "  box.options.length = 0;\n"+
+          "  for (var i = 0; i < vals.length; i++) {\n"+
+          "    box.options[i] = new Option(vals[i], vals[i]);\n"+
+          "  }\n"+
+          "  box.options[0].selected = true;\n"+
+          "}\n"+
+          "-->\n"+
+          "</script>\n"+
+          "</head>\n");
+      out.print(
+          "<body onload=\"init()\">\n"+
+          "<form name=\"myform\" method=\"GET\" action=\""+
           request.getRequestURI()+
           "\" target=\""+RESULT_PAGE+"\">\n"+
           "<b>Find FrameSet:</b><br>\n"+
           "<input type=hidden name=\""+PAGE_PARAM+
           "\" value=\""+RESULT_PAGE+"\"/>\n"+
           "<table border=\"0\">\n");
-      writeInput("FrameSet Name:&nbsp;", NAME_PARAM, name);
-      writeInput("Prototype Kind:&nbsp;", KIND_PARAM, kind);
+      // drop-down names
+      out.print(
+          "<tr><td>FrameSet Name:&nbsp;</td><td>"+
+          "<select name=\""+NAME_PARAM+
+          "\" onchange=\"setKinds();\"/>\n"+
+          "</td></tr>\n");
+      // drop-down kinds
+      out.print(
+          "<tr><td>Prototype Kind:&nbsp;</td><td>"+
+          "<select name=\""+KIND_PARAM+"\"/>\n");
       out.print("<tr><td colspan=3>Properties:</td></tr>\n");
       for (int i = 0; i < NUM_SEARCH_SLOTS; i++) {
-        writeInput(
-            "&nbsp;&nbsp;"+i+":&nbsp;",
-            SLOT_PARAM+i, slots[i],
-            VALUE_PARAM+i, values[i]);
+        out.print(
+            "<tr><td>&nbsp;&nbsp;"+i+":&nbsp;</td>"+
+            "<td><input name=\""+
+            SLOT_PARAM+i+"\" type=\"text\" size=\"20\" value=\""+
+            (slots[i] == null ? "" : slots[i])+
+            "\"></td>"+
+            "<td><input name=\""+
+            VALUE_PARAM+i+"\" type=\"text\" size=\"20\" value=\""+
+            (values[i] == null ? "" : values[i])+
+            "\"></td>"+
+            "</tr>\n");
       }
       out.print(
           "<tr><td>"+
@@ -221,13 +307,43 @@ public class FrameViewerServlet extends ComponentServlet {
         return;
       }
 
-      FrameSet fs = fss.findFrameSet(name, null);
+      if (name.equals("*")) {
+        Set names = fss.getNames();
+        if (names != null && names.size() > 0) {
+          int i = 0;
+          for (Iterator itr = Sortings.sort(names).iterator();
+              itr.hasNext();
+              i++) {
+            String ni = (String) itr.next();
+            out.print(
+                "<table border=1>\n"+
+                "<tr bgcolor=\"DDDDDD\"><th>"+
+                "FrameSet "+i+": "+ni+"</th></tr>"+
+                "<tr><td>\n");
+            writeFrameSet(ni);
+            out.print(
+                "</td></tr>\n"+
+                "</table>\n");
+          }
+        }
+      } else {
+        writeFrameSet(name);
+      }
+
+      out.print(
+          "</body></html>");
+    }
+
+    private void writeFrameSet(String fsname) {
+      FrameSet fs = fss.findFrameSet(fsname, null);
       if (fs == null) {
-        out.print(
-            "Unknown FrameSet Name.\n"+
-            "</body></html>\n");
+        out.print("Unknown FrameSet Name: "+fsname+"<p>\n");
         return;
       }
+      writeFrameSet(fs);
+    }
+
+    private void writeFrameSet(FrameSet fs) {
 
       Properties slot_value_pairs = new Properties();
       for (int i = 0; i < NUM_SEARCH_SLOTS; i++) {
@@ -235,7 +351,23 @@ public class FrameViewerServlet extends ComponentServlet {
         slot_value_pairs.setProperty(slots[i], values[i]);
       }
 
-      Set frames = fs.findFrames(kind, slot_value_pairs);
+      Set frames;
+      if (kind.equals("*")) {
+        frames = new HashSet();
+        Set kinds = fs.getPrototypes();
+        if (kinds != null && !kinds.isEmpty()) {
+          for (Iterator i2 = Sortings.sort(kinds).iterator();
+              i2.hasNext();
+              ) {
+            String k = (String) i2.next();
+            Set set = fs.findFrames(k, slot_value_pairs);
+            if (set == null) continue;
+            frames.addAll(set);
+          }
+        }
+      } else {
+        frames = fs.findFrames(kind, slot_value_pairs);
+      }
 
       int nframes = (frames == null ? 0 : frames.size());
       out.print(
@@ -244,7 +376,6 @@ public class FrameViewerServlet extends ComponentServlet {
           (nframes > 0 ? ":<p>" : ".")+
           "\n");
       if (nframes == 0) {
-        out.print("</body></html>");
         return;
       }
 
@@ -254,17 +385,12 @@ public class FrameViewerServlet extends ComponentServlet {
           ) {
         Frame f = (Frame) itr.next();
         i++;
-        writeFrame(f, i);
+        writeFrame(f, fs, i);
         out.print("<p>\n");
       }
-      out.print(
-          "</body></html>");
     }
 
-    private void writeFrame(Frame f, int i) {
-      out.print(
-          "<a name=\"frame"+i+"\">");
-
+    private void writeFrame(Frame f, FrameSet fs, int i) {
       UID uid = f.getUID();
 
       boolean selected = false;
@@ -290,12 +416,12 @@ public class FrameViewerServlet extends ComponentServlet {
 
       out.print(
           "<table border=1>\n"+
-          "<tr><th colspan=4>"+
+          "<tr bgcolor=\"DDDDDD\"><th colspan=4>"+
           (f instanceof PrototypeFrame ? "Prototype" : "Frame")+
           " "+i+"</th></tr>\n"+
           "<tr><td><table border=0>\n"+
           "<tr><td>FrameSet Name: &nbsp;</td><td colspan=3>"+
-          name+"</td></tr>\n"+
+          fs.getName()+"</td></tr>\n"+
           "<tr><td>Kind: &nbsp;</td><td colspan=3>"+
           f.getKind()+"</td></tr>\n"+
           "<tr><td>UID: &nbsp;</td><td colspan=3>"+
@@ -379,32 +505,6 @@ public class FrameViewerServlet extends ComponentServlet {
           "</tr>\n"+
           "</table>"+
           "</td></tr></table>\n");
-    }
-
-    private void writeInput(
-        String description, String name, String value) {
-      out.print(
-          "<tr><td>"+description+"</td>"+
-          "<td colspan=2><input name=\""+
-          name+"\" type=\"text\" size=\"40\" value=\""+
-          (value == null ? "" : value)+
-          "\"></td>"+
-          "</tr>\n");
-    }
-    private void writeInput(
-        String description,
-        String n1, String v1, String n2, String v2) {
-      out.print(
-          "<tr><td>"+description+"</td>"+
-          "<td><input name=\""+
-          n1+"\" type=\"text\" size=\"20\" value=\""+
-          (v1 == null ? "" : v1)+
-          "\"></td>"+
-          "<td><input name=\""+
-          n2+"\" type=\"text\" size=\"20\" value=\""+
-          (v2 == null ? "" : v2)+
-          "\"></td>"+
-          "</tr>\n");
     }
 
     private String linkToUID(UID uid) {
