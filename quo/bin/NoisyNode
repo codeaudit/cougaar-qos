@@ -1,7 +1,12 @@
 #!/bin/sh
 
 
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.debug=policy,comm"
+logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_SRC_PATH/quo/bin/props/cougaar/logging.props
+
+debug=-Dorg.cougaar.message.transport.debug=policy,comm
+
+COUGAAR_JAVA_ARGS="$debug $logging"
+
 export COUGAAR_JAVA_ARGS
 
 exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
