@@ -26,13 +26,14 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * A simple representation of a fact, likely to be replaced later by
  * Jess facts.  This implementation is for immutable facts.
  */
-public class Fact
+public class Fact implements Serializable
 {
     private String type;
     private HashMap attributes;
