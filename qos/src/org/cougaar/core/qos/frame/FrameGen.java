@@ -141,8 +141,10 @@ public class FrameGen
     {
 	HashMap local_slots = (HashMap) proto_slots.get(proto);
 	String parent = (String) proto_parents.get(proto);
+	String container = (String) proto_containers.get(proto);
 	if (local_slots != null) slots.addAll(local_slots.keySet());
 	if (parent != null) collectSlots(parent, slots);
+	if (container != null) collectSlots(container, slots);
     }
 
     static String fix_name(String name, boolean is_class)

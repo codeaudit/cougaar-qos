@@ -136,33 +136,6 @@ abstract public class Frame
 	return props;
     }
 
-    public Properties getIndirectSlots()
-    {
-	Frame parent = parentFrame();
-	if (parent == null) return null;
-
-	Properties props = new VisibleProperties();
-	Class klass = parent.getClass();
-	try {
-	    java.lang.reflect.Method[] meths = klass.getMethods();
-	    for (int i=0; i<meths.length; i++) {
-		java.lang.reflect.Method meth = meths[i];
-		Class ret_type = meth.getReturnType();
-		Class[] params = meth.getParameterTypes();
-		String name = meth.getName();
-		if (name.startsWith("get") &&
-		    ret_type == Object.class &&
-		    params.length == 0) {
-		    Object value = meth.invoke(parent, ARGS0);
-		    props.put(name.substring(3), value);
-		}
-	    }
-	} catch (Exception ex) {
-	    // do we care?
-	}
-	return props;
-    }
-
     public String getParentKind()
     {
 	Frame parent = parentFrame();
