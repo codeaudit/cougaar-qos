@@ -89,6 +89,18 @@ abstract public class QueryFacet
     abstract protected boolean acceptFact(Object fact);
 
 
+    public AttributeBasedAddress makeABA(String communityName)
+    {
+	return 
+	    AttributeBasedAddress.getAttributeBasedAddress(communityName, 
+							   "Role", 
+							   communityRole);
+    }
+
+
+
+
+
     /*
      * 	subscribe to ResponseRelays from yourself & all DOSNODEs
      */
@@ -140,14 +152,6 @@ abstract public class QueryFacet
 		log.debug("Observed removed ResponseSub"+tr);
 	    }
 	}
-    }
-
-    public AttributeBasedAddress makeABA(String communityName)
-    {
-	return 
-	    AttributeBasedAddress.getAttributeBasedAddress(communityName, 
-							   "Role", 
-							   communityRole);
     }
 
 

@@ -119,8 +119,31 @@ abstract public class CoordinationArtifactImpl
 	}
 	for (int i=0; i<copy.size(); i++) {
 	    Facet facet = (Facet) copy.get(i);
+ 	    facet.execute(blackboard);
+	}
+    }
+
+    public void runRuleEngine(BlackboardService blackboard) 
+    {
+	List copy = null;
+	synchronized (facets) {
+	    copy = new ArrayList(facets);
+	}
+	for (int i=0; i<copy.size(); i++) {
+	    Facet facet = (Facet) copy.get(i);
+	    facet.runRuleEngine(blackboard);
+	}
+    }
+
+    public void processFactBase(BlackboardService blackboard) 
+    {
+	List copy = null;
+	synchronized (facets) {
+	    copy = new ArrayList(facets);
+	}
+	for (int i=0; i<copy.size(); i++) {
+	    Facet facet = (Facet) copy.get(i);
 	    facet.processFactBase(blackboard);
-	    facet.execute(blackboard);
 	}
     }
 

@@ -126,6 +126,14 @@ abstract public class CoordinationArtifactTemplatePlugin
 	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
 	    ca.execute(blackboard);
 	}
+	for (int i=0; i<copy.size(); i++) {
+	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
+	    ca.runRuleEngine(blackboard);
+	}
+	for (int i=0; i<copy.size(); i++) {
+	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
+	    ca.processFactBase(blackboard);
+	}
     }
 
 

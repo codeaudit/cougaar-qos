@@ -37,6 +37,13 @@ public interface Facet
 {
 
     /**
+     * Run the player's rule engine. This should be run in a
+     * blackboard transaction.  Usually invoked by the {@link
+     * CoordinationArtifact} that owns the facet
+     */
+    public void runRuleEngine(BlackboardService blackboard);
+
+    /**
      * Process any queued facts.  This should be run in a blackboard
      * transaction.  Usually invoked by the {@link
      * CoordinationArtifact} that owns the facet.

@@ -34,6 +34,7 @@ import java.util.Observer;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.AgentIdentificationService;
+import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
 import org.cougaar.core.service.community.CommunityService;
@@ -208,7 +209,10 @@ abstract public class FacetImpl
     }
 
 
-
+    public void runRuleEngine(BlackboardService blackboard)
+    {
+	player.runRuleEngine();
+    }
 
     
     // Fact base

@@ -38,4 +38,5 @@ public interface RolePlayer
 
     public void facetAvailable(ConnectionSpec spec, Receptacle receptacle);
 
+    public void runRuleEngine();
 }

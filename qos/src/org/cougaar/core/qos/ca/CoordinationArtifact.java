@@ -61,11 +61,25 @@ public interface CoordinationArtifact
 
 
     /**
-     * Runs code in a Blackboard transaction.  This will be invoked
-     * from within the corresponding {@link
+     * Handle subscriptions in a Blackboard transaction.  This will be
+     * invoked from within the corresponding {@link
      * CoordinationArtifactTemplate} plugin's execute method.
      */
     public void execute(BlackboardService service);
+
+    /**
+     * Run the rule engine in a Blackboard transaction.  This will be
+     * invoked from within the corresponding {@link
+     * CoordinationArtifactTemplate} plugin's execute method.
+     */
+    public void runRuleEngine(BlackboardService service);
+
+    /**
+     * Process fact base in a Blackboard transaction.  This will be
+     * invoked from within the corresponding {@link
+     * CoordinationArtifactTemplate} plugin's execute method.
+     */
+    public void processFactBase(BlackboardService service);
 
 
     /**
