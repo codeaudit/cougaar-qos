@@ -89,7 +89,7 @@ abstract public class QueryFacet
 				       communityType,
 				       managerAttr, 
 				       getAgentID().getAddress());
-	findCommunityForAny(filter);
+	findCommunityForAny(filter, null);
     }
 
     abstract protected boolean acceptFact(Object fact);

@@ -23,6 +23,7 @@
 package org.cougaar.core.qos.ca;
 
 
+import org.cougaar.util.UnaryPredicate;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 import org.cougaar.core.mts.MessageAddress;
@@ -32,6 +33,7 @@ import org.cougaar.core.service.community.CommunityResponseListener;
 import org.cougaar.core.service.community.CommunityService;
 import org.cougaar.core.service.community.CommunityChangeListener;
 import org.cougaar.core.service.community.CommunityChangeEvent;
+import org.cougaar.core.service.community.Entity;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -53,14 +55,17 @@ abstract public class CommunityFinder
     private Community community;
 
     protected String filter;
+    protected UnaryPredicate predicate;
     protected CommunityService svc;
     protected Logger logger;
 
     public CommunityFinder(CommunityService svc,
-			   String filter)
+			   String filter,
+			   UnaryPredicate predicate)
     {
 	this.svc = svc;
 	this.filter = filter;
+	this.predicate = predicate;
 	logger = Logging.getLogger("org.cougaar.core.qos.ca.CommunityFinder");
     }
 
@@ -81,37 +86,45 @@ abstract public class CommunityFinder
 	if (repost) postQuery();
     }
 
-    private synchronized void foundCommunity(String community_found,
-				Community community) 
+    private void getCommunity(String community_name, Community community)
     {
-	if (logger.isDebugEnabled())
-	    logger.debug("Community = " + community_found);
-	boolean notify; // only notify observers once
-	notify = this.community_name == null;
-	if (notify) {
-	    this.community_name = community_found;
-	    if (community != null) {
-		this.community = community;
-	    } else {
-		// find the actual community
-		CommunityResponseListener crl = 
-		    new CommunityResponseListener () {
-			public void getResponse(CommunityResponse response)
-			{
-			    Object xxx = response.getContent();
-			    if (xxx instanceof Community) {
-				CommunityFinder.this.community = (Community)
-				    xxx;
-			    } else {
-				; // ???
-			    }
-			}
-		    };
-		this.community = svc.getCommunity(community_name, crl);
-	    }
+	if (community != null) {
+	    this.community = community;
+	    return;
 	}
 
-	if (notify) {
+	CommunityResponseListener crl = 
+	    new CommunityResponseListener () {
+		public void getResponse(CommunityResponse response)
+		{
+		    Object xxx = response.getContent();
+		    if (xxx instanceof Community) {
+			CommunityFinder.this.community = (Community) xxx;
+		    }
+		}
+	    };
+	this.community = svc.getCommunity(community_name, crl);
+    }
+
+    private boolean shouldNotify(Community community)
+    {
+	return predicate == null || predicate.execute(community);
+    }
+
+    private synchronized void foundCommunity(String community_name,
+					     Community community) 
+    {
+	if (logger.isDebugEnabled())
+	    logger.debug("Community = " + community_name);
+
+	if (this.community_name == null) {
+	    getCommunity(community_name, community); 
+	    if (!shouldNotify(this.community)) {
+		this.community = null;
+		return;
+	    }
+	    
+	    this.community_name = community_name;
 	    setChanged();
 	    notifyObservers(community_name);
 	    clearChanged();
@@ -196,9 +209,11 @@ abstract public class CommunityFinder
      * community.
      */
     public static class ForAny extends CommunityFinder {
-	public ForAny(CommunityService svc, String filter)
+	public ForAny(CommunityService svc, 
+		      String filter, 
+		      UnaryPredicate predicate)
 	{
-	    super(svc, filter);
+	    super(svc, filter, predicate);
 	    go();
 	}
 
@@ -226,9 +241,10 @@ abstract public class CommunityFinder
 
 	public ForAgent(CommunityService svc, 
 			String filter, 
+			UnaryPredicate predicate,
 			MessageAddress agentID)
 	{
-	    super(svc, filter);
+	    super(svc, filter, predicate);
 	    this.agentID = agentID;
 	    go();
 	}
@@ -287,4 +303,48 @@ abstract public class CommunityFinder
 	return buff.toString();
     }
     
+
+
+    private static class MemberHasRoleP implements UnaryPredicate
+    {
+	String entity_name;
+	String role;
+	MemberHasRoleP(String entity_name, String role)
+	{
+	    this.entity_name = entity_name;
+	    this.role = role;
+	}
+
+	public boolean execute(Object comm)
+	{
+	    Community community = (Community) comm;
+	    Logger log = 
+		Logging.getLogger("org.cougaar.core.qos.ca.CommunityFinder");
+	    if (log.isDebugEnabled())
+		log.debug("Searching for member " +entity_name+
+			  " of commumity " +community.getName()+ 
+			  " with role " +role);
+
+	    Entity entity = community.getEntity(entity_name);
+	    boolean result = false;
+	    if (entity != null) {
+		Attributes attrs = entity.getAttributes();
+		Attribute attr = attrs.get("Role");
+		result = (attr != null && attr.contains(role));
+	    }
+
+	    if (log.isDebugEnabled()) {
+		log.debug(result ? "Succeeded" : "Failed");
+	    }
+
+	    return result;
+	}
+
+    }
+
+    public static UnaryPredicate memberHasRole(String entity, String role)
+    {
+	return new MemberHasRoleP(entity, role);
+    }
+
 }

@@ -29,6 +29,7 @@ package org.cougaar.core.qos.ca;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.cougaar.util.UnaryPredicate;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.community.CommunityService;
@@ -82,15 +83,19 @@ abstract public class CommunityFacetImpl
 
 
     // Community helpers
-    protected void findCommunityForAny(String filter)
+    protected void findCommunityForAny(String filter,
+				       UnaryPredicate predicate)
     {
-	finder = new CommunityFinder.ForAny(commService, filter);
+	finder = new CommunityFinder.ForAny(commService, filter, predicate);
 	finder.addObserver(this);
     }
 
-    protected void findCommunityForAgent(String filter)
+    protected void findCommunityForAgent(String filter, 
+					 UnaryPredicate predicate)
     {
-	finder = new CommunityFinder.ForAgent(commService, filter, getAgentID());
+	finder = 
+	    new CommunityFinder.ForAgent(commService, filter, predicate,
+					 getAgentID());
 	finder.addObserver(this);
     }
 
