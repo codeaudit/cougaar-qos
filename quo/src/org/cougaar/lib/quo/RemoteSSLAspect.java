@@ -17,6 +17,7 @@ package org.cougaar.lib.quo;
 
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.ValueSC;
+import com.bbn.quo.rmi.Contract;
 import com.bbn.quo.rmi.SysCond;
 
 import org.cougaar.core.qos.quo.Utils;
@@ -37,6 +38,9 @@ import java.util.Observable;
 
 public class RemoteSSLAspect extends StandardAspect
 {
+    private static String CONTRACT_IFACE = "org::cougaar::lib::quo::RemoteSSL";
+
+
     private ResourceMonitorService rms;
     private QosMonitorService qms;
     private TrustStatusService tss;
@@ -146,7 +150,9 @@ public class RemoteSSLAspect extends StandardAspect
 	    try {
 		initSysconds(kernel);
 		initCallbacks();
-		linkContract(kernel);
+		String name = "Zinky@" + link.getDestination(); 
+		Contract contract = initContract(name, CONTRACT_IFACE, kernel);
+		set_contract_RemoteSSL(contract);
 	    } catch (java.rmi.RemoteException ex) {
 		ex.printStackTrace();
 	    }
