@@ -29,11 +29,15 @@ import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.RSSUtils;
+import com.bbn.quo.event.Connector;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
+import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.node.NodeIdentifier;
+
+import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -120,13 +124,34 @@ public final class RSSMetricsServiceImpl
 	}
     }
 
-    public RSSMetricsServiceImpl(ServiceBroker sb, NodeIdentifier id) {
+    public RSSMetricsServiceImpl(ServiceBroker sb, 
+				 NodeIdentifier id,
+				 MetricsUpdateService mus) 
+    {
+	Properties properties = new Properties();
 	String propertiesURL = System.getProperty(RSS_PROPERTIES);
-	if (propertiesURL != null)
-	    RSS.makeInstance(propertiesURL);
-	else
-	    RSS.makeInstance(new Properties());
-	RSS.instance().setProperty("ServiceBroker", sb);
+	if (propertiesURL != null) {
+	    try {
+		java.net.URL url = new java.net.URL(propertiesURL);
+		java.io.InputStream is = url.openStream();
+		properties.load(is);
+		is.close();
+	    } catch (Exception ex) {
+	    }
+	}
+	properties.put("ServiceBroker", sb);
+	if (mus instanceof STECMetricsUpdateServiceImpl) {
+	    TypedEventChannel channel =
+		((STECMetricsUpdateServiceImpl) mus).getChannel();
+	    String ior = Connector.orb().object_to_string(channel);
+	    String feeds = properties.getProperty("rss.DataFeeds", "");
+	    feeds += " STEC_Channel";
+	    properties.put("rss.DataFeeds", feeds);
+	    properties.put("STEC_Channel.class", 
+			   "com.bbn.quo.event.data.StatusConsumerFeed");
+	    properties.put("STEC_Channel.args", "-ior " +ior);
+	}
+	RSS.makeInstance(properties);
     }
 
 

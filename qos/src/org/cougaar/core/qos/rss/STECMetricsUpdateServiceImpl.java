@@ -50,7 +50,7 @@ public class STECMetricsUpdateServiceImpl
     private ServiceBroker sb;
     private STECSender sender;
     private NamingService namingService;
-
+    private TypedEventChannel channel;
 
     public STECMetricsUpdateServiceImpl(ServiceBroker sb, NodeIdentifier id) {
 	this.sb = sb;
@@ -62,7 +62,7 @@ public class STECMetricsUpdateServiceImpl
 	namingService = (NamingService)
 	    sb.getService(this, NamingService.class, null);
 
-	TypedEventChannel channel = getChannel(id);
+	channel = makeChannel(id);
 
 	sender = new STECSender(channel, Connector.poa());
 
@@ -74,6 +74,9 @@ public class STECMetricsUpdateServiceImpl
 
     }
 
+    TypedEventChannel getChannel() {
+	return channel;
+    }
 
     private Object grabKey(String key, Object value) {
 	DirContext ctx = null;
@@ -140,23 +143,24 @@ public class STECMetricsUpdateServiceImpl
 	String key = RSS_DIR +NS.DirSeparator+ "TopologyIOR";
 	String ior = (String) lookupKey(key);
 	if (ior != null) {
-	    System.out.println("Found TopologyManager " +ior);
+	    // System.out.println("Found TopologyManager " +ior);
 	    return ior;
 	}
 
+	Connector.orb(); // ensure orb exists
 	TopologyRing mgr = new TopologyRing();
 	ior = Connector.orb().object_to_string(mgr._this());
 	String real_ior = (String) grabKey(key, ior);
 	if (real_ior == ior) {
-	    System.err.println("Running TopologyManager " +ior);
+	    // System.err.println("Running TopologyManager " +ior);
 	    mgr.start(null);
 	} else {
-	    System.out.println("Found TopologyManager " +real_ior);
+	    // System.out.println("Found TopologyManager " +real_ior);
 	}
 	return real_ior;
     }
 
-    private TypedEventChannel getChannel(NodeIdentifier id) {
+    private TypedEventChannel makeChannel(NodeIdentifier id) {
 	String ior = topologyIOR();
 	String channel_id = id+"Channel";
 	String args[] = 
