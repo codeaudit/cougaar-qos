@@ -27,7 +27,6 @@ import org.cougaar.core.node.TrustStatusServiceImpl;
 import org.cougaar.core.mts.StandardAspect;
 import org.cougaar.core.mts.TrafficMaskingGeneratorService;
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.monitor.QosMonitorService;
 
 import java.util.Observer;
 import java.util.Observable;
