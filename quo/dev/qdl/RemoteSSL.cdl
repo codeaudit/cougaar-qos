@@ -13,11 +13,40 @@ contract RemoteSSL
      
      )
 {
-  region SSL (UseSSL  or 
-	      ( Bandwidth < 10000000 ))
+  region ForceSSL (UseSSL )
+    {}
+  region AdaptiveSSL (true) {
+    region Compromised (trust == 0) {
+      region SameHost (Bandwidth >= 1000000)
 	{}
-    region Normal (true ) 
+      region SameLan  (Bandwidth >= 10000)
 	{}
-
+      region Wan  (true)  
+	{}
+    }
+    region Suspect (trust <= 2) {
+      region SameHost (Bandwidth >= 10000000)
+	{}
+      region SameLan  (Bandwidth >= 10000)
+	{}
+      region Wan  (true)  
+	{}
+    }
+    region Normal (trust <= 5) {
+      region SameHost (Bandwidth >= 10000000)
+	{}
+      region SameLan  (Bandwidth >= 10000)
+	{}
+      region Wan  (true)  
+	{}
+    }
+    region CareFree (trust <= 10) {
+      region SameHost (Bandwidth >= 10000000)
+	{}
+      region SameLan  (Bandwidth >= 10000)
+	{}
+      region Wan  (true)  
+	{}
+    }
+  }
 };
-

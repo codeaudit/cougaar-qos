@@ -28,6 +28,9 @@ public class RemoteSSLQosketImpl
     private static String local_host;
     private static Timer timer = new Timer(true);
 
+	    
+    private static ValueSC USE_SSL;
+
     static {
 	try {
 	    local_host = java.net.InetAddress.getLocalHost().getHostAddress();
@@ -35,6 +38,24 @@ public class RemoteSSLQosketImpl
 	    local_host = "127.0.0.1";
 	}
     }
+
+    private static synchronized ValueSC Get_USE_SSL (QuoKernel kernel) 
+	throws java.rmi.RemoteException
+
+    {
+	if (USE_SSL == null) {
+	    SysCond syscond =  kernel.bindSysCond("UseSSL",
+						  "com.bbn.quo.rmi.ValueSC",
+						  "com.bbn.quo.ValueSCImpl");
+	    System.out.println("Created UseSSL syscond");
+	    USE_SSL = (ValueSC) syscond;
+
+	    boolean useSSL = Boolean.getBoolean("org.cougaar.lib.quo.UseSSL");
+	    USE_SSL.booleanValue(useSSL);
+	}
+	return USE_SSL;
+    }
+
 
     private DestinationLink link;
     private ResourceMonitorService rms;
@@ -90,7 +111,6 @@ public class RemoteSSLQosketImpl
 	}
     }
 	    
-	    
 
     public void initSysconds(QuoKernel kernel) 
 	throws java.rmi.RemoteException
@@ -100,16 +120,10 @@ public class RemoteSSLQosketImpl
 
 
 
-	SysCond syscond =  kernel.bindSysCond("UseSSL",
-					      "com.bbn.quo.rmi.ValueSC",
-					      "com.bbn.quo.ValueSCImpl");
-	System.out.println("Created UseSSL syscond");
+	UseSSL = Get_USE_SSL(kernel);
 
-	UseSSL = (ValueSC) syscond;
-	boolean useSSL = Boolean.getBoolean("org.cougaar.lib.quo.UseSSL");
-	UseSSL.booleanValue(useSSL);
-
-	syscond = kernel.bindSysCond("Bandwidth",
+	SysCond syscond = kernel.bindSysCond("Bandwidth from " + local_host +
+					     " to " + destination,
 				     "com.bbn.quo.rmi.ExpectedCapacitySC",
 				     "com.bbn.quo.data.ExpectedCapacitySCImpl");
 	System.out.println("Created Bandwidth syscond");
