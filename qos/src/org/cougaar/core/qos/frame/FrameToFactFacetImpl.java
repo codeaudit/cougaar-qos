@@ -26,7 +26,9 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.util.Enumeration;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
@@ -85,7 +87,7 @@ abstract public class FrameToFactFacetImpl
 
 	RolePlayer player = getPlayer();
 
-	java.util.Enumeration en;
+	Enumeration en;
 		
 	// New Frames
 	en = sub.getAddedList();
@@ -94,7 +96,13 @@ abstract public class FrameToFactFacetImpl
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed added b"+frame);
 	    }
-	    player.assertFact(frameToFact(frame));
+	    Object fact = frameToFact(frame);
+	    if (fact instanceof Collection) {
+		Iterator itr = ((Collection) fact).iterator();
+		while (itr.hasNext())  player.assertFact(itr.next());
+	    } else if (fact != null) {
+		player.assertFact(fact);
+	    }
 	}
 		
 		
@@ -106,7 +114,13 @@ abstract public class FrameToFactFacetImpl
 		log.debug("Observed changed "+frame);
 	    }
 	    Collection changes = sub.getChangeReports(frame);
-	    player.assertFact(changesToFact(frame, changes));
+	    Object fact = changesToFact(frame, changes);
+	    if (fact instanceof Collection) {
+		Iterator itr = ((Collection) fact).iterator();
+		while (itr.hasNext())  player.assertFact(itr.next());
+	    } else if (fact != null) {
+		player.assertFact(fact);
+	    }
 	}
 		
 	// Remove Frames.  TBD/
