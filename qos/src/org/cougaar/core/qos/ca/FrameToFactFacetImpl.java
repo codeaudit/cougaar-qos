@@ -54,6 +54,7 @@ abstract public class FrameToFactFacetImpl
 	super(owner, sb, spec, player);
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
+	linkPlayer();
     }
 
     abstract protected Object frame2Fact(Frame frame);
