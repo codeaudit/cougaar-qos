@@ -5,18 +5,15 @@
 LINKS := QuoInstr.jar
 LINKS += QuoKernel.jar
 LINKS += UnixUtils.jar
+LINKS += NTUtils.jar
 LINKS += event.jar
 LINKS += instrumentation.jar
-#LINKS += quo_remos.jar
-#LINKS += remos.jar
 LINKS += jacorb.jar
+LINKS += QuoIdlgen.jar
+LINKS  += quoSumo.jar
 
-JAR = quoSumo.jar
-LINKS += $(JAR)
 
-VERSION=version.txt
-
-install: $(LINKS)
+install: $(LINKS) 
 
 QuoInstr.jar:
 	ln -s ${QUO_ROOT}/lib/QuoInstr.jar .
@@ -27,28 +24,34 @@ QuoKernel.jar:
 UnixUtils.jar:
 	ln -s ${QUO_ROOT}/lib/UnixUtils.jar .
 
+NTUtils.jar:
+	ln -s ${QUO_ROOT}/lib/NTUtils.jar .
+
 event.jar:
 	ln -s ${QUO_ROOT}/dirm/event/event.jar .
 
 instrumentation.jar:
 	ln -s ${QUO_ROOT}/qosket/instrumentation/instrumentation.jar .
 
-#quo_remos.jar:
-#ln -s ${QUO_ROOT}/remos/quo_remos.jar .
-
-#remos.jar:
-#ln -s ${REMOS_LIB}/remos.jar .
+QuoIdlgen.jar:
+	ln -s ${QUO_ROOT}/lib/QuoIdlgen.jar .
 
 jacorb.jar:
 	ln -s ${JACORB_DIR}/lib/jacorb.jar .
 
-perpVersion:
-	version.sh
-
 quoSumo.jar:
-	jar -cvf $(JAR) $(VERSION) 
+	cd ${QUO_ROOT};make lib/quoSumo.jar
+	ln -s ${QUO_ROOT}/lib/quoSumo.jar .
 
 clean:
-	rm -f $(LINKS) $(JAR) $(VERSION)
+	rm -rf $(LINKS)
+
+realclean:
+	make clean
+	cd ${QUO_ROOT}/lib; rm -rf quoSumo.jar
+
+
+
+
 
 
