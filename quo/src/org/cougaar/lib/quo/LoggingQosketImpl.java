@@ -6,9 +6,18 @@
 
 package org.cougaar.lib.quo;
 
+import org.cougaar.core.service.LoggingService;
+
 public class LoggingQosketImpl 
     extends LoggingQosketSkel
-{}
+{
+    private LoggingService loggingService;
+    
+    public void setLoggingService(LoggingService loggingService) {
+	this.loggingService = loggingService;
+    }
 
+
+}
 
 

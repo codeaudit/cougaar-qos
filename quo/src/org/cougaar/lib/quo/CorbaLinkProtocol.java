@@ -63,7 +63,7 @@ public class CorbaLinkProtocol
 	    poa = POAHelper.narrow(raw);
 	    poa.the_POAManager().activate();
 	} catch (Exception error) {
-	    error.printStackTrace();
+	    debugService.error(null, error);
 	}
 	
     }
@@ -87,14 +87,14 @@ public class CorbaLinkProtocol
     }
 
 
-    private void makeMT() {
+    private synchronized void makeMT() {
 	if (myProxy != null) return;
 	MessageAddress myAddress = getNameSupport().getNodeMessageAddress();
 	MTImpl impl = new MTImpl(myAddress, getDeliverer());
 	try {
 	    poa.activate_object(impl);
 	} catch (Exception ex) {
-	    ex.printStackTrace();
+	    debugService.error(null, ex);
 	}
 	myProxy = getServerSideProxy(impl._this());
     }
@@ -105,20 +105,19 @@ public class CorbaLinkProtocol
 	    Object proxy = orb.object_to_string(myProxy);
 	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
-	    System.err.println("Error registering MessageTransport:");
-	    e.printStackTrace();
+	    debugService.error("Error registering MessageTransport", e);
 	}
     }
 
     public final void registerClient(MessageTransportClient client) {
+	makeMT();
 	try {
 	    // Assume node-redirect
 	    Object proxy = orb.object_to_string(myProxy);
 	    MessageAddress addr = client.getMessageAddress();
 	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
-	    System.err.println("Error registering MessageTransport:");
-	    e.printStackTrace();
+	    debugService.error("Error registering MessageTransport", e);
 	}
     }
 
@@ -130,8 +129,7 @@ public class CorbaLinkProtocol
 	    MessageAddress addr = client.getMessageAddress();
 	    getNameSupport().unregisterAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
-	    System.err.println("Error unregistering MessageTransport:");
-	    e.printStackTrace();
+	    debugService.error("Error unregistering MessageTransport", e);
 	}
     }
 
@@ -141,8 +139,7 @@ public class CorbaLinkProtocol
 	try {
 	    return lookupObject(address) != null;
 	} catch (Exception e) {
-	    //System.err.println("Failed in addressKnown:"+e);
-	    //e.printStackTrace();
+	    //debugService.error("Failed in addressKnown", e);
 	}
 	return false;
     }

@@ -58,5 +58,10 @@ public class MTLoggingAdapter
   // inherited methods and attributes of org.cougaar.lib.quo.LoggingQosket
 
   // local methods and attributes of org.cougaar.lib.quo.LoggingQosket
+  public void setLoggingService(org.cougaar.core.service.LoggingService log)
+  {
+     qosket.setLoggingService ( log );
+  }
+
 }
 

@@ -7,6 +7,12 @@
 
 module org {
     module cougaar {
+	module core {
+	    module service {
+		interface LoggingService;
+	    };
+	};
+
         module lib {
             module quo {
                 interface DiagnoseDelegateQosket : qosket::instrumentation::InstrumentationDelegateQosket {
@@ -14,6 +20,7 @@ module org {
                 };
                 interface CompressQosket {
                     void setInstrumentedServer (in org::cougaar::lib::quo::MTInstrumented object);
+                    void setLoggingService (in org::cougaar::core::service::LoggingService log);
                 };
                 interface CompressDelegateQosket {
                     void runCompression (in org::cougaar::core::mts::Message message);
@@ -21,8 +28,11 @@ module org {
                     void runSerializeAndCompress (in org::cougaar::core::mts::Message message);
                 };
                 interface DiagnoseQosket : qosket::instrumentation::InstrumentationQosket {
+                    void setLoggingService (in org::cougaar::core::service::LoggingService log);
+
                 };
                 interface LoggingQosket {
+                    void setLoggingService (in org::cougaar::core::service::LoggingService log);
                 };
             };
         };

@@ -72,7 +72,7 @@ public class RemoteSSLAspect extends QuoAspect
 		    initContract(name, CONTRACT_IFACE, kernel);
 		set_contract_RemoteSSL(contract);
 	    } catch (java.rmi.RemoteException ex) {
-		ex.printStackTrace();
+		debugService.error(null, ex);
 	    }
 	    linkRemoteObject(link);
 	}

@@ -17,6 +17,7 @@ import com.bbn.quo.rmi.DataSC;
 import com.bbn.quo.rmi.impl.RmiUtilities;
 
 import org.cougaar.core.mts.Message;
+import org.cougaar.core.service.LoggingService;
 
 import java.rmi.Remote;
 import java.util.zip.Deflater;
@@ -27,11 +28,17 @@ public class CompressQosketImpl
 
 {
     private static ValueSC USE_COMPRESSION;
+
     private MTInstrumented instrumentedServer;
+    private LoggingService loggingService;
 
     public CompressQosketImpl ()  {
     }
 
+
+    public void setLoggingService(LoggingService loggingService) {
+	this.loggingService = loggingService;
+    }
 
     public void runCompression(Message message)
     {
@@ -47,11 +54,10 @@ public class CompressQosketImpl
   
 	} 
 	catch (java.rmi.RemoteException remote_ex) {
-	    System.err.println("$$$$$ Compression failure " + message);
-	    remote_ex.printStackTrace();
+	    loggingService.error("runCompression, RemoteException", remote_ex);
 	}
 	catch (Exception ex) {
-	    ex.printStackTrace();
+	    loggingService.error("runCompression", ex);
 	}
     }
 
@@ -66,11 +72,11 @@ public class CompressQosketImpl
 	    instrumentedServer.receiveOnlyCompressedBytes(compressedMessage);
 	} 
 	catch (java.rmi.RemoteException remote_ex) {
-	    System.err.println("$$$$$ Compression failure " + message);
-	    remote_ex.printStackTrace();
+	    loggingService.error("runSerializeAndCompress RemoteException", 
+				 remote_ex);
 	}
 	catch (Exception ex) {
-	    ex.printStackTrace();
+	    loggingService.error("runSerializeAndCompress", ex);
 	}
     }
 
@@ -86,11 +92,11 @@ public class CompressQosketImpl
 
 	} 
 	catch (java.rmi.RemoteException remote_ex) {
-	    System.err.println("$$$$$ Compression failure " + message);
-	    remote_ex.printStackTrace();
+	    loggingService.error("runSerializeOnly RemoteException", 
+				 remote_ex);
 	}
 	catch (Exception ex) {
-	    ex.printStackTrace();
+	    loggingService.error("runSerializeOnly", ex);
 	}
     }
 
@@ -116,7 +122,7 @@ public class CompressQosketImpl
 		Utilities.canonicalizeAddress(NetUtilities.getHostAddress());
 	    serverHost = Utilities.canonicalizeAddress(remoteRef.host);
 	} catch (java.net.UnknownHostException unknown_host) {
-	    unknown_host.printStackTrace();
+	    loggingService.error("initRSSSysconds", unknown_host);
 	}
 
 
@@ -165,7 +171,7 @@ public class CompressQosketImpl
 
 	}
 	catch (Exception ex) {
-	    ex.printStackTrace();
+	    loggingService.error("initSysconds", ex);
 	}
     }
 

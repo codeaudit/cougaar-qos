@@ -79,7 +79,7 @@ public class QuoProxyAspect extends StandardAspect
 	    wrapper_class = Class.forName(wrapper_classname);
 	}
 	catch (ClassNotFoundException class_not_found) {
-	    System.err.println(class_not_found);
+	    debugService.error("makeClientAdapter", class_not_found);
 	    return null;
 	}
 
@@ -87,18 +87,18 @@ public class QuoProxyAspect extends StandardAspect
 	    raw_instance = wrapper_class.newInstance();
 	}
 	catch (InstantiationException instantiation) {
-	    System.err.println(instantiation);
+	    debugService.error("makeClientAdapter", instantiation);
 	    return null;
 	}
 	catch (IllegalAccessException illegal_access) {
-	    System.err.println(illegal_access);
+	    debugService.error("makeClientAdapter", illegal_access);
 	    return null;
 	}
 
 	if (raw_instance instanceof CougaarWrapper) {
 	    wrapper = (CougaarWrapper) raw_instance;
 	} else {
-	    System.err.println(raw_instance + " is not an CougaarWrapper");
+	   debugService.error(raw_instance + " is not an CougaarWrapper");
 	    return null;
 	}
 
@@ -115,18 +115,19 @@ public class QuoProxyAspect extends StandardAspect
 		QuoProxy quo_proxy = (QuoProxy) remote;
 		CougaarWrapper wrapper = makeClientAdapter();
 		if (wrapper != null) {
-		    wrapper.connect(quo_proxy.mt, quo_proxy.mti);
+		    wrapper.connect(quo_proxy.mt, quo_proxy.mti,
+				    debugService);
 		}
 		return (MT) wrapper;
 	    } else if (remote instanceof MT) {
 		return (MT) remote;
 	    } else {
-		System.err.println("Object is neither an MT nor a QuoProxy: "
+		debugService.error("Object is neither an MT nor a QuoProxy: "
 				   +  remote);
 		return null;
 	    }
 	} catch (java.rmi.RemoteException re) {
-	    re.printStackTrace();
+	    debugService.error(null, re);
 	    return null;
 	}
     }
@@ -149,7 +150,7 @@ public class QuoProxyAspect extends StandardAspect
 	    wrapper.connect(kernel, mt);
 	    return new QuoProxy(mt, wrapper);
 	} catch (java.rmi.RemoteException ex) {
-	    ex.printStackTrace();
+	    debugService.error(null, ex);
 	    return mt;
 	}
     }

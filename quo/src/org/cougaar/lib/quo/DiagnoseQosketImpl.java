@@ -6,6 +6,8 @@
 
 package org.cougaar.lib.quo;
 
+import org.cougaar.core.service.LoggingService;
+
 import com.bbn.quo.corba.Association;
 import com.bbn.quo.instr.corba.Trace_rec;
 
@@ -18,11 +20,16 @@ public class DiagnoseQosketImpl
 {
 
     private InstrumentationWorker worker;
+    private LoggingService loggingService;
 
     public DiagnoseQosketImpl ()  {
 	worker =  new InstrumentationWorker();
     }
 
+
+    public void setLoggingService(LoggingService loggingService) {
+	this.loggingService = loggingService;
+    }
 
     public void runDiagnostic(org.cougaar.core.mts.Message m, 
 			      org.cougaar.core.mts.MT remoteObj)
@@ -54,10 +61,10 @@ public class DiagnoseQosketImpl
 	    Utils.logEvent(startWholeCallTime,m,"Whole Call");
 	} 
 	catch (java.rmi.RemoteException remote_ex) {
-	    remote_ex.printStackTrace();
+	    loggingService.error(null, remote_ex);
 	}
 	catch (Exception ex) {
-	    ex.printStackTrace();
+	    loggingService.error(null, ex);
 	}
     }
 

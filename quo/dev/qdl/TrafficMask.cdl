@@ -17,6 +17,14 @@ contract TrafficMask
 {
   region ForceTrafficMask (useMask )
     {}
+      transition any -> ForceTrafficMask {
+	synchronous { trafficControl.turnOn(); }
+      }
+
+      transition ForceTrafficMask -> any {
+	synchronous { trafficControl.turnOff(); }
+      }
+
   region AdaptiveTrafficMask (true) {
     region Compromised (trust == 0) {
 

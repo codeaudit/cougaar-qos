@@ -14,4 +14,5 @@ package org.cougaar.lib.quo;
 public interface DiagnoseQosket
        extends com.bbn.quo.qosket.instrumentation.InstrumentationQosket
 {
+  public void setLoggingService(org.cougaar.core.service.LoggingService log);
 }

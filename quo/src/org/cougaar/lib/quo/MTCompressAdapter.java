@@ -64,5 +64,10 @@ public class MTCompressAdapter
      qosket.setInstrumentedServer ( object );
   }
 
+  public void setLoggingService(org.cougaar.core.service.LoggingService log)
+  {
+     qosket.setLoggingService ( log );
+  }
+
 }
 

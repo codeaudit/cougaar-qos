@@ -199,14 +199,14 @@ public class PanicButtonPlugin
     PolicyMulticastMessage policymsg = 
       new PolicyMulticastMessage(getMessageAddress(), dest, trustpolicy);
     messageTransService.sendMessage(policymsg);
-    System.out.println("\n PanicButtonPlugin just sent msg: "+policymsg);
+    // System.out.println("\n PanicButtonPlugin just sent msg: "+policymsg);
   }
 
     
   //MessageTransportClient stuff
   public void receiveMessage(Message message) {
     // I don't want any message for now.
-    System.err.println("\n"+this+": Received unhandled Message: "+message);
+      // System.err.println("\n"+this+": Received unhandled Message: "+message);
   }
 
   public MessageAddress getMessageAddress() {

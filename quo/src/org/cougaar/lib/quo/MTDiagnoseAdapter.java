@@ -64,5 +64,10 @@ public class MTDiagnoseAdapter
 
 
   // local methods and attributes of org.cougaar.lib.quo.DiagnoseQosket
+  public void setLoggingService(org.cougaar.core.service.LoggingService log)
+  {
+     qosket.setLoggingService ( log );
+  }
+
 }
 

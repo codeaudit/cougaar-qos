@@ -13,4 +13,5 @@ package org.cougaar.lib.quo;
 
 public interface LoggingQosket
 {
+  public void setLoggingService(org.cougaar.core.service.LoggingService log);
 }

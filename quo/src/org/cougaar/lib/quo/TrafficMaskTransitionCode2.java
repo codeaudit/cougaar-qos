@@ -13,7 +13,7 @@ package org.cougaar.lib.quo;
 import com.bbn.quo.rmi.*;
 import com.bbn.quo.*;
 
-// Transition code for transition any->Wan
+// Transition code for transition ForceTrafficMask->any
 public class TrafficMaskTransitionCode2 extends TransitionCode
 {
   public void perform() {
@@ -22,7 +22,7 @@ public class TrafficMaskTransitionCode2 extends TransitionCode
 
   public void syncwork() {
     try {
-((org.cougaar.lib.quo.TrafficMaskControl) ((com.bbn.quo.rmi.impl.ContractImpl) contract).callback_objs[0]).turnOn();
+((org.cougaar.lib.quo.TrafficMaskControl) ((com.bbn.quo.rmi.impl.ContractImpl) contract).callback_objs[0]).turnOff();
 }  catch (java.rmi.RemoteException remote_ex) {
       remote_ex.printStackTrace();
 }

@@ -45,7 +45,7 @@ public class SSLAspect
 	    try {
 		return SSLSocketFactory.getDefault().createSocket(host, port);
 	    } catch (IOException ex) {
-		ex.printStackTrace();
+		debugService.error(null, ex);
 		return null;
 	    }
 	} else if (type == ServerSocket.class) {
@@ -57,7 +57,7 @@ public class SSLAspect
 		socket.close();
 		return SSLServerSocketFactory.getDefault().createServerSocket(port);
 	    } catch (IOException ex) {
-		ex.printStackTrace();
+		debugService.error(null, ex);
 		return null;
 	    }
 	} else {

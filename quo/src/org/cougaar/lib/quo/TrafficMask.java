@@ -150,12 +150,12 @@ public class TrafficMask extends com.bbn.quo.rmi.impl.ContractImpl
     region.children[1].children[0].fromAny = new Transition[2];
     region.children[1].children[0].fromAny[0] = new Transition();
     region.children[1].children[0].fromAny[0].toRegion = region.children[1].children[0].children[1];
-    region.children[1].children[0].fromAny[0].code = new TrafficMaskTransitionCode1();
+    region.children[1].children[0].fromAny[0].code = new TrafficMaskTransitionCode3();
     region.children[1].children[0].fromAny[0].code.contract = this;
 
     region.children[1].children[0].fromAny[1] = new Transition();
     region.children[1].children[0].fromAny[1].toRegion = region.children[1].children[0].children[2];
-    region.children[1].children[0].fromAny[1].code = new TrafficMaskTransitionCode2();
+    region.children[1].children[0].fromAny[1].code = new TrafficMaskTransitionCode4();
     region.children[1].children[0].fromAny[1].code.contract = this;
 
 
@@ -163,12 +163,12 @@ public class TrafficMask extends com.bbn.quo.rmi.impl.ContractImpl
     region.children[1].children[0].toAny = new Transition[2];
     region.children[1].children[0].toAny[0] = new Transition();
     region.children[1].children[0].toAny[0].fromRegion = region.children[1].children[0].children[1];
-    region.children[1].children[0].toAny[0].code = new TrafficMaskTransitionCode3();
+    region.children[1].children[0].toAny[0].code = new TrafficMaskTransitionCode5();
     region.children[1].children[0].toAny[0].code.contract = this;
 
     region.children[1].children[0].toAny[1] = new Transition();
     region.children[1].children[0].toAny[1].fromRegion = region.children[1].children[0].children[2];
-    region.children[1].children[0].toAny[1].code = new TrafficMaskTransitionCode4();
+    region.children[1].children[0].toAny[1].code = new TrafficMaskTransitionCode6();
     region.children[1].children[0].toAny[1].code.contract = this;
 
 
@@ -222,7 +222,7 @@ public class TrafficMask extends com.bbn.quo.rmi.impl.ContractImpl
     region.children[1].children[1].fromAny = new Transition[1];
     region.children[1].children[1].fromAny[0] = new Transition();
     region.children[1].children[1].fromAny[0].toRegion = region.children[1].children[1].children[2];
-    region.children[1].children[1].fromAny[0].code = new TrafficMaskTransitionCode6();
+    region.children[1].children[1].fromAny[0].code = new TrafficMaskTransitionCode8();
     region.children[1].children[1].fromAny[0].code.contract = this;
 
 
@@ -230,7 +230,7 @@ public class TrafficMask extends com.bbn.quo.rmi.impl.ContractImpl
     region.children[1].children[1].toAny = new Transition[1];
     region.children[1].children[1].toAny[0] = new Transition();
     region.children[1].children[1].toAny[0].fromRegion = region.children[1].children[1].children[2];
-    region.children[1].children[1].toAny[0].code = new TrafficMaskTransitionCode5();
+    region.children[1].children[1].toAny[0].code = new TrafficMaskTransitionCode7();
     region.children[1].children[1].toAny[0].code.contract = this;
 
 
@@ -366,10 +366,20 @@ public class TrafficMask extends com.bbn.quo.rmi.impl.ContractImpl
     region.between = new Transition[0];
 
     // fromAny transitions
-    region.fromAny = new Transition[0];
+    region.fromAny = new Transition[1];
+    region.fromAny[0] = new Transition();
+    region.fromAny[0].toRegion = region.children[0];
+    region.fromAny[0].code = new TrafficMaskTransitionCode1();
+    region.fromAny[0].code.contract = this;
+
 
     // toAny transitions
-    region.toAny = new Transition[0];
+    region.toAny = new Transition[1];
+    region.toAny[0] = new Transition();
+    region.toAny[0].fromRegion = region.children[0];
+    region.toAny[0].code = new TrafficMaskTransitionCode2();
+    region.toAny[0].code.contract = this;
+
 
     // entering transitions
     region.entering = new Transition[0];

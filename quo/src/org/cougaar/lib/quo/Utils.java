@@ -43,8 +43,7 @@ class Utils
 		FileWriter writer = new FileWriter(logfilename);
 		LogFile = new PrintWriter(writer);
 	    } catch (IOException io_ex) {
-		System.err.println("Error opening " + logfilename +
-				   ": " + io_ex);
+		// nowhere to print...
 	    }
 	}
 

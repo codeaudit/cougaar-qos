@@ -9,6 +9,7 @@ package org.cougaar.lib.quo;
 import java.rmi.Naming;
 
 import org.cougaar.core.qos.quo.Utils;
+import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.mts.MT;
 
 import com.bbn.quo.NetUtilities;
@@ -21,7 +22,9 @@ import com.bbn.quo.rmi.impl.RmiUtilities;
 
 class CompressWrapper extends MTCompressAdapter implements CougaarWrapper
 {
-    public void connect(MT server, MTInstrumented delegate) 
+    public void connect(MT server, 
+			MTInstrumented delegate,
+			LoggingService loggingService) 
 	throws java.rmi.RemoteException
     {
 	QuoKernel kernel = Utils.getKernel();
@@ -31,6 +34,7 @@ class CompressWrapper extends MTCompressAdapter implements CougaarWrapper
 
 	linkRemoteObject(server);
 	setInstrumentedServer(delegate);
+	setLoggingService(loggingService);
 	initSysconds(kernel);
 	initCallbacks();
 
@@ -39,9 +43,9 @@ class CompressWrapper extends MTCompressAdapter implements CougaarWrapper
 		Utilities.canonicalizeAddress(NetUtilities.getHostAddress());
 	    serverHost = Utilities.canonicalizeAddress(remoteRef.host);
 	} catch (java.net.UnknownHostException unknown_host) {
-	    unknown_host.printStackTrace();
+	    loggingService.error(null, unknown_host);
 	} catch (Throwable t) {
-	    t.printStackTrace();
+	    loggingService.error(null, t);
 	}
 
 
@@ -53,7 +57,7 @@ class CompressWrapper extends MTCompressAdapter implements CougaarWrapper
 	    set_contract_Compress(contract);
 
 	} catch (java.rmi.RemoteException ex) {
-	    ex.printStackTrace();
+	    loggingService.error(null, ex);
 	}
 
     }

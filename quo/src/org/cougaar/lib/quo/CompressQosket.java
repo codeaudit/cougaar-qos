@@ -14,4 +14,5 @@ package org.cougaar.lib.quo;
 public interface CompressQosket
 {
   public void setInstrumentedServer(org.cougaar.lib.quo.MTInstrumented object);
+  public void setLoggingService(org.cougaar.core.service.LoggingService log);
 }

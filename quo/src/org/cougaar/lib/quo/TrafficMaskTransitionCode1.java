@@ -13,7 +13,7 @@ package org.cougaar.lib.quo;
 import com.bbn.quo.rmi.*;
 import com.bbn.quo.*;
 
-// Transition code for transition any->SameLan
+// Transition code for transition any->ForceTrafficMask
 public class TrafficMaskTransitionCode1 extends TransitionCode
 {
   public void perform() {
