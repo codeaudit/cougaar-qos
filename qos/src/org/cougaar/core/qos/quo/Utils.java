@@ -13,12 +13,19 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.cougaar.core.mts.MessageTransportRegistry;
+
 public class Utils 
 {
 
 
     public synchronized static QuoKernel getKernel() {
-	return getKernel(new Properties());
+	Properties kprops = new Properties();
+	MessageTransportRegistry registry = 
+	    MessageTransportRegistry.getRegistry();
+	String name = "QuO Kernel: " + registry.getLocalAddress().toString();
+	kprops.put("quoKernel.Title", name);
+	return getKernel(kprops);
     }
 
     public synchronized static QuoKernel getKernel(Properties props) {
