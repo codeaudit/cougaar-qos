@@ -146,7 +146,7 @@ public class FrameSetServicePlugin
 	FrameSet set = (FrameSet) sets.get(name);
 	if (set != null) {
 	    return set;
-	} else {
+	} else if (cb != null) {
 	    HashSet callbacks = (HashSet) pending.get(name);
 	    if (callbacks == null) {
 		callbacks = new HashSet();
@@ -154,7 +154,9 @@ public class FrameSetServicePlugin
 	    }
 	    callbacks.add(cb);
 	    return null;
- 	}
+ 	} else {
+	    return null;
+	}
     }
 
     private class Impl implements FrameSetService
