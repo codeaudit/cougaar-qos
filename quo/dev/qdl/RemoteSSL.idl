@@ -25,7 +25,8 @@ module org {
 		interface RemoteSSLQosket {
 		    void setDestinationLink(in org::cougaar::core::mts::DestinationLink link);
 		    void setServices(in org::cougaar::core::qos::monitor::ResourceMonitorService rms,
-				     in quo::ValueSC trust);
+				     in quo::ValueSC trust,
+				     in quo::ValueSC useSSL);
 		};
 
 		interface RemoteSSLDelegateQosket {

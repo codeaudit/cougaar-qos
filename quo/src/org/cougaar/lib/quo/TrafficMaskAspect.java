@@ -22,39 +22,23 @@ import com.bbn.quo.rmi.ExpectedBandwidthSC;
 
 import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.society.MulticastMessageAddress;
-import org.cougaar.core.society.TrustStatusService;
-import org.cougaar.core.society.TrustStatusServiceImpl;
 import org.cougaar.core.mts.MessageTransportRegistry;
-import org.cougaar.core.mts.StandardAspect;
-import org.cougaar.core.mts.TrafficMaskingGeneratorService;
-import org.cougaar.core.qos.quo.Utils;
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.monitor.ResourceMonitorService;
-import org.cougaar.core.qos.monitor.QosMonitorService;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Observer;
-import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class TrafficMaskAspect extends StandardAspect
+public class TrafficMaskAspect extends QuoAspect
 {
     private static String CONTRACT_IFACE = 
 	"org::cougaar::lib::quo::TrafficMask";
 
-    private QuoKernel kernel;
     private HashMap qoskets;
-    private ResourceMonitorService rms;
-    private TrustStatusService tss;
-    private TrafficMaskingGeneratorService tmgs;
     private Timer timer = new Timer(true);
-    private boolean inited = false;
     private ValueSC USE_MASKING;
-    private ValueSC TRUST;
-    private MessageTransportRegistry registry;
+    private TimerTask nodeUpdater;
 
 
     public TrafficMaskAspect() {
@@ -69,26 +53,6 @@ public class TrafficMaskAspect extends StandardAspect
 	    while (itr.hasNext()) {
 		MessageAddress node_ref = (MessageAddress) itr.next();
 		if (!qoskets.containsKey(node_ref)) qosketInit(node_ref);
-	    }
-	}
-    }
-
-    private class TrustObserver implements Observer {
-	TrustObserver() {
-	    if (tss != null) tss.registerSocietyTrustObserver(this);
-	}
-
-	public void update(Observable obs, Object value) {
-	    if (TRUST != null) {
-		if (obs instanceof TrustStatusServiceImpl) {
-		    int trust = 
-			((TrustStatusServiceImpl) obs).getSocietyTrust();
-		    try {
-			TRUST.longValue(trust);
-		    } catch (java.rmi.RemoteException remote_ex) {
-			remote_ex.printStackTrace();
-		    }
-		}
 	    }
 	}
     }
@@ -122,8 +86,8 @@ public class TrafficMaskAspect extends StandardAspect
 	public void initSysconds(QuoKernel kernel) 
 	    throws java.rmi.RemoteException
 	{
-	    useMask = Get_USE_MASKING(kernel);
-	    trust = Get_TRUST(kernel);
+	    useMask = Get_USE_MASKING();
+	    trust = Get_TRUST();
 	    Bandwidth = 
 		(ExpectedBandwidthSC) 
 		rms.getExpectedBandwidthForAgentSyscond(destination);
@@ -148,89 +112,18 @@ public class TrafficMaskAspect extends StandardAspect
     }
 
 
-    private synchronized ValueSC Get_USE_MASKING (QuoKernel kernel) 
+    private synchronized ValueSC Get_USE_MASKING () 
 	throws java.rmi.RemoteException
 
     {
 	if (USE_MASKING == null) {
-	    SysCond syscond =  kernel.bindSysCond("UseMasking",
-						  "com.bbn.quo.rmi.ValueSC",
-						  "com.bbn.quo.ValueSCImpl");
-	    USE_MASKING = (ValueSC) syscond;
-
-	    boolean useMasking = 
-		Boolean.getBoolean("org.cougaar.lib.quo.UseMasking");
-	    USE_MASKING.booleanValue(useMasking);
+	    USE_MASKING = getBooleanValueSC("UseMasking",
+					    "org.cougaar.lib.quo.UseMasking");
 	}
 	return USE_MASKING;
     }
  
-    private synchronized ValueSC Get_TRUST (QuoKernel kernel) 
-	throws java.rmi.RemoteException
 
-    {
-	if (TRUST == null) {
-	    try {
-		SysCond sc = kernel.bindSysCond("TrustObserver",
-						"com.bbn.quo.rmi.ValueSC",
-						"com.bbn.quo.ValueSCImpl");
-		TRUST = (ValueSC) sc;
-		TRUST.longValue(10);
-
-		new TrustObserver();
-	    } catch (java.rmi.RemoteException remote_ex) {
-		remote_ex.printStackTrace();
-	    }
-
-	}
-	return TRUST;
-    }
-
-    private void ensureServices() {
-	ServiceBroker sb = getServiceBroker();
-
-	if (tss == null) {
-	    System.out.println("%%% Looking for TSS");
-	    Object svc = 
-		sb.getService(this, TrustStatusService.class, null);
-	    if (svc == null) {
-		System.err.println("### Can't find TrustStatusService");
-	    } else {
-		tss = (TrustStatusService) svc;
-		System.out.println("%%% Got TrustStatusService!");
-	    }
-	}
-
-
-	if (tmgs == null) {
-	    System.out.println("%%% Looking for TMGS from " + sb);
-	    Object svc = 
-		sb.getService(this, TrafficMaskingGeneratorService.class, null);
-	    if (svc == null) {
-		System.err.println("### Can't find TrafficMaskingGeneratorService");
-	    } else {
-		tmgs = (TrafficMaskingGeneratorService) svc;
-		System.out.println("%%% Got TrafficMaskingGeneratorService!");
-	    }
-	}
-
-	if (rms == null) {
-	    System.out.println("%%% Looking for RMS");
-	    Object svc = 
-		sb.getService(this, ResourceMonitorService.class, null);
-	    if (svc == null) {
-		System.err.println("### Can't find ResourceMonitorService");
-	    } else {
-		rms = (ResourceMonitorService) svc;
-		System.out.println("%%% Got ResourceMonitorService!");
-	    }
-	}
-
-
-	if (rms != null  && tss != null && tmgs != null) {
-	    inited = true;
-	}
-    }
 
     // No delegates, this aspect used for side-effect only
     public Object getDelegate(Object delegate, Class type) {
@@ -238,18 +131,18 @@ public class TrafficMaskAspect extends StandardAspect
 	return null;
     }
 
-    private synchronized void quoInit() {
-	if (inited) return;  // already inited
+    protected synchronized boolean quoInit() {
+	if (nodeUpdater != null) return true;
 
-	ensureServices();
-	if (!inited) return; // not ready yet
+	boolean result = super.quoInit();
+	if (!result) return false;
 
-	registry = MessageTransportRegistry.getRegistry();
-	kernel = Utils.getKernel();
 	qoskets = new HashMap();
 
-	TimerTask updater = new NodeUpdater();
-	timer.schedule(updater, 0, 5000);
+	nodeUpdater = new NodeUpdater();
+	timer.schedule(nodeUpdater, 0, 5000);
+
+	return true;
 
     }
 

@@ -10,40 +10,17 @@ import org.cougaar.core.mts.SSLRMILinkProtocol;
 import org.cougaar.core.society.Message;
 import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
-import org.cougaar.core.qos.monitor.QosMonitorService;
 
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.ValueSC;
 import com.bbn.quo.rmi.SysCond;
 import com.bbn.quo.rmi.ExpectedBandwidthSC;
-import com.bbn.quo.rmi.ExpectedCapacitySC;
 
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class RemoteSSLQosketImpl
     extends RemoteSSLQosketSkel
 {
 	    
-    private static ValueSC USE_SSL;
-
-    private static synchronized ValueSC Get_USE_SSL (QuoKernel kernel) 
-	throws java.rmi.RemoteException
-
-    {
-	if (USE_SSL == null) {
-	    SysCond syscond =  kernel.bindSysCond("UseSSL",
-						  "com.bbn.quo.rmi.ValueSC",
-						  "com.bbn.quo.ValueSCImpl");
-	    System.out.println("Created UseSSL syscond");
-	    USE_SSL = (ValueSC) syscond;
-
-	    boolean useSSL = Boolean.getBoolean("org.cougaar.lib.quo.UseSSL");
-	    USE_SSL.booleanValue(useSSL);
-	}
-	return USE_SSL;
-    }
-
 
     private DestinationLink link;
     private ResourceMonitorService rms;
@@ -54,10 +31,13 @@ public class RemoteSSLQosketImpl
     }
 
     public void setServices(ResourceMonitorService rms,
-			    ValueSC trust) 
+			    ValueSC trust,
+			    ValueSC useSSL)
     {
 	this.rms = rms;
-	this.trust = trust; // 'trust' defined in RemoteSSL.cdl
+
+	this.trust = trust;     // These two are from RemoteSSL.cdl
+	this.UseSSL = useSSL;
     }
 
     public int computeCost(Message message) 
@@ -77,7 +57,6 @@ public class RemoteSSLQosketImpl
     {
 
 	MessageAddress destination = link.getDestination();
-	UseSSL = Get_USE_SSL(kernel);
 	Bandwidth = 
 	    (ExpectedBandwidthSC) rms.getExpectedBandwidthForAgentSyscond(destination);
     }

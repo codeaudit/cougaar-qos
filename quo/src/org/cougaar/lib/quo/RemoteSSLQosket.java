@@ -14,5 +14,5 @@ package org.cougaar.lib.quo;
 public interface RemoteSSLQosket
 {
   public void setDestinationLink(org.cougaar.core.mts.DestinationLink link);
-  public void setServices(org.cougaar.core.qos.monitor.ResourceMonitorService rms, com.bbn.quo.rmi.ValueSC trust);
+  public void setServices(org.cougaar.core.qos.monitor.ResourceMonitorService rms, com.bbn.quo.rmi.ValueSC trust, com.bbn.quo.rmi.ValueSC useSSL);
 }
