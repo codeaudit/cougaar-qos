@@ -29,14 +29,19 @@ package org.cougaar.core.qos.frame;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.cougaar.core.util.UID;
+import org.cougaar.core.util.UniqueObject;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
-class Path
+
+public class Path
+    implements UniqueObject
+
 {
     private transient Logger log = Logging.getLogger(getClass().getName());
 
-    static class Fork {
+    static class Fork implements java.io.Serializable {
 	Fork(String role, String relation)
 	{
 	    this.role = role;
@@ -47,15 +52,17 @@ class Path
 	private String relation;
     }
 
+    private final UID uid;
     private String name;
     private Fork[] forks;
     private String slot;
 
-    Path(String name, Fork[] forks, String slot)
+    public Path(UID uid, String name, Fork[] forks, String slot)
     {
 	this.name = name;
 	this.forks = forks;
 	this.slot = slot;
+	this.uid = uid;
     }
 
     String getName()
@@ -106,4 +113,17 @@ class Path
 	}
 	return null;
     }
+
+    // UniqueObject
+    public UID getUID()
+    {
+	return uid;
+    }
+
+    public void setUID(UID uid)
+    {
+	if (!uid.equals(this.uid))
+	    throw new RuntimeException("UID already set");
+    }
+
 }

@@ -39,6 +39,10 @@ public interface FrameSet
 
     public Frame findFrame(UID uid);
 
+    public Path findPath(String name);
+
+    public Path findPath(UID uid);
+
     public Set findFrames(String kind, Properties slot_value_pairs);
 
     public Set findRelations(Frame root, String role, String relation);
@@ -52,6 +56,8 @@ public interface FrameSet
 
     public PrototypeFrame makePrototype(String kind, String parent, 
 					Properties properties, UID uid);
+
+    public Path  makePath(String name, Path.Fork[] forks, String slot);
 
     public void removeFrame(Frame frame);
 

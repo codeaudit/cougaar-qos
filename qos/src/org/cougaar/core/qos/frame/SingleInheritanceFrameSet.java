@@ -40,6 +40,7 @@ import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
 import org.cougaar.core.util.UID;
+import org.cougaar.core.util.UniqueObject;
 
 
 public class SingleInheritanceFrameSet
@@ -51,7 +52,6 @@ public class SingleInheritanceFrameSet
     private ArrayList change_queue;
     private Object change_queue_lock;
     private String name;
-    private HashMap paths;
     private HashSet pending_parentage;
     private HashMap kb;
     private HashMap prototypes, parents;
@@ -111,14 +111,14 @@ public class SingleInheritanceFrameSet
     }
 
 
-    private void addFrame(Frame frame)
+    private void addObject(UniqueObject object)
     {
 	if (log.isInfoEnabled())
-	    log.info("Adding frame " +frame);
+	    log.info("Adding  " +object);
 	synchronized (kb) {
-	    kb.put(frame.getUID(), frame);
+	    kb.put(object.getUID(), object);
 	}
-	checkForPendingParentage(); // yuch
+	if (object instanceof Frame) checkForPendingParentage(); // yuch
     }
 
     private void checkForPendingParentage()
@@ -248,10 +248,42 @@ public class SingleInheritanceFrameSet
 	return name;
     }
 
+
+    public Path findPath(UID uid)
+    {
+	synchronized (kb) {
+	    Object raw = kb.get(uid);
+	    if (raw instanceof Path)
+		return (Path) raw;
+	    else
+		return null;
+	}
+    }
+
+    public Path findPath(String name)
+    {
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Object raw = itr.next();
+		if (!(raw instanceof Path)) continue;
+		Path path = (Path) raw;
+		if (path.getName().equals(name)) return path;
+	    }
+	}
+	return null;
+    }
+
+
+		
     public Frame findFrame(UID uid)
     {
 	synchronized (kb) {
-	    return (Frame) kb.get(uid);
+	    Object raw = kb.get(uid);
+	    if (raw instanceof Frame)
+		return (Frame) raw;
+	    else
+		return null;
 	}
     }
 
@@ -260,7 +292,9 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
-		Frame frame = (Frame) itr.next();
+		Object raw = itr.next();
+		if (!(raw instanceof Frame)) continue;
+		Frame frame = (Frame) raw;
 		// Check only local value [?]
 		if (descendsFrom(frame, proto)) {
 		    Object candidate = frame.getValue(slot);
@@ -280,7 +314,9 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
-		Frame frame = (Frame) itr.next();
+		Object raw = itr.next();
+		if (!(raw instanceof Frame)) continue;
+		Frame frame = (Frame) raw;
 		// Check only local value [?]
 		if (descendsFrom(frame, proto) &&
 		    frame.matchesSlots(slot_value_pairs))
@@ -296,10 +332,13 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
-		Frame relationship = (Frame) itr.next();
-		
+		Object raw = itr.next();
+		if (!(raw instanceof Frame)) continue;
 		// Don't check Prototypes at all
-		if (relationship instanceof PrototypeFrame) continue;
+		if (raw instanceof PrototypeFrame) continue;
+
+		Frame relationship = (Frame) raw;
+		
 
 		if (descendsFrom(relationship, relation_prototype)) {
 		    Frame p = getRelate(relationship,
@@ -325,10 +364,13 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
-		Frame relationship = (Frame) itr.next();
-
+		Object raw = itr.next();
+		if (!(raw instanceof Frame)) continue;
 		// Don't check Prototypes at all
-		if (relationship instanceof PrototypeFrame) continue;
+		if (raw instanceof PrototypeFrame) continue;
+
+		Frame relationship = (Frame) raw;
+
 
 		if (descendsFrom(relationship, relation_prototype)) {
 		    Frame c = getRelate(relationship,
@@ -368,29 +410,29 @@ public class SingleInheritanceFrameSet
 				
     }
 
-    private static class FrameAdd {
-	Frame frame;
-	FrameAdd(Frame frame)
+    private static class Add {
+	UniqueObject object;
+	Add(UniqueObject object)
 	{
-	    this.frame = frame;
+	    this.object = object;
 	}
     }
 
-    private static class FrameChange {
-	Frame frame;
+    private static class Change {
+	UniqueObject object;
 	Collection changes;
-	FrameChange(Frame frame, Collection changes)
+	Change(UniqueObject object, Collection changes)
 	{
-	    this.frame = frame;
+	    this.object = object;
 	    this.changes = changes;
 	}
     }
 
-    private static class FrameRemove {
-	Frame frame;
-	FrameRemove(Frame frame)
+    private static class Remove {
+	UniqueObject object;
+	Remove(UniqueObject object)
 	{
-	    this.frame = frame;
+	    this.object = object;
 	}
     }
 
@@ -405,39 +447,39 @@ public class SingleInheritanceFrameSet
 	int count = copy.size();
 	for (int i=0; i<count; i++) {
 	    Object change = copy.get(i);
-	    if (change instanceof FrameChange) {
-		FrameChange fc = (FrameChange) change;
-		bbs.publishChange(fc.frame, fc.changes);
-	    } else  if (change instanceof FrameAdd) {
-		FrameAdd fa = (FrameAdd) change;
-		bbs.publishAdd(fa.frame);
-	    } else  if (change instanceof FrameRemove) {
-		FrameRemove fr = (FrameRemove) change;
-		bbs.publishRemove(fr.frame);
+	    if (change instanceof Change) {
+		Change chng = (Change) change;
+		bbs.publishChange(chng.object, chng.changes);
+	    } else  if (change instanceof Add) {
+		Add add = (Add) change;
+		bbs.publishAdd(add.object);
+	    } else  if (change instanceof Remove) {
+		Remove rem = (Remove) change;
+		bbs.publishRemove(rem.object);
 	    }
 	}
     }
 	
-    void publishAdd(Frame frame)
+    void publishAdd(UniqueObject object)
     {
 	synchronized (change_queue_lock) {
-	    change_queue.add(new FrameAdd(frame));
+	    change_queue.add(new Add(object));
 	    bbs.signalClientActivity();
 	}
     }
 
-    void publishChange(Frame frame, ArrayList changes)
+    void publishChange(UniqueObject object, ArrayList changes)
     {
 	synchronized (change_queue_lock) {
-	    change_queue.add(new FrameChange(frame, changes));
+	    change_queue.add(new Change(object, changes));
 	    bbs.signalClientActivity();
 	}
     }
 
-    void publishRemove(Frame frame)
+    void publishRemove(UniqueObject object)
     {
 	synchronized (change_queue_lock) {
-	    change_queue.add(new FrameRemove(frame));
+	    change_queue.add(new Remove(object));
 	    bbs.signalClientActivity();
 	}
     }
@@ -468,9 +510,18 @@ public class SingleInheritanceFrameSet
 
 	if (isParentageRelation(frame)) establishParentage(frame);
 
-	addFrame(frame);
+	addObject(frame);
 	publishAdd(frame);
 	return frame;
+    }
+
+    public Path makePath(String name, Path.Fork[] forks, String slot)
+    {
+	UID uid = uids.nextUID();
+	Path path = new Path(uid, name, forks, slot);
+	addObject(path);
+	publishAdd(path);
+	return path;
     }
 
     private boolean descendsFrom(Frame frame, String prototype)
@@ -523,7 +574,7 @@ public class SingleInheritanceFrameSet
 	    if (descendsFrom(frame, parent_relation))
 		parent_relations.add(proto);
 	}
-	addFrame(frame);
+	addObject(frame);
 	publishAdd(frame);
 	return frame;
     }

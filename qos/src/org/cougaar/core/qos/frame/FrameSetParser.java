@@ -118,12 +118,12 @@ public class FrameSetParser
 	    this.slot = slot;
 	}
 
-	Path makePath()
+	Path makePath(FrameSet frameSet)
 	{
 	    Path.Fork[] array = new Path.Fork[path.size()];
 	    for (int i=0; i<path.size(); i++)
 		array[i] = (Path.Fork) path.get(i);
-	    return new Path(name, array, slot);
+	    return frameSet.makePath(name, array, slot);
 	}
 
     }
@@ -335,7 +335,7 @@ public class FrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("endPath");
 
-	path_specs.put(path_spec.name, path_spec.makePath());
+	path_specs.put(path_spec.name, path_spec.makePath(frame_set));
 	path_spec = null;
     }
 
@@ -366,7 +366,7 @@ public class FrameSetParser
 
     private void endFrameset()
     {
-	// frame_set.setPaths(path_specs);
+	// no-op
     }
 
 }
