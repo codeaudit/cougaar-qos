@@ -46,7 +46,7 @@ import org.cougaar.util.UnaryPredicate;
  * implemented here, leaving subclasses only to implement the abstract
  * methods of this class.
  */
-public class ResponseFacet
+abstract public class ResponseFacet
     extends FacetImpl
     implements QueryCoordArtConstants
 {
@@ -76,6 +76,7 @@ public class ResponseFacet
     }
 
 
+    abstract protected boolean acceptFact(Object fact);
 
     public AttributeBasedAddress makeABA(String communityName)
     {
@@ -214,7 +215,8 @@ public class ResponseFacet
     private UnaryPredicate QueryPred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
 		if (o instanceof QueryRelay) {
-		    return true;
+		    Object fact = ((QueryRelay) o).getQuery();
+		    return acceptFact(fact);
 		} else {
 		    return false;
 		}

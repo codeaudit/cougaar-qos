@@ -33,6 +33,9 @@ import java.util.Properties;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
+
 
 /**
  * This class is the standard base implementation of {@link
@@ -45,6 +48,8 @@ import org.cougaar.core.service.BlackboardService;
 abstract public class CoordinationArtifactImpl
     implements CoordinationArtifact
 {
+    private Logger logger = 
+	Logging.getLogger("org.cougaar.core.qos.ca.CoordinationArtifactImpl");
     private Properties parameters;
     private List facets = new ArrayList();
     private CoordinationArtifactTemplate owner;
@@ -86,6 +91,8 @@ abstract public class CoordinationArtifactImpl
 			     RolePlayer player,
 			     BlackboardService blackboard)
     {
+	if (logger.isDebugEnabled())
+	    logger.debug("Providing facet for " + spec.logString());
 	Facet facet = makeFacet(spec, player);
 	synchronized (facets) {
 	    facets.add(facet);

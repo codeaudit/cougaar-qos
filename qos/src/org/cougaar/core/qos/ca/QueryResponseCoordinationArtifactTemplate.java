@@ -79,29 +79,19 @@ abstract public class QueryResponseCoordinationArtifactTemplate
 	    this.artifactId = spec.ca_parameters.getProperty(ArtifactIdAttr);
 	}
 	
+	abstract protected QueryFacet makeQueryFacet(ServiceBroker sb,
+					    ConnectionSpec spec, 
+					    RolePlayer player);
+
+	abstract protected ResponseFacet makeResponseFacet(ServiceBroker sb,
+							   ConnectionSpec spec, 
+							   RolePlayer player);
+
 	public String getArtifactId()
 	{
 	    return artifactId;
 	}
 
-
-	protected QueryFacet makeQueryFacet(ServiceBroker sb,
-					    ConnectionSpec spec, 
-					    RolePlayer player)
-	{
-	    return new QueryFacet(this, sb, spec, player);
-	}
-
-
-	/**
-	 * Make a CA-specific ResponseFacet.
-	 */
-	protected ResponseFacet makeResponseFacet(ServiceBroker sb,
-						  ConnectionSpec spec, 
-						  RolePlayer player)
-	{
-	    return new ResponseFacet(this, sb, spec, player);
-	}
 
    
 	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)

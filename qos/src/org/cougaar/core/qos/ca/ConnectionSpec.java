@@ -70,4 +70,9 @@ public class ConnectionSpec
 	this.role = role;
 	this.role_parameters = role_parameters;
     }
+
+    public String logString()
+    {
+	return "<CA Spec " +ca_kind+  ":" +role +">";
+    }
 }
