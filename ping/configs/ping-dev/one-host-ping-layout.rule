@@ -1,0 +1,30 @@
+#############
+# Convert from a single Node and Host to
+#   Agent1 -> Node1 -> Host1
+#   Agent2 -> Node2 -> Host2
+# Also mark Host 1 as the base name server
+# Mark Host 1 as part of the a single "REAR" enclave
+# And creates a enclave robustness (AR) Manager
+
+
+# HOST1 already contains NODE1
+society.hosts['HOST1'].add_node('NODE2')
+
+# NODE1 already contains Source* + Sink* agents
+# NODE2 should have Sink agents
+society.each_agent do |agent|
+  if agent.name =~ /Sink.*/
+    society.agents[agent.name].move_to('NODE2')
+  end
+end
+
+# Make Enclaves with Manager
+# add new host for Manager Agent
+society.hosts['HOST1'].add_node('REAR-MGMT-NODE')
+society.nodes['REAR-MGMT-NODE'].add_agent('REAR-ARManager')
+
+society.hosts['HOST1'].add_facet({'enclave' => 'REAR'}) 
+
+# make HOST2 the name server
+society.nodes['REAR-MGMT-NODE'].add_agent('REAR-NameServer')
+society.agents['REAR-NameServer'].add_facet({'role' => 'NameServer'})
