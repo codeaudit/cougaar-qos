@@ -55,6 +55,7 @@ public class CoordinationArtifactBrokerPlugin
     };
 
     private static final String TemplatesParam = "templates";
+    private ArrayList localTemplates;
     private CoordinationArtifactBroker impl;
     private LoggingService log;
 
@@ -62,27 +63,35 @@ public class CoordinationArtifactBrokerPlugin
     {
 	super.load();
 
+
 	ServiceBroker sb = getServiceBroker();
 	impl = new Impl(sb);
 	sb.addService(CoordinationArtifactBroker.class, this);
 
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
+    }
 
-	BlackboardService bbs = getBlackboardService();
-	for (int i=0; i<StandardTemplates.length; i++) {
-	    makeTemplate(StandardTemplates[i], bbs, sb);
-	}
+    public void start()
+    {
+	super.start();
+	localTemplates = new ArrayList();
+	ServiceBroker sb = getServiceBroker();
+	synchronized (localTemplates) {
+	    BlackboardService bbs = getBlackboardService();
+	    for (int i=0; i<StandardTemplates.length; i++) {
+		makeTemplate(StandardTemplates[i], bbs, sb);
+	    }
 
-	String templates = getParameter(TemplatesParam);
-	if (templates != null) {
-	    StringTokenizer tk = new StringTokenizer(templates, ",");
-	    while (tk.hasMoreTokens()) {
-		String klass = tk.nextToken();
-		makeTemplate(klass, bbs, sb);
+	    String templates = getParameter(TemplatesParam);
+	    if (templates != null) {
+		StringTokenizer tk = new StringTokenizer(templates, ",");
+		while (tk.hasMoreTokens()) {
+		    String klass = tk.nextToken();
+		    makeTemplate(klass, bbs, sb);
+		}
 	    }
 	}
-
     }
 
 
@@ -90,15 +99,21 @@ public class CoordinationArtifactBrokerPlugin
 			      BlackboardService bbs,
 			      ServiceBroker sb)
     {
+	Object template = null;
 	try {
 	    Class cl = Class.forName(klass);
 	    Class[] ptypes = { BlackboardService.class, ServiceBroker.class };
 	    Object[] args = { bbs, sb };
 	    Constructor cons = cl.getConstructor(ptypes);
-	    CoordinationArtifactTemplate template = 
-		(CoordinationArtifactTemplate) cons.newInstance(args);
-	    if (log.isInfoEnabled())
-		log.info("Created template " +template);
+	    template = cons.newInstance(args);
+	    if (template instanceof CoordinationArtifactTemplateImpl) {
+		localTemplates.add(template);
+		if (log.isInfoEnabled())
+		    log.info("Created template " +template);
+	    } else {
+		if (log.isWarnEnabled())
+		    log.warn(klass + " is not a CoordinationArtifactTemplate");
+	    }
 	} catch (Exception ex) {
 	    if (log.isWarnEnabled())
 		log.warn("Couldn't instantiate CoordinationArtifactTemplate " 
@@ -109,6 +124,14 @@ public class CoordinationArtifactBrokerPlugin
     // plugin
     protected void execute()
     {
+	synchronized (localTemplates) {
+	    CoordinationArtifactTemplateImpl template;
+	    for (int i=0; i<localTemplates.size(); i++) {
+		template = (CoordinationArtifactTemplateImpl)
+		    localTemplates.get(i);
+		template.execute();
+	    }
+	}
     }
 
     protected void setupSubscriptions() 
