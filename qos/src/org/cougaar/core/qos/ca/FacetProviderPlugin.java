@@ -61,8 +61,6 @@ abstract public class FacetProviderPlugin
     private Schedulable sched;
     private SimpleQueue factQueue;
 
-    private BlackboardService bbs;
-
 
     private static class SimpleQueue extends LinkedList {
 	Object next() {
@@ -88,15 +86,6 @@ abstract public class FacetProviderPlugin
 	// TBD: fill in this.parameters from the plugin params
 	//String name = getParameter("name");
 	//parameters.put("name", name);
-
-	ServiceBroker sb = getServiceBroker();
-
-
-    }
-
-    public void start()
-    {
-	bbs = getBlackboardService();
     }
 
 
@@ -143,6 +132,13 @@ abstract public class FacetProviderPlugin
 	}
     }
 
+
+    protected boolean factsHaveChanged()
+    {
+	// TBD
+	return true;
+    }
+
     // Extensions of can make specific kinds of facets.  Here we make
     // the generic one.
     protected Facet makeClientFacet(String role, RolePlayer player)
@@ -164,7 +160,16 @@ abstract public class FacetProviderPlugin
 	synchronized (factQueue) {
 	    factQueue.add(entry);
 	}
-	if (bbs != null) bbs.signalClientActivity();
+	triggerExecute();
+    }
+
+    protected void triggerExecute()
+    {
+	BlackboardService bbs = getBlackboardService();
+	if (bbs != null) {
+	    bbs.signalClientActivity();
+	} else {
+	}
     }
 
     // Artifact-specific Providers get at the new facts this way.

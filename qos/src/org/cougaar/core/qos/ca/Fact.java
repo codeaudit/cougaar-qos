@@ -26,28 +26,21 @@
 
 package org.cougaar.core.qos.ca;
 
-import org.cougaar.core.mts.MessageAddress;
+import java.util.HashMap;
 
 /**
  * A simple representation of a fact, likely to be replaced later by
- * Jess facts.
+ * Jess facts.  This implementation is for immutable facts.
  */
 public class Fact
 {
     private String type;
-    private MessageAddress source;
-    private Object payload;
+    private HashMap attributes;
 
-    public Fact(String type, Object payload)
-    {
-	this(type, null, payload);
-    }
-
-    public Fact(String type, MessageAddress source, Object payload)
+    public Fact(String type, HashMap attributes)
     {
 	this.type = type;
-	this.source = source;
-	this.payload = payload;
+	this.attributes = attributes;
     }
 
     public String getType()
@@ -55,14 +48,9 @@ public class Fact
 	return type;
     }
 
-    public MessageAddress getSource()
+    public Object getAttribute(String key)
     {
-	return source;
-    }
-
-    public Object getPayload()
-    {
-	return payload;
+	return attributes.get(key);
     }
 }
 

@@ -36,6 +36,7 @@ import java.util.Properties;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
+import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
@@ -48,6 +49,7 @@ public class FacetBrokerPlugin
     implements ServiceProvider
 {
     private FacetBroker impl;
+    private LoggingService log;
 
     public void load()
     {
@@ -56,6 +58,9 @@ public class FacetBrokerPlugin
 	ServiceBroker sb = getServiceBroker();
 	impl = new Impl(sb);
 	sb.addService(FacetBroker.class, this); // should be root-level
+
+	log = (LoggingService)
+           sb.getService(this, LoggingService.class, null);
     }
 
 
@@ -90,7 +95,7 @@ public class FacetBrokerPlugin
     }
 
 	
-    private static class Impl implements FacetBroker
+    private class Impl implements FacetBroker
     {
 	ThreadService tsvc;
 	HashMap pendingRequests;
@@ -119,6 +124,10 @@ public class FacetBrokerPlugin
 	    if (!findFacet(spec, rolePlayer)) {
 		// assume one queued request per player
 		synchronized (pendingRequests) {
+		    if (log.isDebugEnabled())
+			log.debug("Pending request for "
+				  +spec.kind+ " "
+				  +spec.role);
 		    pendingRequests.put(rolePlayer, spec);
 		    requestsThread.start();
 		}
@@ -138,6 +147,8 @@ public class FacetBrokerPlugin
 		}
 		providers.add(provider);
 	    }
+	    if (log.isDebugEnabled())
+		log.debug("Registered provider for " + kind);
 	    requestsThread.start();
 	}
 
@@ -158,18 +169,30 @@ public class FacetBrokerPlugin
 
 	private boolean findFacet(ConnectionSpec spec, RolePlayer player) 
 	{
+	    if (log.isDebugEnabled())
+		log.debug("Looking for " +spec.kind+ " " +spec.role);
 	    synchronized (facetProviders) {
 		List providers = (List) facetProviders.get(spec.kind);
 		if (providers != null) {
+		    if (log.isDebugEnabled())
+			log.debug(providers.size() + 
+				  " registered providers for " +spec.kind);
 		    for (int i=0; i<providers.size(); i++) {
 			FacetProvider prvdr = (FacetProvider) providers.get(i);
 			if (prvdr.matches(spec)) {
+			    if (log.isDebugEnabled())
+				log.debug("Found " +spec.kind+ " " +spec.role);
 			    prvdr.provideFacet(spec, player);
 			    return true;
 			}
 		    }
+		} else {
+		    if (log.isDebugEnabled())
+			log.debug("No registered providers for " +spec.kind);
 		}
 	    }
+	    if (log.isDebugEnabled())
+		log.debug("Didn't find " +spec.kind+ " " +spec.role);
 	    return false;
 	}
 
