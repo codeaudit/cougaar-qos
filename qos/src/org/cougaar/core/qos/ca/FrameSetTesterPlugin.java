@@ -108,7 +108,7 @@ public class FrameSetTesterPlugin
 	    } else if (delayCycles == 0) {
 		initializeBlackboard();
 		--delayCycles;
-	    } else {
+	    } else if (frameSet != null && host1 != null) {
 		Long now = new Long(System.currentTimeMillis());
 		if (log.isDebugEnabled())
 		    log.debug("Updated host1 \"time\" slot");
@@ -126,15 +126,16 @@ public class FrameSetTesterPlugin
     
     private void initializeBlackboard()
     {
-	BlackboardService bbs = getBlackboardService();
-	ServiceBroker sb = getServiceBroker();
 
 	String xml_filename = (String) getParameter("frame-set");
 	if (xml_filename != null) {
-	    SaxParser parser = new SaxParser(sb, bbs);
-	    frameSet = parser.parseFrameSetFile(xml_filename);
-	    if (frameSet == null) return;
+	    ServiceBroker sb = getServiceBroker();
+	    BlackboardService bbs = getBlackboardService();
+	    FrameSetService fss = (FrameSetService)
+		sb.getService(this, FrameSetService.class, null);
+	    frameSet = fss.makeFrameSet(xml_filename, sb, bbs);
 	    host1 = frameSet.findFrame("host", "name", "host1");
+	    sb.releaseService(this, FrameSetService.class, fss);
 	} else {
 	    if (log.isWarnEnabled())
 		log.warn("No FrameSet XML file was specified");
