@@ -53,7 +53,7 @@ abstract public class ResponseFacet
     implements QueryCoordArtConstants
 {
     private String managerRole;
-    private HashSet completedUIDs;
+//     private HashSet completedUIDs;
     private Relay lastResponse; // for cleaning up
     private IncrementalSubscription querySub;
 
@@ -64,7 +64,7 @@ abstract public class ResponseFacet
     {
 	super(owner, sb, spec, player);
 	Properties role_parameters = spec.role_parameters;
-	completedUIDs = new HashSet();
+// 	completedUIDs = new HashSet();
 
 	String communityType = 
 	    spec.ca_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
@@ -190,21 +190,21 @@ abstract public class ResponseFacet
     // process relays
     void processQuery(Relay.Source query)
     {
-	UID query_id = query.getUID();
-	// check cache
-	if(completedUIDs.contains(query_id)) {
-	    // ignore seen relay
-	    if(log.isDebugEnabled()) {
-		log.debug("Observed already seen relay: " + query);
-	    }
-	    return;
-	} else {
-	    // add relay to seen cache			
-	    completedUIDs.add(query_id);
-	    if (log.isDebugEnabled()) {
-		log.debug("Adding relay: "+query+ " to relays cache.");
-	    }
-	}
+// 	UID query_id = query.getUID();
+// 	// check cache
+// 	if(completedUIDs.contains(query_id)) {
+// 	    // ignore seen relay
+// 	    if(log.isDebugEnabled()) {
+// 		log.debug("Observed already seen relay: " + query);
+// 	    }
+// 	    return;
+// 	} else {
+// 	    // add relay to seen cache			
+// 	    completedUIDs.add(query_id);
+// 	    if (log.isDebugEnabled()) {
+// 		log.debug("Adding relay: "+query+ " to relays cache.");
+// 	    }
+// 	}
 	    
 	if (log.isDebugEnabled()) {
 	    log.debug("Observed added relay"+query);
