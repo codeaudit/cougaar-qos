@@ -10,7 +10,7 @@ LINKS += event.jar
 LINKS += instrumentation.jar
 LINKS += jacorb.jar
 LINKS += QuoIdlgen.jar
-LINKS  += quoSumo.jar
+# LINKS  += quoSumo.jar
 
 
 install: $(LINKS) 
