@@ -84,6 +84,7 @@ abstract public class Frame
 	    throw new RuntimeException(this +" is already in FrameSet "+
 				       this.frameSet);
 	} else {
+	    this.frameSet = frameSet;
 	    frameSet.makeFrame(this);
 	}
     }
