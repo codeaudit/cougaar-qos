@@ -170,19 +170,28 @@ public class DestinationDS
  
 	protected DataValue doCalculation(DataFormula.Values values) 
 	{
-	    String agentAddr = values.get("AgentIpAddress").getStringValue();
-	    String myAddr = values.get("PrimaryIpAddress").getStringValue();
 	    DataValue result = null;
-	    if (NodeDS.isUnknownHost(agentAddr) ||
-		NodeDS.isUnknownHost(myAddr)) {
+	    String agentAddr = null;
+	    String myAddr = null;
+	    try {
+		agentAddr =values.get("AgentIpAddress").getStringValue();
+		myAddr = values.get("PrimaryIpAddress").getStringValue();
+	    } catch (Exception ex) {
+		// One of the dependencies is NO_VALUE
 		result = UnknownCapacityMax;
-	    } else {
-		String[] flow_params = {  myAddr, agentAddr};
-		ResourceNode flow = new ResourceNode("IpFlow", flow_params);
-		ResourceNode capm = new ResourceNode("CapacityMax", null);
-		ResourceNode[] path = { flow, capm };
-		DataFormula cap_max = RSS.instance().getPathFormula(path);
-		result = cap_max.blockingQuery();
+	    }
+	    if (result != UnknownCapacityMax) {
+		if (NodeDS.isUnknownHost(agentAddr) ||
+		    NodeDS.isUnknownHost(myAddr)) {
+		    result = UnknownCapacityMax;
+		} else {
+		    String[] flow_params = {  myAddr, agentAddr};
+		    ResourceNode flow = new ResourceNode("IpFlow", flow_params);
+		    ResourceNode capm = new ResourceNode("CapacityMax", null);
+		    ResourceNode[] path = { flow, capm };
+		    DataFormula cap_max = RSS.instance().getPathFormula(path);
+		    result = cap_max.blockingQuery();
+		}
 	    }
 
 	    Logger logger =
