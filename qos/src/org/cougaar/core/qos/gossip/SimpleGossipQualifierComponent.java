@@ -112,6 +112,8 @@ public class SimpleGossipQualifierComponent
 	    return 
 		!key.startsWith(host_key) &&
 		!key.startsWith("Site_Flow") &&
+		!key.startsWith("Service") &&
+		!key.startsWith("AgentFlow") &&
 		!key.startsWith(node_key) &&
 		key.indexOf("169.0.0.1") == -1;
 	}
