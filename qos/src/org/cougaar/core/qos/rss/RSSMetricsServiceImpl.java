@@ -50,6 +50,14 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+/**
+ * The implementation of MetricsService, and a child component of
+ * MetricsServiceProvider.  This implementation uses the RSS for data
+ * lookup.
+ *
+ * @property org.cougaar.metrics.properties The name of an RSS config
+ * file.
+ */
 public class RSSMetricsServiceImpl 
     extends QosComponent
     implements MetricsService 

@@ -45,6 +45,31 @@ import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.BasicAttributes;
 
+/**
+ * The implementation of MetricsUpdateService, and a child component
+ * of MetricsServiceProvider.  This implementation uses the RSS,
+ * either directly or via a CORBA TypedEventChannel, depending on
+ * whether or not JacORB is available.
+ *
+ * @property org.cougaar.metrics.stec.mesh If true, and if event
+ * channels are in use, the channels from each Node in the society
+ * will be linked in a ring.  This enabled metrics data collected in
+ * one Node to be accessed by another Node.
+ *
+ * @property org.cougaar.metrics.topology.iorfile If present, and if
+ * event channels are in use, the ior of the channel topology manager
+ * will be written to the given file.  This allows external
+ * applications to communicate with the RSS.
+ *
+ * @property org.omg.CORBA.ORBClass Set this to org.jacorb.orb.ORB if
+ * you want to use the TypedEventChannels to share metrics among
+ * Nodes in a society and to get data from third-party collectors.
+ *
+ * @property org.omg.CORBA.ORBSingletonClass Set this to
+ * org.jacorb.orb.ORBSingleton if you want to use the
+ * TypedEventChannels to share metrics among Nodes in a society and to
+ * get data from third-party collectors.
+ */
 public class STECMetricsUpdateServiceImpl
     extends QosComponent
     implements MetricsUpdateService
