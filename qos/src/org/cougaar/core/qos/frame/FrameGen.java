@@ -211,7 +211,7 @@ public class FrameGen
 		       "(Object new_value)");
 	writer.println("    {");
 	writer.println("        this." +fixed_name+ " = new_value;");
-	writer.println("        addLocalSlot(\"" +slot+ "\");");
+	writer.println("        slotModified(\"" +slot+ "\", new_value);");
 	writer.println("    }");
     }
 

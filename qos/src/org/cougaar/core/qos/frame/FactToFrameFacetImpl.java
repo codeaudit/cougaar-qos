@@ -77,8 +77,7 @@ abstract public class FactToFrameFacetImpl
     abstract protected boolean isNewFrame(Object fact);
     abstract protected boolean isModifiedFrame(Object fact);
     abstract protected Frame getFrame(Object fact);
-    abstract protected UID getUID(Object fact);
-    abstract protected Collection  getModifications(Object fact);
+    abstract protected Object getModifications(Object fact);
     
     public void setupSubscriptions(BlackboardService bbs) 
     {
@@ -112,27 +111,44 @@ abstract public class FactToFrameFacetImpl
 	frame.copyToFrameSet(frameSet);
     }
 
-    private void processModifiedFrame(Object fact)
+    private void handleChange(Frame.Change change)
     {
-	UID uid = getUID(fact);
-	Collection changes = getModifications(fact);
+	UID uid = change.getFrameUID();
 	Frame frame = frameSet.findFrame(uid);
 	if (frame == null) {
 	    if (log.isInfoEnabled())
 		log.info("No match for uid " +uid);
 	    return;
 	}
-	if (log.isInfoEnabled())
-	    log.info("Processing " + changes.size() + " changes");
 
-	Iterator itr = changes.iterator();
-	while (itr.hasNext()) {
-	    Frame.Change change = (Frame.Change) itr.next();
-	    String attr = change.getSlot();
-	    Object val = change.getValue();
+	String attr = change.getSlotName();
+	Object val = change.getValue();
+	if (log.isInfoEnabled())
+	    log.info("Changing " +attr+ " to " +val);
+	frame.setValue(attr, val);
+    }
+
+    private void processModifiedFrame(Object fact)
+    {
+	Object mods = getModifications(fact);
+
+	if (mods instanceof Collection) {
+	    Collection changes = (Collection) mods;
 	    if (log.isInfoEnabled())
-		log.info("Changing " +attr+ " to " +val);
-	    frame.setValue(attr, val);
+		log.info("Processing " + changes.size() + " changes");
+
+	    Iterator itr = changes.iterator();
+	    while (itr.hasNext()) {
+		Frame.Change change = (Frame.Change) itr.next();
+		handleChange(change);
+	    }
+	} else if (mods instanceof Frame.Change) {
+	    Frame.Change change = (Frame.Change) mods;
+	    handleChange(change);
+	} else {
+	    if (log.isWarnEnabled())
+		log.warn("Frame Change " +mods+ 
+			 " is neither a Collection nor a Frame.Change");
 	}
 	
     }

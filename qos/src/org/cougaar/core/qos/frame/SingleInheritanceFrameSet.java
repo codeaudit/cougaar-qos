@@ -518,7 +518,7 @@ public class SingleInheritanceFrameSet
 	// Publish the frame itself as the change, or just a change
 	// record for the specific slot?
 	ArrayList changes = new ArrayList(1);
-	Frame.Change change = new Frame.Change(slot, value);
+	Frame.Change change = new Frame.Change(frame.getUID(), slot, value);
 	changes.add(change);
 	publishChange(frame, changes);
     }

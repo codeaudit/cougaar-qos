@@ -63,11 +63,12 @@ abstract public class Frame
 	this.localSlots = new HashSet();
     }
 
-    protected void addLocalSlot(String slot)
+    protected void slotModified(String slot, Object value)
     {
 	synchronized (localSlots) {
 	    localSlots.add(slot);
 	}
+	if (frameSet != null) frameSet.valueUpdated(this, slot, value);
     }
 
     void copyToFrameSet(FrameSet frameSet)
@@ -336,17 +337,25 @@ abstract public class Frame
 
 
     public static class Change implements ChangeReport {
-	public final String slot;
-	public final Object value;
-	public Change(String attr, Object val)
+	private final String slot;
+	private final Object value;
+	private final UID frame_uid;
+	private final int hashcode;
+
+	public Change(UID frame_uid, String attr, Object val)
 	{
 	    this.slot = attr;
 	    this.value = val;
+	    this.frame_uid = frame_uid;
+	    String puid = frame_uid.toString() +attr+ val.toString();
+	    this.hashcode = puid.hashCode();
 	}
 	
-	public String getSlot() { return slot; }
+	public String getSlotName() { return slot; }
 
 	public Object getValue() { return value; }
+	
+	public UID getFrameUID() { return frame_uid; }
 
 	// Object
 	public boolean equals(Object o) 
@@ -354,12 +363,12 @@ abstract public class Frame
 	    return
 		((o == this) ||
 		 ((o instanceof Change) &&
-		  slot.equals(((Change) o).slot)));
+		  hashcode == (((Change) o).hashcode)));
 	}
 
 	public int hashCode() 
 	{
-	    return slot.hashCode();
+	    return hashcode;
 	}
     }
 
