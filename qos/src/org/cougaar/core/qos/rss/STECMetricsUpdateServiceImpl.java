@@ -47,7 +47,9 @@ public class STECMetricsUpdateServiceImpl
     implements MetricsUpdateService
 {
     private static final String RSS_DIR = "RSS";
-    private static final String TOPOLOGY_IORFILE_PROPERTY = 
+    private static final String USE_TOPOLOGY_PROPERTY = 
+	"org.cougaar.metrics.stec.mesh";
+    private static final String TOPOLOGY_DUMP_IORFILE_PROPERTY = 
 	"org.cougaar.metrics.topology.iorfile";
     
     private ServiceBroker sb;
@@ -162,7 +164,7 @@ public class STECMetricsUpdateServiceImpl
 	ior = Connector.orb().object_to_string(mgr._this());
 	String real_ior = (String) grabKey(key, ior);
 	if (real_ior == ior) {
-	    String iorfile = System.getProperty(TOPOLOGY_IORFILE_PROPERTY);
+	    String iorfile = System.getProperty(TOPOLOGY_DUMP_IORFILE_PROPERTY);
 	    mgr.start(iorfile);
 	} else {
 	    // System.out.println("Found TopologyManager " +real_ior);
@@ -171,17 +173,31 @@ public class STECMetricsUpdateServiceImpl
     }
 
     private TypedEventChannel makeChannel(NodeIdentifier id) {
-	String ior = topologyIOR();
-	String channel_id = id+"Channel";
-	String args[] = 
-	    { "-queue",
-	      "com.bbn.quo.event.status.PrioritizedStatusChunkingQ",
-	      "-policy",
-	      "com.bbn.quo.event.status.StatusValidatingCachingPolicy",
-	      "-id", channel_id,
-	      "-ior", ior,
-	    };
-	StatusTEC channel = new StatusTEC(args);
+	String ior = null;
+	String channel_id = null;
+	StatusTEC channel = null;
+	if (Boolean.getBoolean(USE_TOPOLOGY_PROPERTY)) {
+	    ior = topologyIOR();
+	    channel_id = id+"Channel";
+	    String args[] = 
+		{ "-queue",
+		  "com.bbn.quo.event.status.PrioritizedStatusChunkingQ",
+		  "-policy",
+		  "com.bbn.quo.event.status.StatusValidatingCachingPolicy",
+		  "-id", channel_id,
+		  "-ior", ior,
+		};
+	    channel = new StatusTEC(args);
+	} else {
+	    String args[] = 
+		{ "-queue",
+		  "com.bbn.quo.event.status.PrioritizedStatusChunkingQ",
+		  "-policy",
+		  "com.bbn.quo.event.status.StatusValidatingCachingPolicy",
+		};
+	    channel = new StatusTEC(args);
+	}
+
 	return channel._this();
     }
 
