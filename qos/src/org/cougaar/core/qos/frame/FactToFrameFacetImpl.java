@@ -133,6 +133,7 @@ abstract public class FactToFrameFacetImpl
 		// no retractions yet
 	    }
 	}
+	frameSet.processQueue();
     }
 
 }

@@ -161,7 +161,7 @@ public class FrameSetParser
 	    producer.setErrorHandler(consumer);
 	    URL url = xml_file.toURL();
 	    producer.parse(url.toString());
-	} catch (Exception ex) {
+	} catch (Throwable ex) {
 	    log.error("Error parsing FrameSet file " + xml_file, ex);
 	}
 	return frame_set;

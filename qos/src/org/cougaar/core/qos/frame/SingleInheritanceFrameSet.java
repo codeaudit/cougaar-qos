@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.frame;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,10 +48,11 @@ public class SingleInheritanceFrameSet
     private LoggingService log;
     private UIDService uids;
     private BlackboardService bbs;
+    private ArrayList change_queue;
+    private Object change_queue_lock;
     private String name;
     private HashMap visitors;
     private HashSet pending_parentage;
-//     private HashMap kbs;
     private HashMap kb;
     private HashMap prototypes, parents;
     private HashSet parent_relations;
@@ -77,13 +79,14 @@ public class SingleInheritanceFrameSet
     {
 	this.name = name;
 	this.bbs = bbs;
+	this.change_queue = new ArrayList();
+	this.change_queue_lock = new Object();
 	log = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
 	uids = (UIDService)
 	    sb.getService(this, UIDService.class, null);
 
 	this.pending_parentage = new HashSet();
-// 	this.kbs = new HashMap();
  	this.kb = new HashMap();
 	this.prototypes = new HashMap();
 	this.parents = new HashMap();
@@ -350,6 +353,80 @@ public class SingleInheritanceFrameSet
 				
     }
 
+    private static class FrameAdd {
+	Frame frame;
+	FrameAdd(Frame frame)
+	{
+	    this.frame = frame;
+	}
+    }
+
+    private static class FrameChange {
+	Frame frame;
+	Collection changes;
+	FrameChange(Frame frame, Collection changes)
+	{
+	    this.frame = frame;
+	    this.changes = changes;
+	}
+    }
+
+    private static class FrameRemove {
+	Frame frame;
+	FrameRemove(Frame frame)
+	{
+	    this.frame = frame;
+	}
+    }
+
+
+    public void processQueue()
+    {
+	ArrayList copy = null;
+	synchronized (change_queue_lock) {
+	    copy = change_queue;
+	    change_queue = new ArrayList();
+	}
+	int count = copy.size();
+	for (int i=0; i<count; i++) {
+	    Object change = copy.get(i);
+	    if (change instanceof FrameChange) {
+		FrameChange fc = (FrameChange) change;
+		bbs.publishChange(fc.frame, fc.changes);
+	    } else  if (change instanceof FrameAdd) {
+		FrameAdd fa = (FrameAdd) change;
+		bbs.publishAdd(fa.frame);
+	    } else  if (change instanceof FrameRemove) {
+		FrameRemove fr = (FrameRemove) change;
+		bbs.publishRemove(fr.frame);
+	    }
+	}
+    }
+	
+    void publishAdd(Frame frame)
+    {
+	synchronized (change_queue_lock) {
+	    change_queue.add(new FrameAdd(frame));
+	    bbs.signalClientActivity();
+	}
+    }
+
+    void publishChange(Frame frame, ArrayList changes)
+    {
+	synchronized (change_queue_lock) {
+	    change_queue.add(new FrameChange(frame, changes));
+	    bbs.signalClientActivity();
+	}
+    }
+
+    void publishRemove(Frame frame)
+    {
+	synchronized (change_queue_lock) {
+	    change_queue.add(new FrameRemove(frame));
+	    bbs.signalClientActivity();
+	}
+    }
+
 
     public void valueUpdated(Frame frame, String slot, Object value)
     {
@@ -361,7 +438,7 @@ public class SingleInheritanceFrameSet
 	ArrayList changes = new ArrayList(1);
 	Frame.Change change = new Frame.Change(slot, value);
 	changes.add(change);
-	if (bbs != null) bbs.publishChange(frame, changes);
+	publishChange(frame, changes);
     }
 
     public Frame makeFrame(String proto, Properties values)
@@ -377,7 +454,7 @@ public class SingleInheritanceFrameSet
 	if (isParentageRelation(frame)) establishParentage(frame);
 
 	addFrame(frame);
-	if (bbs != null) bbs.publishAdd(frame);
+	publishAdd(frame);
 	return frame;
     }
 
@@ -428,7 +505,7 @@ public class SingleInheritanceFrameSet
 		parent_relations.add(proto);
 	}
 	addFrame(frame);
-	if (bbs != null) bbs.publishAdd(frame);
+	publishAdd(frame);
 	return frame;
     }
 
@@ -444,7 +521,7 @@ public class SingleInheritanceFrameSet
 	// Handle the removal of parent-child relationship frames
 	if (isParentageRelation(frame)) disestablishParentage(frame);
 
-	if (bbs != null) bbs.publishRemove(frame);
+	publishRemove(frame);
     }
 
     public Frame getParent(Frame frame)

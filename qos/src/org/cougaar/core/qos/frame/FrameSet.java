@@ -60,4 +60,6 @@ public interface FrameSet
     public Frame getPrototype(Frame frame);
 
     public void valueUpdated(Frame frame, String slot, Object value);
+
+    public void processQueue();
 }

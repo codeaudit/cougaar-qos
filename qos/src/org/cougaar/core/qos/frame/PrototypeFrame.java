@@ -52,13 +52,13 @@ public class PrototypeFrame
 
     public Object getValue(String slot)
     {
-	VisitorPath path = null;
-	synchronized (paths) {
+	if (paths != null) {
+	    VisitorPath path = null;
 	    path = (VisitorPath) paths.get(slot);
-	}
-	if (path != null) {
-	    Object result = path.getValue(this);
-	    if (result != null) return result;
+	    if (path != null) {
+		Object result = path.getValue(this);
+		if (result != null) return result;
+	    }
 	}
 	 
 	return super.getValue(slot);

@@ -73,6 +73,7 @@ public class FrameSetTesterPlugin
     // plugin
     protected void execute()
     {
+	frameSet.processQueue();
     }
 
     protected void setupSubscriptions() 
