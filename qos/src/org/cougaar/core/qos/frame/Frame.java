@@ -177,15 +177,11 @@ public class Frame
 	return result;
     }
     
-    public Set findParents(String relation_prototype)
+    public Set findRelations(String role, String relation)
     {
-	return frameSet.findParents(this, relation_prototype);
+	return frameSet.findRelations(this, role, relation);
     }
 
-    public Set findChildren(String relation_prototype)
-    {
-	return frameSet.findChildren(this, relation_prototype);
-    }
 
     // UniqueObject
     public UID getUID()

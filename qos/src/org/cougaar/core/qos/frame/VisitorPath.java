@@ -26,61 +26,56 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.cougaar.core.util.UID;
-
-public class PrototypeFrame
-    extends Frame
+class VisitorPath
 {
-    private final String prototype_name;
-    private HashMap paths;
+    static class Entry {
+	Entry(String role, String relation)
+	{
+	    this.role = role;
+	    this.relation = relation;
+	}
 
-    PrototypeFrame(FrameSet frameSet, String prototype_name,
-		   String parent, UID uid, Properties properties)
-    {
-	super(frameSet, parent, uid, properties);
-	this.prototype_name = prototype_name;
-	this.paths = new HashMap();
+	private String role;
+	private String relation;
     }
 
-    void addPath(String slot, VisitorPath path)
+    private String name;
+    private Entry[] entries;
+    private String slot;
+
+    VisitorPath(String name, Entry[] entries, String slot)
     {
-	synchronized (paths) {
-	    paths.put(slot, path);
-	}
+	this.name = name;
+	this.entries = entries;
+	this.slot = slot;
     }
 
-    public Object getValue(String slot)
+    String getName()
     {
-	VisitorPath path = null;
-	synchronized (paths) {
-	    path = (VisitorPath) paths.get(slot);
-	}
-	if (path != null) {
-	    Object result = path.getValue(this);
+	return name;
+    }
+
+    Object getValue(Frame root)
+    {
+	return getNextValue(root, 0);
+    }
+
+    private Object getNextValue(Frame frame, int index)
+    {
+	if (index == entries.length) return frame.getValue(slot);
+
+	Entry entry = entries[index];
+	Set frames = frame.findRelations(entry.role, entry.relation);
+	if (frames == null) return null;
+	Iterator itr = frames.iterator();
+	while (itr.hasNext()) {
+	    Frame next = (Frame) itr.next();
+	    Object result = getNextValue(next, ++index);
 	    if (result != null) return result;
 	}
-	 
-	return super.getValue(slot);
+	return null;
     }
-
-    public String getPrototypeName()
-    {
-	return prototype_name;
-    }
-
-
-    public String toString()
-    {
-	return "<Prototype " +prototype_name+ " " +getUID()+ ">";
-    }
-
-    void copyToFrameSet(FrameSet frameSet)
-    {
-	frameSet.makePrototype(prototype_name, getKind(), getProperties(), 
-			       getUID());
-    }
-
 }

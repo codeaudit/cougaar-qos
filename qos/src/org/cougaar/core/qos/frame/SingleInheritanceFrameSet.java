@@ -280,7 +280,7 @@ public class SingleInheritanceFrameSet
 	return results;
       }
 
-    public Set findChildren(Frame parent, String relation_prototype)
+    Set findChildren(Frame parent, String relation_prototype)
     {
 	HashSet results = new HashSet();
 	synchronized (kb) {
@@ -305,7 +305,7 @@ public class SingleInheritanceFrameSet
 	return results;
     }
 
-    public Set findParents(Frame child, String relation_prototype)
+    Set findParents(Frame child, String relation_prototype)
     {
 	HashSet results = new HashSet();
 	synchronized (kb) {
@@ -328,6 +328,20 @@ public class SingleInheritanceFrameSet
 	    }
 	}
 	return results;
+    }
+
+    public Set findRelations(Frame root, String role, String relation)
+    {
+	if (role.equals("parent")) {
+	    return findParents(root, relation);
+	} else if (role.equals("child")) {
+	    return findChildren(root, relation);
+	} else {
+	    if (log.isWarnEnabled())
+		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+	    return null;
+	}
+				
     }
 
 

@@ -60,15 +60,11 @@ final class ReadOnlyFrameSetProxy
 	return frameSet.findFrames(kind,  slot_value_pairs);
     }
 
-    public Set findChildren(Frame parent, String relation_prototype)
+    public Set findRelations(Frame root, String role, String relation)
     {
-	return frameSet.findChildren(parent, relation_prototype);
+	return frameSet.findRelations(root, role, relation);
     }
 
-    public Set findParents(Frame child, String relation_prototype)
-    {
-	return frameSet.findParents(child, relation_prototype);
-    }
 
 
     public Frame getParent(Frame frame)

@@ -41,9 +41,7 @@ public interface FrameSet
 
     public Set findFrames(String kind, Properties slot_value_pairs);
 
-    public Set findChildren(Frame parent, String relation_prototype);
-
-    public Set findParents(Frame child, String relation_prototype);
+    public Set findRelations(Frame root, String role, String relation);
 
     public Frame makeFrame(String kind, Properties slots);
 
