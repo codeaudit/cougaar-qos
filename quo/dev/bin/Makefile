@@ -2,55 +2,55 @@
 # (c) Copyright 2001  BBNT Solutions, LLC
 # =====================================================================
 
-LINKS := Node.Link
-LINKS += QuoNode.Link
-LINKS += SSLNode.Link
-LINKS += CorbaNode.Link
-LINKS += ComboNode.Link
-LINKS += NoisyNode.Link
-LINKS += SecureNode.Link
-LINKS += SeqNode.Link
-LINKS += SerializeNode.Link
-LINKS += SimpleNode.Link
-LINKS += StatNode.Link
-LINKS += TraceNode.Link
+LINKS := Node
+LINKS += QuoNode
+LINKS += SSLNode
+LINKS += CorbaNode
+LINKS += ComboNode
+LINKS += NoisyNode
+LINKS += SecureNode
+LINKS += SeqNode
+LINKS += SerializeNode
+LINKS += SimpleNode
+LINKS += StatNode
+LINKS += TraceNode
 
 install: $(LINKS)
 
-Node.Link:
+Node:
 	ln -s wrapper Node
 
-QuoNode.Link:
+QuoNode:
 	ln -s wrapper QuoNode
 
-SSLNode.Link:
+SSLNode:
 	ln -s wrapper SSLNode
 
-CorbaNode.Link:
+CorbaNode:
 	ln -s wrapper CorbaNode
 
-ComboNode.Link:
+ComboNode:
 	ln -s wrapper ComboNode
 
-NoisyNode.Link:
+NoisyNode:
 	ln -s wrapper NoisyNode
 
-SecureNode.Link:
+SecureNode:
 	ln -s wrapper SecureNode
 
-SeqNode.Link:
+SeqNode:
 	ln -s wrapper SeqNode
 
-SerializeNode.Link:
+SerializeNode:
 	ln -s wrapper SerializeNode
 
-SimpleNode.Link:
+SimpleNode:
 	ln -s wrapper SimpleNode
 
-StatNode.Link:
+StatNode:
 	ln -s wrapper StatNode
 
-TraceNode.Link:
+TraceNode:
 	ln -s wrapper TraceNode
 
 clean:
