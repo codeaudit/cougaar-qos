@@ -1,7 +1,7 @@
 classes=.classes
 jar=newquo.jar
 #cougaar=${COUGAAR_INSTALL_PATH}/lib/core.jar
-cougaar=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
+cougaar=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
 qos=${COUGAAR_SRC_PATH}/qos/newqos.jar
 src=$(shell find .  -name "*.java")
 thirdparty=dev/3rdparty

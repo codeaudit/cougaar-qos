@@ -1,4 +1,4 @@
-COUGAARJAR=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
+COUGAARJAR=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
 
 COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/quo/dev/3rdparty
 

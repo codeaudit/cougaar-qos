@@ -7,7 +7,7 @@
 COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/quo/dev/3rdparty
 export COUGAAR3RDPARTY
 
-newcore=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
+newcore=${COUGAAR_SRC_PATH}/core/newcore.jar
 newquo=${COUGAAR_SRC_PATH}/quo/newquo.jar
 newqos=${COUGAAR_SRC_PATH}/qos/newqos.jar
 #perf=${COUGAAR_SRC_PATH}/glm/src/performance.jar
