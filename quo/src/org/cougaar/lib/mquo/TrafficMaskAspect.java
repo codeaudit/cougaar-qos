@@ -25,7 +25,6 @@ import com.bbn.quo.rmi.ExpectedBandwidthSC;
 
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MulticastMessageAddress;
-import org.cougaar.core.qos.rss.MetricSC;
 
 import java.util.HashMap;
 import java.util.Iterator;

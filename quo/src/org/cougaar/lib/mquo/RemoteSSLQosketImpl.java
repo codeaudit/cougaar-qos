@@ -12,7 +12,6 @@ import org.cougaar.core.mts.DestinationLink;
 import org.cougaar.core.mts.SSLRMILinkProtocol;
 import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.qos.rss.MetricSC;
 
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.ValueSC;
