@@ -42,8 +42,8 @@ for additional usage and testing notes.
       <!-- disable planning and communities (bug 2522) -->
       <vm_parameter>-Dorg.cougaar.core.load.planning=false</vm_parameter>
       <vm_parameter>-Dorg.cougaar.core.load.community=false</vm_parameter>
-      <!-- minimal config path, excludes "configs/common" -->
-      <vm_parameter>-Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/ping/configs/ping</vm_parameter>
+      <!-- minimal config path -->
+      <vm_parameter>-Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/ping/configs/ping\;$COUGAAR_INSTALL_PATH/configs/common</vm_parameter>
       <!-- the rest is probably okay as-is -->
       <vm_parameter>-XX:ThreadStackSize=256</vm_parameter>
       <vm_parameter>-Xms16m</vm_parameter>
@@ -142,7 +142,6 @@ for additional usage and testing notes.
         -->
 
         <!-- required ping timer, set for every second-->
-        plugin = org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)
         <component
           name='org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)'
           class='org.cougaar.ping.PingTimerPlugin'
@@ -169,7 +168,6 @@ for additional usage and testing notes.
         </component>
 
         <!-- optional "/ping" servlet -->
-        plugin = org.cougaar.ping.PingServlet(/ping)
         <component
           name='org.cougaar.ping.PingServlet(/ping)'
           class='org.cougaar.ping.PingServlet'
