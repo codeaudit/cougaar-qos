@@ -30,13 +30,14 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.RSSUtils;
 
+import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
-import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.node.NodeIdentifier;
 
-import java.util.Properties;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 public final class RSSMetricsServiceImpl 
@@ -119,7 +120,7 @@ public final class RSSMetricsServiceImpl
 	}
     }
 
-    public RSSMetricsServiceImpl(ServiceBroker sb) {
+    public RSSMetricsServiceImpl(ServiceBroker sb, NodeIdentifier id) {
 	String propertiesURL = System.getProperty(RSS_PROPERTIES);
 	if (propertiesURL != null)
 	    RSS.makeInstance(propertiesURL);
