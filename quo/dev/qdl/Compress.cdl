@@ -1,0 +1,24 @@
+/*
+ * =====================================================================
+ * (c) Copyright 2001  BBNT Solutions, LLC
+ * =====================================================================
+ */
+
+contract Compress 
+    (
+     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedServerLoadAverage,	
+     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedServerEffectiveMJips,
+     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedClientEffectiveMJips,
+     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedNetworkCapacity,
+     syscond quo::ValueSC ValueSCImpl UseCompression
+
+     )
+{
+    region Compress (UseCompression or
+		     expectedNetworkCapacity < 500 )
+	{}
+    region Normal (true ) 
+	{}
+
+};
+

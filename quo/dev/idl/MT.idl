@@ -1,0 +1,27 @@
+/*
+ * =====================================================================
+ * (c) Copyright 2001  BBNT Solutions, LLC
+ * =====================================================================
+ */
+
+// quo.idl,v
+
+#if !defined(MT_IDL)
+#define MT_IDL
+
+module cougaar {
+
+    typedef sequence<octet> bytes;
+
+    exception CorbaMisdeliveredMessage {
+    };
+
+
+    interface MT {
+	void rerouteMessage(in bytes m) raises(CorbaMisdeliveredMessage);
+    };
+
+};
+
+
+#endif
