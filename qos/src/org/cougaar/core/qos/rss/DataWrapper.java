@@ -57,4 +57,6 @@ public class DataWrapper implements Metric, java.io.Serializable
     public double getCredibility() { return data.getCredibility(); }
     public String getUnits() { return data.getUnits(); }
     public String getProvenance() { return data.getProvenance(); }
+    public long getTimestamp() { return data.getTimestamp(); }
+    public long getHalflife() { return data.getHalflife(); }
 }

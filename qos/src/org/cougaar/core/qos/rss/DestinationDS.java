@@ -91,11 +91,7 @@ public class DestinationDS
 	    // System.err.println("### Recalculating " +getKey());
 	    DataValue computedValue = values.get("Formula");
 	    DataValue defaultValue = defaultValue();
-	    if (computedValue.atLeastAsCredibleAs(defaultValue)) {
-		return computedValue; 
-	    } else {
-		return defaultValue;
-	    }
+	    return DataValue.mostCredible(computedValue, defaultValue);
 	}
 
     }

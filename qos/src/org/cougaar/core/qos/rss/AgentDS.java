@@ -133,11 +133,7 @@ public class AgentDS
 	    // System.err.println("### Recalculating " +getKey());
 	    DataValue computedValue = values.get("Formula");
 	    DataValue defaultValue = defaultValue();
-	    if (computedValue.atLeastAsCredibleAs(defaultValue)) {
-		return computedValue; 
-	    } else {
-		return defaultValue;
-	    }
+	    return DataValue.mostCredible(computedValue, defaultValue);
 	}
 
     }
@@ -185,7 +181,7 @@ public class AgentDS
 	    }
 	    long sendTime = formulaDV.getLongValue();
 	    long alarmTime = alarmDV.getLongValue();
-	    DataValue elapsed = new DataValue(0);
+	    long elapsed = 0;
 
 // 	    String agentName = (String) getScope().getValue(AGENTNAME);
 // 	    System.err.println("Agent "+agentName+ 
@@ -194,11 +190,9 @@ public class AgentDS
 // 			       " delta=" + (alarmTime - sendTime));
 
 	    if (alarmTime > sendTime) {
-		long seconds= (long) Math.floor((alarmTime-sendTime)/1000.0);
-		elapsed.setValue(seconds);
+		elapsed = (long) Math.floor((alarmTime-sendTime)/1000.0);
 	    }
-	    elapsed.setCredibility(vals.minCredibility());
-	    return elapsed;
+	    return new DataValue(elapsed, vals.minCredibility());
 	}
 
 	

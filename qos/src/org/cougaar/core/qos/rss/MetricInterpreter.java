@@ -39,7 +39,9 @@ class MetricInterpreter implements DataInterpreter
 	String prov = metric.getProvenance();
 	String units = metric.getUnits();
 	Object val = metric.getRawValue();
-	return new DataValue(val, credibility, units, prov);
+	long ts = metric.getTimestamp();
+	long hl = metric.getHalflife();
+	return new DataValue(val, credibility, units, prov, ts, hl);
     }
 }
 
