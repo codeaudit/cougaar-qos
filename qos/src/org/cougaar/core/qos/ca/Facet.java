@@ -28,13 +28,13 @@ package org.cougaar.core.qos.ca;
 
 
 /**
- * A Facet represents a role in {@link CoordinationArtifact}.  {@link
- * RolePlayer}s interact with Facets through a {@link Receptacle}
- * handle.  This naming convention is deliberately suggestive of the
- * CORBA Component Model, since the functions of these two interfaces
- * are roughly equivalent to the similarly named entities in CCM.  By
- * analogy, the {@link CoordinationArtifact} itself corresponds to a
- * CCM Component.
+ * A Facet represents a role in {@link CoordinationArtifact}, from the
+ * perspective of the Artifact itself. {@link RolePlayer}s interact
+ * with Facets through a {@link Receptacle} handle.  This naming
+ * convention is deliberately suggestive of the CORBA Component Model,
+ * since the functions of these two interfaces are roughly equivalent
+ * to the similarly named entities in CCM.  By analogy, the {@link
+ * CoordinationArtifact} itself corresponds to a CCM Component.
  */
 public interface Facet extends BlackboardExecutor
 {

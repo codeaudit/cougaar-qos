@@ -4,73 +4,107 @@
 
 <body>
 
-<h3>Introduction</h3>
+  <p><i>Coordination Artifacts</i> are designed to separate out an
+    abstract communication pattern, on the one hand, and the
+    domain-specific clients of the communication on the other. The
+    internal parts of the Artifact are concerned with organizing
+    Communities, Relays and other COUGAAR infrastructure in a
+    structured way in order to represent a pattern of inter-Agent
+    chatter.  Each kind of Artifact completes this by supplying
+    Community names, data types etc.
+  </p>  
 
-<p><i>Coordination Artifacts</i> are designed to separate out an
-  abstract communication pattern, on the one hand, and the
-  domain-specific clients of the communication on the other. The
-  internal parts of the Artifact are concerned with organizing
-  Communities, Relays and other COUGAAR infrastructure in a structured
-  way in order to represent a pattern of inter-Agent chatter.  Each
-  kind of Artifact completes this by supplying Community names, data
-  types etc.
+  <p>Coordination Artifacts are specifically designed to
+    operate <i>across</i> Plugins.  At first glance this might appear
+    to violate one of the design principles of COUGAAR.  But on
+    further reflection it can be seen that the Coordination approach
+    is analagous to a <i>cross-cut</i> in Aspect Oriented Programming.
+    Just as an Aspect cross-cuts the dominant Object Oriented
+    decomposition, so a Coordination Artifact cross-cuts the Plugin
+    "decomposition" of a COUGAAR Agent.
+  </p>
 
-<p>Coordination Artifacts are created by a
-  CoordinationArtifactProvider, via requests made to the
-  CoordinationArtifactBroker.  A CoordinationArtifactProviders is like
-  a COUGAAR ServiceProvider: its primary job is to find or make
-  CoordinationArtifacts of some particular kind.  But it also
-  implicitly defines a set of <i>Roles</i> that describe the functions
-  performed by clients of this kind of Artifact.  For example in
-  Artifacts that implement a multicast request (one request, multiple
-  replies), the two Roles are queryer and responder.  
+  <p>Coordination Artifacts are created by a
+    CoordinationArtifactProvider, via requests made to the
+    CoordinationArtifactBroker.  A CoordinationArtifactProvider is
+    like a COUGAAR ServiceProvider: its primary job is to find or make
+    CoordinationArtifacts of some particular kind.  But it also
+    implicitly defines a set of <i>Roles</i> that describe the
+    functions performed by clients of this kind of Artifact.  For
+    example in Artifacts that implement a multicast request (one
+    request, multiple replies), the two Roles are queryer and
+    responder.
+  </p>
 
-<p>Every Role has a corresponding interface that specifies the
-  operations that can be performed on the Artifact by clients playing
-  that Role.  These interfaces are therefore very much
-  like <i>Facets</i> in the CORBA Component Model: they present a
-  Role-specific viewport into the Artifact as a whole.  Likewise, the
-  client's handle on a Facet is similar to a <i>Receptacle</i> in CCM.
-  A Provider also defines a set of parameters that distinguish the
-  individuals of that kind of Artifact.
-
+  <p>Every Role has a corresponding interface that specifies the
+    operations that can be performed on the Artifact by clients
+    playing that Role.  These interfaces are therefore very much
+    like <i>Facets</i> in the CORBA Component Model: they present a
+    Role-specific viewport into the Artifact as a whole.  Likewise,
+    the client's handle on a Facet is similar to a <i>Receptacle</i>
+    in CCM.  A Provider also defines a set of parameters that
+    distinguish the individuals of that kind of Artifact.
+  </p>
   
 
 
-<p>  This leads to the following Java interfaces:
+  <p>This leads to the following Java interfaces:
 
-<ul>
+    <ul>
 
- <li><strong>RolePlayer</strong>: From the Artifact's perspective, each
-     client plays one of the Artifact's defined roles.  This interface
-     specifies that abstracion.</li>
+      <li><strong>RolePlayer</strong>: From the Artifact's
+	perspective, each client plays one of the Artifact's defined
+	roles.  This interface specifies that abstracion.
+      </li>
 
- <li><strong>Facet</strong>: The generic viewport that any given
-     RolePlayer has into the Artifact is specified by a Facet, which
-     is effectively a definition of the role.
- </li>
+      <li><strong>Facet</strong>: The generic viewport that any given
+	RolePlayer has into the Artifact is specified by a Facet,
+	which is effectively a definition of the role.
+      </li>
 
- <li><strong>Receptacle</strong>: The RolePlayer's handle on a Facet.
- </li>
+      <li><strong>Receptacle</strong>: The RolePlayer's handle on a Facet.
+      </li>
 
- <li><strong>CoordinationArtifact</strong>: The creation of Facets and
-     the linkage between Facets RolePlayers is handled at this
-     layer.</li>
+      <li><strong>CoordinationArtifact</strong>: The creation of
+	Facets and the linkage between Facets RolePlayers is handled
+	at this layer.
+      </li>
 
- <li><strong>CoordinationArtifactProvider</strong>: The main job of
-   the Provider is to define the logical Roles and parameters, and to
-   create and manage CoordinationArtifacts as needed.
- </li>
+      <li><strong>CoordinationArtifactProvider</strong>: The main job
+	of the Provider is to define the logical Roles and parameters, and
+	to create and manage CoordinationArtifacts as needed.
+      </li>
 
- <li><strong>CoordinationArtifactBroker</strong>: This interface
-     defines a COUGAAR service that provides the top-level entry point
-     into CAs.</li>
+      <li><strong>CoordinationArtifactBroker</strong>: This interface
+	defines a COUGAAR service that provides the top-level entry point
+	into CAs.
+      </li>
 
-</ul>
+    </ul>
 
+  </p>
 
+  <p>Given these definitions, we can see that a Coordination Artifact
+    is essentially coordinating communication between Role Players.
+    But the Role Players as well implement a kind of coordination of
+    their own, a dual of the Coordination Artifact: the Players
+    coordinate the operation of the various Artifacts in which they
+    play.  Although the purposes and structure of these two sorts of
+    coordination differ, they share one important feature: the logical
+    structure of both can be described declaratively as set of
+    dependencies between and actions among the parts.  Rule languages
+    are particularly good at this, and the Coordination Artifact above
+    is explicitly designed to work with rule systems, though it's
+    written in a language neutral way.  The assumption is that a
+    collection of implementation classes of the abstract interfaces
+    above can be written to use a given rule language, while the
+    common infrastructure can deal in general with facts, assertions,
+    etc.
+  </p>
 
-
+  <p>A working example of using COUGAAR with Coordination Artifacts and
+    the rule language <b>Jess</b> can be found in SASSI project.
+  </p>
 
 </body>
 </html>

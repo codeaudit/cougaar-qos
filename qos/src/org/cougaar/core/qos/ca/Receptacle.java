@@ -28,13 +28,13 @@ package org.cougaar.core.qos.ca;
 
 
 /**
- * A Receptacle represents a {@link RolePlayer}'s viewport into some
- * role of a {@link CoordinationArtifact}.  This is the player's only
- * interface to the artifact.  The correspdonding entity in the
- * Artifact is a {@link Facet}. This naming convention is deliberately
- * suggestive of the CORBA Component Model (CCM), since the functions
- * of these two interfaces are roughly equivalent to the similarly
- * named entities in CCM.  By analogy, the {@link
+ * A Receptacle represents a role in a {@link CoordinationArtifact}
+ * from the perspective of the {@link RolePlayer}.  This is the
+ * player's only interface to the artifact.  The correspdonding entity
+ * in the Artifact is a {@link Facet}. This naming convention is
+ * deliberately suggestive of the CORBA Component Model (CCM), since
+ * the functions of these two interfaces are roughly equivalent to the
+ * similarly named entities in CCM.  By analogy, the {@link
  * CoordinationArtifact} itself corresponds to a CCM Component.
  */
 public interface Receptacle extends BlackboardExecutor

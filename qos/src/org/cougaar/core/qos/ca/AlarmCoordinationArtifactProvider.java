@@ -29,7 +29,7 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.component.ServiceBroker;
 
 /**
- * CA interface to Alarms
+ * Coordination Artifact for COUGAAR Alarms
  */
 abstract public class AlarmCoordinationArtifactProvider
     extends CoordinationArtifactProviderImpl

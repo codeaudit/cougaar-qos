@@ -31,8 +31,8 @@ import java.util.Properties;
 import org.cougaar.core.component.ServiceBroker;
 
 /**
- * This interface describes the broker service that finds artifact
- * facets for {@link RolePlayer}s.
+ * This interface describes the broker service that finds {@link
+ * CoordinationArtifact}s for {@link RolePlayer}s.
  */
 public interface CoordinationArtifactBroker
 {

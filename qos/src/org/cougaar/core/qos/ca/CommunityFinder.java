@@ -40,6 +40,10 @@ import java.util.Observable;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
+/**
+ * This utility class helps simplify Community lookup.  For now it
+ * comes in two variants, which are inner class extensions.
+ */
 abstract public class CommunityFinder
     extends Observable
     implements CommunityResponseListener, CommunityChangeListener
@@ -185,6 +189,12 @@ abstract public class CommunityFinder
     }
 
 
+    /**
+     * This variant of CommunityFinder is useful for finding
+     * Communities without assuming any particular Agent is a member.
+     * A filter supplied as a constructor parameter describes the
+     * community.
+     */
     public static class ForAny extends CommunityFinder {
 	public ForAny(CommunityService svc, String filter)
 	{
@@ -194,7 +204,7 @@ abstract public class CommunityFinder
 
 	public void postQuery() {
 	    if (logger.isDebugEnabled())
-		    logger.debug("Posted Manger Subscription filter="+
+		    logger.debug("Posted Manager Subscription filter="+
 				 filter);
 	    Collection results = svc.searchCommunity(null, filter, true, 
 						     Community.COMMUNITIES_ONLY,
@@ -206,6 +216,11 @@ abstract public class CommunityFinder
     }
 
 
+    /**
+     * This variant of CommunityFinder is useful for finding
+     * Communities of which a given Agent is a member.  A filter
+     * supplied as a constructor parameter describes the community.
+     */
     public static class ForAgent extends CommunityFinder {
 	private MessageAddress agentID;
 
@@ -232,13 +247,17 @@ abstract public class CommunityFinder
 	
     }
 
-    // match one Community attribute
+    /**
+     * Constructs a filter that matches one Community attribute.
+     */
     public static String makeFilter(String attribute, String value)
     {
 	return "(" +attribute+ "=" +value+ ")";
     }
 
-    // match two Community attributes
+    /**
+     * Constructs a filter that matches two Community attributes.
+     */
     public static String makeFilter(String attribute1, String value1,
 				    String attribute2, String value2)
     {
@@ -248,7 +267,9 @@ abstract public class CommunityFinder
     }
 
 
-    // match N Community attributes
+    /**
+     * Constructs a filter that matches N Community attributes.
+     */
     public static String makeFilter(Map attributes)
     {
 	StringBuffer buff = new StringBuffer();

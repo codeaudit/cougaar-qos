@@ -27,8 +27,7 @@
 package org.cougaar.core.qos.ca;
 
 /**
- * This interface describes a simplified form of a
- * CoordinationArtifact client.
+ * This interface describes a generic CoordinationArtifact client.
  */
 public interface RolePlayer
 {
