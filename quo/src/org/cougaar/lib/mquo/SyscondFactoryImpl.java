@@ -201,8 +201,9 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	if (syscond == null) {
 	    String name = "Bandwidth " +local_host+ " to " +addr;
 	    syscond = makeMetricSC(name);
-	    BandwidthSyscondListener syscondListener = 
-		new BandwidthSyscondListener(syscond, addr);
+//	    rst -- Commented out unused new BandwidthSyscondListener
+//          BandwidthSyscondListener syscondListener = 
+//		new BandwidthSyscondListener(syscond, addr);
 	    bandwidthSysconds.put(addr, syscond);
 	}
 	return syscond;
@@ -229,8 +230,9 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	if (syscond == null) {
 	    String name = "Max Bandwidth " +local_host+ " to " +addr;
 	    syscond = makeMetricSC(name);
-	    CapacitySyscondListener syscondListener = 
-		new CapacitySyscondListener(syscond, addr);
+//	    rst commented out unused new CapacitySyscondListener
+//          CapacitySyscondListener syscondListener = 
+//		new CapacitySyscondListener(syscond, addr);
 	    capacitySysconds.put(addr, syscond);
 	}
 	return syscond;
