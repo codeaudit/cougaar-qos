@@ -137,7 +137,8 @@ public class TrafficMaskAspect extends QuoAspect
 	qoskets = new HashMap();
 
 	nodeUpdater = new NodeUpdater();
-	TimerTask task = threadService.getTimerTask(this, nodeUpdater);
+	TimerTask task = threadService.getTimerTask(this, nodeUpdater,
+						    "NodeUpdater");
 	threadService.schedule(task, 0, NODE_PERIOD);
 
 	return true;

@@ -20,6 +20,7 @@ LINKS += SerializeNode.dev
 LINKS += SimpleNode.dev
 LINKS += StatNode.dev
 LINKS += StepNode.dev
+LINKS += ThreadNode.dev
 LINKS += TraceNode.dev
 LINKS += TrafficMaskNode.dev
 
@@ -85,6 +86,9 @@ StepNode.dev:
 
 TraceNode.dev:
 	ln -s devwrapper TraceNode.dev
+
+ThreadNode.dev:
+	ln -s devwrapper ThreadNode.dev
 
 TrafficMaskNode.dev:
 	ln -s devwrapper TrafficMaskNode.dev

@@ -256,7 +256,8 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	ThreadService threadService = (ThreadService)
 	    sb.getService(this, ThreadService.class, null);
 	updater = new AgentHostUpdater();
-	TimerTask task = threadService.getTimerTask(this, updater);
+	TimerTask task = threadService.getTimerTask(this, updater, 
+						    "AgentHostUpdater");
 	threadService.schedule(task, 0, PERIOD);
 
 	loggingService =

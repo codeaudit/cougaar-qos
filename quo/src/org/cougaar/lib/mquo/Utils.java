@@ -66,7 +66,8 @@ public class Utils
 		    logThreadCount();
 		}
 	    };
-	java.util.TimerTask task = threadService.getTimerTask(who, logger);
+	java.util.TimerTask task = threadService.getTimerTask(who, logger,
+							      "StatsLogger");
 	threadService.schedule(task, 0, 1000);
     }
 
