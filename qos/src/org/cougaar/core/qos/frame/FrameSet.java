@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.frame;
 
 import java.util.Properties;
+import java.util.Set;
 
 import org.cougaar.core.util.UID;
 
@@ -37,6 +38,12 @@ public interface FrameSet
     public Frame findFrame(String kind, String slot, Object value);
 
     public Frame findFrame(UID uid);
+
+    public Set findFrames(String kind, Properties slot_value_pairs);
+
+    public Set findChildren(Frame parent, String relation_prototype);
+
+    public Set findParents(Frame child, String relation_prototype);
 
     public Frame makeFrame(String kind, Properties attributes);
 

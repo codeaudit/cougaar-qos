@@ -26,7 +26,10 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 
 import org.cougaar.core.blackboard.ChangeReport;
@@ -101,6 +104,19 @@ public class Frame
 	frameSet.makeFrame(kind, properties, uid);
     }
 
+    boolean matchesSlots(Properties slot_value_pairs)
+    {
+	Iterator itr = slot_value_pairs.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Object value = getValue(slot);
+	    if (value == null) return false;
+	    if (!value.equals(entry.getValue())) return false;
+	}
+	return true;
+    }
+
     // These should only be called from the FrameSet owning the
     // frame. 
 
@@ -127,6 +143,15 @@ public class Frame
 	return null;
     }
     
+    public Set findParents(String relation_prototype)
+    {
+	return frameSet.findParents(this, relation_prototype);
+    }
+
+    public Set findChildren(String relation_prototype)
+    {
+	return frameSet.findChildren(this, relation_prototype);
+    }
 
     // UniqueObject
     public UID getUID()
@@ -153,7 +178,6 @@ public class Frame
     {
 	return uid.hashCode();
     }
-
 
     // Hack for servlet
     public static class VisibleProperties extends Properties

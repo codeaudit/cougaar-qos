@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.BlackboardService;
@@ -260,6 +261,75 @@ public class SingleInheritanceFrameSet
 	}
 	return null;
     }
+
+
+
+    public Set findFrames(String proto, Properties slot_value_pairs)
+    {
+	HashSet results = new HashSet();
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Frame frame = (Frame) itr.next();
+		// Check only local value [?]
+		if (descendsFrom(frame, proto) &&
+		    frame.matchesSlots(slot_value_pairs))
+		    results.add(frame);
+	    }
+	}
+	return results;
+      }
+
+    public Set findChildren(Frame parent, String relation_prototype)
+    {
+	HashSet results = new HashSet();
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Frame relationship = (Frame) itr.next();
+		if (descendsFrom(relationship, relation_prototype)) {
+		    Frame p = getRelate(relationship,
+					parent_proto_slot, 
+					parent_slot_slot,
+					parent_value_slot);
+		    if ( p != null && p.equals(parent)) {
+			Frame child = getRelate(relationship,
+						child_proto_slot, 
+						child_slot_slot,
+						child_value_slot);
+			if (child != null) results.add(child);
+		    }		    
+		}
+	    }
+	}
+	return results;
+    }
+
+    public Set findParents(Frame child, String relation_prototype)
+    {
+	HashSet results = new HashSet();
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Frame relationship = (Frame) itr.next();
+		if (descendsFrom(relationship, relation_prototype)) {
+		    Frame c = getRelate(relationship,
+					child_proto_slot, 
+					child_slot_slot,
+					child_value_slot);
+		    if ( c != null && c.equals(child)) {
+			Frame parent = getRelate(relationship,
+						parent_proto_slot, 
+						parent_slot_slot,
+						parent_value_slot);
+			if (parent != null) results.add(parent);
+		    }		    
+		}
+	    }
+	}
+	return results;
+    }
+
 
     public void valueUpdated(Frame frame, String attribute, Object value)
     {
