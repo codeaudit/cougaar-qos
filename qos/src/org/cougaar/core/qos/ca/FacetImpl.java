@@ -28,19 +28,43 @@ package org.cougaar.core.qos.ca;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Observable;
 import java.util.Observer;
+
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.service.AgentIdentificationService;
+import org.cougaar.core.service.BlackboardService;
+import org.cougaar.core.service.LoggingService;
+import org.cougaar.core.service.UIDService;
+import org.cougaar.core.service.community.CommunityService;
+import org.cougaar.core.service.community.Community;
+import org.cougaar.core.util.UID;
+import org.cougaar.multicast.AttributeBasedAddress;
 
 
 /**
  * Default implementation for the client Facet.
  */
-public class FacetImpl // should be abstract
+abstract public class FacetImpl // should be abstract
     implements Facet,  Observer
 {
     private RolePlayer player;
     private ConnectionSpec spec;
     private FacetProviderPlugin owner;
     private SimpleQueue factQueue;
+    private Community community;
+    private String communityName;
+    private CommunityFinder finder;
+    private AttributeBasedAddress aba;
+    private ServiceBroker sb;
+    private BlackboardService blackboard;
+    private CommunityService commService;
+    private UIDService uids;
+    private MessageAddress agentId;
+
+    protected LoggingService log;
+
 
     private static class SimpleQueue extends LinkedList {
 	Object next() {
@@ -49,6 +73,7 @@ public class FacetImpl // should be abstract
     }
 
     protected FacetImpl(FacetProviderPlugin owner, 
+			ServiceBroker sb,
 			ConnectionSpec spec, 
 			RolePlayer player)
     {
@@ -57,18 +82,124 @@ public class FacetImpl // should be abstract
 	this.owner = owner;
 	// The factQueue consists of FactRevision instances
 	this.factQueue = new SimpleQueue();
+
+	this.sb = sb;
+	this.blackboard = (BlackboardService)
+	    sb.getService(owner, BlackboardService.class, null);
+
+	log = (LoggingService)
+	    sb.getService(this, LoggingService.class, null);
+
+	uids = (UIDService)
+	    sb.getService(this, UIDService.class, null);
+	
+
+	// get agent id
+	AgentIdentificationService agentIdService = (AgentIdentificationService) 
+	    sb.getService(this, 
+			  AgentIdentificationService.class, 
+			  null);
+	if (agentIdService == null) {
+	    throw new RuntimeException("Unable to obtain agent-id service");
+	}
+
+	agentId = agentIdService.getMessageAddress();
+	sb.releaseService(this, 
+			  AgentIdentificationService.class, 
+			  agentIdService);
+	if (agentId == null) {
+	    throw new RuntimeException("Agent id is null");
+	}
+
+
+	commService = (CommunityService)
+	    sb.getService(this, CommunityService.class, null);
+
     }
 
 
-    protected RolePlayer getPlayer()
+    // when is this called?
+    public void unload() 
+    {
+	if (uids != null) {
+	    sb.releaseService(this, UIDService.class, uids);
+	    uids = null;
+	}
+    }
+
+
+
+    RolePlayer getPlayer()
     {
 	return player;
     }
 
-    // Remove this when this class becomes abstract
-    public void update(java.util.Observable obs, Object value)
+    FacetProviderPlugin getOwner()
     {
+	return owner;
     }
+
+
+    CommunityService getCommunityService()
+    {
+	return commService;
+    }
+
+    MessageAddress getAgentID()
+    {
+	return agentId;
+    }
+
+
+    AttributeBasedAddress getABA()
+    {
+	return aba;
+    }
+
+
+    UID nextUID()
+    {
+	return uids.nextUID();
+    }
+
+    Community getCommunity()
+    {
+	return community;
+    }
+
+
+    protected void findCommunityForAny(String filter)
+    {
+	finder = new CommunityFinder.ForAny(commService, filter);
+	finder.addObserver(this);
+    }
+
+    protected void findCommunityForAgent(String filter)
+    {
+	finder = new CommunityFinder.ForAgent(commService, filter, agentId);
+	finder.addObserver(this);
+    }
+
+    public abstract AttributeBasedAddress makeABA(String communityName);
+
+    // Observer.
+    //
+    // Used for CommunityFinder callbacks.
+    public void update(Observable obs, Object value)
+    {
+	if (log.isDebugEnabled())
+	    log.debug("CommunityFinder " +obs+ " callback returned " 
+		      + value);
+	if (obs instanceof CommunityFinder) {
+	    CommunityFinder finder = (CommunityFinder) obs;
+	    this.communityName = (String) value;
+	    this.community = finder.getCommunity();
+	    this.aba = makeABA(communityName);
+	    linkPlayer();
+	    getOwner().triggerExecute();
+	}
+    }
+
 
 
     protected void linkPlayer()

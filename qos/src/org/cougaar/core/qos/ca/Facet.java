@@ -26,6 +26,8 @@
 
 package org.cougaar.core.qos.ca;
 
+import org.cougaar.core.service.BlackboardService;
+
 /**
  * A Facet represents a linkage between a specific RolePlayer role and
  * an Coordination Artifact.  This is the player's only interface to
@@ -35,4 +37,9 @@ public interface Facet
 {
     public void assertFact(Fact fact);
     public void retractFact(Fact fact);
+
+    public void processFactBase(BlackboardService blackboard);
+
+    public void setupSubscriptions(BlackboardService blackboard);
+    public void execute(BlackboardService blackboard);
 }

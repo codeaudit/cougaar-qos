@@ -26,8 +26,11 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 
@@ -46,11 +49,39 @@ abstract public class FacetProviderPlugin
     implements FacetProvider
 {
     private Properties parameters;
+    private List facets = new ArrayList();
 
     protected FacetProviderPlugin()
     {
 	this.parameters = new Properties();
     }
+
+    /**
+     * The implementation of this method in instantiable extensions
+     * would return the name of the specific Coordination Artifact.
+     */
+    public abstract String getArtifactKind();
+
+
+    public void start()
+    {
+	super.start();
+
+	ServiceBroker sb = getServiceBroker();
+	FacetBroker fb = (FacetBroker) 
+	    sb.getService(this, FacetBroker.class, null);
+	String kind = getArtifactKind();
+	fb.registerFacetProvider(kind, this);
+	sb.releaseService(this, FacetBroker.class, fb);
+    }
+
+
+    // Extensions of can make specific kinds of facets.  Here we make
+    // the generic one.
+    abstract protected Facet makeClientFacet(ConnectionSpec spec, 
+					     RolePlayer player);
+
+
 
     // FacetProvider
     public boolean matches(ConnectionSpec spec)
@@ -63,14 +94,18 @@ abstract public class FacetProviderPlugin
 
     public void provideFacet(ConnectionSpec spec, RolePlayer player)
     {
-	makeClientFacet(spec, player);
-    }
-
-    // Extensions of can make specific kinds of facets.  Here we make
-    // the generic one.
-    protected Facet makeClientFacet(ConnectionSpec spec, RolePlayer player)
-    {
-	return new FacetImpl(this, spec, player);
+	Facet facet = makeClientFacet(spec, player);
+	synchronized (facets) {
+	    facets.add(facet);
+	}
+	try {
+	    blackboard.openTransaction();
+	    facet.setupSubscriptions(blackboard);
+	} catch (Exception ex) {
+	    ex.printStackTrace();
+	} finally {
+	    blackboard.closeTransaction();
+	}
     }
 
     protected void triggerExecute()
@@ -81,6 +116,27 @@ abstract public class FacetProviderPlugin
 	} else {
 	}
     }
+
+    protected void setupSubscriptions() 
+    {
+    }
+    
+    // Two circumstances in which this runs:
+    // (1) subscription (ResponsePred)
+    // (2) new fact assertion or retraction in our fact base
+    protected void execute() 
+    {
+	List copy = null;
+	synchronized (facets) {
+	    copy = new ArrayList(facets);
+	}
+	for (int i=0; i<copy.size(); i++) {
+	    Facet facet = (Facet) copy.get(i);
+	    facet.processFactBase(blackboard);
+	    facet.execute(blackboard);
+	}
+    }
+
 
 
 }
