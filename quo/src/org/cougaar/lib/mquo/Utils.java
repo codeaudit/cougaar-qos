@@ -16,7 +16,10 @@ import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.impl.KernelImpl;
 
 /**
- * This class defines static utility methods for QuO and RSS
+ * This class defines static utility methods for QuO and RSS.  
+ * 
+ * @property org.cougaar.lib.quo.kernel.properties specifies a
+ * configuration file for the QuO kernel.
  */
 
 public class Utils 
