@@ -27,10 +27,7 @@
 package org.cougaar.core.qos.ca;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
@@ -95,10 +92,22 @@ public class CoordinationArtifactBrokerPlugin
     }
 
 	
+    private static class PendingRequest
+    {
+	ConnectionSpec spec;
+	RolePlayer player;
+
+	PendingRequest(ConnectionSpec spec, RolePlayer player)
+	{
+	    this.spec = spec;
+	    this.player = player;
+	}
+    }
+
     private class Impl implements CoordinationArtifactBroker
     {
 	ThreadService tsvc;
-	HashMap pendingRequests;
+	ArrayList pendingRequests;
 	ArrayList templates;
 	Schedulable requestsThread;
 	ServiceBroker sb;
@@ -107,7 +116,7 @@ public class CoordinationArtifactBrokerPlugin
 	{
 	    tsvc = (ThreadService)
 		sb.getService(this, ThreadService.class, null);
-	    pendingRequests = new HashMap();
+	    pendingRequests = new ArrayList();
 	    templates = new ArrayList();
 	    Runnable runner = new Runnable() {
 		    public void run() {
@@ -127,7 +136,7 @@ public class CoordinationArtifactBrokerPlugin
 		    log.debug("Pending request for "
 			      +spec.ca_kind+ " "
 			      +spec.role);
-		pendingRequests.put(rolePlayer, spec);
+		pendingRequests.add(new PendingRequest(spec, rolePlayer));
 		requestsThread.start();
 	    }
 	}
@@ -149,11 +158,11 @@ public class CoordinationArtifactBrokerPlugin
 	private void checkPendingRequests() 
 	{
 	    synchronized (pendingRequests) {
-		Iterator itr = pendingRequests.entrySet().iterator();
+		Iterator itr = pendingRequests.iterator();
 		while (itr.hasNext()) {
-		    Map.Entry entry = (Map.Entry) itr.next();
-		    RolePlayer player = (RolePlayer) entry.getKey();
-		    ConnectionSpec spec = (ConnectionSpec) entry.getValue();
+		    PendingRequest pr = (PendingRequest) itr.next();
+		    RolePlayer player = pr.player;
+		    ConnectionSpec spec = pr.spec;
 		    if (findFacet(spec, player)) itr.remove();
 		}
 	    }
