@@ -179,26 +179,33 @@ public final class SyscondFactory
 	    this.node_hosts = new HashMap();
 	}
 
-	public synchronized void addListener(AgentHostUpdaterListener listener,
-					     MessageAddress agent) 
+	public void addListener(AgentHostUpdaterListener listener,
+				MessageAddress agent) 
 	{
-	    ArrayList agentListeners = (ArrayList) listeners.get(agent);
-	    if (agentListeners == null) {
-		agentListeners = new ArrayList();
-		listeners.put(agent.toString(), agentListeners);
+	    String agentName = agent.toString();
+	    synchronized (listeners) {
+		ArrayList agentListeners = (ArrayList) 
+		    listeners.get(agentName);
+		if (agentListeners == null) {
+		    agentListeners = new ArrayList();
+		    listeners.put(agentName, agentListeners);
+		}
+		agentListeners.add(listener);
 	    }
-	    agentListeners.add(listener);
-	    String host = (String) agent_hosts.get(agent.toString());
+	    String host = (String) agent_hosts.get(agentName);
 	    if (host != null) listener.newHost(host);
 	}
 
-	public synchronized void 
-	    removeListener(AgentHostUpdaterListener listener,
-			   MessageAddress agent) 
+	public void removeListener(AgentHostUpdaterListener listener,
+				   MessageAddress agent) 
 	{
-	    ArrayList agentListeners = (ArrayList) listeners.get(agent);
-	    if (agentListeners != null) {
-		agentListeners.remove(listener);
+	    String agentName = agent.toString();
+	    synchronized (listeners) {
+		ArrayList agentListeners = (ArrayList) 
+		    listeners.get(agentName);
+		if (agentListeners != null) {
+		    agentListeners.remove(listener);
+		}
 	    }
 	}
 
@@ -218,25 +225,25 @@ public final class SyscondFactory
 		TopologyEntry entry = (TopologyEntry) itr.next();
 
 		// See if the Node has moved
-		String node = entry.getNode();
-		String old_node_host = (String) node_hosts.get(node);
+		String nodeName = entry.getNode();
+		String old_node_host = (String) node_hosts.get(nodeName);
 		String new_node_host = entry.getHost();
 		if (old_node_host == null || !old_node_host.equals(new_node_host)) {
 		    // node has moved. 
-		    Object[] params = { node };
+		    Object[] params = { nodeName };
 		    Class cls = org.cougaar.core.qos.rss.NodeDS.class;
 		    RSS.instance().deleteScope(cls, params);
 // 		    System.err.println("===== Deleted Node " +node+
 // 				       " scope");
-		    node_hosts.put(node, new_node_host);
+		    node_hosts.put(nodeName, new_node_host);
 		}
 
-		String agent = entry.getAgent();
+		String agentName = entry.getAgent();
 		//  		System.out.print("Agent " +agent);
 		// Should we restrict this to ACTIVE Agents?
 		if (entry.getStatus() != TopologyEntry.ACTIVE) continue;
 		String new_host = entry.getHost();
-		String host = (String) agent_hosts.get(agent);
+		String host = (String) agent_hosts.get(agentName);
 
 		//  		System.out.println(" Old host: " +host+
 		//  				   " New host: " +new_host);
@@ -244,17 +251,17 @@ public final class SyscondFactory
 		if (host == null || !host.equals(new_host)) {
 		    // Agent has moved to a new host.  Delete the
 		    // old DataScope.
-		    Object[] params = { agent };
+		    Object[] params = { agentName };
 		    Class cls = org.cougaar.core.qos.rss.AgentDS.class;
 		    RSS.instance().deleteScope(cls, params);
 // 		    System.err.println("===== Deleted Agent " +agent+
 // 				       " scope");
-		    agent_hosts.put(agent, new_host);
+		    agent_hosts.put(agentName, new_host);
 		    if (Debug.isDebugEnabled(loggingService,RMS))
 			loggingService.debug("===== New host " 
 					     +new_host+
 					     " for agent " 
-					     +agent);
+					     +agentName);
 
 
 		    // We still need to update these sysconds, since
@@ -262,15 +269,19 @@ public final class SyscondFactory
 		    // they were, the rest of this would be
 		    // unnecessary).  They're subscribed to a Host
 		    // formula.
-		    ArrayList agentListeners = 
-			(ArrayList) listeners.get(agent);
-		    if (agentListeners == null) continue;
-		    
-		    Iterator litr = agentListeners.iterator();
-		    while (litr.hasNext()) {
-			AgentHostUpdaterListener listener =
-			    (AgentHostUpdaterListener) litr.next();
-			listener.newHost(new_host);
+		    synchronized (listeners) {
+			ArrayList agentListeners = 
+			    (ArrayList) listeners.get(agentName);
+			if (agentListeners == null) continue;
+			Iterator litr = agentListeners.iterator();
+			while (litr.hasNext()) {
+			    AgentHostUpdaterListener listener =
+				(AgentHostUpdaterListener) litr.next();
+			    if (loggingService.isDebugEnabled()) 
+				loggingService.debug("New host " +new_host+
+						     " for " +listener);
+			    listener.newHost(new_host);
+			}
 		    }
 		}
 	    }

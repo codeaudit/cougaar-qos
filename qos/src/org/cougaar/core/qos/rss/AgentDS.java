@@ -172,8 +172,15 @@ public class AgentDS
 
 	protected DataValue doCalculation(DataFormula.Values vals)
 	{
-	    long sendTime = vals.get("Formula").getLongValue();
-	    long alarmTime = vals.get("Alarm").getLongValue();
+	    DataValue formulaDV = vals.get("Formula");
+	    DataValue alarmDV = vals.get("Alarm");
+	    if (formulaDV == null || alarmDV == null) {
+		// Callback before both dependencies were registered.
+		// Punt.
+		return DataValue.NO_VALUE;
+	    }
+	    long sendTime = formulaDV.getLongValue();
+	    long alarmTime = alarmDV.getLongValue();
 	    DataValue elapsed = new DataValue(0);
 
 // 	    String agentName = (String) getScope().getValue(AGENTNAME);
