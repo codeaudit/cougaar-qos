@@ -32,7 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.servlet.ServletFrameset;
-
+/**
+ * Servlet to display Gossip overhead statistics.
+ */
 public class GossipServlet 
     extends ServletFrameset
 {

@@ -29,6 +29,10 @@ package org.cougaar.core.qos.gossip;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.plugin.ComponentPlugin;
 
+/**
+ * Plugin which loads the GossipStatisticServlet.
+ */
+
 public class GossipStatisticsPlugin extends ComponentPlugin
 {
     public GossipStatisticsPlugin() {

@@ -45,7 +45,11 @@ import org.cougaar.mts.base.DestinationLink;
 import org.cougaar.mts.base.DestinationLinkDelegateImplBase;
 import org.cougaar.mts.base.SendLinkDelegateImplBase;
 import org.cougaar.mts.base.StandardAspect;
-import org.cougaar.mts.base.RMILinkProtocol;
+import org.cougaar.mts.base.RPCLinkProtocol;
+
+/** 
+ * Aspect to collect Gossip overhead statistics
+ */
 
 final public class GossipStatisticsServiceAspect
     extends StandardAspect
@@ -92,7 +96,7 @@ final public class GossipStatisticsServiceAspect
 	    // RMI only!
 	    DestinationLink link = (DestinationLink) delegatee;
 	    Class cl = link.getProtocolClass();
-	    if (RMILinkProtocol.class.isAssignableFrom(cl)) {
+	    if (RPCLinkProtocol.class.isAssignableFrom(cl)) {
 		return new DestinationLinkDelegate(link);
 	    } else {
 		return null;

@@ -23,9 +23,11 @@
  *  
  * </copyright>
  */
-
 package org.cougaar.core.qos.gossip;
 
+/**
+ * Sensor service for Gossip overhead statistics.
+ */
 public interface GossipStatisticsService
 {
     GossipTrafficRecord getStatistics();

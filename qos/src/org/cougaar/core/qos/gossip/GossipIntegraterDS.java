@@ -32,6 +32,12 @@ import com.bbn.rss.DataFormula;
 import com.bbn.rss.ResourceContext;
 import com.bbn.rss.IntegraterDS;
 
+/**
+ * Special IntegratorDS used to integrate information from RSS
+ * Datafeeds, but which the Gossip subsytem can be subscribed to
+ * without messing up the standard IntegratorDS.
+ */
+
 public class GossipIntegraterDS extends IntegraterDS 
 {
 

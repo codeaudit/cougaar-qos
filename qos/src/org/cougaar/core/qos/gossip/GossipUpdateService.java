@@ -29,6 +29,9 @@ package org.cougaar.core.qos.gossip;
 import org.cougaar.core.component.Service;
 import org.cougaar.core.qos.metrics.Metric;
 
+/**
+ * Interface for publishing metrics into the GossipDataFeed
+ */
 public interface GossipUpdateService extends Service
 {
     void updateValue(String key, Metric value);

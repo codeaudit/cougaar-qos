@@ -31,6 +31,9 @@ import java.util.Map;
 
 import org.cougaar.core.qos.metrics.Metric;
 
+/**
+ * Gossip object which holds Key/Value Pairs
+ */
 class ValueGossip 
     extends Gossip
 {

@@ -37,6 +37,10 @@ import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricNotificationQualifier;
 import org.cougaar.core.qos.metrics.MetricsService;
 
+/**
+ * Metrics callback class for holding the subscription to a Key
+ * requested by a neighbor.
+ */
 class GossipSubscription
 {
     private class Callback implements Observer {

@@ -28,8 +28,24 @@ package org.cougaar.core.qos.gossip;
 
 import org.cougaar.core.qos.metrics.MetricNotificationQualifier;
 
+/**
+ * Interface for a service which restricts which keys and values to
+ * send via Gossip
+ */
+
 interface GossipQualifierService 
 {
+    /**
+     * Return a Metrics value qualifier for a specific key. The
+     * qualifier is used to determine if a metrics value has
+     * changed enough to warrant sending it. 
+     */
     MetricNotificationQualifier getNotificationQualifier(String key);
+
+    /**
+     * Determines if a key should be requested. Some keys should not
+     * be requested. For example, metrics that are being collected by
+     * this Node or voluminous Keys, such as a traffic matrix.
+     */
     boolean shouldForwardRequest(String key);
 }

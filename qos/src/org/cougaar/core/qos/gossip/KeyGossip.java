@@ -28,7 +28,9 @@ package org.cougaar.core.qos.gossip;
 
 import java.util.Iterator;
 import java.util.Map;
-
+/**
+ * Gossip object which holds a request for Metric Keys
+ */
 class KeyGossip  extends Gossip
 {
     private static class Data 

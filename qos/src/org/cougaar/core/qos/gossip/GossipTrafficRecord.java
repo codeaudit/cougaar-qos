@@ -26,6 +26,10 @@
 
 package org.cougaar.core.qos.gossip;
 
+/**
+ * Gossip overhead statisics record collected by the
+ * GossipStatisicsServiceAspect and displayed by the GossipStatiticsServlet.
+ */
 public class GossipTrafficRecord
 {
     int requests_sent;

@@ -35,6 +35,10 @@ import org.cougaar.core.qos.metrics.DeltaValueQualifier;
 import org.cougaar.core.qos.metrics.MetricNotificationQualifier;
 import org.cougaar.mts.base.BoundComponent;
 
+/**
+ * Default Gossip Qualifier implementation which specifies the
+ * restrictions on keys and values being sent to neighbors
+ */
 public class SimpleGossipQualifierComponent
     extends BoundComponent 
 {

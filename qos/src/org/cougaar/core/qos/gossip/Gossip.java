@@ -30,7 +30,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 /*
- * A bundle of metrics to be sent between nodes. 
+ * Base Gossip class for a bundle of Metrics to be sent between Nodes. 
  */
 class Gossip implements Serializable
 {

@@ -41,6 +41,10 @@ import org.cougaar.core.qos.rss.MetricInterpreter;
 import com.bbn.rss.DataFeedListener;
 import com.bbn.rss.SimpleQueueingDataFeed;
 
+/** 
+ * QuO RSS DataFeed used to extract a list of Metrics to request and
+ * to update their values. 
+ */
 public class GossipFeedComponent
     extends QosComponent
 {

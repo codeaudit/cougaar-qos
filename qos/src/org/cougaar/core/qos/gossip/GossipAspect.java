@@ -41,7 +41,7 @@ import org.cougaar.core.service.wp.WhitePagesService;
 
 import org.cougaar.mts.std.AttributedMessage;
 
-import org.cougaar.mts.base.RMILinkProtocol;
+import org.cougaar.mts.base.RPCLinkProtocol;
 import org.cougaar.mts.base.MessageDeliverer;
 import org.cougaar.mts.base.MessageDelivererDelegateImplBase;
 import org.cougaar.mts.base.MisdeliveredMessageException;
@@ -117,7 +117,7 @@ public class GossipAspect
 	    // RMI only!
 	    DestinationLink link = (DestinationLink) delegatee;
 	    Class cl = link.getProtocolClass();
-	    if (RMILinkProtocol.class.isAssignableFrom(cl)) {
+	    if (RPCLinkProtocol.class.isAssignableFrom(cl)) {
 		return new DestinationLinkDelegate(link);
 	    }
 	} else if (type == MessageDeliverer.class) {

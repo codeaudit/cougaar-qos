@@ -28,9 +28,19 @@ package org.cougaar.core.qos.gossip;
 
 import org.cougaar.core.component.Service;
 
+/**
+ * Service for remembering which keys to request
+ */
 public interface GossipKeyDistributionService extends Service
 {
+    /**
+     * Request a Key, but only forward it the number of hops
+     * indicated by propagationDistance
+     */
     public void addKey(String key, int propagationDistance);
+    /**
+     * No longer request a Key
+     */
     public void removeKey(String key);
 }
 
