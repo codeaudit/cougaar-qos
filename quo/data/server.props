@@ -1,0 +1,100 @@
+# Sample Unix/Linux configuration file for the AppServer.
+# 
+# Edit the claspath, install-path and config-path to reflect your 
+#   local installation.  See "java.util.Properties" for syntax details.
+#
+# CSMART will add some properties to this list, such as the 
+#   "org.cougaar.node.name=..", but otherwise this is the *complete*
+#   list of properties.
+#
+# Note that some symbols, such as ";", must be encoded ("\;")
+
+# Set the Cougaar install path.
+org.cougaar.install.path=/opt/cougaar
+
+# Set the cougaar system path, which is used to find third-party jars
+#   (e.g. "log4j.jar").
+#
+# This defaults to "{org.cougaar.install.path} + /sys", but one can
+#   use a different directory by setting this property.
+#org.cougaar.system.path=/opt/cougaar/sys
+
+# Enable or disable persistence.
+#
+# By default persistence is disabled.
+#org.cougaar.core.cluster.persistence.enabled=true
+
+# Add the "java-io-patch" to allow Cougaar persistence.
+#
+# If persistence is disabled then this has no effect.  For simplicity
+# this "java-io-patch" jar should always be included.  Since this jar
+# overrides "java.io" it must be prepended to the JVM's bootclasspath.
+java.Xbootclasspath/p=/opt/cougaar/lib/javaiopatch.jar
+
+# Set the class path for starting the Node, which uses ":" separators.
+#
+# Typically only core.jar needs to be in here.
+java.class.path=/opt/cougaar/lib/core.jar
+
+# Set the config path, which uses ";" separators.
+#
+# Note that this must end with an (escaped) semi-colon to indicate
+# that the path specified here should in addition to the default
+# search path.
+#
+# This path must contain your "cougaar.rc", database files ("*.q"), 
+#   "default.psps.xml", and other configuration files.
+#
+# Here we override the default configuration path to include both
+# the "common" directory and "GLMTrans" directory.
+org.cougaar.config.path="/opt/cougaar/configs/common\;/opt/cougaar/glmtrans/configs/demo-config/config\;"
+
+# Some standard memory settings.
+#
+# These are not usually modified.
+java.Xms100m 
+java.Xmx300m
+
+# Set some standard COUGAAR properties.
+#
+# These are not usually modified.
+user.timezone=GMT
+org.cougaar.core.cluster.startTime=08/10/2005
+csmart.log.severity=PROBLEM
+org.cougaar.domain.planning.ldm.lps.ComplainingLP.level=0
+#org.cougaar.message.transport.aspects=org.cougaar.core.mts.StatisticsAspect
+
+# Default to localhost popups, which also requires that localhost
+#   have "xhost +localhost" for local X authorization.
+#
+# In general, the CSMART UI will be on host "csmarthost" with multiple
+#   server hosts, "serverhost[1-N]".  For the display to work (AWT, 
+#   Swing, etc) each "serverhost[1-N]" needs "env.DISPLAY=csmarthost:0.0" 
+#   and the CSMART UI host needs "xhost +serverhost1 .. +serverhostN" 
+#   (or just "xhost +").
+#
+# On some machines you may need to use the full machine name.
+env.DISPLAY=localhost:0.0
+
+
+#
+# Begin properties needed for MTS Adaptability
+#
+
+#Turn on SSL
+org.cougaar.core.naming.useSSL=true
+
+#ssl keystore
+javax.net.ssl.trustStore=/opt/cougaar/<my_keystore>
+javax.net.ssl.trustStorePassword=<my_password>
+javax.net.ssl.keyStore=/opt/cougaar/<my_keystore>
+javax.net.ssl.keyStorePassword=<my_password>
+
+#adaptdemo.props conversion
+org.cougaar.properties.url=file:/opt/cougaar/quo/data/adaptdemo.props
+
+# traffic generation
+# Default is set to trust everyone (10). To run in comprimised mode
+# uncomment the line below (use this for the assessment)
+#org.cougaar.node.trustStatus=0
+

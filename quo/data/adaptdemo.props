@@ -1,0 +1,22 @@
+# RSS/QuO
+# Specify location of kernel.conf
+org.cougaar.rss.properties=/opt/cougaar/quo/data/kernel.conf
+
+# Allow Quo Kernel Guis for each Cougaar Node
+org.cougaar.lib.quo.kernel.gui=true
+
+# Link Protocols
+org.cougaar.message.transport.aspects=org.cougaar.lib.quo.RemoteSSLAspect
+org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
+
+# Aspects
+org.cougaar.message.transport.aspects=org.cougaar.lib.quo.QuoProxyAspect,org.cougaar.lib.quo.RemoteSSLAspect,org.cougaar.lib.quo.TrafficMaskAspect,org.cougaar.core.mts.StatisticsAspect
+
+# Debug
+org.cougaar.message.transport.debug=none
+
+# Compression
+org.cougaar.lib.quo.wrapper=org.cougaar.lib.quo.CompressWrapper
+
+
+
