@@ -5,6 +5,7 @@
 LINKS := Node
 LINKS += QuoNode
 LINKS += SSLNode
+LINKS += AdaptDemoNode
 LINKS += CorbaNode
 LINKS += ComboNode
 LINKS += FutileNode
@@ -21,6 +22,7 @@ LINKS += TraceNode
 LINKS += TrafficMaskNode
 
 
+
 install: $(LINKS)
 
 Node:
@@ -31,6 +33,9 @@ QuoNode:
 
 SSLNode:
 	ln -s wrapper SSLNode
+
+AdaptDemoNode:
+	ln -s wrapper AdaptDemoNode
 
 CorbaNode:
 	ln -s wrapper CorbaNode

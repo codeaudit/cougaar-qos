@@ -51,6 +51,13 @@ contract TrafficMask
 	{}
       region Wan  (true)  
 	{}
+      transition Wan -> any {
+	synchronous { trafficControl.turnOff(); }
+      }
+
+      transition any -> Wan {
+	synchronous { trafficControl.turnOn(); }
+      }
     }
     region Normal (trust <= 5) {
       region SameHost (Bandwidth >= 10000000)
@@ -59,13 +66,6 @@ contract TrafficMask
 	{}
       region Wan  (true)  
 	{}
-      transition Wan -> any {
-	synchronous { trafficControl.turnOff(); }
-      }
-
-      transition any -> Wan {
-	synchronous { trafficControl.turnOn(); }
-      }
 
     }
     region CareFree (trust <= 10) {
