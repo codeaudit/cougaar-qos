@@ -1,0 +1,17 @@
+#!/bin/sh
+
+module=quo
+
+#prints out to this log file
+#cougaar_quo_log=`hostname`-$1-`date +%y%m%d%H%M%S`.log
+
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/${module}/test/configs/compression.props -Dorg.cougaar.lib.quo.logfile=${cougaar_quo_log} -Dorg.cougaar.useBootstrapper=true  "
+export COUGAAR_JAVA_ARGS
+
+#LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${QUO_ROOT}/lib
+#export LD_LIBRARY_PATH
+
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+
+

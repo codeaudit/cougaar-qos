@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#  -Djavax.net.debug=all
+ssl_args="-Djavax.net.ssl.trustStore=/home/rshapiro/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=/home/rshapiro/keystore -Djavax.net.ssl.keyStorePassword=password"
+
+#debug="-Djavax.net.debug=ssl"
+
+aspects="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.SSLAspect"
+
+COUGAAR_JAVA_ARGS="-Xbootclasspath/a: $aspects $ssl_args"
+export COUGAAR_JAVA_ARGS
+
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+
+
+

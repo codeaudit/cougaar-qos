@@ -1,0 +1,9 @@
+#!/bin/sh
+
+
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.debug.flush=true"
+export COUGAAR_JAVA_ARGS
+
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+
