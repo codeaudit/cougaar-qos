@@ -28,6 +28,9 @@ package org.cougaar.core.qos.ca;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 
 /**
  * A simple representation of a fact, likely to be replaced later by
@@ -44,6 +47,13 @@ public class Fact implements Serializable
 	this.attributes = attributes;
     }
 
+    public Fact(Fact fact, HashMap updates)
+    {
+	this.type = fact.type;
+	this.attributes = (HashMap) fact.attributes.clone();
+	this.attributes.putAll(updates);
+    }
+
     public String getType()
     {
 	return type;
@@ -52,6 +62,28 @@ public class Fact implements Serializable
     public Object getAttribute(String key)
     {
 	return attributes.get(key);
+    }
+
+    public String toString()
+    {
+	return "<Fact " +type+ " [" +attributes.size()+ "]>";
+    }
+
+    public String debugString()
+    {
+	StringBuffer buffer = new StringBuffer();
+	buffer.append("Fact ");
+	buffer.append(type);
+	buffer.append('\n');
+	Iterator itr = attributes.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    buffer.append(entry.getKey());
+	    buffer.append('=');
+	    buffer.append(entry.getValue());
+	    buffer.append('\n');
+	}
+	return buffer.toString();
     }
 }
 
