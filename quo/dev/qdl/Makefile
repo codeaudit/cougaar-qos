@@ -26,6 +26,8 @@ dl_flags += -idl $(dl_idl)
 dl_flags += -interface org.cougaar.core.society.Message
 dl_flags += -interface org.cougaar.core.society.MessageAddress
 dl_flags += -interface java.lang.Class
+dl_flags += -interface java.lang.Object
+
 
 mt_idl=MT.idl
 

@@ -144,5 +144,8 @@ quo_curRegs_RemoteSSL = quo_RemoteSSL.signalAndEvalAndGetCurrentRegion(quo_sig1)
     public org.cougaar.core.society.MessageAddress getDestination() {
     return(remote.getDestination());
   }
+    public java.lang.Object getRemoteReference() {
+    return(remote.getRemoteReference());
+  }
 };
 

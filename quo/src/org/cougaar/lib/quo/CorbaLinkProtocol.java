@@ -46,6 +46,7 @@ public class CorbaLinkProtocol
     // private MessageAddress myAddress;
     private MT myProxy;
     private HashMap links;
+    private HashMap remoteRefs;
     private ORB orb;
     private POA poa;
 
@@ -53,6 +54,7 @@ public class CorbaLinkProtocol
     public CorbaLinkProtocol(String id, AspectSupport aspectSupport) {
 	super(aspectSupport); 
 	links = new HashMap();
+	remoteRefs = new HashMap();
 	String[] args = null;
 	orb = ORB.init(args, null);
 	try {
@@ -78,6 +80,7 @@ public class CorbaLinkProtocol
 	    String ior = (String) object;
 	    org.omg.CORBA.Object raw = orb.string_to_object(ior);
 	    object = MTHelper.narrow(raw);
+	    remoteRefs.put(address, object);
 	    return getClientSideProxy(object);
 	}
 
@@ -253,6 +256,14 @@ public class CorbaLinkProtocol
 		throw new CommFailureException(ex);
 	    }
 	}
+
+
+	public Object getRemoteReference() {
+	    return remoteRefs.get(target);
+	}
+
+	
+
     }
 
 
