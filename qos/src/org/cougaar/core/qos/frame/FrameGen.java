@@ -55,7 +55,6 @@ public class FrameGen
 
     private String package_name;
     private String dir_name;
-    private PrintWriter writer;
     private String path;
     private HashMap slots;
     private HashMap proto_parents;
@@ -83,7 +82,6 @@ public class FrameGen
 	    ex.printStackTrace();
 	    return;
 	}
-	System.out.println("Finished parsing " + xml_file);
     }
 
 
@@ -118,7 +116,7 @@ public class FrameGen
     }
 
 
-
+    // Utilities
     private boolean inherits_slot(String proto, String slot)
     {
 	String parent = (String) proto_parents.get(proto);
@@ -156,6 +154,8 @@ public class FrameGen
 	}
     }
 
+    
+    // Parsing 
 
     private void startFrameset(Attributes attrs)
     {
@@ -171,12 +171,74 @@ public class FrameGen
 	package_name = pkg_prefix +"."+ name;
 	dir_name = path + File.separator+ 
 	    package_name.replaceAll("\\.", File.separator);
-	System.out.println("package=" +package_name+ " directory=" +dir_name);
+    }
+
+    private void startPrototype(Attributes attrs)
+    {
+	current_prototype = attrs.getValue("name");
+	String parent = attrs.getValue("prototype");
+	proto_parents.put(current_prototype, parent);
+	slots = new HashMap();
+    }
+
+    private void endPrototype()
+    {
+	proto_slots.put(current_prototype, slots);
+	current_prototype = null;
+    }
+
+    private void slot(Attributes attrs)
+    {
+	String slot = attrs.getValue("name");
+	Object value = attrs.getValue("value");
+	if (value == null) value = UNDEFINED;
+	slots.put(slot, value);
+    }
+
+    private void endFrameset()
+    {
+	generateCode();
     }
 
 
-    private void beginPrototypeClass(String name, String parent)
+
+    // Code Generation 
+
+    private void generateCode()
     {
+	Iterator itr = proto_parents.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String prototype = (String) entry.getKey();
+	    String parent = (String) entry.getValue();
+	    HashMap slots = (HashMap) proto_slots.get(prototype);
+	    generateCode(prototype, parent, slots);
+	}
+    }
+
+    private void generateCode(String prototype, String parent, HashMap slots)
+    {
+	String name = fix_name(prototype, true);
+	File out = new File(dir_name, name+".java");
+	PrintWriter writer = null;
+	try {
+	    FileWriter fw = new FileWriter(out);
+	    writer = new PrintWriter(fw);
+	} catch (java.io.IOException iox) {
+	    iox.printStackTrace();
+	    System.exit(-1);
+	}
+	beginPrototypeClass(writer, prototype, parent);
+	endPrototypeClass(writer, prototype, slots);
+	writer.close();
+
+    }
+
+    private void beginPrototypeClass(PrintWriter writer,
+				     String prototype, 
+				     String parent)
+    {
+	String name = fix_name(prototype, true);
 	writer.println("package " +package_name+ ";\n");
 	writer.println("import org.cougaar.core.util.UID;");
 	writer.println("import org.cougaar.core.qos.frame.FrameSet;");
@@ -191,7 +253,37 @@ public class FrameGen
 	writer.println("{");
     }
 
-    private void writeSlot(String slot, Object value)
+    private void endPrototypeClass(PrintWriter writer,
+				   String prototype, 
+				   HashMap slots)
+    {
+	HashMap local_defaults = new HashMap();
+
+	Iterator itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Object value = entry.getValue();
+	    if (inherits_slot(prototype, slot)) {
+		if (!value.equals(UNDEFINED)) local_defaults.put(slot, value);
+	    } else {
+		writeSlot(writer, slot, value);
+	    }
+	}
+
+	writeConstructors(writer, prototype, local_defaults);
+
+	// dump accessors
+	itr = slots.keySet().iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    if (!inherits_slot(prototype, slot)) writeAccessors(writer, slot);
+	}
+
+	writer.println("}");
+    }
+
+    private void writeSlot(PrintWriter writer, String slot, Object value)
     {
 	writer.print("    private Object " + fix_name(slot, false));
 	
@@ -199,7 +291,9 @@ public class FrameGen
 	writer.println(";");
     }
 
-    private void writeConstructors(String name, HashMap local_overrides)
+    private void writeConstructors(PrintWriter writer,
+				   String name, 
+				   HashMap local_overrides)
     {
 	// Define values for inherited slots!
 	String cname = fix_name(name, true);
@@ -225,7 +319,7 @@ public class FrameGen
 	writer.println("    }");
     }
 
-    private void writeAccessors(String slot)
+    private void writeAccessors(PrintWriter writer, String slot)
     {
 	String accessor_name = fix_name(slot, true);
 	String fixed_name = fix_name(slot, false);
@@ -256,81 +350,8 @@ public class FrameGen
 	writer.println("    }");
     }
 
-    private void endPrototypeClass()
-    {
-	proto_slots.put(current_prototype, slots);
-	
-	HashMap local_defaults = new HashMap();
 
-	Iterator itr = slots.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    String slot = (String) entry.getKey();
-	    Object value = entry.getValue();
-	    if (inherits_slot(current_prototype, slot)) {
-		if (!value.equals(UNDEFINED)) local_defaults.put(slot, value);
-	    } else {
-		writeSlot(slot, value);
-	    }
-	}
-
-	
-
-	writeConstructors(current_prototype, local_defaults);
-
-	// dump accessors
-	itr = slots.keySet().iterator();
-	while (itr.hasNext()) {
-	    String slot = (String) itr.next();
-	    if (!inherits_slot(current_prototype, slot)) writeAccessors(slot);
-	}
-
-	writer.println("}");
-	current_prototype = null;
-    }
-
-    private void startPrototype(Attributes attrs)
-    {
-	current_prototype = attrs.getValue("name");
-	String name = fix_name(current_prototype, true);
-	String parent = attrs.getValue("prototype");
-	proto_parents.put(name, parent);
-	File out = new File(dir_name, name+".java");
-	try {
-	    FileWriter fw = new FileWriter(out);
-	    writer = new PrintWriter(fw);
-	} catch (java.io.IOException iox) {
-	    iox.printStackTrace();
-	    System.exit(-1);
-	}
-	beginPrototypeClass(name, parent);
-	slots = new HashMap();
-    }
-
-    private void endPrototype()
-    {
-	endPrototypeClass();
-	writer.close();
-    }
-
-    
-    
-    private void slot(Attributes attrs)
-    {
-	String slot = attrs.getValue("name");
-	Object value = attrs.getValue("value");
-	if (value == null) value = UNDEFINED;
-	slots.put(slot, value);
-    }
-
-    private void endFrameset()
-    {
-	// no-op
-    }
-
-
-
-
+    // Driver
 
     public static void main(String[] args)
     {
