@@ -5,9 +5,10 @@ LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${libdir}
 export LD_LIBRARY_PATH
 # export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${QUO_ROOT}/lib
 
-count="-Dorg.cougaar.thread.running.max=${THREAD_MAX:-1}"
-debug="-Dorg.cougaar.thread.debug=${DEBUG_THREADS:-false}"
-scheduler="-Dorg.cougaar.thread.timeslice=${TIME_SLICE:-true}"
+logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_INSTALL_PATH/quo/bin/props/cougaar/logging.props
+count="-Dorg.cougaar.thread.running.max=${THREAD_MAX:-10}"
+debug="-Dorg.cougaar.thread.debug=${DEBUG_THREADS:-false} -Dorg.cougaar.message.transport.debug=${DEBUG_MTS:-false}"
+scheduler="-Dorg.cougaar.thread.scheduler=${SCHEDULER:-org.cougaar.core.thread.PropagatingScheduler}"
 
 #Priority based on priorities in a file
 aspects=" -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.PrioritizedThreadsAspect,org.cougaar.core.mts.WasteCPUAspect  -Dorg.cougaar.lib.quo.priorities=${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/performance-priorities.props"
@@ -21,7 +22,7 @@ aspects=" -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.Prioritiz
 
 #aspects=" -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.WasteCPUAspect -Dorg.cougaar.message.transport.percentages=${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/performance-percentages.props -Dorg.cougaar.message.transport.threadtest=true"
 
-COUGAAR_JAVA_ARGS="$count $scheduler $debug $aspects"
+COUGAAR_JAVA_ARGS="$count $scheduler $logging $debug $aspects"
 
 export COUGAAR_JAVA_ARGS
 

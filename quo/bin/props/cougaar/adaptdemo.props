@@ -8,6 +8,7 @@ org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org
 # Enables STEC
 org.omg.CORBA.ORBClass=org.jacorb.orb.ORB
 org.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton
+jacorb.verbosity=0
 
 # Aspects
 #org.cougaar.core.mts.ForwardMessageLoggingAspect
@@ -27,7 +28,7 @@ org.cougaar.lib.quo.wrapper=org.cougaar.lib.mquo.CompressWrapper
 org.cougaar.lib.quo.kernel.gui=true
 
 # Debug
-org.cougaar.message.transport.debug=traffic_masking_generator
+#org.cougaar.message.transport.debug=traffic_masking_generator
 #org.cougaar.message.transport.debug=service
 
 #Default Trust

@@ -3,7 +3,7 @@
 #  $COUGAAR_INSTALL_PATH/bin/eventgenerator.sh generates multicast traffic
 
 # The standard Node script should do this:
-orb="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB -Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton "
+orb="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB -Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton -Djacorb.verbosity=0"
 
 iorfile=${IORFILE:-topology.ior}
 key=${KEY:-Host_128.89.72.1_CPU_Jips}
