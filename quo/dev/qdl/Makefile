@@ -98,7 +98,7 @@ traffic=$(src)/$(srcdir)/TrafficMask.java
 remotessl=$(src)/$(srcdir)/RemoteSSL.java
 
 # Qosket and contract
-$(traffic): RemoteSSL.idl TrafficMask.cdl $(traffic_idl)
+$(traffic): RemoteSSL.idl TrafficMask.cdl $(traffic_idl) $(dl_idl)
 	$(QUOGEN) \
 	--target=client \
 	--cdl=TrafficMask.cdl \
