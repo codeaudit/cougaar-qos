@@ -26,19 +26,11 @@
 
 package org.cougaar.core.qos.ca;
 
-/**
- * A set of constants used by the {@link
- * QueryResponseCoordinationArtifactTemplate}.
- */
-public interface QueryCoordArtConstants extends CoordArtConstants
+public interface CoordArtConstants
 {
-    public static final String QueryFact = "Query";
-    public static final String ResponseFact = "Response";
-    public static final String BufferedResponseFact = "BufferedResponse";
-    public static final String RequestorRole = "Requestor";
-    public static final String ReceiverRole = "Receiver";
-    public static final String SourceAttr = "source";
-    public static final String PayloadAttr = "payload";
-    public static final String RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE =
-	"RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE ";
+    public static final String UidAttr = "uid";
+    public static final String ArtifactIdAttr = "artifact-id";
+    public static final String CommunityAttr = "community"; // deprecated
+    public static final String COMMUNITY_TYPE_ATTRIBUTE = "CommunityType";
+    public static final String MANAGER_ATTRIBUTE = "Manager";
 }
