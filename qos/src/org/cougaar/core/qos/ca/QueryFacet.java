@@ -202,6 +202,8 @@ abstract public class QueryFacet
     {
 	blackboard.publishAdd(query);
 	reclaimer.add(query, blackboard);
+	// ******** !!!!!!
+	blackboard.signalClientActivity();
     }
 
 

@@ -170,6 +170,10 @@ abstract public class ResponseFacet
 	//blackboard.publishChange(tr);
 	blackboard.publishAdd(response);
 
+	// ******** !!!!!!
+	blackboard.signalClientActivity();
+
+
 	lastResponse = response;
 
     }
