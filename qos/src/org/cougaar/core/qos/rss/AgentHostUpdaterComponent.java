@@ -27,7 +27,6 @@
 package org.cougaar.core.qos.rss;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +35,7 @@ import java.util.Set;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.node.NodeControlService;
 import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
@@ -70,7 +70,15 @@ public final class AgentHostUpdaterComponent
 	schedulable.schedule(0, PERIOD);
 	sb.releaseService(this, ThreadService.class, threadService);
 
-	sb.addService(AgentHostUpdater.class, this);
+
+	NodeControlService ncs = (NodeControlService)
+	    sb.getService(this, NodeControlService.class, null);
+	if (ncs != null) {
+	    ServiceBroker rootsb = ncs.getRootServiceBroker();
+	    rootsb.addService(AgentHostUpdater.class, this);
+	    rootsb.addService(AgentTopologyService.class, this);
+	    sb.releaseService(this, NodeControlService.class, ncs);
+	}
 
     }
 
@@ -79,6 +87,8 @@ public final class AgentHostUpdaterComponent
 			     Class serviceClass) 
     {
 	if (serviceClass == AgentHostUpdater.class) {
+	    return updater;
+	} else if (serviceClass == AgentTopologyService.class) {
 	    return updater;
 	} else {
 	    return null;
@@ -95,7 +105,8 @@ public final class AgentHostUpdaterComponent
 
 
     private static class AgentHostUpdaterImpl 
-	implements AgentHostUpdater, EventSubscriber, Runnable
+	implements AgentHostUpdater, AgentTopologyService,
+		   EventSubscriber, Runnable
     {
 	private static final String TOPOLOGY = "topology";
 	private HashMap listeners;
@@ -135,6 +146,48 @@ public final class AgentHostUpdaterComponent
 	    }
 	}
 
+	public String getAgentHost(MessageAddress agent)
+	{
+	    String agentName = agent.toString();
+	    String host = null;
+	    synchronized (agent_hosts) {
+		host = (String) agent_hosts.get(agentName);
+	    }
+	    if (host != null) return host;
+	    synchronized (agents) {
+		agents.add(agentName);
+	    }
+	    return null; // caller should try again later
+	}
+
+	public String getNodeHost(MessageAddress node)
+	{
+	    String nodeName = node.toString();
+	    String host = null;
+	    synchronized (node_hosts) {
+		host = (String) node_hosts.get(nodeName);
+	    }
+	    if (host != null) return host;
+	    synchronized (nodes) {
+		nodes.add(nodeName);
+	    }
+	    return null; // caller should try again later
+	}
+
+	public String getAgentNode(MessageAddress agent)
+	{
+	    String agentName = agent.toString();
+	    String node = null;
+	    synchronized (agent_hosts) {
+		node = (String) agent_nodes.get(agentName);
+	    }
+	    if (node != null) return node;
+	    synchronized (agents) {
+		agents.add(agentName);
+	    }
+	    return null; // caller should try again later
+	}
+
 	public void addListener(AgentHostUpdaterListener listener,
 				MessageAddress agent) 
 	{
@@ -143,10 +196,10 @@ public final class AgentHostUpdaterComponent
 		agents.add(agentName);
 	    }
 	    synchronized (listeners) {
-		ArrayList agentListeners = (ArrayList) 
+		HashSet agentListeners = (HashSet) 
 		    listeners.get(agentName);
 		if (agentListeners == null) {
-		    agentListeners = new ArrayList();
+		    agentListeners = new HashSet();
 		    listeners.put(agentName, agentListeners);
 		}
 		agentListeners.add(listener);
@@ -160,7 +213,7 @@ public final class AgentHostUpdaterComponent
 	{
 	    String agentName = agent.toString();
 	    synchronized (listeners) {
-		ArrayList agentListeners = (ArrayList) 
+		HashSet agentListeners = (HashSet) 
 		    listeners.get(agentName);
 		if (agentListeners != null) {
 		    agentListeners.remove(listener);
@@ -216,8 +269,7 @@ public final class AgentHostUpdaterComponent
 		//
 		// Maybe this should only run when entityClass == AgentDS?
 		synchronized (listeners) {
-		    ArrayList entityListeners = 
-			(ArrayList) listeners.get(entity);
+		    HashSet entityListeners = (HashSet) listeners.get(entity);
 		    if (entityListeners == null) return;
 		    Iterator litr = entityListeners.iterator();
 		    while (litr.hasNext()) {
