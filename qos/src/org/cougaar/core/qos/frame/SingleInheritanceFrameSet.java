@@ -51,7 +51,7 @@ public class SingleInheritanceFrameSet
     private BlackboardService bbs;
     private ArrayList change_queue;
     private Object change_queue_lock;
-    private String name;
+    private final String name;
     private HashSet pending_parentage;
     private HashMap kb;
     private HashMap prototypes, parents;

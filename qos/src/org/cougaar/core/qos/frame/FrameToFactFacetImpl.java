@@ -48,13 +48,18 @@ abstract public class FrameToFactFacetImpl
     // This should check the frameset_name!!!
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
-		return (o instanceof Frame) &&
+	       boolean result = (o instanceof Frame) &&
 		    ((Frame) o).getFrameSet().getName().equals(frameset_name);
+		if (log.isDebugEnabled())
+		    log.debug("Executing frame predicate on " +o+
+			      " result = " +result);
+		
+	       return result;
 	    }
 	};
     private IncrementalSubscription sub;
     private LoggingService log;
-    private String frameset_name;
+    private final String frameset_name;
 
     protected FrameToFactFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -71,15 +76,9 @@ abstract public class FrameToFactFacetImpl
     abstract protected Object frameToFact(Frame frame);
     abstract protected Object changesToFact(Frame frame, Collection changes);
 
-    public void setupSubscriptions(BlackboardService bbs) 
+    private void do_execute(BlackboardService bbs)
     {
-	sub = (IncrementalSubscription)
-	    bbs.subscribe(framePred);
-    }
-
-    public void execute(BlackboardService bbs)
-    {
-	if (sub == null /* || !sub.hasChanged() */) {
+	if (!sub.hasChanged()) {
 	    if (log.isDebugEnabled())
 		log.debug("No Frame changes");
 	    return;
@@ -131,6 +130,24 @@ abstract public class FrameToFactFacetImpl
 		log.debug("Observed removed "+frame);
 	    }
 	}
+    }
+
+    public void setupSubscriptions(BlackboardService bbs) 
+    {
+	if (log.isDebugEnabled())
+	    log.debug("FrameSet name is " + frameset_name);
+
+	sub = (IncrementalSubscription)
+	    bbs.subscribe(framePred);
+	
+	if (!sub.getAddedCollection().isEmpty() && log.isDebugEnabled())
+	    log.debug("Subscription has initial contents");
+	do_execute(bbs);
+    }
+
+    public void execute(BlackboardService bbs)
+    {
+	do_execute(bbs);
     }
 
 }

@@ -193,7 +193,7 @@ public class FrameGen
 
     private void writeSlot(String slot, Object value)
     {
-	writer.print("    Object " + fix_name(slot, false));
+	writer.print("    private Object " + fix_name(slot, false));
 	
 	if (value != UNDEFINED)  writer.print(" = \"" +value+ "\"");
 	writer.println(";");
@@ -219,7 +219,8 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String key = (String) entry.getKey();
 	    String value = (String) entry.getValue();
-	    writer.println("        " +fix_name(key,false)+ " = \"" +value+ "\";");
+	    writer.println("        initialize" +fix_name(key,true)+ 
+			   "(\"" +value+ "\");");
 	}
 	writer.println("    }");
     }
