@@ -199,18 +199,27 @@ public class RSSMetricsServiceImpl
 	}
     }
 
+    private static final Pattern pattern = Pattern.compile("\\$\\([^\\)]*\\)");
 
     private String evaluateVariables(String path, VariableEvaluator eval) {
 	if (eval == null) return path;
 
 	StringBuffer buf = new StringBuffer();
-	Pattern pattern = Pattern.compile("\\$\\([^\\)]*\\)");
 	Matcher matcher = pattern.matcher(path);
 	while (matcher.find()) {
 	    String match = matcher.group();
 	    String var = match.substring(2, match.length()-1);
 	    String val = eval.evaluateVariable(var);
-	    matcher.appendReplacement(buf, val);
+	    if (val == null) {
+		if (loggingService.isErrorEnabled())
+		    loggingService.error("Path variable " +var+
+					 " has no value");
+		// What's the right way to proceed?  For now put
+		// pattern back in.
+		matcher.appendReplacement(buf, match);
+	    } else {
+		matcher.appendReplacement(buf, val);
+	    }
 	}
 	matcher.appendTail(buf);
 
