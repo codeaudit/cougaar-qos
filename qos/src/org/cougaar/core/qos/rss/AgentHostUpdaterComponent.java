@@ -113,7 +113,7 @@ public final class AgentHostUpdaterComponent
 	    wpService = (WhitePagesService)
 		sb.getService(this, WhitePagesService.class, null);
 
-	    RSS.subscribeToEvent(this, RSS.CREATION_EVENT);
+	    RSS.instance().subscribeToEvent(this, RSS.CREATION_EVENT);
 	}
 
 	public void rssEvent(DataScope scope, int event_type) {
@@ -156,17 +156,24 @@ public final class AgentHostUpdaterComponent
 	}
 
 	public void run() {
-	    // Loop over all Agents, seeing if the Host has changed,
+	    // Asking the WhitePages for data can block, so we'd like
+	    // not to  do it in a synchronized biock.  Unfortunately
+	    // access to the 'agents' Set has to be synchronized.  The
+	    // only alternative seems to be to copy the set.
+	    
+	    Set copy = new HashSet();
 	    synchronized (agents) {
-		Iterator itr = agents.iterator();
-		while (itr.hasNext()) {
-		    String agent = (String) itr.next();
-		    try {
-			AddressEntry entry = wpService.get(agent, TOPOLOGY, 
-							   SCHEME);
-			if (entry != null) checkHost(agent,entry.getAddress());
-		    } catch (Exception ex) {
-		    }
+		copy.addAll(agents);
+	    }
+
+	    // Loop over all Agents, seeing if the Host has changed,
+	    Iterator itr = copy.iterator();
+	    while (itr.hasNext()) {
+		String agent = (String) itr.next();
+		try {
+		    AddressEntry entry = wpService.get(agent, TOPOLOGY,SCHEME);
+		    if (entry != null) checkHost(agent,entry.getAddress());
+		} catch (Exception ex) {
 		}
 	    }
 	}
