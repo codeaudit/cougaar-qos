@@ -75,7 +75,11 @@ public class Frame
 	return properties;
     }
 
-
+    public String getParentKind()
+    {
+	Frame parent = getParent();
+	return parent == null ? null : parent.getKind();
+    }
 
     Frame getPrototype()
     {
@@ -163,7 +167,7 @@ public class Frame
 
     private void addSlotNames(Set set)
     {
-	set.addAll(properties.entrySet());
+	if (properties != null) set.addAll(properties.keySet());
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) prototype.addSlotNames(set);
 	Frame parent =  frameSet.getParent(this);
@@ -172,9 +176,9 @@ public class Frame
 
     public Set getAllSlotNames()
     {
-	Set result = new HashSet();
-	addSlotNames(result);
-	return result;
+	HashSet set = new HashSet();
+	addSlotNames(set);
+	return set;
     }
     
     public Set findRelations(String role, String relation)
