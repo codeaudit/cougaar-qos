@@ -85,11 +85,11 @@ logging := $(src)/$(srcdir)/Logging.java
 instserver := $(src)/$(srcdir)/MTInstrumentedServerAdapter.java
 
 remotessl=$(src)/$(srcdir)/RemoteSSL.java
-remotessladapter=$(src)/$(srcdir)/DestinationLinkRemoteSSLAdapter.java
 
 # Qosket and contract
-$(remotessl): RemoteSSL.idl RemoteSSL.cdl $(mt_idl) $(dl_idl)
+$(remotessl): RemoteSSL.idl RemoteSSL.cdl $(mt_idl) $(dl_idl) RemoteSSL.asl
 	$(QUOGEN) \
+	--generate=both \
 	--target=client \
 	--cdl=RemoteSSL.cdl \
 	--idl=$(mt_idl) \
@@ -98,27 +98,11 @@ $(remotessl): RemoteSSL.idl RemoteSSL.cdl $(mt_idl) $(dl_idl)
 	--idl=quo.idl \
 	--adapterqosket=org::cougaar::lib::quo::RemoteSSLQosket \
 	--delegateqosket=org::cougaar::lib::quo::RemoteSSLDelegateQosket \
-	$(rmi_qdl_flags)
-
-# Adapter and delegate
-$(remotessladapter): $(remotessl) RemoteSSL.asl
-	$(QUOGEN) \
-	--target=client \
-	--cdl=RemoteSSL.cdl \
-	--idl=$(mt_idl) \
-	--idl=$(dl_idl) \
-	--idl=RemoteSSL.idl \
-	--idl=quo.idl \
 	--business=org::cougaar::core::mts::DestinationLink \
-	--adapterqosket=org::cougaar::lib::quo::RemoteSSLQosket \
-	--delegateqosket=org::cougaar::lib::quo::RemoteSSLDelegateQosket \
 	--qosketimpl=org.cougaar.lib.quo.RemoteSSLQosketImpl \
 	--adapter=DestinationLinkRemoteSSLAdapter \
 	--asl=RemoteSSL.asl \
 	$(aspect_qdl_flags)
-
-
-
 
 
 $(diagnose): $(mt_idl) $(mt_inst_idl)  Qosket.idl Diagnose.asl
@@ -191,7 +175,7 @@ $(instserver): $(mt_idl) $(mt_inst_idl) Qosket.idl InstrumentedServer.asl Server
 
 
 
-$(tag): $(logging) $(diagnose)  $(compress) $(instserver) $(remotessladapter)
+$(tag): $(logging) $(diagnose)  $(compress) $(instserver) $(remotessl)
 	touch $(tag)
 
 clean:
