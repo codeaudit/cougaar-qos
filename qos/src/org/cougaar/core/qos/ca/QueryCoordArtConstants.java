@@ -28,7 +28,7 @@ package org.cougaar.core.qos.ca;
 
 /**
  * A set of constants used by the {@link
- * QueryResponseCoordinationArtifactTemplate}.
+ * QueryResponseCoordinationArtifactProvider}.
  */
 public interface QueryCoordArtConstants extends CoordArtConstants
 {

@@ -31,13 +31,13 @@ import org.cougaar.core.component.ServiceBroker;
 /**
  * CA interface to Alarms
  */
-abstract public class AlarmCoordinationArtifactTemplate
-    extends CoordinationArtifactTemplateImpl
+abstract public class AlarmCoordinationArtifactProvider
+    extends CoordinationArtifactProviderImpl
 {
 
     private static final String AlarmCA = "AlarmCA";
 
-    public AlarmCoordinationArtifactTemplate(ServiceBroker sb) 
+    public AlarmCoordinationArtifactProvider(ServiceBroker sb) 
     {
 	super(AlarmCA, sb);
     }
@@ -51,7 +51,7 @@ abstract public class AlarmCoordinationArtifactTemplate
 	private String artifactId;
 
 
-	protected AlarmCA(CoordinationArtifactTemplate owner,
+	protected AlarmCA(CoordinationArtifactProvider owner,
 			  ConnectionSpec spec)
 	{
 	    super(owner, spec);

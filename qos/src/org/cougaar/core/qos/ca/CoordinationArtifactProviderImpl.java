@@ -34,14 +34,14 @@ import org.cougaar.core.component.ServiceBroker;
 
 /**
  * This class represents the base implementation of a {@link
- * CoordinationArtifactTemplate}. It registers the Template with the
+ * CoordinationArtifactProvider}. It registers the Provider with the
  * broker and provides basic bookkeepiing for the {@link
  * CoordinationArtifact}s.  Instantiation of CoordinationArtifactss
  * must be handled in subclasses, via the makeArtifact method.
  *
  */
-abstract public class CoordinationArtifactTemplateImpl
-    implements CoordinationArtifactTemplate
+abstract public class CoordinationArtifactProviderImpl
+    implements CoordinationArtifactProvider
 {
 
     private ArrayList artifacts;
@@ -54,14 +54,14 @@ abstract public class CoordinationArtifactTemplateImpl
      */
     abstract public CoordinationArtifact makeArtifact(ConnectionSpec spec);
 
-    protected CoordinationArtifactTemplateImpl(String kind, ServiceBroker sb)
+    protected CoordinationArtifactProviderImpl(String kind, ServiceBroker sb)
     {
 	this.artifacts = new ArrayList();
 	this.sb = sb;
 	this.kind = kind;
 	CoordinationArtifactBroker cab = (CoordinationArtifactBroker) 
 	    sb.getService(this, CoordinationArtifactBroker.class, null);
-	cab.registerCoordinationArtifactTemplate(this);
+	cab.registerCoordinationArtifactProvider(this);
 	sb.releaseService(this, CoordinationArtifactBroker.class, cab);
     }
 

@@ -35,27 +35,27 @@ import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 
 /**
  * This class represents the base implementation of a {@link
- * CoordinationArtifactTemplate}. It registers the Template with the
+ * CoordinationArtifactProvider}. It registers the Provider with the
  * broker and provides basic bookkeepiing for the {@link
  * CoordinationArtifact}s.  Instantiation of CoordinationArtifactss
  * must be handled in subclasses, via the makeArtifact method.
  *
  */
-abstract public class CoordinationArtifactTemplatePlugin
+abstract public class CoordinationArtifactProviderPlugin
     extends ParameterizedPlugin
 {
 
-    protected abstract CoordinationArtifactTemplateImpl 
-	makeTemplate(ServiceBroker sb);
+    protected abstract CoordinationArtifactProviderImpl 
+	makeProvider(ServiceBroker sb);
 
-    private CoordinationArtifactTemplateImpl impl;
+    private CoordinationArtifactProviderImpl impl;
 
     public void start()
     {
 	super.start();
 
 	ServiceBroker sb = getServiceBroker();
-	impl = makeTemplate(sb);
+	impl = makeProvider(sb);
     }
 
     protected void setupSubscriptions() 

@@ -40,7 +40,7 @@ import org.cougaar.util.log.Logging;
  * This class is the standard base implementation of {@link
  * CoordinationArtifact} some.  It acts an intermediary between {@link
  * Facet}s, which it creates, and the {@link
- * CoordinationArtifactTemplate} they 'implement' (conceptually, not
+ * CoordinationArtifactProvider} they 'implement' (conceptually, not
  * in the Java sense).
  *
  */
@@ -51,9 +51,9 @@ abstract public class CoordinationArtifactImpl
 	Logging.getLogger("org.cougaar.core.qos.ca.CoordinationArtifactImpl");
     private Properties parameters;
     private List facets = new ArrayList();
-    private CoordinationArtifactTemplate owner;
+    private CoordinationArtifactProvider owner;
 
-    protected CoordinationArtifactImpl(CoordinationArtifactTemplate owner, 
+    protected CoordinationArtifactImpl(CoordinationArtifactProvider owner, 
 				       ConnectionSpec spec)
     {
 	if (spec.ca_parameters != null)

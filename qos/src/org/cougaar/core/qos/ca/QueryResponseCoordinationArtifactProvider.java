@@ -30,7 +30,7 @@ import org.cougaar.core.component.ServiceBroker;
 
 /**
  * This plugin is the generic implementation of a multicast
- * query/response rpc {@link CoordinationArtifactTemplate}.  The
+ * query/response rpc {@link CoordinationArtifactProvider}.  The
  * {@link CoordinationArtifact}s it creates handles the Community and
  * Relay muck, leaving instantiable extensions only a few
  * domain-specific tasks to deal with, as described in the abtract
@@ -54,11 +54,11 @@ import org.cougaar.core.component.ServiceBroker;
  * the new response Fact and processes it. </li> </ol>
  *
  */
-abstract public class QueryResponseCoordinationArtifactTemplate
-    extends CoordinationArtifactTemplateImpl
+abstract public class QueryResponseCoordinationArtifactProvider
+    extends CoordinationArtifactProviderImpl
     implements QueryCoordArtConstants
 {
-    public QueryResponseCoordinationArtifactTemplate(String kind,
+    public QueryResponseCoordinationArtifactProvider(String kind,
 						     ServiceBroker sb) 
     {
 	super(kind, sb);
@@ -72,7 +72,7 @@ abstract public class QueryResponseCoordinationArtifactTemplate
 	private String artifactId;
 
 
-	protected QueryResponseCA(CoordinationArtifactTemplate owner,
+	protected QueryResponseCA(CoordinationArtifactProvider owner,
 				  ConnectionSpec spec)
 	{
 	    super(owner, spec);

@@ -27,30 +27,30 @@
 package org.cougaar.core.qos.ca;
 
 /**
- * See xxx for more detailes on CoordinationArtifactTemplates.
- * Templates provide the general description of a family of
+ * See xxx for more detailes on CoordinationArtifactProviders.
+ * Providers provide the general description of a family of
  * {@link CoordinationArtifact}s, all of which have the same set of
  * roles and parameters.
  */
-public interface CoordinationArtifactTemplate
+public interface CoordinationArtifactProvider
 {
     /**
-     * Returns the kind of Artifacts the Template can make.
+     * Returns the kind of Artifacts the Provider can make.
     */
     public String getArtifactKind();
 
     /**
-     * Returns true iff the Template can handle the given spec.  The
+     * Returns true iff the Provider can handle the given spec.  The
      * default implementation in {@link
-     * CoordinationArtifactTemplatePlugin} returns true iff the spec's
-     * ca_kind equals the Template's artifact kind.
+     * CoordinationArtifactProviderPlugin} returns true iff the spec's
+     * ca_kind equals the Provider's artifact kind.
     */
     public boolean supports(ConnectionSpec spec);
 
     /**
      *  This method is used by the {@link CoordinationArtifactBroker}
-     * to request the Template to provide a {@link Facet} for the
-     * given {@link RolePlayer}.  The job of the template is to find
+     * to request the Provider to provide a {@link Facet} for the
+     * given {@link RolePlayer}.  The job of the provider is to find
      * or make an appropriate {@link CoordinationArtifact}, given the
      * spec.  The artifact itself will do the actual linkage between
      * the Facet and the RolePlayer.

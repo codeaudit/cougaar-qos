@@ -36,7 +36,7 @@ public interface CoordinationArtifact
 {
     /**
      * Returns true iff the Artifact can handle the given spec.  This
-     * will only be called with specs that the Artifact's template has
+     * will only be called with specs that the Artifact's provider has
      * already said it supports.  The default implementation in {@link
      * CoordinationArtifactImpl} therefore returns true for all specs.
     */
@@ -53,13 +53,13 @@ public interface CoordinationArtifact
 
 
     /**
-     * Returns the {@link CoordinationArtifactTemplate} kind.
+     * Returns the {@link CoordinationArtifactProvider} kind.
      */
     public String getArtifactKind();
 
     /**
      * Returns the Artifact's id (not to be confused with the
-     * Template's kind).
+     * Provider's kind).
     */
     public String getArtifactId();
 

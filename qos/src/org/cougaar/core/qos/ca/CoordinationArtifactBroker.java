@@ -37,11 +37,11 @@ import org.cougaar.core.component.ServiceBroker;
 public interface CoordinationArtifactBroker
 {
     /**
-     * When an Template plugin is avaliable for use, it should call
-     * this. This is handled automatically for Templates that extend
-     * {@link CoordinationArtifactTemplatePlugin},
+     * When an Provider plugin is avaliable for use, it should call
+     * this. This is handled automatically for Providers that extend
+     * {@link CoordinationArtifactProviderPlugin},
     */
-    public void registerCoordinationArtifactTemplate(CoordinationArtifactTemplate artifactTemplate);
+    public void registerCoordinationArtifactProvider(CoordinationArtifactProvider artifactProvider);
 
 
     /**

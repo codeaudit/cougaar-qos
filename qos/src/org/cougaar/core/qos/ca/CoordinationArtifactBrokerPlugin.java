@@ -48,13 +48,13 @@ public class CoordinationArtifactBrokerPlugin
     extends ParameterizedPlugin
     implements ServiceProvider
 {
-    private static final String[] StandardTemplates = 
+    private static final String[] StandardProviders = 
     {
-	"org.cougaar.robustness.dos.ca.JessAlarmArtifactTemplate",
+	"org.cougaar.robustness.dos.ca.JessAlarmArtifactProvider",
     };
 
-    private static final String TemplatesParam = "templates";
-    private ArrayList localTemplates;
+    private static final String ProvidersParam = "providers";
+    private ArrayList localProviders;
     private CoordinationArtifactBroker impl;
     private LoggingService log;
 
@@ -74,45 +74,45 @@ public class CoordinationArtifactBrokerPlugin
     public void start()
     {
 	super.start();
-	localTemplates = new ArrayList();
+	localProviders = new ArrayList();
 	ServiceBroker sb = getServiceBroker();
-	synchronized (localTemplates) {
-	    for (int i=0; i<StandardTemplates.length; i++) {
-		makeTemplate(StandardTemplates[i], sb);
+	synchronized (localProviders) {
+	    for (int i=0; i<StandardProviders.length; i++) {
+		makeProvider(StandardProviders[i], sb);
 	    }
 
-	    String templates = getParameter(TemplatesParam);
-	    if (templates != null) {
-		StringTokenizer tk = new StringTokenizer(templates, ",");
+	    String providers = getParameter(ProvidersParam);
+	    if (providers != null) {
+		StringTokenizer tk = new StringTokenizer(providers, ",");
 		while (tk.hasMoreTokens()) {
 		    String klass = tk.nextToken();
-		    makeTemplate(klass, sb);
+		    makeProvider(klass, sb);
 		}
 	    }
 	}
     }
 
 
-    private void makeTemplate(String klass, ServiceBroker sb)
+    private void makeProvider(String klass, ServiceBroker sb)
     {
-	Object template = null;
+	Object provider = null;
 	try {
 	    Class cl = Class.forName(klass);
 	    Class[] ptypes = { ServiceBroker.class };
 	    Object[] args = { sb };
 	    Constructor cons = cl.getConstructor(ptypes);
-	    template = cons.newInstance(args);
-	    if (template instanceof CoordinationArtifactTemplateImpl) {
-		localTemplates.add(template);
+	    provider = cons.newInstance(args);
+	    if (provider instanceof CoordinationArtifactProviderImpl) {
+		localProviders.add(provider);
 		if (log.isInfoEnabled())
-		    log.info("Created template " +template);
+		    log.info("Created provider " +provider);
 	    } else {
 		if (log.isWarnEnabled())
-		    log.warn(klass + " is not a CoordinationArtifactTemplate");
+		    log.warn(klass + " is not a CoordinationArtifactProvider");
 	    }
 	} catch (Exception ex) {
 	    if (log.isWarnEnabled())
-		log.warn("Couldn't instantiate CoordinationArtifactTemplate " 
+		log.warn("Couldn't instantiate CoordinationArtifactProvider " 
 			 +klass);
 	}
     }
@@ -164,7 +164,7 @@ public class CoordinationArtifactBrokerPlugin
     {
 	ThreadService tsvc;
 	ArrayList pendingRequests;
-	ArrayList templates;
+	ArrayList providers;
 	Schedulable requestsThread;
 	ServiceBroker sb;
 
@@ -173,7 +173,7 @@ public class CoordinationArtifactBrokerPlugin
 	    tsvc = (ThreadService)
 		sb.getService(this, ThreadService.class, null);
 	    pendingRequests = new ArrayList();
-	    templates = new ArrayList();
+	    providers = new ArrayList();
 	    Runnable runner = new Runnable() {
 		    public void run() {
 			checkPendingRequests();
@@ -199,10 +199,10 @@ public class CoordinationArtifactBrokerPlugin
 
 
 
-	public void registerCoordinationArtifactTemplate(CoordinationArtifactTemplate cat)
+	public void registerCoordinationArtifactProvider(CoordinationArtifactProvider cat)
 	{
-	    synchronized (templates) {
-		templates.add(cat);
+	    synchronized (providers) {
+		providers.add(cat);
 	    }
 	    if (log.isDebugEnabled())
 		log.debug("Registered artifact for " + cat.getArtifactKind());
@@ -228,10 +228,10 @@ public class CoordinationArtifactBrokerPlugin
 	{
 	    if (log.isDebugEnabled())
 		log.debug("Looking for " +spec.ca_kind+ " " +spec.role);
-	    synchronized (templates) {
-		for (int i=0; i<templates.size(); i++) {
-		    CoordinationArtifactTemplate cat = (CoordinationArtifactTemplate) 
-			templates.get(i);
+	    synchronized (providers) {
+		for (int i=0; i<providers.size(); i++) {
+		    CoordinationArtifactProvider cat = (CoordinationArtifactProvider) 
+			providers.get(i);
 		    
 		    if (cat.supports(spec)) {
 			if (log.isDebugEnabled())

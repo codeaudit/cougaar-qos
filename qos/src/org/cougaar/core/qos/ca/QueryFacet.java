@@ -45,7 +45,7 @@ import org.cougaar.util.UnaryPredicate;
 
 /**
  * An abstraction of the query role in the {@link
- * QueryResponseCoordinationArtifactTemplate}.  The {@link Facet} methods are
+ * QueryResponseCoordinationArtifactProvider}.  The {@link Facet} methods are
  * implemented here, leaving subclasses only to implement the abstract
  * methods of this class.
  */
