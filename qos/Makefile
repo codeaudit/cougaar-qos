@@ -2,7 +2,7 @@ COUGAARJAR=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_SRC_PATH}/util/newutil
 
 COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/quo/dev/3rdparty
 
-CLASSPATH=${COUGAARJAR}:${COUGAAR3RDPARTY}/QuoRSS.jar:${COUGAAR3RDPARTY}/QuoKernel.jar:${COUGAAR3RDPARTY}/event.jar:.
+CLASSPATH=${COUGAARJAR}:${COUGAAR3RDPARTY}/QuoRSS.jar:${COUGAAR3RDPARTY}/event.jar:.
 #CLASSPATH=${COUGAAR_INSTALL_PATH}/lib/core.jar:${QUO_ROOT}/lib/quoSumo.jar
 
 export CLASSPATH
@@ -14,11 +14,6 @@ jar=newqos.jar
 
 all: $(jar)
 
-
-$(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
-	javac -d . $(srcdir)/MetricSCTie.java
-	rmic -d . -keep org.cougaar.core.qos.rss.MetricSCTie
-	mv $(pathdir)/*.java $(srcdir)
 
 
 $(jar):  $(src) 
