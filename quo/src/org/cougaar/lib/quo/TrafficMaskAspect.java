@@ -22,7 +22,6 @@ import com.bbn.quo.rmi.ExpectedBandwidthSC;
 
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MulticastMessageAddress;
-import org.cougaar.core.mts.MessageTransportRegistry;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,7 +51,7 @@ public class TrafficMaskAspect extends QuoAspect
 	public void run() {
 	    MulticastMessageAddress addr = 
 		(MulticastMessageAddress) MessageAddress.SOCIETY;
-	    Iterator itr = registry.findRemoteMulticastTransports(addr);
+	    Iterator itr = getRegistry().findRemoteMulticastTransports(addr);
 	    while (itr.hasNext()) {
 		MessageAddress node_ref = (MessageAddress) itr.next();
 		if (!qoskets.containsKey(node_ref)) qosketInit(node_ref);

@@ -21,7 +21,6 @@ import com.bbn.quo.rmi.SysCond;
 
 import org.cougaar.core.node.TrustStatusService;
 import org.cougaar.core.node.TrustStatusServiceImpl;
-import org.cougaar.core.mts.MessageTransportRegistry;
 import org.cougaar.core.mts.StandardAspect;
 import org.cougaar.core.mts.TrafficMaskingGeneratorService;
 import org.cougaar.core.qos.quo.Utils;
@@ -39,7 +38,6 @@ abstract public class QuoAspect extends StandardAspect
     protected ResourceMonitorService rms;
     protected TrustStatusService tss;
     protected TrafficMaskingGeneratorService tmgs;
-    protected MessageTransportRegistry registry;
 
     private boolean inited = false;
 
@@ -163,7 +161,6 @@ abstract public class QuoAspect extends StandardAspect
 	ensureServices();
 	if (!inited) return false; // not ready yet
 
-	registry = MessageTransportRegistry.getRegistry();
 	kernel = Utils.getKernel();
 
 	return true;

@@ -51,8 +51,8 @@ public class CorbaLinkProtocol
     private POA poa;
 
 
-    public CorbaLinkProtocol(String id, AspectSupport aspectSupport) {
-	super(aspectSupport); 
+    public CorbaLinkProtocol() {
+	super(); 
 	links = new HashMap();
 	remoteRefs = new HashMap();
 	String[] args = null;

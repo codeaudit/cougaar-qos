@@ -1,5 +1,5 @@
 # org.cougaar.lib.quo.UseMasking=true
 org.cougaar.rss.propfile=/home/jzinky/cougaar/cougaar_HEAD/quo/test/configs/kernel.conf
 org.cougaar.lib.quo.kernel.gui=true
-org.cougaar.message.transport.aspects=org.cougaar.lib.quo.TrafficMaskAspect
+org.cougaar.message.transport.aspects=org.cougaar.lib.quo.TrafficMaskAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect
 #org.cougaar.message.transport.debug=true

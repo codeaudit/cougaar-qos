@@ -18,6 +18,7 @@ LINKS += SeqNode
 LINKS += SerializeNode
 LINKS += SimpleNode
 LINKS += StatNode
+LINKS += StepNode
 LINKS += TraceNode
 LINKS += TrafficMaskNode
 
@@ -73,6 +74,10 @@ SimpleNode:
 
 StatNode:
 	ln -s wrapper StatNode
+
+StepNode:
+	ln -s wrapper StepNode
+
 
 TraceNode:
 	ln -s wrapper TraceNode

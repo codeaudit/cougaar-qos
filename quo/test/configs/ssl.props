@@ -1,6 +1,6 @@
 org.cougaar.rss.propfile=/home/jzinky/cougaar/cougaar_HEAD/quo/test/configs/kernel.conf
 org.cougaar.lib.quo.kernel.gui=true
-org.cougaar.message.transport.aspects=org.cougaar.lib.quo.RemoteSSLAspect
+org.cougaar.message.transport.aspects=org.cougaar.lib.quo.RemoteSSLAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect
 org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
 org.cougaar.message.transport.debug=policy
-#org.cougaar.lib.quo.UseSSL=true
+org.cougaar.lib.quo.UseSSL=true

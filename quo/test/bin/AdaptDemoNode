@@ -5,11 +5,13 @@
 module=quo
 ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password"
 
+firewall=-Djava.rmi.server.hostname=`hostname`.bbn.com
+
 naming="-Dorg.cougaar.core.naming.useSSL=true"
 
 quo="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/quo/test/configs/adaptdemo.props"
 
-COUGAAR_JAVA_ARGS="$quo $ssl $naming"
+COUGAAR_JAVA_ARGS="$quo $ssl $naming $firewall"
 export COUGAAR_JAVA_ARGS
 
 

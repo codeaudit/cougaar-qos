@@ -2,7 +2,7 @@
 
 module=quo
 
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.TraceAspect,org.cougaar.core.mts.WatcherAspect"
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.TraceAspect"
 export COUGAAR_JAVA_ARGS
 
 
