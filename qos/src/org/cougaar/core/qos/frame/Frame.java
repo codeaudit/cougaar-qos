@@ -178,7 +178,7 @@ abstract public class Frame
 	return result;
     }
 
-    Frame getParent()
+    public Frame getParent()
     {
 	if (frameSet == null) return null;
 	Frame result = frameSet.getParent(this);

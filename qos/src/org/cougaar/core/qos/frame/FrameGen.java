@@ -31,6 +31,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -58,6 +59,7 @@ public class FrameGen
     private String path;
     private HashMap slots;
     private HashMap proto_parents;
+    private HashMap proto_containers;
     private HashMap proto_slots;
     private String current_prototype;
 
@@ -67,6 +69,7 @@ public class FrameGen
 	this.path = path;
 	proto_parents = new HashMap();
 	proto_slots = new HashMap();
+	proto_containers = new HashMap();
     }
 
     public void parseProtoFile(File xml_file)
@@ -126,7 +129,21 @@ public class FrameGen
 	return inherits_slot(parent, slot);
     }
 
+    private HashSet collectSlots(String proto)
+    {
+	// **** TBD ****
+	HashSet slots = new HashSet();
+	collectSlots(proto, slots);
+	return slots;
+    }
 
+    private void collectSlots(String proto, HashSet slots)
+    {
+	HashMap local_slots = (HashMap) proto_slots.get(proto);
+	String parent = (String) proto_parents.get(proto);
+	if (local_slots != null) slots.addAll(local_slots.keySet());
+	if (parent != null) collectSlots(parent, slots);
+    }
 
     static String fix_name(String name, boolean is_class)
     {
@@ -177,7 +194,9 @@ public class FrameGen
     {
 	current_prototype = attrs.getValue("name");
 	String parent = attrs.getValue("prototype");
-	proto_parents.put(current_prototype, parent);
+	if (parent != null) proto_parents.put(current_prototype, parent);
+	String container = attrs.getValue("container");
+	if (container != null) proto_containers.put(current_prototype, container);
 	slots = new HashMap();
     }
 
@@ -211,12 +230,16 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String prototype = (String) entry.getKey();
 	    String parent = (String) entry.getValue();
+	    String container = (String) proto_containers.get(prototype);
 	    HashMap slots = (HashMap) proto_slots.get(prototype);
-	    generateCode(prototype, parent, slots);
+	    generateCode(prototype, parent, container, slots);
 	}
     }
 
-    private void generateCode(String prototype, String parent, HashMap slots)
+    private void generateCode(String prototype, 
+			      String parent, 
+			      String container,
+			      HashMap slots)
     {
 	String name = fix_name(prototype, true);
 	File out = new File(dir_name, name+".java");
@@ -229,7 +252,7 @@ public class FrameGen
 	    System.exit(-1);
 	}
 	beginPrototypeClass(writer, prototype, parent);
-	endPrototypeClass(writer, prototype, slots);
+	endPrototypeClass(writer, prototype, container, slots);
 	writer.close();
 
     }
@@ -255,6 +278,7 @@ public class FrameGen
 
     private void endPrototypeClass(PrintWriter writer,
 				   String prototype, 
+				   String container,
 				   HashMap slots)
     {
 	HashMap local_defaults = new HashMap();
@@ -268,6 +292,16 @@ public class FrameGen
 		if (!value.equals(UNDEFINED)) local_defaults.put(slot, value);
 	    } else {
 		writeSlot(writer, slot, value);
+	    }
+	}
+
+	if (container != null) {
+	    HashSet container_accessors = collectSlots(container);
+	    itr = container_accessors.iterator();
+	    while (itr.hasNext()) {
+		String slot = (String) itr.next();
+		if (!inherits_slot(prototype, slot))
+		    writeContainerReader(writer, container, slot);
 	    }
 	}
 
@@ -349,6 +383,22 @@ public class FrameGen
 	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
 	writer.println("    }");
     }
+
+    private void writeContainerReader(PrintWriter writer, 
+				      String container,
+				      String slot)
+    {
+	String reader_name = "get"+fix_name(slot, true);
+	String container_class = fix_name(container, true);
+	writer.println("\n\n    public Object " +reader_name+ "()");
+	writer.println("    {");
+	writer.println("       " +container_class+  " ___parent___ = ("
+		       +container_class+ ") getParent();");
+	writer.println("       if ( ___parent___ == null) return null;");
+	writer.println("       return ___parent___." +reader_name+ "();");
+	writer.println("    }");
+    }
+
 
 
     // Driver
