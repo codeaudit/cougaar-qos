@@ -22,19 +22,14 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
+import java.util.StringTokenizer;
+
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.node.NodeIdentificationService;
-import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
-import org.cougaar.core.service.ThreadService;
 
 import com.bbn.quo.sysstat.DirectSysStatSupplier;
-
-
-import java.net.URI;
-import java.util.StringTokenizer;
 
 /**
  * The implementation of MetricsUpdateService, and a child component

@@ -21,18 +21,18 @@
 
 package org.cougaar.core.qos.rss;
 
+import java.io.InputStream;
+import java.net.URI;
+
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
+import org.cougaar.core.qos.metrics.QosComponent;
+import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.LoggingService;
-import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
-import org.cougaar.core.qos.metrics.QosComponent;
 
 import com.bbn.quo.data.PropertiesDataFeed;
-
-import java.io.InputStream;
-import java.net.URI;
 
 public class ConfigFinderDataFeedComponent
     extends QosComponent

@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.impl.KernelImpl;
 

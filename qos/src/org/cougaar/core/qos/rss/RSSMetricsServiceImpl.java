@@ -22,33 +22,6 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
-import com.bbn.quo.data.BoundDataFormula;
-import com.bbn.quo.data.DataFeed;
-import com.bbn.quo.data.DataFormula;
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.DataScopeSpec;
-import com.bbn.quo.data.DataValue;
-import com.bbn.quo.data.NotificationQualifier;
-import com.bbn.quo.data.RSS;
-import com.bbn.quo.data.SitesDB;
-import com.bbn.quo.data.RSSUtils;
-
-import org.cougaar.util.ConfigFinder;
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.metrics.DataProvider;
-import org.cougaar.core.qos.metrics.Metric;
-import org.cougaar.core.qos.metrics.MetricNotificationQualifier;
-import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
-import org.cougaar.core.qos.metrics.MetricsService;
-import org.cougaar.core.qos.metrics.MetricsUpdateService;
-import org.cougaar.core.qos.metrics.QosComponent;
-import org.cougaar.core.qos.metrics.VariableEvaluator;
-import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.service.LoggingService;
-import org.cougaar.core.service.ThreadService;
-import org.cougaar.core.thread.RunnableQueue;
-import org.cougaar.core.thread.Schedulable;
-
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -56,9 +29,31 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
+import org.cougaar.core.qos.metrics.DataProvider;
+import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.qos.metrics.MetricNotificationQualifier;
+import org.cougaar.core.qos.metrics.MetricsService;
+import org.cougaar.core.qos.metrics.MetricsUpdateService;
+import org.cougaar.core.qos.metrics.QosComponent;
+import org.cougaar.core.qos.metrics.VariableEvaluator;
+import org.cougaar.core.service.LoggingService;
+import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.thread.RunnableQueue;
+import org.cougaar.util.ConfigFinder;
+
+import com.bbn.quo.data.BoundDataFormula;
+import com.bbn.quo.data.DataFeed;
+import com.bbn.quo.data.DataFormula;
+import com.bbn.quo.data.DataValue;
+import com.bbn.quo.data.NotificationQualifier;
+import com.bbn.quo.data.RSS;
+import com.bbn.quo.data.RSSUtils;
+import com.bbn.quo.data.SitesDB;
 
 /**
  * The implementation of MetricsService, and a child component of

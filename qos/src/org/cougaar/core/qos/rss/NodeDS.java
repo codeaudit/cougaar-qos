@@ -26,13 +26,9 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.service.wp.WhitePagesService;
 
-
 import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.RSS;
-
-import java.util.Iterator;
-import java.util.Set;
 
 public class NodeDS 
     extends CougaarDS

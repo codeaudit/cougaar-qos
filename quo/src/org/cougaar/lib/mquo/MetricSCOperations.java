@@ -21,11 +21,11 @@
 
 package org.cougaar.lib.mquo;
 
-import com.bbn.quo.rmi.ReadOnlyValueSCOperations;
+import java.rmi.RemoteException;
 
 import org.cougaar.core.qos.metrics.MetricsService;
 
-import java.rmi.RemoteException;
+import com.bbn.quo.rmi.ReadOnlyValueSCOperations;
 
 public interface MetricSCOperations extends ReadOnlyValueSCOperations
 {

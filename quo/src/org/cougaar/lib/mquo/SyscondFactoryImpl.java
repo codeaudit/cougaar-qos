@@ -20,22 +20,16 @@
  */
 package org.cougaar.lib.mquo;
 
-import com.bbn.quo.rmi.ExpectedMaxJipsSC;
-import com.bbn.quo.rmi.ExpectedBandwidthSC;
-import com.bbn.quo.rmi.ExpectedCapacitySC;
-import com.bbn.quo.rmi.ExpectedAvailableJipsSC;
-import com.bbn.quo.rmi.QuoKernel;
-import com.bbn.quo.rmi.SysCond;
+import java.util.HashMap;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.MetricsService;
-import org.cougaar.core.service.LoggingService;
-
 import org.cougaar.core.qos.rss.AgentHostUpdater;
 import org.cougaar.core.qos.rss.AgentHostUpdaterListener;
+import org.cougaar.core.service.LoggingService;
 
-import java.util.HashMap;
+import com.bbn.quo.rmi.QuoKernel;
 
 
 final class SyscondFactoryImpl implements SyscondFactoryService

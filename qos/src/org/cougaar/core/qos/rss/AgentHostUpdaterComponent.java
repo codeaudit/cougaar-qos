@@ -28,12 +28,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.EventSubscriber;
-import com.bbn.quo.data.RSS;
-
-import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
@@ -41,6 +37,10 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.service.wp.WhitePagesService;
 import org.cougaar.core.thread.Schedulable;
+
+import com.bbn.quo.data.DataScope;
+import com.bbn.quo.data.EventSubscriber;
+import com.bbn.quo.data.RSS;
 
 public final class AgentHostUpdaterComponent
     extends QosComponent

@@ -24,7 +24,6 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-import org.cougaar.core.service.LoggingService;
 
 import com.bbn.quo.data.DataScope;
 

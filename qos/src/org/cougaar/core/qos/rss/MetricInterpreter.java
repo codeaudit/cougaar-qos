@@ -21,10 +21,10 @@
 
 package org.cougaar.core.qos.rss;
 
+import org.cougaar.core.qos.metrics.Metric;
+
 import com.bbn.quo.data.DataInterpreter;
 import com.bbn.quo.data.DataValue;
-
-import org.cougaar.core.qos.metrics.Metric;
 
 
 class MetricInterpreter implements DataInterpreter 

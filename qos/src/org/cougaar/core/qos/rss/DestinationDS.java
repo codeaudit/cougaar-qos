@@ -24,8 +24,6 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.qos.metrics.Constants;
 
-
-
 import com.bbn.quo.data.DataFormula;
 import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;

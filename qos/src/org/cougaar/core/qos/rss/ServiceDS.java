@@ -23,8 +23,6 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
-
-import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.node.NodeIdentificationService;
 import org.cougaar.core.qos.metrics.Constants;
 
@@ -33,7 +31,6 @@ import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
-import com.bbn.quo.data.RSSUtils;
 
 public class ServiceDS 
     extends CougaarDS

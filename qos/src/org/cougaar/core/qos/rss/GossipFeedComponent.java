@@ -33,11 +33,8 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
-import com.bbn.quo.data.SimpleQueueingDataFeed;
-import com.bbn.quo.data.DataFeed;
-import com.bbn.quo.data.DataFormula;
-import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataFeedListener;
+import com.bbn.quo.data.SimpleQueueingDataFeed;
 
 public class GossipFeedComponent
     extends QosComponent

@@ -21,14 +21,14 @@
 
 package org.cougaar.lib.mquo;
 
-import org.cougaar.core.qos.rss.DataWrapper;
-import org.cougaar.core.qos.metrics.Metric;
-import org.cougaar.core.qos.metrics.MetricsService;
-
-import com.bbn.quo.ValueSCImpl;
-
 import java.util.Observable;
 import java.util.Observer;
+
+import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.qos.metrics.MetricsService;
+import org.cougaar.core.qos.rss.DataWrapper;
+
+import com.bbn.quo.ValueSCImpl;
 
 public class MetricSCImpl
     extends ValueSCImpl

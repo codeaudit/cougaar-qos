@@ -23,7 +23,6 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Constants;
 import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.service.wp.WhitePagesService;

@@ -25,8 +25,8 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
-import com.bbn.quo.data.SimpleQueueingDataFeed;
 import com.bbn.quo.data.DataValue;
+import com.bbn.quo.data.SimpleQueueingDataFeed;
 
 
 public class TrivialDataFeed 
