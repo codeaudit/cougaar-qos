@@ -24,7 +24,6 @@ package org.cougaar.lib.mquo;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.rss.DataWrapper;
 
