@@ -27,38 +27,56 @@
 package org.cougaar.core.qos.frame;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
 import org.cougaar.core.util.UID;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 public class PrototypeFrame
     extends Frame
 {
     private final String prototype_name;
+    private transient Logger log = Logging.getLogger(getClass().getName());
+
+    // Are these really transient?
     private transient HashMap paths;
+    private transient HashSet required_slots;
 
     PrototypeFrame(FrameSet frameSet, String prototype_name,
 		   String parent, UID uid, Properties properties)
     {
 	super(frameSet, parent, uid, properties);
 	this.prototype_name = prototype_name;
+	this.required_slots = new HashSet();
+	this.paths = new HashMap();
     }
 
     void addPaths(HashMap paths)
     {
-	this.paths = paths;
+	this.paths.putAll(paths);
+    }
+
+    void addRequiredSlots(HashSet required_slots)
+    {
+	this.required_slots.addAll(required_slots);
     }
 
     Object getValue(Frame origin, String slot)
     {
-	if (paths != null) {
-	    Path path = (Path) paths.get(slot);
-	    if (path != null) {
-		Object result = path.getValue(origin);
-		if (result != null) return result;
-	    }
+	Path path = (Path) paths.get(slot);
+	if (path != null) {
+	    Object result = path.getValue(origin);
+	    if (result != null) return result;
+	} else if (required_slots.contains(slot)) {
+	    if (log.isWarnEnabled())
+		log.warn("Slot " +slot+ " is required by prototype "
+			 +prototype_name+ " but was never provided in frame "
+			 +origin);
+	    return null;
 	}
 	return super.getValue(origin, slot);
     }

@@ -30,6 +30,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Properties;
 
 import org.xml.sax.Attributes;
@@ -63,6 +64,7 @@ public class FrameSetParser
 	String parent;
 	Properties props;
 	HashMap paths;
+	HashSet requiredSlots;
 
 	FrameSpec(String kind, String parent)
 	{
@@ -70,12 +72,14 @@ public class FrameSetParser
 	    this.parent = parent;
 	    props = new Properties();
 	    paths = new HashMap();
+	    requiredSlots = new HashSet();
 	}
 
 	Frame makePrototype(FrameSet frameSet)
 	{
 	    PrototypeFrame frame = frameSet.makePrototype(kind, parent, props);
 	    if (!paths.isEmpty()) frame.addPaths(paths);
+	    if (!requiredSlots.isEmpty()) frame.addRequiredSlots(requiredSlots);
 	    return frame;
 	}
 
@@ -93,6 +97,11 @@ public class FrameSetParser
 	void putPath(String attr, Path path)
 	{
 	    paths.put(attr, path);
+	}
+
+	void addRequiredSlot(String name)
+	{
+	    requiredSlots.add(name);
 	}
     }
 
@@ -357,7 +366,11 @@ public class FrameSetParser
 		frame_spec.putPath(slot, vp);
 	    } else {
 		String value = attrs.getValue("value");
-		frame_spec.put(slot, value);
+		if (value == null) {
+		    frame_spec.addRequiredSlot(slot);
+		} else {
+		    frame_spec.put(slot, value);
+		}
 	    }
 	} else {
 	    // log
