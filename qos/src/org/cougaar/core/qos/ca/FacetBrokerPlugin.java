@@ -49,9 +49,9 @@ public class FacetBrokerPlugin
 {
     private FacetBroker impl;
 
-    public void start()
+    public void load()
     {
-	super.start();
+	super.load();
 
 	ServiceBroker sb = getServiceBroker();
 	impl = new Impl(sb);

@@ -29,15 +29,16 @@ package org.cougaar.core.qos.ca;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
 
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
-import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.thread.Schedulable;
-import org.cougaar.util.CircularQueue;
 
 /**
  * This class represents the piece of a Coordination Artifact that
@@ -48,57 +49,35 @@ import org.cougaar.util.CircularQueue;
  * RolePlayers through facets.  Subclasses can provide domain-specific
  * state.
  *
- * This class is a Runnable so that it can run a Schedulable for a
- * queue of fact revisions (assertions and retractions).
+ * This class is an Observer so that it can be notified by a
+ * CommunityFinder when the community is known.
  */
 abstract public class FacetProviderPlugin
     extends ParameterizedPlugin
-    implements Runnable, FacetProvider
+    implements FacetProvider, Observer
 {
     private Properties parameters;
     private HashMap facets;
     private Schedulable sched;
-    private CircularQueue queue;
+    private SimpleQueue factQueue;
+
+    private BlackboardService bbs;
 
 
-
-
-    private abstract class FactRevision implements Runnable {
-	Fact fact;
-	Facet facet;
-	FactRevision(Fact fact, Facet facet) {
-	    this.fact = fact;
-	    this.facet = facet;
+    private static class SimpleQueue extends LinkedList {
+	Object next() {
+	    return removeFirst();
 	}
     }
 
-    private class FactAssertion extends FactRevision {
-	FactAssertion(Fact fact, Facet facet) {
-	    super(fact, facet);
-	}
-
-	public void run() {
-	    factAsserted(fact, facet); // plugin handling -- blackboard etc.
-	}
-    }
-
-    private class FactRetraction extends FactRevision {
-	FactRetraction(Fact fact, Facet facet) {
-	    super(fact, facet);
-	}
-
-	public void run() {
-	    factRetracted(fact, facet); // plugin handling -- blackboard etc.
-	}
-    }
-	
+    // The factQueue consists of FactRevision instances
 
     protected FacetProviderPlugin()
     {
 	this.parameters = new Properties();
 
 	this.facets = new HashMap();
-	this.queue = new CircularQueue();
+	this.factQueue = new SimpleQueue();
     }
 
 
@@ -107,14 +86,17 @@ abstract public class FacetProviderPlugin
 	super.load();
 
 	// TBD: fill in this.parameters from the plugin params
-	String name = getParameter("name");
-	parameters.put("name", name);
+	//String name = getParameter("name");
+	//parameters.put("name", name);
 
 	ServiceBroker sb = getServiceBroker();
-	ThreadService tsvc = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
-	this.sched = tsvc.getThread(this, this, "Fact Propagater");
-	this.sched.start();
+
+
+    }
+
+    public void start()
+    {
+	bbs = getBlackboardService();
     }
 
 
@@ -145,7 +127,21 @@ abstract public class FacetProviderPlugin
     }
 
 
-
+    protected void assertFactToRole(Fact fact, String role)
+    {
+	Set role_facets = null;
+	synchronized (facets) {
+	    Set _facets = (Set) facets.get(role); // multiple players/role
+	    if (_facets != null) role_facets = new HashSet(_facets);
+	}
+	if (role_facets != null) {
+	    Iterator itr = role_facets.iterator();
+	    while (itr.hasNext()) {
+		Facet facet = (Facet) itr.next();
+		facet.assertFact(fact);
+	    }
+	}
+    }
 
     // Extensions of can make specific kinds of facets.  Here we make
     // the generic one.
@@ -162,26 +158,24 @@ abstract public class FacetProviderPlugin
 	return new ProviderFacetImpl(player);
     }
 
-    // Handle the facts, super-simple version
-    public void run() 
+
+    private void addRevision(FactRevision entry)
     {
-	long max = System.currentTimeMillis() + 500; // arbitary max run time
-	boolean restart = false;
-	FactRevision entry = null;
-	while (true) {
-	    synchronized (queue) {
-		if (queue.isEmpty()) {
-		    break;
-		} else if (System.currentTimeMillis() >= max) {
-		    restart = true;
-		    break;
-		} else {
-		    entry = (FactRevision) queue.next();
-		}
-	    }
-	    entry.run();
+	synchronized (factQueue) {
+	    factQueue.add(entry);
 	}
-	if (restart) sched.start();
+	if (bbs != null) bbs.signalClientActivity();
+    }
+
+    // Artifact-specific Providers get at the new facts this way.
+    protected FactRevision nextFact()
+    {
+	synchronized (factQueue) {
+	    if (factQueue.isEmpty())
+		return null;
+	    else
+		return (FactRevision) factQueue.next();
+	}
     }
 
 
@@ -191,48 +185,15 @@ abstract public class FacetProviderPlugin
     void assertFact(Facet facet, Fact fact)
     {
 	FactRevision entry = new FactAssertion(fact, facet);
-	synchronized (queue) {
-	    queue.add(entry);
-	}
-	sched.start();
+	addRevision(entry);
     }
+
 
     void retractFact(Facet facet, Fact fact)
     {
 	FactRevision entry = new FactRetraction(fact, facet);
-	synchronized (queue) {
-	    queue.add(entry);
-	}
-	sched.start();
+	addRevision(entry);
     }
 
-
-    // The next two methods are run in the queue thread and provide
-    // any local handling of facts.  The default is to notify all
-    // facets. 
-
-    protected void factAsserted(Fact fact, Facet assertingFacet)
-    {
-	// Notify the facets.  These could happen in parallel.
-	synchronized (facets) {
-	    Iterator itr =facets.values().iterator();
-	    while (itr.hasNext()) {
-		Facet facet = (Facet) itr.next();
-		facet.assertFact(fact);
-	    }
-	}
-    }
-
-    protected void factRetracted(Fact fact, Facet retractingFacet)
-    {
-	// Notify the facets. These could happen in parallel
-	synchronized (facets) {
-	    Iterator itr =facets.values().iterator();
-	    while (itr.hasNext()) {
-		Facet facet = (Facet) itr.next();
-		facet.retractFact(fact);
-	    }
-	}
-    }
 
 }

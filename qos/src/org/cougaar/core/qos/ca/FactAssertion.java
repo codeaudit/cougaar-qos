@@ -26,39 +26,18 @@
 
 package org.cougaar.core.qos.ca;
 
-import java.util.Properties;
-
-/**
- * This simple struct provides a specification for a role in
- * particular CoodinationArtifact.  It's used by RolePlayers to get
- * themselves connected.
- */
-public class ConnectionSpec
+public class FactAssertion 
+    extends FactRevision 
 {
-    /**
-     * The Coordination Artifact kind.  Each kind has one or more
-     * roles, and each role is visible to clients as a 'facet'.  The
-     * specific role for any particular Connection spec is given in
-     * the 'role' instance variable.
-    */
-    public String kind;
-
-    /**
-     * The specific role for the given Coordination Artifact kind.
-     */
-    public String role;
-
-    /**
-     * A plist which can distinguish the instances of the given
-     * Coordination Artifact kind from one another.
-    */
-    public Properties parameters;
-
-
-    public ConnectionSpec(String kind, Properties parameters, String role)
-    {
-	this.kind = kind;
-	this.parameters = parameters;
-	this.role = role;
+    FactAssertion(Fact fact, Facet facet) {
+	super(fact, facet);
     }
+
+
+    public boolean isAssertion()
+    {
+	return true;
+    }
+    
 }
+
