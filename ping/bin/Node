@@ -19,16 +19,31 @@
 #  PERFORMANCE OF THE COUGAAR SOFTWARE.
 # </copyright>
 
+#-Dorg.cougaar.core.logging.log4j.category.org.cougaar.ping=INFO
 
-
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.core.agent.showtraffic=false 
--Dorg.cougaar.core.persistence.enable=false 
--Dorg.cougaar.core.persistence.clear=false 
+COUGAAR_JAVA_ARGS="
 -Dorg.cougaar.planning.ldm.lps.ComplainingLP.level=0 
--Dorg.cougaar.core.load.planning=false"
+-Dorg.cougaar.core.load.planning=false
+-Dorg.cougaar.core.agent.showtraffic=false 
+-Dorg.cougaar.core.agent.quiet=true
+-Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping=DEBUG
+-Dorg.cougaar.core.load.community=false
+-Dorg.cougaar.thread.service.type=single
+-Dorg.cougaar.class.path=/home/jzinky/cougaar/HEAD/core/newcore.jar:/home/jzinky/cougaar/HEAD/mtsstd/newmts.jar:/home/jzinky/cougaar/HEAD/qos/newqos.jar:/home/jzinky/cougaar/HEAD/quo/newquo.jar:/home/jzinky/cougaar/HEAD/util/newutil.jar:/home/jzinky/cougaar/robustness/bbn/robustness.jar:/home/jzinky/cougaar/robustness/bbn/dev/3rdparty/deconfliction.jar:/home/jzinky/cougaar/HEAD/quo/dev/3rdparty/quoSumo.jar:/home/jzinky/cougaar/HEAD/ping/newping.jar
+"
+#-Dorg.cougaar.core.load.servlet=false
+#-Dorg.cougaar.metrics.trivial=true
+#-Dorg.cougaar.thread.service.type=trivial
+#-Dorg.cougaar.core.mts.singlenode=true
+#-Dorg.cougaar.core.persistence.enable=false 
+#-Dorg.cougaar.core.persistence.clear=false 
+
+
+
 export COUGAAR_JAVA_ARGS
+
+echo "ARGS => ${COUGAAR_JAVA_ARGS}"
 
 
 #exec ${COUGAAR_INSTALL_PATH}/bin/Node -v $*
 exec ${COUGAAR_SRC_PATH}/base/bin/Node -v $*
-

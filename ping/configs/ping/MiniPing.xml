@@ -37,8 +37,8 @@ for additional usage and testing notes.
       <!--
       <vm_parameter>-Dorg.cougaar.core.logging.config.filename=loggingConfig.conf</vm_parameter>
       -->
-      <vm_parameter>-Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.core.mobility.ping=DEBUG</vm_parameter>
-      <vm_parameter>-Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.mobility.ping=INFO</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping=DEBUG</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.core.logging.log4j.category.org.cougaar.ping=INFO</vm_parameter>
       <!-- disable planning and communities (bug 2522) -->
       <vm_parameter>-Dorg.cougaar.core.load.planning=false</vm_parameter>
       <vm_parameter>-Dorg.cougaar.core.load.community=false</vm_parameter>
@@ -60,7 +60,9 @@ for additional usage and testing notes.
       <vm_parameter>-Dorg.cougaar.core.persistence.lazyInterval=15000</vm_parameter>
       -->
 
+
       <!-- optional agent mobility support -->
+      <!--
       <component
         name='mobility'
         class='org.cougaar.core.mobility.ldm.MobilityDomain'
@@ -73,6 +75,7 @@ for additional usage and testing notes.
         class='org.cougaar.core.mobility.service.RootMobilityPlugin'
         priority='COMPONENT'
         insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+      -->
 
       <!-- optional servlets -->
       <component
@@ -94,6 +97,7 @@ for additional usage and testing notes.
       <!-- "AgentA", which sends pings to "AgentB" -->
       <agent name='AgentA' class='org.cougaar.core.agent.SimpleAgent'>
         <!-- optional agent mobility support -->
+	<!--
         <component
           name='mobility'
           class='org.cougaar.core.mobility.ldm.MobilityDomain'
@@ -111,6 +115,7 @@ for additional usage and testing notes.
           class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+	-->
 
         <!-- optional servlets -->
         <component
@@ -136,7 +141,7 @@ for additional usage and testing notes.
         for important usage notes.
         -->
 
-        <!-- required ping timer, set for every second -->
+        <!-- required ping timer, set for every second-->
         plugin = org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)
         <component
           name='org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)'
@@ -144,6 +149,23 @@ for additional usage and testing notes.
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
           <argument>wakeMillis=1000</argument>
+        </component>
+
+        <!--
+        Config plugin that defines the pings.
+
+        Creates an endless series of pings from this agent to AgentB,
+        sent one per second and statistics reports every 10 seconds
+	See the javadocs for additional options.
+        -->
+        <component
+          name='org.cougaar.ping.PingAdderPlugin(target=AgentB, delayMillis=1000)'
+          class='org.cougaar.ping.PingAdderPlugin'
+          priority='COMPONENT'
+          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+          <argument>target=AgentB</argument>
+          <argument>delayMillis=0</argument>
+	  <argument>eventMillis=10000</argument>
         </component>
 
         <!-- optional "/ping" servlet -->
@@ -156,20 +178,7 @@ for additional usage and testing notes.
           <argument>/ping</argument>
         </component>
 
-        <!--
-        Config plugin that defines the pings.
 
-        Creates an endless series of pings from this agent to AgentB,
-        sent one per second.  See the javadocs for additional options.
-        -->
-        <component
-          name='org.cougaar.ping.PingAdderPlugin(target=AgentB, delayMillis=1000)'
-          class='org.cougaar.ping.PingAdderPlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>target=AgentB</argument>
-          <argument>delayMillis=1000</argument>
-        </component>
       </agent>
 
       <!--
