@@ -82,8 +82,8 @@ abstract public class AlarmCoordinationArtifactProvider
 	{
 	    ServiceBroker sb = getServiceBroker();
 	    if (spec.role.equals(SleeperRole)) {
-		String useThreadsP =spec.ca_parameters.getProperty(USE_THREADS);
-		if (useThreadsP.equalsIgnoreCase("true"))
+		String useThreads = spec.ca_parameters.getProperty(USE_THREADS);
+		if (useThreads != null && useThreads.equalsIgnoreCase("true"))
 		    return makeThreadSleeperFacet(sb, spec, player);
 		else
 		    return makeAlarmSleeperFacet(sb, spec, player);
