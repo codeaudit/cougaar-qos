@@ -28,8 +28,10 @@ import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
+
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
+import org.cougaar.core.component.ServiceBroker;
 
 import java.util.Properties;
 import java.util.Observable;
@@ -39,6 +41,24 @@ import java.util.StringTokenizer;
 public final class RSSMetricsServiceImpl 
     implements MetricsService 
 {
+
+    // Setup name->class mappings
+
+    static {
+	DataScopeSpec.defineNameToClass("Node",
+					org.cougaar.core.qos.rss.NodeDS.class);
+	DataScopeSpec.defineNameToClass("node", 
+					org.cougaar.core.qos.rss.NodeDS.class);
+	DataScopeSpec.defineNameToClass("NODE", 
+					org.cougaar.core.qos.rss.NodeDS.class);
+	DataScopeSpec.defineNameToClass("Agent",
+					org.cougaar.core.qos.rss.AgentDS.class);
+	DataScopeSpec.defineNameToClass("agent", 
+					org.cougaar.core.qos.rss.AgentDS.class);
+	DataScopeSpec.defineNameToClass("AGENT", 
+					org.cougaar.core.qos.rss.AgentDS.class);
+    }
+
 
     private static final String RSS_PROPERTIES =
 	"org.cougaar.metrics.properties";
@@ -98,12 +118,13 @@ public final class RSSMetricsServiceImpl
 	}
     }
 
-    public RSSMetricsServiceImpl() {
+    public RSSMetricsServiceImpl(ServiceBroker sb) {
 	String propertiesURL = System.getProperty(RSS_PROPERTIES);
 	if (propertiesURL != null)
 	    RSS.makeInstance(propertiesURL);
 	else
 	    RSS.makeInstance(new Properties());
+	RSS.instance().setProperty("ServiceBroker", sb);
     }
 
 
