@@ -36,8 +36,11 @@ Cougaar.new_experiment("Mini-Ping").run(1) {
 
   # Select your society config here
   do_action "CreateOneToOnePing", 3, "false"
-  #do_action "CreateSrcToMultSinkPing", 3, "true"
-  #do_action "CreateMultSrcToSinkPing", 3, "true"
+
+  ## Example Usage
+  #do_action "CreateOneToOnePing", <numPairs:int>, <security:boolean>
+  #do_action "CreateSrcToMultSinkPing", <numsinks:int>, <security:boolean>, <hosts:boolean>
+  #do_action "CreateMultSrcToSinkPing", <numsrcs:int>, <security:boolean>, <hosts:boolean>
 
   do_action "MapHosts", HOSTS_FILE
 
