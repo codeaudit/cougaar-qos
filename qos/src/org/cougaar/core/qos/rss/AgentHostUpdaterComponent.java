@@ -27,9 +27,11 @@
 package org.cougaar.core.qos.rss;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
@@ -43,9 +45,9 @@ import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.service.wp.WhitePagesService;
 import org.cougaar.core.thread.Schedulable;
 
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.EventSubscriber;
-import com.bbn.quo.data.RSS;
+import com.bbn.rss.EventSubscriber;
+import com.bbn.rss.RSS;
+import com.bbn.rss.ResourceContext;
 
 public final class AgentHostUpdaterComponent
     extends QosComponent
@@ -111,17 +113,19 @@ public final class AgentHostUpdaterComponent
 	private static final String TOPOLOGY = "topology";
 	private HashMap listeners;
 	private HashSet agents, nodes;
-	private HashMap agent_hosts, node_hosts, agent_nodes;
+	private HashMap node_hosts, agent_nodes;
+	private HashMap agent_hosts; // only used for callbacks
 	private LoggingService loggingService;
 	private WhitePagesService wpService;
 
-	AgentHostUpdaterImpl(ServiceBroker sb) {
+	AgentHostUpdaterImpl(ServiceBroker sb) 
+	{
 	    this.listeners = new HashMap();
 	    this.agents = new HashSet();
 	    this.nodes = new HashSet();
-	    this.agent_hosts = new HashMap();
-	    this.agent_nodes = new HashMap();
-	    this.node_hosts = new HashMap();
+	    this.agent_hosts = new HashMap(); // cache only
+	    this.agent_nodes = new HashMap(); // authoritative
+	    this.node_hosts = new HashMap();  // authoritative
 
 	    loggingService = (LoggingService) 
 		sb.getService(this, LoggingService.class, null);
@@ -132,200 +136,286 @@ public final class AgentHostUpdaterComponent
 	    RSS.instance().subscribeToEvent(this, RSS.CREATION_EVENT);
 	}
 
-	public void rssEvent(DataScope scope, int event_type) {
-	    if (scope instanceof AgentDS) {
-		String name = ((AgentDS) scope).getAgentName();
-		synchronized (agents) {
+
+	// RSS EventSubscriber interface
+	public void rssEvent(ResourceContext context, int event_type) 
+	{
+	    if (context instanceof AgentDS) {
+		String name = ((AgentDS) context).getAgentName();
+		synchronized (this) {
 		    agents.add(name);
 		}
-	    } else if (scope instanceof NodeDS) {
-		String name = ((NodeDS) scope).getNodeName();
-		synchronized (nodes) {
+	    } else if (context instanceof NodeDS) {
+		String name = ((NodeDS) context).getNodeName();
+		synchronized (this) {
 		    nodes.add(name);
 		}
 	    }
 	}
 
-	public String getAgentHost(MessageAddress agent)
+	// AgentTopologyService interface
+	public synchronized String getAgentHost(MessageAddress agent)
 	{
-	    String agentName = agent.toString();
-	    String host = null;
-	    synchronized (agent_hosts) {
-		host = (String) agent_hosts.get(agentName);
+	    String nodeName = getAgentNode(agent);
+	    if (nodeName != null) {
+		MessageAddress node = MessageAddress.getMessageAddress(nodeName);
+		return getNodeHost(node);
+	    } else {
+		// No known node yet -  add it to the set
+		return null;
 	    }
-	    if (host != null) return host;
-	    synchronized (agents) {
-		agents.add(agentName);
-	    }
-	    return null; // caller should try again later
 	}
 
-	public String getNodeHost(MessageAddress node)
+	public synchronized String getNodeHost(MessageAddress node)
 	{
 	    String nodeName = node.toString();
-	    String host = null;
-	    synchronized (node_hosts) {
-		host = (String) node_hosts.get(nodeName);
-	    }
-	    if (host != null) return host;
-	    synchronized (nodes) {
-		nodes.add(nodeName);
-	    }
-	    return null; // caller should try again later
+	    nodes.add(nodeName);
+	    return (String) node_hosts.get(nodeName);
 	}
 
-	public String getAgentNode(MessageAddress agent)
+	public synchronized String getAgentNode(MessageAddress agent)
 	{
 	    String agentName = agent.toString();
-	    String node = null;
-	    synchronized (agent_hosts) {
-		node = (String) agent_nodes.get(agentName);
-	    }
-	    if (node != null) return node;
-	    synchronized (agents) {
-		agents.add(agentName);
-	    }
-	    return null; // caller should try again later
+	    agents.add(agent.toString());
+	    return (String) agent_nodes.get(agentName);
 	}
 
-	public void addListener(AgentHostUpdaterListener listener,
-				MessageAddress agent) 
+
+
+	// AgentHostUpdater interface
+	public synchronized void addListener(AgentHostUpdaterListener listener,
+					     MessageAddress agent) 
 	{
 	    String agentName = agent.toString();
-	    synchronized (agents) {
-		agents.add(agentName);
+	    agents.add(agentName);
+	    HashSet agentListeners = (HashSet) 
+		listeners.get(agentName);
+	    if (agentListeners == null) {
+		agentListeners = new HashSet();
+		listeners.put(agentName, agentListeners);
 	    }
-	    synchronized (listeners) {
-		HashSet agentListeners = (HashSet) 
-		    listeners.get(agentName);
-		if (agentListeners == null) {
-		    agentListeners = new HashSet();
-		    listeners.put(agentName, agentListeners);
-		}
-		agentListeners.add(listener);
-	    }
-	    String host = (String) agent_hosts.get(agentName);
+	    agentListeners.add(listener);
+
+	    String host = getAgentHost(agent);
 	    if (host != null) listener.newHost(host);
 	}
 
-	public void removeListener(AgentHostUpdaterListener listener,
-				   MessageAddress agent) 
+	public synchronized void removeListener(AgentHostUpdaterListener listener,
+						MessageAddress agent) 
 	{
 	    String agentName = agent.toString();
-	    synchronized (listeners) {
-		HashSet agentListeners = (HashSet) 
-		    listeners.get(agentName);
-		if (agentListeners != null) {
-		    agentListeners.remove(listener);
-		}
+	    HashSet agentListeners = (HashSet) 
+		listeners.get(agentName);
+	    if (agentListeners != null) {
+		agentListeners.remove(listener);
 	    }
 	}
 
-	private void checkHost(String entity, URI uri, HashMap hosts, Class entityClass) {
-	    String node = uri.getPath().substring(1);
-	    boolean node_changed = false;
-
-	    if (entityClass == AgentDS.class) {
-		// Ensure that the Agent's node is on the nodes list (if it's a real node).
-		if (!node.equals(AgentDS.UNKNOWN_NODE)) {
-		    synchronized (nodes) {
-			nodes.add(node);
-		    }
-		}
-		
-		String old_node = (String) agent_nodes.get(entity);
-		node_changed = !node.equals(old_node);
-		agent_nodes.put(entity, node);
+	private void notifyListeners(String agent, String host)
+	{
+	    // We still need to update these sysconds, since
+	    // they're not subscribed to an Agent formula (if
+	    // they were, the rest of this would be
+	    // unnecessary).  They're subscribed to a Host
+	    // formula.
+	    //
+	    // Maybe this should only run when entityClass == AgentDS?
+	    HashSet agentListeners = (HashSet) listeners.get(agent);
+	    if (agentListeners == null) return;
+	    Iterator litr = agentListeners.iterator();
+	    while (litr.hasNext()) {
+		AgentHostUpdaterListener listener =
+		    (AgentHostUpdaterListener) litr.next();
+		if (loggingService.isDebugEnabled()) 
+		    loggingService.debug("New host " +host+
+					 " for listener " +listener);
+		listener.newHost(host);
 	    }
+	}
 
-	    if (entity.equals(AgentDS.UNKNOWN_NODE)) {
+
+
+
+	private boolean checkAgentMoved(String agent, String node, URI uri)
+	{
+	    // Ensure that the Agent's node is on the nodes list (if
+	    // it's a real node).
+	    if (!node.equals(AgentDS.UNKNOWN_NODE)) {
+		nodes.add(node);
+	    }
+		
+	    String old_node = (String) agent_nodes.get(agent);
+
+	    if (!node.equals(old_node)) {
+		agent_nodes.put(agent, node);
+		if (loggingService.isDebugEnabled())
+		    loggingService.debug("New node " 
+					 +node+
+					 " for agent " 
+					 +agent);
+		return true;
+	    } else {
+		return false;
+	    }
+	}
+
+	private boolean checkNodeMoved(String node, URI uri) 
+	{
+	    if (node.equals(AgentDS.UNKNOWN_NODE)) {
 		if (loggingService.isErrorEnabled())
 		    loggingService.error("checkHost called on foster node!");
 	    }
 
 	    String host = uri.getHost();
-	    String old_host = (String) hosts.get(entity);
+	    String old_host = (String) node_hosts.get(node);
 
 	    if (old_host == null || !old_host.equals(host)) {
-
-		// Entity has moved to a new host.  Delete the
-		// old DataScope.
-		Object[] params = { entity };
-		RSS.instance().deleteScope(entityClass, params);
-
-		hosts.put(entity, host);
+		node_hosts.put(node, host);
 		if (loggingService.isDebugEnabled())
 		    loggingService.debug("New host " 
 					 +host+
-					 " for entity " 
-					 +entity);
+					 " for node " 
+					 +node);
 
-
-		// We still need to update these sysconds, since
-		// they're not subscribed to an Agent formula (if
-		// they were, the rest of this would be
-		// unnecessary).  They're subscribed to a Host
-		// formula.
-		//
-		// Maybe this should only run when entityClass == AgentDS?
-		synchronized (listeners) {
-		    HashSet entityListeners = (HashSet) listeners.get(entity);
-		    if (entityListeners == null) return;
-		    Iterator litr = entityListeners.iterator();
-		    while (litr.hasNext()) {
-			AgentHostUpdaterListener listener =
-			    (AgentHostUpdaterListener) litr.next();
-			if (loggingService.isDebugEnabled()) 
-			    loggingService.debug("New host " +host+
-						 " for listener " +listener);
-			listener.newHost(host);
-		    }
-		}
-	    } else if (node_changed) {
-		// Handle the case in which the agent's node has changed
-		// _without_ the host changing.
-		Object[] params = { entity };
-		RSS.instance().deleteScope(entityClass, params);
-
-		if (loggingService.isDebugEnabled())
-		    loggingService.debug("New node " 
-					 +node+
-					 " for agent " 
-					 +entity);
+		return true;
+	    } else {
+		return false;
 	    }
 	}
 
 
-	
-	private void checkEntities(HashSet entities, HashMap hosts, Class entityClass) {
-	    // Asking the WhitePages for data can block, so we'd like
-	    // not to do it in a synchronized block.  Unfortunately
-	    // access to the Set has to be synchronized.  The only
-	    // alternative seems to be to copy the set.
-	    
-	    Set copy = new HashSet();
-	    synchronized (entities) {
-		copy.addAll(entities);
-	    }
-
-	    // Loop over all Agents, seeing if the Host has changed,
-	    Iterator itr = copy.iterator();
+	private ArrayList agentWalk(HashMap node_wp) 
+	{
+	    // Loop over all Agents, seeing if the Node has changed,
+	    ArrayList changed = new ArrayList();
+	    Iterator itr = agents.iterator();
 	    while (itr.hasNext()) {
-		String entity_name = (String) itr.next();
+		String agent = (String) itr.next();
 		try {
-		    AddressEntry entry = wpService.get(entity_name, TOPOLOGY, 10);
-		    if (entry != null) checkHost(entity_name, entry.getURI(), hosts, entityClass);
+		    AddressEntry entry = wpService.get(agent, TOPOLOGY, -1);
+		    if (entry != null) {
+			URI uri = entry.getURI();
+			String node = uri.getPath().substring(1);
+			if (node.equals(agent)) {
+			    // This is a node-agent, add it
+			    node_wp.put(node, entry);
+			}
+			if (checkAgentMoved(agent, node, uri))
+			    changed.add(agent);
+		    }
 		} catch (Exception ex) {
 		}
 	    }
-	}
-
-	public void run() {
-	    checkEntities(nodes, node_hosts, NodeDS.class);
-	    checkEntities(agents, agent_hosts, AgentDS.class);
+	    return changed;
 	}
 
 
+	private ArrayList agentNotificationWalk() 
+	{
+	    // Loop over all Agents, seeing if the Host has changed,
+	    ArrayList change_list = new ArrayList();
+	    Iterator itr = agents.iterator();
+	    while (itr.hasNext()) {
+		String agent = (String) itr.next();
+		MessageAddress addr  = MessageAddress.getMessageAddress(agent);
+		String current_host = getAgentHost(addr);
+		String old_host = (String) agent_hosts.get(agent);
+		if (current_host != null) {
+		    if (old_host == null || !old_host.equals(current_host)) {
+			agent_hosts.put(agent, current_host);
+			change_list.add(agent);
+		    }
+		}
+	    }
+	    return change_list;
+	}
+
+
+	private ArrayList nodeWalk(HashMap node_wp) 
+	{
+	    // Loop over all Nodes, seeing if the Host has changed,
+	    ArrayList changed = new ArrayList();
+	    Iterator itr = nodes.iterator();
+	    while (itr.hasNext()) {
+		String node = (String) itr.next();
+		AddressEntry entry = (AddressEntry)
+		    node_wp.get(node);
+		if (entry == null) {
+		    try {
+			entry = wpService.get(node, TOPOLOGY, -1);
+		    } catch (Exception ex) {
+		    }
+		}
+		if (entry != null) {
+		    if (checkNodeMoved(node, entry.getURI()))
+			changed.add(node);
+		}
+	    }
+	    return changed;
+	}
+
+	private void updateRSS(ArrayList names, String type)
+	{
+	    RSS rss = RSS.instance();
+	    String[] params = new String[1];
+	    if (names != null) {
+		int length = names.size();
+		for (int i=0; i<length; i++) {
+		    params[0] = (String) names.get(i);
+		    rss.deleteContext(type, params);
+		}
+	    }
+	}
+
+	private void updateListeners(ArrayList change_list)
+	{
+	    int length = change_list.size();
+	    for (int i=0; i<length; i++) {
+		String agent = (String) change_list.get(i);
+		String host = getAgentHost(MessageAddress.getMessageAddress(agent));
+		notifyListeners(agent, host);
+	    }
+	}
+
+	public void run() 
+	{
+	    ArrayList agent_host_change_list = null;
+	    ArrayList agent_node_change_list = null;
+	    ArrayList node_host_change_list = null;
+
+	    // First, walk through the agents collecting a list of
+	    // those whose node has changed.  Also collect a map of
+	    // node names and the corresponding wp entry for each
+	    // node agent.  The update list will be used to sync the
+	    // RSS. The map will be used in step 2.
+	    // 
+	    // Next, walk through the nodes collecting a list of
+	    // those whose host has changed.  Use the wp entries as
+	    // collected in step 1.  The update list will be used to
+	    // sync the RSS.
+	    //
+	    // Finally, walk through the agents again collecting
+	    // a list of those whose host has changed.  The update
+	    // list will be used to notify subscribers.
+	    //
+	    // By using a single wp entry per agent and synchronizing
+	    // all three calls, the result should be a consistent
+	    // topology that can be used by the AgentTopologyService.
+	    synchronized (this) {
+		HashMap node_wp = new HashMap(); // node -> wp-entry
+		agent_node_change_list = agentWalk(node_wp);
+		node_host_change_list = nodeWalk(node_wp);
+		agent_host_change_list = agentNotificationWalk();
+	    }
+
+	    // Sync the RSS by reconstructing the resource contexts
+	    // whose parent has changed.
+	    updateRSS(agent_node_change_list, "Agent");
+	    updateRSS(node_host_change_list, "Node");
+
+	    // Inform the subcribers of agent-host changes.
+	    updateListeners(agent_host_change_list);
+	}
     }
 }
 

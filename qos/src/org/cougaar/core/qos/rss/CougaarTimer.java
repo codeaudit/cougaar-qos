@@ -31,7 +31,7 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
-import com.bbn.quo.data.TaskScheduler;
+import com.bbn.rss.TaskScheduler;
 
 public class CougaarTimer implements TaskScheduler
 {

@@ -28,27 +28,52 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Constants;
 import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.service.wp.WhitePagesService;
 
-import com.bbn.quo.data.DataFormula;
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.DataScopeSpec;
-import com.bbn.quo.data.DataValue;
-import com.bbn.quo.data.RSS;
-import com.bbn.quo.data.RSSUtils;
+import com.bbn.rss.AbstractContextInstantiater;
+import com.bbn.rss.ContextInstantiater;
+import com.bbn.rss.DataFormula;
+import com.bbn.rss.DataValue;
+import com.bbn.rss.RSS;
+import com.bbn.rss.ResourceContext;
+import com.bbn.ResourceStatus.ResourceNode;
+
 
 public class AgentDS 
     extends CougaarDS
 {
+
+    static void register()
+    {
+	ContextInstantiater cinst = new AbstractContextInstantiater() {
+		public ResourceContext instantiateContext(String[] parameters, 
+							  ResourceContext parent)
+		    throws ParameterError
+		{
+		    return new AgentDS(parameters, parent);
+		}
+
+		public Object identifyParameters(String[] parameters) 
+		{
+		    if (parameters == null || parameters.length != 1) 
+			return null;
+		    return  parameters[0];
+		}		
+
+		
+	    };
+	registerContextInstantiater("Agent", cinst);
+    }
+
     private static final String AGENTNAME = "agentname".intern();
     static final String TOPOLOGY = "topology";
     static final String UNKNOWN_NODE = "FosterNode";
 
-
-    public AgentDS(Object[] parameters, DataScope parent) 
-	throws DataScope.ParameterError
+    public AgentDS(String[] parameters, ResourceContext parent) 
+	throws ParameterError
     {
 	super(parameters, parent);
     }
@@ -64,51 +89,92 @@ public class AgentDS
     // Node DataScopes can be the first element in a path.  They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
-    protected DataScope preferredParent(RSS root) {
-	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	WhitePagesService svc = (WhitePagesService)
-	    sb.getService(this, WhitePagesService.class, null);
+    protected ResourceContext preferredParent(RSS root) {
 	String agentname = (String) getSymbolValue(AGENTNAME);
-        String node = null;
-	try {
-	    AddressEntry entry = svc.get(agentname, TOPOLOGY, 10);
-	    if (entry == null) {
-		if (logger.isWarnEnabled())
-		    logger.warn("Can't find node for agent " +agentname);
-		node = UNKNOWN_NODE;
-	    } else {
-		node = entry.getURI().getPath().substring(1);
+	String nodename = null;
+	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
+	AgentTopologyService ats = (AgentTopologyService)
+	    sb.getService(this, AgentTopologyService.class, null);
+	if (ats != null) {
+	    nodename=ats.getAgentNode(MessageAddress.getMessageAddress(agentname));
+	} else {
+	    // AgentTopologyService not loaded.  Try a direct WP
+	    // call, even though it can give an inconsistent picture.
+	    WhitePagesService svc = (WhitePagesService)
+		sb.getService(this, WhitePagesService.class, null);
+	    try {
+		AddressEntry entry = svc.get(agentname, TOPOLOGY, -1);
+		if (entry == null) {
+		    if (logger.isWarnEnabled())
+			logger.warn("Can't find node for agent " +agentname);
+		} else {
+		    nodename = entry.getURI().getPath().substring(1);
+		}
+	    } catch (Exception ex) {
+		// log?
 	    }
-	} catch (Exception ex) {
-	    node = UNKNOWN_NODE;
+
 	}
 
-
-
-
-	Object[] params = { node };
-	DataScopeSpec spec = new DataScopeSpec("Node", params);
-	DataScopeSpec[] path = { spec } ;
-	DataScope parent = root.getDataScope(path);
+	String[] params = { nodename == null ? UNKNOWN_NODE : nodename };
+	ResourceNode node = new ResourceNode();
+	node.kind = "Node";
+	node.parameters = params;
+	ResourceNode[] path = { node };
+	ResourceContext parent = root.getPathContext(path);
 	setParent(parent);
 	return parent;
     }
 
 
-    protected void verifyParameters(Object[] parameters) 
-	throws DataScope.ParameterError
+    protected void verifyParameters(String[] parameters) 
+	throws ParameterError
     {
 	if (parameters == null || parameters.length != 1) {
-	    throw new DataScope.ParameterError("AgentDS: wrong number of parameters");
+	    throw new ParameterError("AgentDS: wrong number of parameters");
 	}
 	if (!(parameters[0] instanceof String)) {
-	    throw new DataScope.ParameterError("AgentDS: wrong parameter type");
+	    throw new ParameterError("AgentDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
 	    String agentname = (String) parameters[0];
 	    bindSymbolValue(AGENTNAME, agentname);
+	    historyPrefix = "Agent" +KEY_SEPR+ agentname;
 	}
     }
+
+
+    protected DataFormula instantiateFormula(String kind)
+    {
+	if (kind.equals("LastHeard")) {
+	    return new LastHeard();
+	} else if (kind.equals("LastSpoke")) {
+	    return new LastSpoke();
+	} else if (kind.equals("LastSpokeError")) {
+	    return new LastSpokeError();
+	} else if (kind.equals("HeardTime")) {
+	    return new HeardTime();
+	} else if (kind.equals("SpokeTime")) {
+	    return new SpokeTime();
+	} else if (kind.equals("SpokeErrorTime")) {
+	    return new SpokeErrorTime();
+	} else if (kind.equals(Constants.PERSIST_SIZE_LAST)) {
+	    return new PersistSizeLast();
+	} else if (kind.equals(Constants.CPU_LOAD_AVG) ||
+		   kind.equals(Constants.CPU_LOAD_MJIPS) ||
+		   kind.equals(Constants.MSG_IN) ||
+		   kind.equals(Constants.BYTES_IN) ||
+		   kind.equals(Constants.MSG_OUT) ||
+		   kind.equals(Constants.BYTES_OUT)) {
+	    return new DecayingHistoryFormula(historyPrefix, kind);
+	} else {
+	    return null;
+	}
+    }
+
+
+
+
 
 
     abstract static class Formula 
@@ -122,15 +188,20 @@ public class AgentDS
 	}
 	
 
-	protected void initialize(DataScope scope) {
-	    super.initialize(scope);
-	    String agentName = (String) scope.getValue(AGENTNAME);
+	protected void initialize(ResourceContext context) {
+	    super.initialize(context);
+	    String agentName = (String) context.getValue(AGENTNAME);
 	    String key = "Agent" +KEY_SEPR+ agentName +KEY_SEPR+ getKey();
 
-	    Object[] parameters = { key };
-	    DataScopeSpec spec = new DataScopeSpec("com.bbn.quo.data.IntegraterDS", 
-						   parameters);
-	    DataScope dependency = RSS.instance().getDataScope(spec);
+	    String[] parameters = { key };
+	    ResourceNode node = new ResourceNode();
+	    node.kind = "Integrater";
+	    node.parameters = parameters;
+	    ResourceNode formula = new ResourceNode();
+	    formula.kind = "Formula";
+	    formula.parameters = new String[0];
+	    ResourceNode[] path = { node, formula };
+	    DataFormula dependency = RSS.instance().getPathFormula(path);
 	    registerDependency(dependency, "Formula");
 	}
 
@@ -166,11 +237,20 @@ public class AgentDS
 	}
 	
 
-	protected void initialize(DataScope scope) {
-	    super.initialize(scope);
-	    DataFormula baseFormula=getScope().getFormula(getKey());
+	protected void initialize(ResourceContext context) {
+	    super.initialize(context);
+
+	    DataFormula baseFormula = context.getFormula(getKey(), null);
 	    registerDependency(baseFormula, "Formula");
-	    DataFormula alarm = RSSUtils.getPathFormula("Alarm():OneSecond");
+
+	    ResourceNode node = new ResourceNode();
+	    node.kind = "Alarm";
+	    node.parameters = new String[0];
+	    ResourceNode formula = new ResourceNode();
+	    formula.kind = "OneSecond";
+	    formula.parameters = new String[0];
+	    ResourceNode[] path = { node, formula };
+	    DataFormula alarm = RSS.instance().getPathFormula(path);
 	    registerDependency(alarm, "Alarm");
 	}
 
@@ -243,155 +323,13 @@ public class AgentDS
 
 
 
-
-    public static class CPULoadAvg1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_1_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_10_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_100_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_1000_SEC_AVG;
-	}
-    }	
-
-    public static class CPULoadMJips1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_1_SEC_AVG;
-	}
-    }	
-    public static class CPULoadMJips10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_10_SEC_AVG;
-	}
-    }	
-    public static class CPULoadMJips100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_100_SEC_AVG;
-	}
-    }	
-    public static class CPULoadMJips1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class MsgIn1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_IN_1_SEC_AVG;
-	}
-    }	
-
-    public static class MsgIn10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_IN_10_SEC_AVG;
-	}
-    }	
-
-    public static class MsgIn100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_IN_100_SEC_AVG;
-	}
-    }	
-
-    public static class MsgIn1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_IN_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class MsgOut1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_OUT_1_SEC_AVG;
-	}
-    }	
-
-    public static class MsgOut10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_OUT_10_SEC_AVG;
-	}
-    }	
-
-    public static class MsgOut100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_OUT_100_SEC_AVG;
-	}
-    }	
-
-    public static class MsgOut1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_OUT_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class BytesIn1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_IN_1_SEC_AVG;
-	}
-    }	
-
-    public static class BytesIn10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_IN_10_SEC_AVG;
-	}
-    }	
-
-    public static class BytesIn100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_IN_100_SEC_AVG;
-	}
-    }	
-
-    public static class BytesIn1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_IN_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class BytesOut1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_OUT_1_SEC_AVG;
-	}
-    }	
-
-    public static class BytesOut10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_OUT_10_SEC_AVG;
-	}
-    }	
-
-    public static class BytesOut100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_OUT_100_SEC_AVG;
-	}
-    }	
-
-    public static class BytesOut1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_OUT_1000_SEC_AVG;
-	}
-    }	
-
-
     public static class PersistSizeLast extends Formula {
 	String getKey() {
 	    return Constants.PERSIST_SIZE_LAST;
 	}
     }	
+
+
 
 
 }

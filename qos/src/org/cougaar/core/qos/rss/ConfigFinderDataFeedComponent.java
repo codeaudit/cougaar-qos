@@ -37,7 +37,7 @@ import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
-import com.bbn.quo.data.PropertiesDataFeed;
+import com.bbn.rss.PropertiesDataFeed;
 
 public class ConfigFinderDataFeedComponent
     extends QosComponent

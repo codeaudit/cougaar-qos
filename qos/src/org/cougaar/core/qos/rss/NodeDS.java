@@ -29,21 +29,52 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.wp.AddressEntry;
+import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.wp.WhitePagesService;
 
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.DataScopeSpec;
-import com.bbn.quo.data.RSS;
+import com.bbn.rss.AbstractContextInstantiater;
+import com.bbn.rss.ContextInstantiater;
+import com.bbn.rss.DataFormula;
+import com.bbn.rss.RSS;
+import com.bbn.rss.ResourceContext;
+import com.bbn.ResourceStatus.ResourceNode;
 
 public class NodeDS 
     extends CougaarDS
 {
+    static void register()
+    {
+	ContextInstantiater cinst = new AbstractContextInstantiater() {
+		public ResourceContext instantiateContext(String[] parameters, 
+							  ResourceContext parent)
+		    throws ParameterError
+		{
+		    return new NodeDS(parameters, parent);
+		}
+
+		public Object identifyParameters(String[] parameters) 
+		{
+		    if (parameters == null || parameters.length != 1) 
+			return null;
+		    return  parameters[0];
+		}		
+
+		
+	    };
+	registerContextInstantiater("Node", cinst);
+    }
+
     static final String NODENAME = "nodename".intern();
     static final String TOPOLOGY = "topology";
     static final String UNKNOWN_HOST_IP = "169.0.0.1";//DHCP No Address from server
+    static boolean isUnknownHost(String addr)
+    {
+	return addr.equals(UNKNOWN_HOST_IP);
+    }
 
-    public NodeDS(Object[] parameters, DataScope parent) 
-	throws DataScope.ParameterError
+
+    public NodeDS(String[] parameters, ResourceContext parent) 
+	throws ParameterError
     {
 	super(parameters, parent);
     }
@@ -60,42 +91,53 @@ public class NodeDS
     // Node DataScopes can be the first element in a path.  They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
-    protected DataScope preferredParent(RSS root) {
+    protected ResourceContext preferredParent(RSS root) 
+    {
+
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	WhitePagesService svc = (WhitePagesService)
-	    sb.getService(this, WhitePagesService.class, null);
+	AgentTopologyService ats = (AgentTopologyService)
+	    sb.getService(this, AgentTopologyService.class, null);
 	String nodename = (String) getSymbolValue(NODENAME);
-	String host = null;
-	try {
-	    AddressEntry entry = svc.get(nodename, TOPOLOGY, 10);
-	    if (entry == null) {
-		if (logger.isWarnEnabled())
-		    logger.warn("Can't find host for node " +nodename);
-		host = UNKNOWN_HOST_IP;
-	    } else {
-		host = entry.getURI().getHost();
+	String hostname = null;
+	if (ats != null) {
+	    hostname=ats.getNodeHost(MessageAddress.getMessageAddress(nodename));
+	} else {
+	    // AgentTopologyService not loaded.  Try a direct WP
+	    // call, even though it can give an inconsistent picture.
+	    WhitePagesService svc = (WhitePagesService)
+		sb.getService(this, WhitePagesService.class, null);
+	    try {
+		AddressEntry entry = svc.get(nodename, TOPOLOGY, -1);
+		if (entry == null) {
+		    if (logger.isWarnEnabled())
+			logger.warn("Can't find host for node " +nodename);
+		} else {
+		    hostname = entry.getURI().getHost();
+		}
+	    } catch (Exception ex) {
+		// log this?
 	    }
-	} catch (Exception ex) {
-	    host = UNKNOWN_HOST_IP;
 	}
 
-	Object[] params = { host };
-	DataScopeSpec spec = new DataScopeSpec("Host", params);
-	DataScopeSpec[] path = { spec } ;
-	DataScope parent = root.getDataScope(path);
+	String[] params = { hostname == null ? UNKNOWN_HOST_IP : hostname };
+	ResourceNode node = new ResourceNode();
+	node.kind = "Host";
+	node.parameters = params;
+	ResourceNode[] path = { node } ;
+	ResourceContext parent = root.getPathContext(path);
 	setParent(parent);
 	return parent;
     }
 
 
-    protected void verifyParameters(Object[] parameters) 
-	throws DataScope.ParameterError
+    protected void verifyParameters(String[] parameters) 
+	throws ParameterError
     {
 	if (parameters == null || parameters.length != 1) {
-	    throw new DataScope.ParameterError("NodeDS: wrong number of parameters");
+	    throw new ParameterError("NodeDS: wrong number of parameters");
 	}
 	if (!(parameters[0] instanceof String)) {
-	    throw new DataScope.ParameterError("NodeDS: wrong parameter type");
+	    throw new ParameterError("NodeDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
 	    String nodename = (String) parameters[0];
@@ -103,5 +145,11 @@ public class NodeDS
 	}
     }
 
+
+    protected DataFormula instantiateFormula(String kind)
+    {
+	// No local formulas
+	return null;
+    }
 }
 

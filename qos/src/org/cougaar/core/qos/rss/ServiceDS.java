@@ -31,20 +31,43 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.node.NodeIdentificationService;
 import org.cougaar.core.qos.metrics.Constants;
 
-import com.bbn.quo.data.DataFormula;
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.DataScopeSpec;
-import com.bbn.quo.data.DataValue;
-import com.bbn.quo.data.RSS;
+import com.bbn.rss.AbstractContextInstantiater;
+import com.bbn.rss.ContextInstantiater;
+import com.bbn.rss.DataFormula;
+import com.bbn.rss.DataValue;
+import com.bbn.rss.RSS;
+import com.bbn.rss.ResourceContext;
+import com.bbn.ResourceStatus.ResourceNode;
 
 public class ServiceDS 
     extends CougaarDS
 {
+    static void register()
+    {
+	ContextInstantiater cinst = new AbstractContextInstantiater() {
+		public ResourceContext instantiateContext(String[] parameters, 
+							  ResourceContext parent)
+		    throws ParameterError
+		{
+		    return new ServiceDS(parameters, parent);
+		}
+
+		public Object identifyParameters(String[] parameters) 
+		{
+		    if (parameters == null || parameters.length != 1) 
+			return null;
+		    return  parameters[0];
+		}		
+
+		
+	    };
+	registerContextInstantiater("Service", cinst);
+    }
+
     private static final String SERVICENAME = "servicename".intern();
 
-
-    public ServiceDS(Object[] parameters, DataScope parent) 
-	throws DataScope.ParameterError
+    public ServiceDS(String[] parameters, ResourceContext parent) 
+	throws ParameterError
     {
 	super(parameters, parent);
     }
@@ -56,111 +79,52 @@ public class ServiceDS
     // Service DataScopes can be the first element in a path.  They must
     // find or make the corresponding NodeDS and return that as the
     // preferred parent.
-    protected DataScope preferredParent(RSS root) {
+    protected ResourceContext preferredParent(RSS root) {
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
 	NodeIdentificationService node_id_svc = (NodeIdentificationService)
 	    sb.getService(this, NodeIdentificationService.class, null);
 	String nodeID = node_id_svc.getMessageAddress().toString();
 
-	Object[] params = { nodeID };
-	DataScopeSpec spec = new DataScopeSpec("Node", params);
-	DataScopeSpec[] path = { spec } ;
-	DataScope parent = root.getDataScope(path);
+	String[] params = { nodeID };
+	ResourceNode node = new ResourceNode();
+	node.kind = "Node";
+	node.parameters = params;
+	ResourceNode[] path = { node };
+	ResourceContext parent = root.getPathContext(path);
 	setParent(parent);
 	return parent;
     }
 
+    
 
-    protected void verifyParameters(Object[] parameters) 
-	throws DataScope.ParameterError
+    protected void verifyParameters(String[] parameters) 
+	throws ParameterError
     {
 	if (parameters == null || parameters.length != 1) {
-	    throw new DataScope.ParameterError("ServiceDS: wrong number of parameters");
+	    throw new ParameterError("ServiceDS: wrong number of parameters");
 	}
 	if (!(parameters[0] instanceof String)) {
-	    throw new DataScope.ParameterError("ServiceDS: wrong parameter type");
+	    throw new ParameterError("ServiceDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
 	    String servicename = (String) parameters[0];
 	    bindSymbolValue(SERVICENAME, servicename);
+	    historyPrefix = "Service" +KEY_SEPR+ servicename;
 	}
     }
 
 
-    abstract static class Formula 
-	extends DataFormula
+    protected DataFormula instantiateFormula(String kind)
     {
-
-	abstract String getKey();
-	
-	protected DataValue defaultValue() {
-	    return new DataValue(0);
+	if (kind.equals(Constants.CPU_LOAD_AVG)
+	    ||
+	    kind.equals(Constants.CPU_LOAD_MJIPS)) {
+	    return new DecayingHistoryFormula(historyPrefix, kind);
+	} else {
+	    return null;
 	}
-	
-
-	protected void initialize(DataScope scope) {
-	    super.initialize(scope);
-	    String serviceName = (String) scope.getValue(SERVICENAME);
-	    String key = "Service" +KEY_SEPR+ serviceName +KEY_SEPR+ getKey();
-
-	    Object[] parameters = { key };
-	    DataScopeSpec spec = new DataScopeSpec("com.bbn.quo.data.IntegraterDS", 
-						   parameters);
-	    DataScope dependency = RSS.instance().getDataScope(spec);
-	    registerDependency(dependency, "Formula");
-	}
-
-	protected DataValue doCalculation(DataFormula.Values values) {
-	    DataValue computedValue = values.get("Formula");
-	    DataValue defaultValue = defaultValue();
-	    return DataValue.mostCredible(computedValue, defaultValue);
-	}
-
     }
 
-
-
-    public static class CPULoadAvg1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_1_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_10_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_100_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_1000_SEC_AVG;
-	}
-    }	
-
-    public static class CPULoadMJips1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_1_SEC_AVG;
-	}
-    }	
-    public static class CPULoadMJips10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_10_SEC_AVG;
-	}
-    }	
-    public static class CPULoadMJips100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_100_SEC_AVG;
-	}
-    }	
-    public static class CPULoadMJips1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_1000_SEC_AVG;
-	}
-    }	
 
 }
 

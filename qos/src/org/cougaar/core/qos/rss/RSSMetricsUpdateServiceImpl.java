@@ -34,7 +34,7 @@ import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
 
-import com.bbn.quo.sysstat.DirectSysStatSupplier;
+import com.bbn.rss.sysstat.DirectSysStatSupplier;
 
 /**
  * The implementation of MetricsUpdateService, and a child component
@@ -61,7 +61,7 @@ public class RSSMetricsUpdateServiceImpl
     private static final int SYSTAT_PERIOD = 15000;
     
     private TrivialDataFeed dataFeed;
-    private com.bbn.quo.data.DataInterpreter interpreter;
+    private com.bbn.rss.DataInterpreter interpreter;
 
     public RSSMetricsUpdateServiceImpl() {
     }
@@ -76,7 +76,8 @@ public class RSSMetricsUpdateServiceImpl
 	// kinds_string empty or 'none' for no probes
 	// Otherwise it should be a comma-separated list
 
-	String[] kinds = null;
+	String[] kinds = 
+	    { "Jips", "Memory", "CPU", "LoadAverage", "Sockets",  "CPUCount"};;
 	// kinds == null for all probes
 	// kinds == zero-length array for no probes
 	// kinds == true array of strings for specified probes

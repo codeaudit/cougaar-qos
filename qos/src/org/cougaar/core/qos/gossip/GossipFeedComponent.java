@@ -38,8 +38,8 @@ import org.cougaar.core.thread.Schedulable;
 
 import org.cougaar.core.qos.rss.MetricInterpreter;
 
-import com.bbn.quo.data.DataFeedListener;
-import com.bbn.quo.data.SimpleQueueingDataFeed;
+import com.bbn.rss.DataFeedListener;
+import com.bbn.rss.SimpleQueueingDataFeed;
 
 public class GossipFeedComponent
     extends QosComponent

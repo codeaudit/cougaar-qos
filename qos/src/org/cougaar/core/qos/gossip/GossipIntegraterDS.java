@@ -26,20 +26,54 @@
 
 package org.cougaar.core.qos.gossip;
 
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.IntegraterDS;
+import com.bbn.rss.AbstractContextInstantiater;
+import com.bbn.rss.ContextInstantiater;
+import com.bbn.rss.DataFormula;
+import com.bbn.rss.ResourceContext;
+import com.bbn.rss.IntegraterDS;
 
 public class GossipIntegraterDS extends IntegraterDS 
 {
 
-    public GossipIntegraterDS(Object[] keys, DataScope parent) 
-	throws DataScope.ParameterError
+    public static void register()
+    {
+	ContextInstantiater cinst = new AbstractContextInstantiater() {
+		public ResourceContext instantiateContext(String[] parameters, 
+							  ResourceContext parent)
+		    throws ParameterError
+		{
+		    return new GossipIntegraterDS(parameters, parent);
+		}
+
+		public Object identifyParameters(String[] parameters) 
+		{
+		    if (parameters == null || parameters.length != 1) 
+			return null;
+		    return  parameters[0];
+		}		
+
+		
+	    };
+	registerContextInstantiater("GossipIntegrater", cinst);
+    }
+
+    public GossipIntegraterDS(String[] keys, ResourceContext parent) 
+	throws ParameterError
     {
 	super(keys, parent);
     }
 
 
-    public static class GossipFormula extends IntegraterDS.Formula {
+    protected DataFormula instantiateFormula(String kind)
+    {
+	if (kind.equals("GossipFormula")) {
+	    return new GossipFormula();
+	} else {
+	    return super.instantiateFormula(kind);
+	}
+    }
+
+    static class GossipFormula extends IntegraterDS.Formula {
     }
 
 }

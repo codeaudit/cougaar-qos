@@ -27,184 +27,253 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 import org.cougaar.core.qos.metrics.Constants;
 
-import com.bbn.quo.data.DataFormula;
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.DataScopeSpec;
-import com.bbn.quo.data.DataValue;
-import com.bbn.quo.data.RSS;
+import com.bbn.rss.AbstractContextInstantiater;
+import com.bbn.rss.ContextInstantiater;
+import com.bbn.rss.DataFormula;
+import com.bbn.rss.DataValue;
+import com.bbn.rss.RSS;
+import com.bbn.rss.ResourceContext;
+import com.bbn.ResourceStatus.ResourceNode;
 
 public class DestinationDS 
     extends CougaarDS
 {
+    static void register()
+    {
+	ContextInstantiater cinst = new AbstractContextInstantiater() {
+		public ResourceContext instantiateContext(String[] parameters, 
+							  ResourceContext parent)
+		    throws ParameterError
+		{
+		    return new DestinationDS(parameters, parent);
+		}
+
+		public Object identifyParameters(String[] parameters) 
+		{
+		    if (parameters == null || parameters.length != 1) 
+			return null;
+		    return  parameters[0];
+		}		
+
+		
+	    };
+	registerContextInstantiater("Destination", cinst);
+    }
+
+
     private static final String DESTINATION = "destination".intern();
 
 
-    public DestinationDS(Object[] parameters, DataScope parent) 
-	throws DataScope.ParameterError
+    public DestinationDS(String[] parameters, ResourceContext parent) 
+	throws ParameterError
     {
 	super(parameters, parent);
     }
 
-    protected void verifyParameters(Object[] parameters) 
-	throws DataScope.ParameterError
+    protected void verifyParameters(String[] parameters) 
+	throws ParameterError
     {
 	if (parameters == null || parameters.length != 1) {
-	    throw new DataScope.ParameterError("DestinationDS: wrong number of parameters");
+	    throw new ParameterError("DestinationDS: wrong number of parameters");
 	}
 	if (!(parameters[0] instanceof String)) {
-	    throw new DataScope.ParameterError("DestinationDS: wrong parameter type");
+	    throw new ParameterError("DestinationDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
 	    String destination = (String) parameters[0];
 	    bindSymbolValue(DESTINATION, destination);
+	    String node_name = (String) getValue(NodeDS.NODENAME);
+	    historyPrefix = "Node" +KEY_SEPR+ node_name
+		+KEY_SEPR+ "Destination" 
+		+KEY_SEPR+ destination;
 	}
     }
 
+    protected DataFormula instantiateFormula(String kind)
+    {
+	if (kind.equals(Constants.MSG_FROM) ||
+	    kind.equals(Constants.BYTES_FROM) ||
+	    kind.equals(Constants.MSG_TO) ||
+	    kind.equals(Constants.BYTES_TO)) {
+	    return new DecayingHistoryFormula(historyPrefix, kind);
+	} else if (kind.equals(Constants.PERSIST_SIZE_LAST)) {
+	    return new PersistSizeLast();
+	} else if (kind.equals("AgentIpAddress")) {
+	    return new AgentIpAddress();
+	} else if (kind.equals("CapacityMax")) {
+	    return new CapacityMax();
+	} else if (kind.equals("OnSameSecureLAN")) {
+	    return new OnSameSecureLAN();
+	} else {
+	    return null;
+	}
+    }
 
-    abstract static class Formula 
+    public static class AgentIpAddress extends DataFormula
+    {
+	protected void initialize(ResourceContext context) 
+	{
+	    super.initialize(context);
+	    String agent = (String) context.getValue(DESTINATION);
+	    String[] parameters = { agent };
+	    ResourceNode resource_node = new ResourceNode("Agent", parameters);
+	    ResourceNode[] path = { resource_node };
+	    ResourceContext dependency = RSS.instance().getPathContext(path);
+	    registerDependency(dependency, "PrimaryIpAddress");
+	}
+ 
+	public void formulaDeleted(DataFormula formula) {
+	    super.formulaDeleted(formula);
+	    
+	    Logger logger = 
+		Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
+	    if (logger.isDebugEnabled()) {
+		String agent = (String) getContext().getValue(DESTINATION);
+		logger.debug("Formula " +formula+
+			     " deleted from " +agent);
+	    }
+
+	}
+
+	protected DataValue doCalculation(DataFormula.Values values) 
+	{
+	    DataValue result = values.get("PrimaryIpAddress");
+	    Logger logger = 
+		Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
+	    if (logger.isDebugEnabled()) {
+		String agent = (String) getContext().getValue(DESTINATION);
+		logger.debug("Recalculating Agent " +agent+
+			     " AgentIpAddress as" + result);
+	    }
+	    return result;
+	}
+ 
+    }
+
+
+    public static class CapacityMax extends DataFormula
+    {
+	private static final DataValue UnknownCapacityMax =
+	    new DataValue(0, 0.0);
+
+	protected void initialize(ResourceContext context) 
+	{
+	    super.initialize(context);
+	    // subscribe to our own IpAddress and NodeIpAddress
+	    registerDependency(context, "AgentIpAddress");
+	    registerDependency(context, "PrimaryIpAddress");
+	}
+ 
+	protected DataValue doCalculation(DataFormula.Values values) 
+	{
+	    String agentAddr = values.get("AgentIpAddress").getStringValue();
+	    String myAddr = values.get("PrimaryIpAddress").getStringValue();
+	    DataValue result = null;
+	    if (NodeDS.isUnknownHost(agentAddr) ||
+		NodeDS.isUnknownHost(myAddr)) {
+		result = UnknownCapacityMax;
+	    } else {
+		String[] flow_params = {  myAddr, agentAddr};
+		ResourceNode flow = new ResourceNode("IpFlow", flow_params);
+		ResourceNode capm = new ResourceNode("CapacityMax", null);
+		ResourceNode[] path = { flow, capm };
+		DataFormula cap_max = RSS.instance().getPathFormula(path);
+		result = cap_max.blockingQuery();
+	    }
+
+	    Logger logger =
+		Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
+	    if (logger.isDebugEnabled()) {
+		String agent = (String) getContext().getValue(DESTINATION);
+		logger.debug("Recalculating CapacityMax with" +
+			     " my address = " +myAddr+
+			     " dest address = " +agentAddr+
+			     " = " +result);
+	    }
+
+ 	    return result;
+	}
+ 
+
+    }
+
+    private static final double LAN_CAPACITY= 10000.0;
+
+    public static class OnSameSecureLAN extends DataFormula
+    {
+	protected void initialize(ResourceContext context) 
+	{
+	    super.initialize(context);
+	    registerDependency(context, "CapacityMax");
+	}
+ 
+
+	protected DataValue doCalculation(DataFormula.Values values) 
+	{
+	    DataValue capacityMax = values.get("CapacityMax");
+	    double capacityMaxValue= capacityMax.getDoubleValue();
+	    double capacityMaxCred= capacityMax.getCredibility();
+
+	    DataValue results = 
+		new DataValue( capacityMaxCred >= SYS_DEFAULT_CREDIBILITY &&
+			       capacityMaxValue >= LAN_CAPACITY,
+			       capacityMaxCred);
+	    Logger logger = 
+		Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
+	    if (logger.isDebugEnabled()) {
+		String agent = (String) getContext().getValue(DESTINATION);
+		logger.debug("Recalculating Agent " +agent+
+			     " OnSameSecureLAN with" +
+			     " capacity max = " +capacityMax+
+			     " results = " +results);
+	    }
+	    return results;
+	}
+ 
+    }
+
+
+
+    class PersistSizeLast
 	extends DataFormula
     {
 
-	abstract String getKey();
 	
-	protected DataValue defaultValue() {
+	protected DataValue defaultValue() 
+	{
 	    return new DataValue(0);
 	}
 	
 
-	protected void initialize(DataScope scope) {
-	    super.initialize(scope);
-	    String dest = (String) scope.getValue(DESTINATION);
-	    String node = (String) scope.getValue(NodeDS.NODENAME);
-	    String key = "Node" +KEY_SEPR+ node	
-		+KEY_SEPR+ "Destination" 
-		+KEY_SEPR+ dest +KEY_SEPR+ 
-		getKey();
-
-	    Object[] parameters = { key };
-	    DataScopeSpec spec = new DataScopeSpec("com.bbn.quo.data.IntegraterDS", 
-						   parameters);
-	    DataScope dependency = RSS.instance().getDataScope(spec);
+	protected void initialize(ResourceContext ctx) 
+	{
+	    super.initialize(ctx);
+	    String key = historyPrefix +KEY_SEPR+ Constants.PERSIST_SIZE_LAST;
+	    String[] parameters = { key };
+	    ResourceNode node = new ResourceNode();
+	    node.kind = "Integrater";
+	    node.parameters = parameters;
+	    ResourceNode formula = new ResourceNode();
+	    formula.kind = "Formula";
+	    formula.parameters = new String[0];
+	    ResourceNode[] path = { node, formula };
+	    DataFormula dependency = RSS.instance().getPathFormula(path);
 	    registerDependency(dependency, "Formula");
+
 	}
 
-	protected DataValue doCalculation(DataFormula.Values values) {
+	protected DataValue doCalculation(DataFormula.Values values) 
+	{
 	    DataValue computedValue = values.get("Formula");
 	    DataValue defaultValue = defaultValue();
 	    return DataValue.mostCredible(computedValue, defaultValue);
 	}
 
     }
-
-
-    public static class MsgFrom1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_FROM_1_SEC_AVG;
-	}
-    }	
-
-    public static class MsgFrom10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_FROM_10_SEC_AVG;
-	}
-    }	
-
-    public static class MsgFrom100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_FROM_100_SEC_AVG;
-	}
-    }	
-
-    public static class MsgFrom1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_FROM_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class MsgTo1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_TO_1_SEC_AVG;
-	}
-    }	
-
-    public static class MsgTo10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_TO_10_SEC_AVG;
-	}
-    }	
-
-    public static class MsgTo100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_TO_100_SEC_AVG;
-	}
-    }	
-
-    public static class MsgTo1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_TO_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class BytesFrom1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_FROM_1_SEC_AVG;
-	}
-    }	
-
-    public static class BytesFrom10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_FROM_10_SEC_AVG;
-	}
-    }	
-
-    public static class BytesFrom100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_FROM_100_SEC_AVG;
-	}
-    }	
-
-    public static class BytesFrom1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_FROM_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class BytesTo1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_TO_1_SEC_AVG;
-	}
-    }	
-
-    public static class BytesTo10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_TO_10_SEC_AVG;
-	}
-    }	
-
-    public static class BytesTo100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_TO_100_SEC_AVG;
-	}
-    }	
-
-    public static class BytesTo1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTES_TO_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class PersistSizeLast extends Formula {
-	String getKey() {
-	    return Constants.PERSIST_SIZE_LAST;
-	}
-    }	
-
 
 }
 

@@ -30,19 +30,36 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
-import com.bbn.quo.data.DataScope;
+import com.bbn.rss.ResourceContext;
 
 abstract class CougaarDS 
-    extends DataScope 
+    extends ResourceContext
 {
 
     protected Logger logger;
+    protected String historyPrefix;
 
-    CougaarDS(Object[] parameters, DataScope parent) 
-	throws DataScope.ParameterError
+    CougaarDS(String[] parameters, ResourceContext parent) 
+	throws ParameterError
     {
 	super(parameters, parent);
+    }
+
+    protected void postInitialize()
+    {
+	super.postInitialize();
 	logger = Logging.getLogger(getClass().getName());
+	if (logger.isDebugEnabled()) {
+	    ResourceContext parent = getParent();
+	    logger.debug(parent + " created " +this);
+	}
+    }
+
+    protected void delete() 
+    {
+	if (logger.isDebugEnabled())
+	    logger.debug("Deleting " + this);
+	super.delete();
     }
 
 }

@@ -28,8 +28,8 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.qos.metrics.Metric;
 
-import com.bbn.quo.data.DataInterpreter;
-import com.bbn.quo.data.DataValue;
+import com.bbn.rss.DataInterpreter;
+import com.bbn.rss.DataValue;
 
 
 public class MetricInterpreter implements DataInterpreter 

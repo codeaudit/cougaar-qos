@@ -51,14 +51,16 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.RunnableQueue;
 import org.cougaar.util.ConfigFinder;
 
-import com.bbn.quo.data.BoundDataFormula;
-import com.bbn.quo.data.DataFeed;
-import com.bbn.quo.data.DataFormula;
-import com.bbn.quo.data.DataValue;
-import com.bbn.quo.data.NotificationQualifier;
-import com.bbn.quo.data.RSS;
-import com.bbn.quo.data.RSSUtils;
-import com.bbn.quo.data.SitesDB;
+import com.bbn.rss.BoundDataFormula;
+import com.bbn.rss.DataFeed;
+import com.bbn.rss.DataFormula;
+import com.bbn.rss.DataValue;
+import com.bbn.rss.NotificationQualifier;
+import com.bbn.rss.PathParser;
+import com.bbn.rss.RSS;
+import com.bbn.rss.RSSUtils;
+import com.bbn.rss.SitesDB;
+import com.bbn.ResourceStatus.ResourceNode;
 
 /**
  * The implementation of MetricsService, and a child component of
@@ -110,7 +112,7 @@ public class RSSMetricsServiceImpl
 	}
 
 	public String getPath() {
-	    return bdf.getPath();
+	    return RSSUtils.pathToString(bdf.getDescription());
 	}
     }
 
@@ -162,8 +164,13 @@ public class RSSMetricsServiceImpl
 	// Make a ServiceBroker available to AgentDS and HostDS.
 	properties.put("ServiceBroker", sb);
 
-	RSSUtils.registerPackage("org.cougaar.core.qos.rss");
-	RSSUtils.registerPackage("org.cougaar.core.qos.gossip");
+	// register local contexts
+	AgentDS.register();
+	AgentFlowDS.register();
+	DestinationDS.register();
+	NodeDS.register();
+	ServiceDS.register();
+	org.cougaar.core.qos.gossip.GossipIntegraterDS.register();
 
 	// Make a Timer available to RSS and TEC
 	CougaarTimer timer = new CougaarTimer(sb);
@@ -277,9 +284,13 @@ public class RSSMetricsServiceImpl
 	    bdf = (BoundDataFormula) bdfCache.get(path);
 	    if (bdf == null) {
 		try { 
-		    bdf = new BoundDataFormula(path);	
+		    ResourceNode[] path_spec = PathParser.parsePath(path);
+		    bdf = new BoundDataFormula(path_spec);	
 		} 
-		catch (com.bbn.quo.data.NullFormulaException ex) {
+		catch (com.bbn.rss.NullFormulaException ex) {
+		    return null;
+		}
+		catch (com.bbn.ResourceStatus.ResourceDescriptionParseException ex) {
 		    return null;
 		}
 		bdfCache.put(path, bdf);
@@ -334,11 +345,15 @@ public class RSSMetricsServiceImpl
 		qualifier == null ? null : new Qualifier(qualifier);
 	    // Defer the formula creation, since it might result in a
 	    // 'dns' lookup.
-	    BoundDataFormula bdf = new BoundDataFormula(path, true, qual);
+	    ResourceNode[] path_spec = PathParser.parsePath(path);
+	    BoundDataFormula bdf = new BoundDataFormula(path_spec, true, qual);
 	    Runnable binder = bdf.getDelayedFormulaCreator();
 	    subscriptionQueue.add(binder);
 	    return new DataValueObserver(observer, bdf);
-	} catch (com.bbn.quo.data.NullFormulaException ex) {
+	} catch (com.bbn.rss.NullFormulaException ex) {
+	    loggingService.error(path+ " is not valid");
+	    return null;
+	} catch (com.bbn.ResourceStatus.ResourceDescriptionParseException ex) {
 	    loggingService.error(path+ " is not valid");
 	    return null;
 	}

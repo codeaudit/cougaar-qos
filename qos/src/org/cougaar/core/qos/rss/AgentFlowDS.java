@@ -28,23 +28,50 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.qos.metrics.Constants;
 
-import com.bbn.quo.data.DataFormula;
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.DataScopeSpec;
-import com.bbn.quo.data.DataValue;
-import com.bbn.quo.data.RSS;
+import com.bbn.rss.AbstractContextInstantiater;
+import com.bbn.rss.ContextInstantiater;
+import com.bbn.rss.DataFormula;
+import com.bbn.rss.DataValue;
+import com.bbn.rss.RSS;
+import com.bbn.rss.ResourceContext;
+import com.bbn.ResourceStatus.ResourceNode;
 
 
 public class AgentFlowDS 
     extends CougaarDS 
 {
+
+    static void register()
+    {
+	ContextInstantiater cinst = new AbstractContextInstantiater() {
+		public ResourceContext instantiateContext(String[] parameters, 
+							  ResourceContext parent)
+		    throws ParameterError
+		{
+		    return new AgentFlowDS(parameters, parent);
+		}
+
+		public Object identifyParameters(String[] parameters) 
+		{
+		    if (parameters == null || parameters.length != 1) 
+			return null;
+		    String src = (String) parameters[0];
+		    String dst = (String) parameters[1];
+		    return src +"->"+ dst;
+		}		
+
+		
+	    };
+	registerContextInstantiater("AgentFlow", cinst);
+    }
+
     private static final String SOURCE_AGENT = "sourceAgent".intern();
     private static final String DESTINATION_AGENT = "destinationAgent".intern();
     private static final DataValue NO_VALUE = DataValue.NO_VALUE;
 
 
-    public AgentFlowDS(Object[] parameters, DataScope parent) 
-	throws DataScope.ParameterError
+    public AgentFlowDS(String[] parameters, ResourceContext parent) 
+	throws ParameterError
     {
 	super(parameters, parent);
     }
@@ -58,114 +85,46 @@ public class AgentFlowDS
     //Source and Destination hosts as perents in order to predict serialization cost
     // The Flow Layering needs new Modeling primitives TBD later.
     //JAZ Standalone for now
-    protected DataScope preferredParent(RSS root) {
+    protected ResourceContext preferredParent(RSS root) {
 	return root;
     }
 
     // Two Parameter which are Agent Names
-    protected void verifyParameters(Object[] parameters) 
-	throws DataScope.ParameterError
+    protected void verifyParameters(String[] parameters) 
+	throws ParameterError
     {
+	String source = null;
+	String destination = null;
 	if (parameters == null || parameters.length != 2) {
-	    throw new DataScope.ParameterError("AgentFlowDS: wrong number of parameters");
+	    throw new ParameterError("AgentFlowDS: wrong number of parameters");
 	}
 	if (!(parameters[0] instanceof String)) {
-	    throw new DataScope.ParameterError("AgentFlowDS: wrong parameter 1 type");
+	    throw new ParameterError("AgentFlowDS: wrong parameter 1 type");
 	} else {
-	    String source = (String) parameters[0];
+	    source = (String) parameters[0];
 	    bindSymbolValue(SOURCE_AGENT, source);
 	}
 	if (!(parameters[1] instanceof String)) {
-	    throw new DataScope.ParameterError("AgentFlowDS: wrong parameter 2 type");
+	    throw new ParameterError("AgentFlowDS: wrong parameter 2 type");
 	} else {
-	    String destination = (String) parameters[1];
+	    destination = (String) parameters[1];
 	    bindSymbolValue(DESTINATION_AGENT, destination);
+	    historyPrefix = "AgentFlow" +KEY_SEPR+ 
+		source  +KEY_SEPR+ 
+		destination;
 	}
     }
 
-    abstract static class Formula 
-	extends DataFormula
+
+    protected DataFormula instantiateFormula(String kind)
     {
-
-	abstract String getKey();
-	
-	protected DataValue defaultValue() {
-	    return NO_VALUE;
+	if (kind.equals(Constants.MSG_RATE) ||
+	    kind.equals(Constants.BYTE_RATE)) {
+	    return new DecayingHistoryFormula(historyPrefix, kind);
+	} else {
+	    return null;
 	}
-
-	protected void initialize(DataScope scope) {
-	    super.initialize(scope);
-	    String sourceAgent = (String) scope.getValue(SOURCE_AGENT);
-	    String destinationAgent = (String) scope.getValue(DESTINATION_AGENT);
-	    String key = "AgentFlow" +KEY_SEPR+ 
-		sourceAgent  +KEY_SEPR+ 
-		destinationAgent +KEY_SEPR+ 
-		getKey();
-
-	    Object[] parameters = { key };
-	    DataScopeSpec spec = new DataScopeSpec("com.bbn.quo.data.IntegraterDS", 
-						   parameters);
-	    DataScope dependency = RSS.instance().getDataScope(spec);
-	    registerDependency(dependency, "Formula");
-	}
-
-	protected DataValue doCalculation(DataFormula.Values values) {
-	    DataValue computedValue = values.get("Formula");
-	    DataValue defaultValue = defaultValue();
-	    return DataValue.mostCredible(computedValue, defaultValue);
-	}
-
     }
-
-
-    public static class MsgRate1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_RATE_1_SEC_AVG;
-	}
-    }	
-
-    public static class MsgRate10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_RATE_10_SEC_AVG;
-	}
-    }	
-
-    public static class MsgRate100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_RATE_100_SEC_AVG;
-	}
-    }	
-
-    public static class MsgRate1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.MSG_RATE_1000_SEC_AVG;
-	}
-    }	
-
-
-    public static class ByteRate1SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTE_RATE_1_SEC_AVG;
-	}
-    }	
-
-    public static class ByteRate10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTE_RATE_10_SEC_AVG;
-	}
-    }	
-
-    public static class ByteRate100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTE_RATE_100_SEC_AVG;
-	}
-    }	
-
-    public static class ByteRate1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.BYTE_RATE_1000_SEC_AVG;
-	}
-    }	
 
 
 }
