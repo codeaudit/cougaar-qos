@@ -5,15 +5,13 @@ cougaar=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_SRC_PATH}/util/newutil.ja
 qos=${COUGAAR_SRC_PATH}/qos/newqos.jar
 src=$(shell find .  -name "*.java")
 thirdparty=dev/3rdparty
-depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoRSS.jar:$(thirdparty)/QuoInstr.jar:$(thirdparty)/UnixUtils.jar:$(thirdparty)/instrumentation.jar:$(thirdparty)/jacorb.jar
+depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoRSS.jar:$(thirdparty)/jacorb.jar
 
-pkg=org.cougaar.lib.quo
-pathdir=org/cougaar/lib/quo
+
+# for rmic
+pathdir=org/cougaar/lib/mquo
 srcdir=src/$(pathdir)
 
-stub_file=$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object_Stub.java
-rmic_file=$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object.java
-rmic_class=$(pkg).MTInstrumentedInstrumentedServerDelegate_object
 
 CLASSPATH=$(cougaar):$(qos):$(depends):$(classes)
 export CLASSPATH
@@ -38,14 +36,15 @@ gen:
 
 
 
-#$(stub_file): $(rmic_file)
-#	javac  -d $(classes) $(rmic_file)
-#	rmic $(rmic_class) -d $(classes) -keep
-#	mv $(classes)/$(pathdir)/*.java $(srcdir)
+
+$(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
+	javac -d . $(srcdir)/MetricSCTie.java
+	rmic -d . -keep org.cougaar.lib.mquo.MetricSCTie
+	mv $(pathdir)/*.java $(srcdir)
+
 
 $(jar): $(src) 
 	javac  -d $(classes) $(src)
-#	rmic -d $(classes)  org.cougaar.lib.mquo.ZippyTestServerImpl
 	jar cf $(jar) -C $(classes) .
 
 
