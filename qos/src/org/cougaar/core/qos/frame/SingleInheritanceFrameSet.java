@@ -129,20 +129,6 @@ public class SingleInheritanceFrameSet
 	checkForPendingParentage(); // yuch
     }
 
-    private Frame getParent(Frame frame)
-    {
-	synchronized (parents) {
-	    return (Frame) parents.get(frame);
-	}
-    }
-
-    private Frame getPrototype(Frame frame)
-    {
-	synchronized (prototypes) {
-	    return (Frame) prototypes.get(frame.getKind());
-	}
-    }
-
     private void checkForPendingParentage()
     {
 	synchronized (pendingParentage) {
@@ -244,24 +230,7 @@ public class SingleInheritanceFrameSet
 	return null;
     }
 
-    public Object getFrameValue(Frame frame, String attribute)
-    {
-	Object result = frame.getValue(attribute);
-	if (result != null) return result;
-	Frame parent = getParent(frame);
-	if (parent != null) {
-	    result = getFrameValue(parent, attribute);
-	    if (result != null) return result;
-	}
-	Frame prototype = getPrototype(frame);
-	if (prototype != null) {
-	    return getFrameValue(prototype, attribute);
-	}
-
-	return null;
-    }
-
-    public void setFrameValue(Frame frame, String attribute, Object value)
+    public void valueUpdated(Frame frame, String attribute, Object value)
     {
 	frame.setValue(attribute, value);
 
@@ -279,7 +248,7 @@ public class SingleInheritanceFrameSet
     public Frame makeFrame(String kind, Properties values)
     {
 	UID uid = uids.nextUID();
-	Frame frame = new Frame(kind, uid, values);
+	Frame frame = new Frame(this, kind, uid, values);
 
 	if (kind.equals(parent_relation)) establishParentage(frame);
 
@@ -294,7 +263,7 @@ public class SingleInheritanceFrameSet
     public Frame makePrototype(String kind, Properties values)
     {
 	UID uid = uids.nextUID();
-	Frame frame = new Frame(PROTOTYPE, uid, values);
+	Frame frame = new Frame(this, PROTOTYPE, uid, values);
 	synchronized (prototypes) { prototypes.put(kind, frame); }
 	addFrame(frame);
 	if (bbs != null) bbs.publishAdd(frame);
@@ -317,6 +286,20 @@ public class SingleInheritanceFrameSet
 	    disestablishParentage(frame);
 
 	if (bbs != null) bbs.publishRemove(frame);
+    }
+
+    public Frame getParent(Frame frame)
+    {
+	synchronized (parents) {
+	    return (Frame) parents.get(frame);
+	}
+    }
+
+    public Frame getPrototype(Frame frame)
+    {
+	synchronized (prototypes) {
+	    return (Frame) prototypes.get(frame.getKind());
+	}
     }
 
 

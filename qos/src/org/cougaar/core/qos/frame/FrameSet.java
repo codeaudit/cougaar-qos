@@ -36,14 +36,15 @@ public interface FrameSet
 
     public Frame findFrame(UID uid);
 
-    public Object getFrameValue(Frame frame, String attribute);
-
-    public void setFrameValue(Frame frame, String attribute, Object value);
-
     public Frame makeFrame(String kind, Properties attributes);
 
     public Frame makePrototype(String kind, Properties properties);
 
     public void removeFrame(Frame frame);
 
+    public Frame getParent(Frame frame);
+
+    public Frame getPrototype(Frame frame);
+
+    public void valueUpdated(Frame frame, String attribute, Object value);
 }

@@ -39,9 +39,11 @@ public final class Frame
     private final UID uid;
     private final String kind;
     private VisibleProperties properties;
+    private transient FrameSet frameSet;
 
-    Frame(String kind, UID uid, Properties properties)
+    Frame(FrameSet frameSet, String kind, UID uid, Properties properties)
     {
+	this.frameSet = frameSet;
 	this.uid = uid;
 	this.kind = kind;
 	this.properties = new VisibleProperties(properties);
@@ -66,18 +68,36 @@ public final class Frame
 	return properties;
     }
 
+
+    FrameSet getFrameSet()
+    {
+	return frameSet;
+    }
+
     // These should only be called from the FrameSet owning the
     // frame. 
 
-    void setValue(String attribute, Object object)
+    public void setValue(String attribute, Object object)
     {
 	properties.put(attribute, object);
+	frameSet.valueUpdated(this, attribute, object);
     }
 
 
-    Object getValue(String attribute)
+    public Object getValue(String attribute)
     {
-	return properties.get(attribute);
+	Object result = properties.get(attribute);
+	if (result != null) return result;
+	Frame parent = frameSet.getParent(this);
+	if (parent != null) {
+	    result = parent.getValue(attribute);
+	    if (result != null) return result;
+	}
+	Frame prototype = frameSet.getPrototype(this);
+	if (prototype != null) {
+	    return prototype.getValue(attribute);
+	}
+	return null;
     }
     
 
