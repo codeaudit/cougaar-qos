@@ -121,16 +121,14 @@ public class CoordinationArtifactBrokerPlugin
 	public void requestFacet(ConnectionSpec spec,
 				 RolePlayer rolePlayer)
 	{
-	    if (!findFacet(spec, rolePlayer)) {
-		// assume one queued request per player
-		synchronized (pendingRequests) {
-		    if (log.isDebugEnabled())
-			log.debug("Pending request for "
-				  +spec.ca_kind+ " "
-				  +spec.role);
-		    pendingRequests.put(rolePlayer, spec);
-		    requestsThread.start();
-		}
+	    // assume one queued request per player
+	    synchronized (pendingRequests) {
+		if (log.isDebugEnabled())
+		    log.debug("Pending request for "
+			      +spec.ca_kind+ " "
+			      +spec.role);
+		pendingRequests.put(rolePlayer, spec);
+		requestsThread.start();
 	    }
 	}
 
