@@ -67,32 +67,6 @@ public class RSSMetricsServiceImpl
 
     // Setup name->class mappings
 
-    static {
-	DataScopeSpec.defineNameToClass("Node",
-					org.cougaar.core.qos.rss.NodeDS.class);
-	DataScopeSpec.defineNameToClass("node", 
-					org.cougaar.core.qos.rss.NodeDS.class);
-	DataScopeSpec.defineNameToClass("NODE", 
-					org.cougaar.core.qos.rss.NodeDS.class);
-	DataScopeSpec.defineNameToClass("Agent",
-					org.cougaar.core.qos.rss.AgentDS.class);
-	DataScopeSpec.defineNameToClass("agent", 
-					org.cougaar.core.qos.rss.AgentDS.class);
-	DataScopeSpec.defineNameToClass("AGENT", 
-					org.cougaar.core.qos.rss.AgentDS.class);
-	DataScopeSpec.defineNameToClass("Service",
-					org.cougaar.core.qos.rss.ServiceDS.class);
-	DataScopeSpec.defineNameToClass("service", 
-					org.cougaar.core.qos.rss.ServiceDS.class);
-	DataScopeSpec.defineNameToClass("SERVICE", 
-					org.cougaar.core.qos.rss.ServiceDS.class);
-	DataScopeSpec.defineNameToClass("Destination",
-					org.cougaar.core.qos.rss.DestinationDS.class);
-	DataScopeSpec.defineNameToClass("destination", 
-					org.cougaar.core.qos.rss.DestinationDS.class);
-	DataScopeSpec.defineNameToClass("DESTINATION", 
-					org.cougaar.core.qos.rss.DestinationDS.class);
-    }
 
 
     private static final String RSS_PROPERTIES =
@@ -189,6 +163,8 @@ public class RSSMetricsServiceImpl
 
 	// Make a ServiceBroker available to AgentDS and HostDS.
 	properties.put("ServiceBroker", sb);
+
+	RSSUtils.addClassPackage("org.cougaar.core.qos.rss.");
 
 	// Make a Timer available to RSS and TEC
 	Timer timer = new CougaarTimer(sb);
