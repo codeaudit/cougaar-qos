@@ -57,6 +57,12 @@ public final class Frame
 
     // These should only be called from the FrameSet owning the
     // frame. 
+
+    Properties cloneValues()
+    {
+	return new Properties(properties);
+    }
+
     void setValue(String attribute, Object object)
     {
 	properties.put(attribute, object);

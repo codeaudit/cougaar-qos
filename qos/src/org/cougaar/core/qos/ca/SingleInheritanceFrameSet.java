@@ -121,6 +121,13 @@ public class SingleInheritanceFrameSet
 	if (bbs != null) bbs.publishChange(frame);
     }
 
+    public Frame makeFrame(Frame frame)
+    {
+	String kind = frame.getKind();
+	Properties values = frame.cloneValues();
+	return makeFrame(kind, values);
+    }
+
     public Frame makeFrame(String kind, Properties values)
     {
 	UID uid = uids.nextUID();
