@@ -24,7 +24,8 @@ society.each_node do |node|
     node.override_parameter("-Dorg.cougaar.core.persistence.enable","false")
     node.override_parameter("-Dorg.cougaar.core.persistence.clear","false")
 
-
+    # Disable the "LDMDomain.ini"
+    node.override_parameter("-Dorg.cougaar.core.domain.config.filename","")
     
     # Add start time/timezone if startTime parameter is not present
     start_time = nil
