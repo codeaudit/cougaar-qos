@@ -85,37 +85,9 @@ public class SaxParser
 
     private static class FrameSetSpec
     {
-	String relation_name;
-	String parent_kind;
-	String parent_slot;
-	String parent_value;
-	String child_kind;
-	String child_slot;
-	String child_value;
-
-	FrameSetSpec(String relation_name)
-	{
-	    this.relation_name = relation_name;
-	}
-
-	FrameSet makeFrameSet(ServiceBroker sb,
-			      BlackboardService bbs)
-	{
-	    return new SingleInheritanceFrameSet(sb, bbs,
-						 relation_name,
-						 parent_kind,
-						 parent_slot,
-						 parent_value,
-						 child_kind,
-						 child_slot,
-						 child_value
-						 );
-	}
-
     }
 
     private FrameSet frame_set;
-    private FrameSetSpec frame_set_spec;
     private FrameSpec frame_spec;
 
     private ServiceBroker sb;
@@ -157,12 +129,6 @@ public class SaxParser
     {
 	if (name.equals("frameset")) {
 	    startFrameset(attrs);
-	} else if (name.equals("parent-relation")) {
-	    startParentRelation(attrs);
-	} else if (name.equals("parent")) {
-	    parent(attrs);
-	} else if (name.equals("child")) {
-	    child(attrs);
 	} else if (name.equals("prototypes")) {
 	    // no-op
 	} else if (name.equals("prototype")) {
@@ -180,10 +146,12 @@ public class SaxParser
     {
 	if (name.equals("frameset")) {
 	    endFrameset();
-	} else if (name.equals("parent-relation")) {
-	    endParentRelation();
+	} else if (name.equals("prototypes")) {
+	    // no-op
 	} else if (name.equals("prototype")) {
 	    endPrototype();
+	} else if (name.equals("frames")) {
+	    // no-op
 	} else if (name.equals("frame")) {
 	    endFrame();
 	} 
@@ -199,31 +167,27 @@ public class SaxParser
 
     private void startFrameset(Attributes attrs)
     {
-    }
+	String kind = attrs.getValue("kind");
+	if (!kind.equals("single-inheritance")) {
+	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
+	}
 
-    private void startParentRelation(Attributes attrs)
-    {
-	frame_set_spec = new FrameSetSpec(attrs.getValue("name"));
-    }
+	String relation_name = attrs.getValue("parent-relation");
+	String parent_kind = attrs.getValue("parent-kind");
+	String parent_slot = attrs.getValue("parent-slot");
+	String parent_value = attrs.getValue("parent-value");
+	String child_kind = attrs.getValue("child-kind");
+	String child_slot = attrs.getValue("child-slot");
+	String child_value = attrs.getValue("child-value");
 
-    private void parent(Attributes attrs)
-    {
-	frame_set_spec.parent_kind = attrs.getValue("kind");
-	frame_set_spec.parent_slot = attrs.getValue("slot");
-	frame_set_spec.parent_value = attrs.getValue("value");
-    }
-
-    private void child(Attributes attrs)
-    {
-	frame_set_spec.child_kind = attrs.getValue("kind");
-	frame_set_spec.child_slot = attrs.getValue("slot");
-	frame_set_spec.child_value = attrs.getValue("value");
-    }
-
-    private void endParentRelation()
-    {
-	frame_set = frame_set_spec.makeFrameSet(sb, bbs);
-	frame_set_spec = null;
+	frame_set = new SingleInheritanceFrameSet(sb, bbs,
+						  relation_name,
+						  parent_kind,
+						  parent_slot,
+						  parent_value,
+						  child_kind,
+						  child_slot,
+						  child_value);
     }
 
 
