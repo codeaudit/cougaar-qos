@@ -33,7 +33,7 @@ import org.cougaar.core.service.BlackboardService;
 public interface FrameSetService extends Service
 {
     public interface Callback {
-	public void frameSetAvailable(String xml_filename, FrameSet set);
+	public void frameSetAvailable(String name, FrameSet set);
     }
 
     public FrameSet findFrameSet(String name, Callback callback);
