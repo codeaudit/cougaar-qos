@@ -124,6 +124,8 @@ public class CoordinationArtifactBrokerPlugin
     // plugin
     protected void execute()
     {
+	if (localTemplates == null) return;
+
 	synchronized (localTemplates) {
 	    CoordinationArtifactTemplateImpl template;
 	    for (int i=0; i<localTemplates.size(); i++) {
