@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#Debug
+#debug=" -Dorg.cougaar.message.transport.debug=service,comm"
+
+#logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_SRC_PATH/quo/bin/props/cougaar/logging.props
+
+
+#Compression only
+#COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.CompressingStreamsAspect -Dcompression-level=2"
+
+#Checksum only
+#COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.ChecksumStreamsAspect"
+
+# Combined Compression and checksum
+# THIS DOES NOT WORK, compression must be the last stream filtering aspect
+#COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.CompressingStreamsAspect,org.cougaar.core.mts.ChecksumStreamsAspect -Dcompression-level=2 -Dorg.cougaar.message.transport.debug=service,comm $logging"
+
+
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.ChecksumStreamsAspect,org.cougaar.core.mts.CompressingStreamsAspect -Dcompression-level=2"
+
+
+export COUGAAR_JAVA_ARGS
+
+
+exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
