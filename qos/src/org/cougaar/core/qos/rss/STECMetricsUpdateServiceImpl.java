@@ -32,6 +32,7 @@ import org.cougaar.core.service.ThreadService;
 
 import com.bbn.quo.event.Connector;
 import com.bbn.quo.event.status.StatusTEC;
+import com.bbn.quo.event.sysstat.StatusSupplierSysStat;
 import com.bbn.quo.event.topology.TopologyRing;
 
 import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
@@ -46,6 +47,8 @@ public class STECMetricsUpdateServiceImpl
     implements MetricsUpdateService
 {
     private static final String RSS_DIR = "RSS";
+    private static final String TOPOLOGY_IORFILE_PROPERTY = 
+	"org.cougaar.metrics.topology.iorfile";
     
     private ServiceBroker sb;
     private STECSender sender;
@@ -66,11 +69,18 @@ public class STECMetricsUpdateServiceImpl
 
 	sender = new STECSender(channel, Connector.poa());
 
-	Heartbeater beater = new Heartbeater(sender);
-	ThreadService threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
-	TimerTask task = threadService.getTimerTask(this, beater, "Beater");
-	threadService.schedule(task, 0, 1000);
+	StatusSupplierSysStat sysstat =
+	    new StatusSupplierSysStat(channel, 1000);
+	Thread sysstatThread = new Thread(sysstat, "SysStat");
+	sysstatThread.start();
+
+	// The SysStat thread does it own heartbeat
+
+//  	Heartbeater beater = new Heartbeater(sender);
+//  	ThreadService threadService = (ThreadService)
+//  	    sb.getService(this, ThreadService.class, null);
+//  	TimerTask task = threadService.getTimerTask(this, beater, "Beater");
+//  	threadService.schedule(task, 0, 1000);
 
     }
 
@@ -152,8 +162,8 @@ public class STECMetricsUpdateServiceImpl
 	ior = Connector.orb().object_to_string(mgr._this());
 	String real_ior = (String) grabKey(key, ior);
 	if (real_ior == ior) {
-	    // System.err.println("Running TopologyManager " +ior);
-	    mgr.start(null);
+	    String iorfile = System.getProperty(TOPOLOGY_IORFILE_PROPERTY);
+	    mgr.start(iorfile);
 	} else {
 	    // System.out.println("Found TopologyManager " +real_ior);
 	}
