@@ -26,6 +26,7 @@ public class RemoteSSLQosketImpl
 {
 
     private static String local_host;
+    private static Timer timer = new Timer(true);
 
     static {
 	try {
@@ -38,7 +39,6 @@ public class RemoteSSLQosketImpl
     private DestinationLink link;
     private ResourceMonitorService rms;
     private QosMonitorService qms;
-    private Timer timer = new Timer(true);
 
 
     public void setDestinationLink(DestinationLink link) {

@@ -7,7 +7,7 @@ include include.mk
 
 idl=$(src)/$(srcdir)/MT.java
 
-all: $(idl) gen thirdparty
+all: $(idl) gen thirdparty links
 
 thirdparty:
 	cd 3rdparty; make
@@ -18,6 +18,8 @@ $(idl): idl/MT.idl
 gen:
 	cd qdl; make
 
+links:
+	cd bin; make
 
 
 

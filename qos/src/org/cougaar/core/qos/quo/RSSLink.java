@@ -20,6 +20,9 @@
  */
 package org.cougaar.core.qos.quo;
 
+import com.bbn.quo.rmi.ExpectedMaxJipsSC;
+import com.bbn.quo.rmi.QuoKernel;
+import com.bbn.quo.rmi.SysCond;
 import com.bbn.quo.data.BoundDataFormula;
 import com.bbn.quo.data.DataFormula;
 import com.bbn.quo.data.DataScopeSpec;
@@ -33,19 +36,110 @@ import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
 
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Observable;
+
 
 public class RSSLink extends ResourceMonitorServiceImpl
 {
     private static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
+    private static final int PERIOD = 5000;
+
+    private Timer timer = new Timer(true);
     private RSS rss;
+    private QuoKernel kernel;
+    private HashMap updaters = new HashMap();
+    private HashMap jipsSysconds = new HashMap();
     
+
+    interface AgentHostUpdaterListener {
+	void newHost(String host);
+    }
+
+    private class JipsSyscondListener implements AgentHostUpdaterListener {
+	private ExpectedMaxJipsSC syscond;
+
+	JipsSyscondListener(ExpectedMaxJipsSC syscond, MessageAddress address)
+	{
+	    this.syscond = syscond;
+	    getUpdater(address).addListener(this);
+	}
+
+	public void newHost(String host) {
+	    try {
+		syscond.setHost(host);
+	    } catch (java.rmi.RemoteException remote_ex) {
+		remote_ex.printStackTrace();
+	    }
+	}
+    }
+
+    private class AgentHostUpdater 
+	extends TimerTask 
+    {
+	private MessageAddress agent;
+	private String host;
+	private ArrayList listeners;
+
+	AgentHostUpdater(MessageAddress agent) {
+	    this.agent = agent;
+	}
+
+	public void addListener(AgentHostUpdaterListener listener) {
+	    listeners.add(listener);
+	    if (host != null) listener.newHost(host);
+	}
+
+	public void removeListener(AgentHostUpdaterListener listener) {
+	    listeners.remove(listener);
+	}
+
+	public void run() {
+	    String new_host = getHostForAgent(agent);
+	    if (new_host == null) return;
+	    if (host == null || !host.equals(new_host)) {
+		host = new_host;
+		System.out.println("===== New host " + host +
+				   " for agent " + agent);
+		Iterator itr = listeners.iterator();
+		while (itr.hasNext()) {
+		    AgentHostUpdaterListener listener =
+			(AgentHostUpdaterListener) itr.next();
+		    listener.newHost(host);
+		}
+	    }
+	}
+    }
+
+	    
     public RSSLink(NameSupport nameSupport, ServiceBroker sb) {
 	super(nameSupport, sb);
 	String propfile = System.getProperty(RSS_PROPFILE);
 	rss = RSS.makeInstance(propfile);
+	kernel = Utils.getKernel();
+	if (Boolean.getBoolean("org.cougaar.lib.quo.kernel.gui")) {
+	    try {
+		kernel.newFrame();
+	    } catch (java.rmi.RemoteException ex) {
+		ex.printStackTrace();
+	    }
+	}
     }
 
+
+    private synchronized AgentHostUpdater getUpdater(MessageAddress address) {
+	AgentHostUpdater updater = (AgentHostUpdater) updaters.get(address);
+	if (updater == null) {
+	    updater = new AgentHostUpdater(address);
+	    updaters.put(address, updater);
+	    timer.schedule(updater, 0, PERIOD);
+	}
+	return updater;
+    }
 
     private DataFormula jips(MessageAddress agentAddress) {
 	String host = getHostForAgent(agentAddress);
@@ -75,6 +169,30 @@ public class RSSLink extends ResourceMonitorServiceImpl
 	    return null;
 	}
     }
-  
+
+    private ExpectedMaxJipsSC makeJipsSyscond(MessageAddress address) {
+	try {
+	    SysCond syscond = 
+		kernel.bindSysCond(address + "MaxJips",
+				   "com.bbn.quo.rmi.ExpectedMaxJipsSC",
+				   "com.bbn.quo.data.ExpectedMaxJipsSCImpl");
+	    return (ExpectedMaxJipsSC) syscond;
+	} catch (java.rmi.RemoteException ex) {
+	    ex.printStackTrace();
+	    return null;
+	}
+    }
+
+    public Object getJipsForAgentSyscond(MessageAddress address) {
+	ExpectedMaxJipsSC syscond = 
+	    (ExpectedMaxJipsSC)jipsSysconds.get(address);
+	if (syscond == null) {
+	    syscond = makeJipsSyscond(address);
+	    JipsSyscondListener syscondListener = 
+		new JipsSyscondListener(syscond,address);
+	    jipsSysconds.put(address, syscond);
+	}
+	return syscond;
+    }
 
 }

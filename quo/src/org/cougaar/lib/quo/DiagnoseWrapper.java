@@ -8,6 +8,8 @@ package org.cougaar.lib.quo;
 
 import java.rmi.Naming;
 
+import org.cougaar.core.qos.quo.Utils;
+
 import org.cougaar.core.mts.MT;
 import com.bbn.quo.rmi.QuoKernel;
 

@@ -17,10 +17,13 @@ package org.cougaar.lib.quo;
 
 import com.bbn.quo.rmi.QuoKernel;
 
+import org.cougaar.core.qos.quo.Utils;
+
 import org.cougaar.core.mts.DestinationLink;
 import org.cougaar.core.mts.SSLRMILinkProtocol;
 import org.cougaar.core.mts.StandardAspect;
 import org.cougaar.core.society.Message;
+import org.cougaar.core.society.TrustStatusService;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
 import org.cougaar.core.qos.monitor.QosMonitorService;
@@ -30,6 +33,8 @@ public class RemoteSSLAspect extends StandardAspect
 {
     private ResourceMonitorService rms;
     private QosMonitorService qms;
+    private TrustStatusService tss;
+
     public Object getDelegate(Object delegate, Class type) 
     {
 	if (type == DestinationLink.class) {
@@ -57,6 +62,18 @@ public class RemoteSSLAspect extends StandardAspect
 		System.out.println("%%% Got ResourceMonitorService!");
 	    }
 	}
+
+	if (tss == null) {
+	    Object svc = 
+		sb.getService(this, TrustStatusService.class, null);
+	    if (svc == null) {
+		System.err.println("### Can't find TrustStatusService");
+	    } else {
+		tss = (TrustStatusService) svc;
+		System.out.println("%%% Got TrustStatusService!");
+	    }
+	}
+
 	if (qms == null) {
 
 	    Object svc = sb.getService(this, QosMonitorService.class, null);

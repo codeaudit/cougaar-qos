@@ -2,6 +2,7 @@ classes=.classes
 jar=newquo.jar
 #cougaar=${COUGAAR_INSTALL_PATH}/lib/core.jar
 cougaar=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
+qos=${COUGAAR_SRC_PATH}/qos/src/org/cougaar/core/qos.jar
 src=$(shell find .  -name "*.java")
 thirdparty=../dev/3rdparty
 depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoInstr.jar:$(thirdparty)/UnixUtils.jar:$(thirdparty)/instrumentation.jar:$(thirdparty)/jacorb.jar
@@ -13,7 +14,7 @@ rmic_class=$(pkg).MTInstrumentedInstrumentedServerDelegate_object
 rmic_classfile=$(classes)/$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object.class
 rmic_javafile=$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object.java
 
-CLASSPATH=$(cougaar):$(depends)
+CLASSPATH=$(cougaar):${qos}:$(depends)
 export CLASSPATH
 
 

@@ -8,14 +8,16 @@ LINKS += SSLNode
 LINKS += CorbaNode
 LINKS += ComboNode
 LINKS += FutileNode
+LINKS += MulticastNode
 LINKS += NoisyNode
+LINKS += RemoteSSLNode
 LINKS += SecureNode
 LINKS += SeqNode
 LINKS += SerializeNode
 LINKS += SimpleNode
 LINKS += StatNode
 LINKS += TraceNode
-LINKS += RemoteSSLNode
+
 
 install: $(LINKS)
 
@@ -36,6 +38,9 @@ ComboNode:
 
 FutileNode:
 	ln -s wrapper FutileNode
+
+MulticastNode:
+	ln -s wrapper MulticastNode
 
 NoisyNode:
 	ln -s wrapper NoisyNode
