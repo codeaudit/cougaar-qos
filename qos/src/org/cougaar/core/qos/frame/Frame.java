@@ -69,12 +69,12 @@ public class Frame
 	return frameSet.descendsFrom(this, kind);
     }
 
-    public Frame getRelationshipParent()
+    public Frame relationshipParent()
     {
 	return frameSet.getRelationshipParent(this);
     }
 
-    public Frame getRelationshipChild()
+    public Frame relationshipChild()
     {
 	return frameSet.getRelationshipChild(this);
     }

@@ -152,6 +152,7 @@ public class SingleInheritanceFrameSet
 		if (slot == null) {
 		    log.warn("Relationship " +relationship+
 			     " has no value for " +slot_slot);
+		    Thread.dumpStack();
 		}
 		if (proto == null) {
 		    log.warn("Relationship " +relationship+
