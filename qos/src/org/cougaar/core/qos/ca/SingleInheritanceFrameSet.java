@@ -26,9 +26,11 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
@@ -253,7 +255,10 @@ public class SingleInheritanceFrameSet
 
 	// Publish the frame itself as the change, or just a change
 	// record for the specific attribute?
-	if (bbs != null) bbs.publishChange(frame);
+	ArrayList changes = new ArrayList(1);
+	Change change = new Change(attribute, value);
+	changes.add(change);
+	if (bbs != null) bbs.publishChange(frame, changes);
     }
 
     public void replaceFrame(Frame frame)
@@ -267,6 +272,7 @@ public class SingleInheritanceFrameSet
 		old.mergeValues(frame);
 		if (log.isInfoEnabled())
 		    log.info("Replacing frame " +old+ " with " +frame);
+		// publish changes!
 	    } else {
 		addFrame(frame);
 		if (bbs != null) bbs.publishAdd(frame);
