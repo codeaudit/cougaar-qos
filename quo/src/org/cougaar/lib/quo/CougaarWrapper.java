@@ -10,11 +10,7 @@ import org.cougaar.core.mts.MT;
 
 interface CougaarWrapper
 {
-    public void connect(MT server,
-			MTInstrumented delegate,
-			String kernelURL,
-			boolean kernelIntegrated,
-			boolean kernelGui) 
+    public void connect(MT server, MTInstrumented delegate) 
 	throws java.rmi.RemoteException;
 }
 

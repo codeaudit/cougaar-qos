@@ -111,15 +111,8 @@ public class QuoProxyAspect extends StandardAspect
 	    if (remote instanceof QuoProxy) {
 		QuoProxy quo_proxy = (QuoProxy) remote;
 		CougaarWrapper wrapper = makeClientAdapter();
-		boolean kgui = 
-		    Boolean.getBoolean("org.cougaar.lib.quo.kernel.gui");
 		if (wrapper != null) {
-		    wrapper.connect(quo_proxy.mt, 
-				    quo_proxy.mti,
-				    null,   // ClientKernelURL,
-				    true,   // kernel integration
-				    kgui
-				    );
+		    wrapper.connect(quo_proxy.mt, quo_proxy.mti);
 		}
 		return (MT) wrapper;
 	    } else if (remote instanceof MT) {
