@@ -32,8 +32,8 @@ package org.cougaar.core.qos.ca;
 public class FactAssertion 
     extends FactRevision 
 {
-    FactAssertion(Fact fact, Facet facet) {
-	super(fact, facet);
+    FactAssertion(Fact fact) {
+	super(fact);
     }
 
 

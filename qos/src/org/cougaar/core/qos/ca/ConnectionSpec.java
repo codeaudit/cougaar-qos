@@ -41,7 +41,7 @@ public class ConnectionSpec
      * specific role for any particular Connection spec is given in
      * the 'role' instance variable.
     */
-    public String kind;
+    public String ca_kind;
 
     /**
      * The specific role for the given Coordination Artifact kind.
@@ -49,16 +49,25 @@ public class ConnectionSpec
     public String role;
 
     /**
-     * A plist which can distinguish the instances of the given
+     * A plist that can distinguish the instances of the given
      * Coordination Artifact kind from one another.
     */
-    public Properties parameters;
+    public Properties ca_parameters;
+
+    /**
+     * A plist includes all the instance-specific data for a
+     * particular Facet instance.
+    */
+    public Properties role_parameters;
 
 
-    public ConnectionSpec(String kind, Properties parameters, String role)
+    public ConnectionSpec(String ca_kind, Properties ca_parameters, 
+			  String role, Properties role_parameters)
+			  
     {
-	this.kind = kind;
-	this.parameters = parameters;
+	this.ca_kind = ca_kind;
+	this.ca_parameters = ca_parameters;
 	this.role = role;
+	this.role_parameters = role_parameters;
     }
 }

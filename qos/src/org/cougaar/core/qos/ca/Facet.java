@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.ca;
 
-
 /**
  * A Facet represents a linkage between a specific RolePlayer role and
  * an Coordination Artifact.  This is the player's only interface to

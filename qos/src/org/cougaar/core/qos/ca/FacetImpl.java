@@ -26,38 +26,103 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Observer;
+
 
 /**
  * Default implementation for the client Facet.
  */
-public class FacetImpl
-    implements Facet
+public class FacetImpl // should be abstract
+    implements Facet,  Observer
 {
     private RolePlayer player;
-    private String name;
+    private ConnectionSpec spec;
     private FacetProviderPlugin owner;
+    private SimpleQueue factQueue;
+
+    private static class SimpleQueue extends LinkedList {
+	Object next() {
+	    return removeFirst();
+	}
+    }
 
     protected FacetImpl(FacetProviderPlugin owner, 
-			String name, 
+			ConnectionSpec spec, 
 			RolePlayer player)
     {
 	this.player = player;
-	this.name = name;
+	this.spec = spec;
 	this.owner = owner;
+	// The factQueue consists of FactRevision instances
+	this.factQueue = new SimpleQueue();
     }
 
-    // Simple Pass Through implementation
 
-
-    public void assertFact(Fact fact) 
+    protected RolePlayer getPlayer()
     {
-	owner.assertFact(this, fact);
+	return player;
     }
+
+    // Remove this when this class becomes abstract
+    public void update(java.util.Observable obs, Object value)
+    {
+    }
+
+
+    protected void linkPlayer()
+    {
+	player.facetAvailable(spec, this);
+    }
+
+
+
+
+    protected boolean factsHaveChanged()
+    {
+	// TBD
+	return true;
+    }
+
+
+    // Artifact-specific Providers get at the new facts this way.
+    protected FactRevision nextFact()
+    {
+	synchronized (factQueue) {
+	    if (factQueue.isEmpty())
+		return null;
+	    else
+		return (FactRevision) factQueue.next();
+	}
+    }
+
+
+
+    private void addRevision(FactRevision entry)
+    {
+	synchronized (factQueue) {
+	    factQueue.add(entry);
+	}
+	owner.triggerExecute();
+    }
+
+
+    // The next two methods are up calls from facets.  The actual
+    // handling of facts runs in its own thread, associated with the
+    // queue.   See the two subsequent methods.
+    public void assertFact(Fact fact)
+    {
+	FactRevision entry = new FactAssertion(fact);
+	addRevision(entry);
+    }
+
 
     public void retractFact(Fact fact)
     {
-	owner.retractFact(this, fact);
+	FactRevision entry = new FactRetraction(fact);
+	addRevision(entry);
     }
 
-    
+
 }

@@ -27,18 +27,17 @@
 package org.cougaar.core.qos.ca;
 
 /**
- * This class represents a queued retraction of a Fact.
+ * A set of constants for the Query/Response Coordination Artifact:
+ * fact kinds, role names, fact attribute names.
  */
-public class FactRetraction extends FactRevision 
+public interface CoordArtConstants
 {
-    FactRetraction(Fact fact) {
-	super(fact);
-    }
- 
-    public boolean isAssertion()
-    {
-	return false;
-    }
+    public static final String QueryFact = "Query";
+    public static final String ResponseFact = "Response";
+    public static final String BufferedResponseFact = "BufferedResponse";
+    public static final String RequestorRole = "Requestor";
+    public static final String ReceiverRole = "Receiver";
+    public static final String SourceAttr = "source";
+    public static final String PayloadAttr = "payload";
+    public static final String UidAttr = "uid";
 }
-	
-

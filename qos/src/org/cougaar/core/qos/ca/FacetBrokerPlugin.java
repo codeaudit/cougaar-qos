@@ -126,7 +126,7 @@ public class FacetBrokerPlugin
 		synchronized (pendingRequests) {
 		    if (log.isDebugEnabled())
 			log.debug("Pending request for "
-				  +spec.kind+ " "
+				  +spec.ca_kind+ " "
 				  +spec.role);
 		    pendingRequests.put(rolePlayer, spec);
 		    requestsThread.start();
@@ -170,29 +170,29 @@ public class FacetBrokerPlugin
 	private boolean findFacet(ConnectionSpec spec, RolePlayer player) 
 	{
 	    if (log.isDebugEnabled())
-		log.debug("Looking for " +spec.kind+ " " +spec.role);
+		log.debug("Looking for " +spec.ca_kind+ " " +spec.role);
 	    synchronized (facetProviders) {
-		List providers = (List) facetProviders.get(spec.kind);
+		List providers = (List) facetProviders.get(spec.ca_kind);
 		if (providers != null) {
 		    if (log.isDebugEnabled())
 			log.debug(providers.size() + 
-				  " registered providers for " +spec.kind);
+				  " registered providers for " +spec.ca_kind);
 		    for (int i=0; i<providers.size(); i++) {
 			FacetProvider prvdr = (FacetProvider) providers.get(i);
 			if (prvdr.matches(spec)) {
 			    if (log.isDebugEnabled())
-				log.debug("Found " +spec.kind+ " " +spec.role);
+				log.debug("Found " +spec.ca_kind+ " " +spec.role);
 			    prvdr.provideFacet(spec, player);
 			    return true;
 			}
 		    }
 		} else {
 		    if (log.isDebugEnabled())
-			log.debug("No registered providers for " +spec.kind);
+			log.debug("No registered providers for " +spec.ca_kind);
 		}
 	    }
 	    if (log.isDebugEnabled())
-		log.debug("Didn't find " +spec.kind+ " " +spec.role);
+		log.debug("Didn't find " +spec.ca_kind+ " " +spec.role);
 	    return false;
 	}
 

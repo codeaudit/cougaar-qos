@@ -33,11 +33,9 @@ package org.cougaar.core.qos.ca;
 public abstract class FactRevision  
 {
     private Fact fact;
-    private Facet facet;
 
-    FactRevision(Fact fact, Facet facet) {
+    FactRevision(Fact fact) {
 	this.fact = fact;
-	this.facet = facet;
     }
     
     public Fact getFact()
@@ -45,10 +43,6 @@ public abstract class FactRevision
 	return fact;
     }
 
-    public Facet getFacet()
-    {
-	return facet;
-    }
 
     abstract public boolean isAssertion();
 

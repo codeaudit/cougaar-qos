@@ -26,27 +26,10 @@
 
 package org.cougaar.core.qos.ca;
 
-/**
- * Default implementation for the provider's view of a Facet.
- */
-public class ProviderFacetImpl
-    implements Facet
+public interface QueryCoordArtConstants
 {
-    RolePlayer player;
-    
-    protected ProviderFacetImpl(RolePlayer player)
-    {
-	this.player = player;
-    }
-
-    public void assertFact(Fact fact)
-    {
-	player.factAsserted(fact);
-    }
-	
-    public void retractFact(Fact fact)
-    {
-	player.factRetracted(fact);
-    }
+	public static final String COMMUNITY_TYPE_ATTRIBUTE = "CommunityType";
+	public static final String MANAGER_ATTRIBUTE = "RobustnessManager";
+	public static final String RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE =
+	    "RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE ";
 }
-
