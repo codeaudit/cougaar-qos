@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.frame;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Properties;
 
 import org.cougaar.core.util.UID;
@@ -35,21 +36,18 @@ public class PrototypeFrame
     extends Frame
 {
     private final String prototype_name;
-    private HashMap paths;
+    private transient HashMap paths;
 
     PrototypeFrame(FrameSet frameSet, String prototype_name,
 		   String parent, UID uid, Properties properties)
     {
 	super(frameSet, parent, uid, properties);
 	this.prototype_name = prototype_name;
-	this.paths = new HashMap();
     }
 
-    void addPath(String slot, VisitorPath path)
+    void addPaths(HashMap paths)
     {
-	synchronized (paths) {
-	    paths.put(slot, path);
-	}
+	this.paths = paths;
     }
 
     public Object getValue(String slot)

@@ -28,6 +28,8 @@ package org.cougaar.core.qos.frame;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.xml.sax.Attributes;
@@ -55,17 +57,19 @@ public class FrameSetParser
     }
 
     // Helper structs
-    private static class FrameSpec
+    private class FrameSpec
     {
 	String kind;
 	String parent;
 	Properties props;
+	HashMap paths;
 
 	FrameSpec(String kind, String parent)
 	{
 	    this.kind = kind;
 	    this.parent = parent;
 	    props = new Properties();
+	    paths = new HashMap();
 	}
 
 	Frame makePrototype(FrameSet frameSet)
@@ -75,7 +79,16 @@ public class FrameSetParser
 
 	Frame makeFrame(FrameSet frameSet)
 	{
-	    return frameSet.makeFrame(kind, props);
+	    Frame frame = frameSet.makeFrame(kind, props);
+	    if (!paths.isEmpty()) {
+		if (frame instanceof PrototypeFrame) {
+		    PrototypeFrame pf = (PrototypeFrame) frame;
+		    pf.addPaths(paths);
+		} else {
+		    log.error("Paths added to ordinary Frame " + frame);
+		}
+	    }
+	    return frame;
 	}
 
 
@@ -83,14 +96,49 @@ public class FrameSetParser
 	{
 	    props.setProperty(attr, value);
 	}
+
+	void putPath(String attr, VisitorPath path)
+	{
+	    paths.put(attr, path);
+	}
     }
 
-    private static class FrameSetSpec
+    private class VisitorSpec
     {
+	String name;
+	ArrayList path;
+	String slot;
+
+	VisitorSpec(String name)
+	{
+	    this.name = name;
+	    path = new ArrayList();
+	}
+
+	void addToPath(String role, String relation)
+	{
+	    path.add(new VisitorPath.Entry(role, relation));
+	}
+
+	void setSlot(String slot)
+	{
+	    this.slot = slot;
+	}
+
+	VisitorPath makePath()
+	{
+	    VisitorPath.Entry[] array = (VisitorPath.Entry[]) path.toArray();
+	    return new VisitorPath(name, array, slot);
+	}
+
     }
+
+
 
     private FrameSet frame_set;
     private FrameSpec frame_spec;
+    private VisitorSpec visitor_spec;
+    HashMap visitor_specs;
 
     private ServiceBroker sb;
     private BlackboardService bbs;
@@ -102,6 +150,7 @@ public class FrameSetParser
 	this.bbs = bbs;
 	this.log = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
+	visitor_specs = new HashMap();
     }
 
     public FrameSet parseFrameSetFile(String xml_filename)
@@ -137,10 +186,14 @@ public class FrameSetParser
 	    startPrototype(attrs);
 	} else if (name.equals("slot")) {
 	    slot(attrs);
+	} else if (name.equals("visit")) {
+	    visit(attrs);
 	} else if (name.equals("frames")) {
 	    // no-op
 	} else if (name.equals("frame")) {
 	    startFrame(attrs);
+	} else if (name.equals("visitor-path")) {
+	    startVisitor(attrs);
 	} 
     }
 
@@ -156,6 +209,8 @@ public class FrameSetParser
 	    // no-op
 	} else if (name.equals("frame")) {
 	    endFrame();
+	} else if (name.equals("visitor-path")) {
+	    endVisitor();
 	} 
     }
 
@@ -235,14 +290,56 @@ public class FrameSetParser
 	frame_spec = null;
     }
 
+
+
+    private void startVisitor(Attributes attrs)
+    {
+	if (log.isDebugEnabled())
+	    log.debug("startVisitor");
+
+	String name = attrs.getValue("name");
+	visitor_spec = new VisitorSpec(name);
+    }
+
+    private void visit(Attributes attrs)
+    {
+	String role = attrs.getValue("role");
+	String relation = attrs.getValue("relation");
+	visitor_spec.addToPath(role, relation);
+    }
+
+    private void endVisitor()
+    {
+	if (log.isDebugEnabled())
+	    log.debug("endVisitor");
+
+	visitor_specs.put(visitor_spec.name, visitor_spec.makePath());
+	visitor_spec = null;
+    }
+
+
+
+
     private void slot(Attributes attrs)
     {
 	if (log.isDebugEnabled())
 	    log.debug("slot");
 
 	String slot = attrs.getValue("name");
-	String value = attrs.getValue("value");
-	frame_spec.put(slot, value);
+	if (visitor_spec != null) {
+	    visitor_spec.setSlot(slot);
+	} else if (frame_spec != null) {
+	    String path = attrs.getValue("path");
+	    if (path != null) {
+		VisitorPath vp = (VisitorPath) visitor_specs.get(path);
+		frame_spec.putPath(slot, vp);
+	    } else {
+		String value = attrs.getValue("value");
+		frame_spec.put(slot, value);
+	    }
+	} else {
+	    // log
+	}
     }
 
     private void endFrameset()
