@@ -45,6 +45,7 @@ public class Utils
 	Properties kprops = new Properties();
 	readKernelProperties(kprops);
 	kprops.put("quoKernel.EvaluatorThread", "false");
+	kprops.put("quoKernel.Export", "false");
 	String nodeName = System.getProperty("org.cougaar.node.name");
   	kprops.put("quoKernel.Title",  "QuOKernel-" +  nodeName);
 
