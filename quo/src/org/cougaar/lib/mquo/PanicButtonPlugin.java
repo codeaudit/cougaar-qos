@@ -36,8 +36,9 @@ import org.cougaar.core.plugin.ComponentPlugin;
 import org.cougaar.core.mts.Message;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MulticastMessageAddress;
-import org.cougaar.core.node.NodeTrustPolicy;
-import org.cougaar.core.node.PolicyMulticastMessage;
+import org.cougaar.planning.ldm.PlanningFactory;
+import org.cougaar.planning.plugin.node.NodeTrustPolicy;
+import org.cougaar.planning.plugin.node.PolicyMulticastMessage;
 import org.cougaar.core.mts.MessageTransportClient;
 import org.cougaar.core.service.MessageTransportService;
 import org.cougaar.core.component.ServiceRevokedListener;
@@ -57,10 +58,16 @@ public class PanicButtonPlugin
   
   private MessageTransportService messageTransService = null;
   private DomainService domainService = null;
+  private PlanningFactory ldmf = null;
     
   public PanicButtonPlugin() {}
 
   protected void setupSubscriptions() {
+    ldmf = (PlanningFactory) domainService.getFactory("planning");
+    if (ldmf == null) {
+      throw new RuntimeException(
+          "Unable to find \"planing\" domain factory");
+    }
     createGUI();
     // setup and register message transport service
     messageTransService = (MessageTransportService)
@@ -194,12 +201,12 @@ public class PanicButtonPlugin
     // for now assume that pushing the button means to create a
     // society wide trust policy of '0' (trust no one level)
     NodeTrustPolicy trustpolicy = 
-      (NodeTrustPolicy)domainService.getFactory().newPolicy(NodeTrustPolicy.class.getName());
+      (NodeTrustPolicy)ldmf.newPolicy(NodeTrustPolicy.class.getName());
     trustpolicy.setTrustCategory(category);
     trustpolicy.setTrustLevel(trustlevel);
     //create a message to contain the trust policy
     MulticastMessageAddress dest = 
-      MulticastMessageAddress.getMulticastMessageAddress(org.cougaar.core.node.NodePolicyWatcher.class);
+      MulticastMessageAddress.getMulticastMessageAddress(org.cougaar.planning.plugin.node.NodePolicyWatcher.class);
     PolicyMulticastMessage policymsg = 
       new PolicyMulticastMessage(getMessageAddress(), dest, trustpolicy);
     messageTransService.sendMessage(policymsg);

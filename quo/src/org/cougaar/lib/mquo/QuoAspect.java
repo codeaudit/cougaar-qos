@@ -22,8 +22,8 @@ import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.ValueSC;
 import com.bbn.quo.rmi.SysCond;
 
-import org.cougaar.core.node.TrustStatusService;
-import org.cougaar.core.node.TrustStatusServiceImpl;
+import org.cougaar.planning.plugin.node.TrustStatusService;
+import org.cougaar.planning.plugin.node.TrustStatusServiceImpl;
 import org.cougaar.core.mts.StandardAspect;
 import org.cougaar.core.mts.TrafficMaskingGeneratorService;
 import org.cougaar.core.component.ServiceBroker;
