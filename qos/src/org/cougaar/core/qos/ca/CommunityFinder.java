@@ -152,30 +152,10 @@ abstract public class CommunityFinder
 	}
     }
 
-    // This is only called in response to a match of the exact
-    // communuty type and manager attribute, so there better not be
-    // more than one entry.
-    protected void handleCollectionResponse(Collection result) {
-	int count = result.size();
-	if (count > 0) {
-	    handleResponse(result.iterator().next());
-	    if (count > 1 && logger.isWarnEnabled()) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(filter);
-		buffer.append(" matched ");
-		buffer.append(Integer.toString(count));
-		buffer.append(" communities: ");
-		Iterator itr = result.iterator();
-		while (itr.hasNext()) {
-		    buffer.append(itr.next());
-		    buffer.append (" ");
-		}
-		logger.warn(buffer.toString());
-	    }
-	} else {
-	    if (logger.isDebugEnabled())
-		logger.debug("CommunityResponse is empty");
-	}
+    protected void handleCollectionResponse(Collection result) 
+    {
+	Iterator itr = result.iterator();
+	while (itr.hasNext()) handleResponse(itr.next());
     }
 
     public void getResponse(CommunityResponse response) 
@@ -320,9 +300,9 @@ abstract public class CommunityFinder
 	    Community community = (Community) comm;
 	    Logger log = 
 		Logging.getLogger("org.cougaar.core.qos.ca.CommunityFinder");
-	    if (log.isDebugEnabled())
-		log.debug("Searching for member " +entity_name+
-			  " of commumity " +community.getName()+ 
+	    if (log.isInfoEnabled())
+		log.info("Searching for member " +entity_name+
+			  " of community " +community.getName()+ 
 			  " with role " +role);
 
 	    Entity entity = community.getEntity(entity_name);
@@ -333,8 +313,8 @@ abstract public class CommunityFinder
 		result = (attr != null && attr.contains(role));
 	    }
 
-	    if (log.isDebugEnabled()) {
-		log.debug(result ? "Succeeded" : "Failed");
+	    if (log.isInfoEnabled()) {
+		log.info(result ? "Succeeded" : "Failed");
 	    }
 
 	    return result;
