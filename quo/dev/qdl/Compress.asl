@@ -13,10 +13,7 @@ behavior Compression ()
     void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::society::Message m) {
 	inplaceof METHODCALL {
 	    region Normal {
-		local long long startTime;
-		startTime = System.currentTimeMillis();
-		qk.runSerializeOnly(m);
-		Utils.logMessage(startTime,m); 
+	      remote.rerouteMessage(m);
 	    }
 
 	    region Compress {
