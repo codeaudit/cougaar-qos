@@ -24,7 +24,7 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.ca;
+package org.cougaar.core.qos.frame;
 
 import java.util.ArrayList;
 import java.util.HashMap;

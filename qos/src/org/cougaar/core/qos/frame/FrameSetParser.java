@@ -24,7 +24,7 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.ca;
+package org.cougaar.core.qos.frame;
 
 import java.io.File;
 import java.net.URL;
@@ -41,7 +41,7 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.ConfigFinder;
 
 
-public class SaxParser
+public class FrameSetParser
     extends DefaultHandler
 {
     private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
@@ -94,7 +94,7 @@ public class SaxParser
     private BlackboardService bbs;
     private LoggingService log;
 
-    public SaxParser(ServiceBroker sb, BlackboardService bbs)
+    public FrameSetParser(ServiceBroker sb, BlackboardService bbs)
     {
 	this.sb = sb;
 	this.bbs = bbs;

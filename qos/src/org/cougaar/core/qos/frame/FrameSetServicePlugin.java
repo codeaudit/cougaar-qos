@@ -24,7 +24,7 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.ca;
+package org.cougaar.core.qos.frame;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,7 +102,7 @@ public class FrameSetServicePlugin
 					  BlackboardService bbs)
 					  
     {
-	SaxParser parser = new SaxParser(sb, bbs);
+	FrameSetParser parser = new FrameSetParser(sb, bbs);
 	FrameSet set = parser.parseFrameSetFile(xml_filename);
 	sets.put(xml_filename, set);
 

@@ -24,9 +24,16 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.ca;
+package org.cougaar.core.qos.frame;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.ca.ConnectionSpec;
+import org.cougaar.core.qos.ca.CoordArtConstants;
+import org.cougaar.core.qos.ca.CoordinationArtifactImpl;
+import org.cougaar.core.qos.ca.CoordinationArtifactProvider;
+import org.cougaar.core.qos.ca.CoordinationArtifactProviderImpl;
+import org.cougaar.core.qos.ca.Facet;
+import org.cougaar.core.qos.ca.RolePlayer;
 
 /**
  * Coordination Artifact for Frame propagation

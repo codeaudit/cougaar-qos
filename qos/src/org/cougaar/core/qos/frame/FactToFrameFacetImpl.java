@@ -24,13 +24,19 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.ca;
+package org.cougaar.core.qos.frame;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.ca.ConnectionSpec;
+import org.cougaar.core.qos.ca.CoordinationArtifact;
+import org.cougaar.core.qos.ca.FacetImpl;
+import org.cougaar.core.qos.ca.FactAssertion;
+import org.cougaar.core.qos.ca.FactRevision;
+import org.cougaar.core.qos.ca.RolePlayer;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.util.UID;

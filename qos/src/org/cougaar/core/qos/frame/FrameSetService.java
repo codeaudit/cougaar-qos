@@ -24,7 +24,7 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.ca;
+package org.cougaar.core.qos.frame;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.Service;

@@ -24,12 +24,16 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.ca;
+package org.cougaar.core.qos.frame;
 
 import java.util.Collection;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.ca.ConnectionSpec;
+import org.cougaar.core.qos.ca.CoordinationArtifact;
+import org.cougaar.core.qos.ca.FacetImpl;
+import org.cougaar.core.qos.ca.RolePlayer;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
