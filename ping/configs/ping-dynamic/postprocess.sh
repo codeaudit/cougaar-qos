@@ -40,7 +40,7 @@ cd $TEMP
 
 touch directories
 cd $CIP/Logs
-ls -d Mini-Ping* > $TEMP/directories
+ls -d miniALL* > $TEMP/directories
 cd $TEMP
 
 dirs=`cat directories`
@@ -56,7 +56,7 @@ tar xvzf $CIP/Logs/$d/Logs.tgz
 # -- grep all Node*.log files for Ping events and sort into new file
 touch $d-ping_events.txt
 
-grep -h "PingTimerPlugin" Node*.log | sort > $d-ping_events.txt
+grep -h "PingTimerPlugin" *Node*.log | sort > $d-ping_events.txt
 echo $d-ping_events.txt created!
 
 # -- compute values and output pingstats.csv file

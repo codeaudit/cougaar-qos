@@ -25,20 +25,33 @@ require 'ultralog/enclaves'
 #############################
 # Adds ping to pinger agents
 #############################
-def addPing(source, dest, args=nil)
+def addPing(source, dest, numAgents=1, args=nil)
   srcAgent = @run.society.agents[source]
   destAgent = @run.society.agents[dest]
   puts "srcAgent = #{source}" 
   puts "destAgent = #{dest}"
   
   if args.nil?
-    args =
-      {'eventMillis' => '10000',    # delay between cougaar events
-      'delayMillis' => '0',        # delay between pings
-      'sendFillerSize' => '10000',     # extra bytes on send
-      'sendFillerRand' => 'false',  # randomize send bytes
-       'echoFillerSize' => '10000',     # extra bytes on ack
-      'echoFillerRand' => 'false'}  # randomize ack bytes
+    if numAgents < 100
+      args =
+	{'eventMillis' => '100000',    # delay between cougaar events
+	'delayMillis' => '0',        # delay between pings
+	'sendFillerSize' => '1000',     # extra bytes on send
+	'sendFillerRand' => 'false',  # randomize send bytes
+	'echoFillerSize' => '1000',     # extra bytes on ack
+	'echoFillerRand' => 'false', # randomize ack bytes
+	'startMillis' => '+60000'}  # time to start pinging  
+      
+    else  # We have LOTS of pingers, i.e. >=101, lengthen times
+      args =
+	{'eventMillis' => '100000',    # delay between cougaar events
+	'delayMillis' => '0',        # delay between pings
+	'sendFillerSize' => '1000',     # extra bytes on send
+	'sendFillerRand' => 'false',  # randomize send bytes
+	'echoFillerSize' => '1000',     # extra bytes on ack
+	'echoFillerRand' => 'false', # randomize ack bytes
+	'startMillis' => "+".concat((1000*numAgents).to_s) }  # time to start pinging  
+    end
   end
   
   if srcAgent && destAgent
@@ -187,7 +200,8 @@ module Cougaar
 	@singlenode = singlenode
       end
       def perform
-	if @singlenode = "true"
+	if @singlenode == "true"
+	  puts "Running on One Host----"
 	  @run.society.add_host('HOST1') do |host|
 	    host.add_node('NodeA') do |node|
 	      i=0
@@ -196,22 +210,27 @@ module Cougaar
 		node.add_agent("src#{i}")
 		i+=1
 	      end
-	    end
-	    host.add_node('NodeB') do |node|
+	      
 	      i=0
 	      while i < @numAgents
 		node.add_agent("sink#{i}")
+		
 		# Add pings here
-		addPing("src#{i}", "sink#{i}")
+		# Check for lots of pingers & pass into addPing
+		addPing("src#{i}", "sink#{i}", @numAgents)
+		
 		# wake once every second to check ping timeouts
 		managePings('1000')
 		i+=1
 	      end
+	      
+	      # Add Nameserver facet to NodeA
+	      # Not adding Mgmt node ever
+	      @run.society.nodes['NodeA'].add_facet({'role' => 'NameServer'})
 	    end
-	    # Add Manager Node / Agent & Nameserver
-	    addMgntNode("HOST1", @security)
 	  end
 	else
+	  puts "Running on Two Hosts----"
 	  @run.society.add_host('HOST1') do |host|
 	    host.add_node('NodeA') do |node|
 	      i=0
@@ -237,7 +256,7 @@ module Cougaar
 	  end
 	  # Add Manager Node / Agent & Nameserver
 	  addMgntNode("HOST2", @security)
-	end
+	end  #if
       end     # perform
     end     # CreateOneToOnePing
     
@@ -434,9 +453,9 @@ module Cougaar
 		
 		j=0
 		while j < @numPingers[i]
-		  node.add_agent("sink#{j}")
+		  node.add_agent("sink#{i}_#{j}")
 		  # Add pings here
-		  addPing("src", "sink#{j}")
+		  addPing("src", "sink#{i}_#{j}")
 		  # wake once every second to check ping timeouts
 		  managePings('1000')
 		  j+=1
