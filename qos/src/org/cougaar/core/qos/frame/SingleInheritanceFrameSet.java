@@ -48,6 +48,7 @@ public class SingleInheritanceFrameSet
     private UIDService uids;
     private BlackboardService bbs;
     private String name;
+    private HashMap visitors;
     private HashSet pending_parentage;
 //     private HashMap kbs;
     private HashMap kb;
@@ -106,6 +107,11 @@ public class SingleInheritanceFrameSet
 	this.child_value_slot = child_value_slot;
     }
 
+
+    void setVisitors(HashMap visitors)
+    {
+	this.visitors = visitors;
+    }
 
     private void addFrame(Frame frame)
     {
@@ -389,16 +395,20 @@ public class SingleInheritanceFrameSet
 
     // In this case the proto argument refers to what the prototype
     // should be a prototype of.  
-    public Frame makePrototype(String proto, String parent, Properties values)
+    public PrototypeFrame makePrototype(String proto, 
+					String parent, 
+					Properties values)
     {
 	UID uid = uids.nextUID();
 	return makePrototype(proto, parent, values, uid);
     }
 
-    public Frame makePrototype(String proto, String parent, Properties values,
-			       UID uid)
+    public PrototypeFrame makePrototype(String proto, 
+					String parent, 
+					Properties values,
+					UID uid)
     {
-	Frame frame = null;
+	PrototypeFrame frame = null;
 	synchronized (prototypes) { 
 	    
 	    if (prototypes.containsKey(proto)) {

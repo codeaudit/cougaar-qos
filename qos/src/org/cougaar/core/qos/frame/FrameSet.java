@@ -47,11 +47,11 @@ public interface FrameSet
 
     public Frame makeFrame(String kind, Properties slots, UID uid);
 
-    public Frame makePrototype(String kind, String parent, 
-			       Properties properties);
+    public PrototypeFrame makePrototype(String kind, String parent, 
+					Properties properties);
 
-    public Frame makePrototype(String kind, String parent, 
-			       Properties properties, UID uid);
+    public PrototypeFrame makePrototype(String kind, String parent, 
+					Properties properties, UID uid);
 
     public void removeFrame(Frame frame);
 

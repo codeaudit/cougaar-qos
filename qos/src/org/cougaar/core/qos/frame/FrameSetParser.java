@@ -74,21 +74,14 @@ public class FrameSetParser
 
 	Frame makePrototype(FrameSet frameSet)
 	{
-	    return frameSet.makePrototype(kind, parent, props);
+	    PrototypeFrame frame = frameSet.makePrototype(kind, parent, props);
+	    if (!paths.isEmpty()) frame.addPaths(paths);
+	    return frame;
 	}
 
 	Frame makeFrame(FrameSet frameSet)
 	{
-	    Frame frame = frameSet.makeFrame(kind, props);
-	    if (!paths.isEmpty()) {
-		if (frame instanceof PrototypeFrame) {
-		    PrototypeFrame pf = (PrototypeFrame) frame;
-		    pf.addPaths(paths);
-		} else {
-		    log.error("Paths added to ordinary Frame " + frame);
-		}
-	    }
-	    return frame;
+	    return frameSet.makeFrame(kind, props);
 	}
 
 
@@ -135,7 +128,7 @@ public class FrameSetParser
 
 
 
-    private FrameSet frame_set;
+    private SingleInheritanceFrameSet frame_set;
     private FrameSpec frame_spec;
     private VisitorSpec visitor_spec;
     HashMap visitor_specs;
@@ -344,7 +337,7 @@ public class FrameSetParser
 
     private void endFrameset()
     {
-	// no-op
+	frame_set.setVisitors(visitor_specs);
     }
 
 }
