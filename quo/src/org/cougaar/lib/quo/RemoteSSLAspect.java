@@ -150,7 +150,7 @@ public class RemoteSSLAspect extends StandardAspect
 	    try {
 		initSysconds(kernel);
 		initCallbacks();
-		String name = "Zinky@" + link.getDestination(); 
+		String name = "SSL_" + link.getDestination(); 
 		Contract contract = initContract(name, CONTRACT_IFACE, kernel);
 		set_contract_RemoteSSL(contract);
 	    } catch (java.rmi.RemoteException ex) {
