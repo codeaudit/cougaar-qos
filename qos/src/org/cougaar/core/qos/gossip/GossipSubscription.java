@@ -89,7 +89,7 @@ class GossipSubscription
     }
 
     synchronized ValueGossip getChanges() {
-	if (changes == null) return null;
+	if (changes == null || changes.size() == 0) return null;
 	ValueGossip result = new ValueGossip();
 	Iterator itr = changes.iterator();
 	Map.Entry entry = null;
@@ -101,7 +101,7 @@ class GossipSubscription
     }
 
     synchronized void commitChanges(ValueGossip uncommitted_changes) {
-	if (uncommitted_changes == null) return;
+	if (uncommitted_changes == null || uncommitted_changes.size() == 0) return;
 	Iterator itr = uncommitted_changes.iterator();
 	Map.Entry entry = null;
 	Object key = null;
