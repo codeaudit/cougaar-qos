@@ -1,9 +1,13 @@
 #!/bin/sh
 
 module=quo
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/${module}/test/configs/ssl.props"
-export COUGAAR_JAVA_ARGS
 
+ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password"
+
+
+quo="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/quo/test/configs/ssl.props"
+COUGAAR_JAVA_ARGS="$quo $ssl"
+export COUGAAR_JAVA_ARGS
 
 #exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
 exec ${COUGAAR_SRC_PATH}/${module}/test/bin/Node $*
