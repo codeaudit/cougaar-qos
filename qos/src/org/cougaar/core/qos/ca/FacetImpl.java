@@ -45,7 +45,7 @@ import org.cougaar.multicast.AttributeBasedAddress;
 /**
  * Default implementation for Facet.
  */
-abstract public class FacetImpl // should be abstract
+abstract public class FacetImpl
     implements Facet, Observer
 {
     private RolePlayer player;
@@ -121,7 +121,7 @@ abstract public class FacetImpl // should be abstract
     }
 
 
-    // when is this called?
+    // Component, which this class isn't.  Deal with this later.
     public void unload() 
     {
 	if (uids != null) {
@@ -132,35 +132,35 @@ abstract public class FacetImpl // should be abstract
 
 
 
-    RolePlayer getPlayer()
+    // Facet.  Other methods of this interface are handled by
+    // extensions.
+    public String getArtifactId()
+    {
+	return owner.getArtifactId();
+    }
+
+
+
+    // Accessors
+    protected RolePlayer getPlayer()
     {
 	return player;
     }
 
-    CoordinationArtifact getOwner()
-    {
-	return owner;
-    }
 
-
-    CommunityService getCommunityService()
-    {
-	return commService;
-    }
-
-    MessageAddress getAgentID()
+    protected MessageAddress getAgentID()
     {
 	return agentId;
     }
 
 
-    AttributeBasedAddress getABA()
+    protected AttributeBasedAddress getABA()
     {
 	return aba;
     }
 
 
-    UID nextUID()
+    protected UID nextUID()
     {
 	return uids.nextUID();
     }
@@ -171,6 +171,8 @@ abstract public class FacetImpl // should be abstract
     }
 
 
+
+    // Community helpers
     protected void findCommunityForAny(String filter)
     {
 	finder = new CommunityFinder.ForAny(commService, filter);
@@ -184,9 +186,7 @@ abstract public class FacetImpl // should be abstract
     }
 
 
-    // Observer.
-    //
-    // Used for CommunityFinder callbacks.
+    // Observer.  Used for CommunityFinder callbacks.
     public void update(Observable obs, Object value)
     {
 	if (log.isDebugEnabled())
@@ -204,6 +204,38 @@ abstract public class FacetImpl // should be abstract
 
 
 
+
+    
+    // Fact base
+    protected boolean factsHaveChanged()
+    {
+	// TBD
+	return true;
+    }
+
+    protected FactRevision nextFact()
+    {
+	synchronized (factQueue) {
+	    if (factQueue.isEmpty())
+		return null;
+	    else
+		return (FactRevision) factQueue.next();
+	}
+    }
+
+
+    private void addRevision(FactRevision entry)
+    {
+	synchronized (factQueue) {
+	    factQueue.add(entry);
+	}
+	owner.triggerExecute();
+    }
+
+
+
+
+    // Receptacles
     protected Receptacle getReceptacle()
     {
 	return receptacle;
@@ -224,40 +256,6 @@ abstract public class FacetImpl // should be abstract
 
 
 
-
-    protected boolean factsHaveChanged()
-    {
-	// TBD
-	return true;
-    }
-
-
-    protected FactRevision nextFact()
-    {
-	synchronized (factQueue) {
-	    if (factQueue.isEmpty())
-		return null;
-	    else
-		return (FactRevision) factQueue.next();
-	}
-    }
-
-
-
-    private void addRevision(FactRevision entry)
-    {
-	synchronized (factQueue) {
-	    factQueue.add(entry);
-	}
-	owner.triggerExecute();
-    }
-
-    public String getArtifactId()
-    {
-	return owner.getArtifactId();
-    }
-
-    // Receptacle
     protected class ReceptacleImpl implements Receptacle {
 	public void assertFact(Fact fact)
 	{
