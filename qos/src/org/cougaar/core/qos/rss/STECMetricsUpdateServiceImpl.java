@@ -55,6 +55,9 @@ public class STECMetricsUpdateServiceImpl
     public STECMetricsUpdateServiceImpl(ServiceBroker sb, NodeIdentifier id) {
 	this.sb = sb;
 
+	// make sure jacorb is configured
+	String orbclass = System.getProperty("org.omg.CORBA.ORBClass");
+	if (orbclass == null || !orbclass.equals("org.jacorb.orb.ORB")) return;
 
 	namingService = (NamingService)
 	    sb.getService(this, NamingService.class, null);
@@ -169,7 +172,10 @@ public class STECMetricsUpdateServiceImpl
     }
 
     public void updateValue(String key, String type, Metric value) {
-	sender.send(key, type, value);
+	if (sender != null) 
+	    sender.send(key, type, value);
+	else
+	    System.err.println("No JacORB!");
     }
 
 
