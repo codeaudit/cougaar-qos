@@ -94,7 +94,10 @@ public final class SyscondFactory
 	abstract protected String path(String host);
 
 	public void newHost(String host) {
-	    syscond.newPath(path(host));
+	    try { 
+		syscond.newPath(path(host));
+	    } catch (java.rmi.RemoteException ex) {
+	    }
 	}
 
     }
@@ -315,7 +318,10 @@ public final class SyscondFactory
     {
 	String name = host+"EffectiveMJips";
 	MetricSC syscond = makeMetricSC(name);
-	syscond.newPath("Host(" +host+ "):EffectiveMJips");
+	try {
+	    syscond.newPath("Host(" +host+ "):EffectiveMJips");
+	} catch (java.rmi.RemoteException ex) {
+	}
 	return syscond;
     }
 
@@ -338,9 +344,12 @@ public final class SyscondFactory
     {
 	String name = "Bandwidth " +local_host+ " to " +host;
 	MetricSC syscond = makeMetricSC(name);
-	syscond.newPath("IpFlow(" +local_host+
-			"," +host+
-			"):CapacityUnused");
+	try {
+	    syscond.newPath("IpFlow(" +local_host+
+			    "," +host+
+			    "):CapacityUnused");
+	} catch (java.rmi.RemoteException ex) {
+	}
 	return syscond;
     }
 
