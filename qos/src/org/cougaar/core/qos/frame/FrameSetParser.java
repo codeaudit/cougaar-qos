@@ -90,19 +90,19 @@ public class FrameSetParser
 	    props.setProperty(attr, value);
 	}
 
-	void putPath(String attr, VisitorPath path)
+	void putPath(String attr, Path path)
 	{
 	    paths.put(attr, path);
 	}
     }
 
-    private class VisitorSpec
+    private class PathSpec
     {
 	String name;
 	ArrayList path;
 	String slot;
 
-	VisitorSpec(String name)
+	PathSpec(String name)
 	{
 	    this.name = name;
 	    path = new ArrayList();
@@ -110,7 +110,7 @@ public class FrameSetParser
 
 	void addToPath(String role, String relation)
 	{
-	    path.add(new VisitorPath.Entry(role, relation));
+	    path.add(new Path.Fork(role, relation));
 	}
 
 	void setSlot(String slot)
@@ -118,10 +118,10 @@ public class FrameSetParser
 	    this.slot = slot;
 	}
 
-	VisitorPath makePath()
+	Path makePath()
 	{
-	    VisitorPath.Entry[] array = (VisitorPath.Entry[]) path.toArray();
-	    return new VisitorPath(name, array, slot);
+	    Path.Fork[] array = (Path.Fork[]) path.toArray();
+	    return new Path(name, array, slot);
 	}
 
     }
@@ -130,8 +130,8 @@ public class FrameSetParser
 
     private SingleInheritanceFrameSet frame_set;
     private FrameSpec frame_spec;
-    private VisitorSpec visitor_spec;
-    HashMap visitor_specs;
+    private PathSpec path_spec;
+    HashMap path_specs;
 
     private ServiceBroker sb;
     private BlackboardService bbs;
@@ -143,7 +143,7 @@ public class FrameSetParser
 	this.bbs = bbs;
 	this.log = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
-	visitor_specs = new HashMap();
+	path_specs = new HashMap();
     }
 
     public FrameSet parseFrameSetFile(String xml_filename)
@@ -179,14 +179,14 @@ public class FrameSetParser
 	    startPrototype(attrs);
 	} else if (name.equals("slot")) {
 	    slot(attrs);
-	} else if (name.equals("visit")) {
-	    visit(attrs);
+	} else if (name.equals("fork")) {
+	    fork(attrs);
 	} else if (name.equals("frames")) {
 	    // no-op
 	} else if (name.equals("frame")) {
 	    startFrame(attrs);
-	} else if (name.equals("visitor-path")) {
-	    startVisitor(attrs);
+	} else if (name.equals("path")) {
+	    startPath(attrs);
 	} 
     }
 
@@ -202,8 +202,8 @@ public class FrameSetParser
 	    // no-op
 	} else if (name.equals("frame")) {
 	    endFrame();
-	} else if (name.equals("visitor-path")) {
-	    endVisitor();
+	} else if (name.equals("path")) {
+	    endPath();
 	} 
     }
 
@@ -285,29 +285,29 @@ public class FrameSetParser
 
 
 
-    private void startVisitor(Attributes attrs)
+    private void startPath(Attributes attrs)
     {
 	if (log.isDebugEnabled())
-	    log.debug("startVisitor");
+	    log.debug("startPath");
 
 	String name = attrs.getValue("name");
-	visitor_spec = new VisitorSpec(name);
+	path_spec = new PathSpec(name);
     }
 
-    private void visit(Attributes attrs)
+    private void fork(Attributes attrs)
     {
 	String role = attrs.getValue("role");
 	String relation = attrs.getValue("relation");
-	visitor_spec.addToPath(role, relation);
+	path_spec.addToPath(role, relation);
     }
 
-    private void endVisitor()
+    private void endPath()
     {
 	if (log.isDebugEnabled())
-	    log.debug("endVisitor");
+	    log.debug("endPath");
 
-	visitor_specs.put(visitor_spec.name, visitor_spec.makePath());
-	visitor_spec = null;
+	path_specs.put(path_spec.name, path_spec.makePath());
+	path_spec = null;
     }
 
 
@@ -319,12 +319,12 @@ public class FrameSetParser
 	    log.debug("slot");
 
 	String slot = attrs.getValue("name");
-	if (visitor_spec != null) {
-	    visitor_spec.setSlot(slot);
+	if (path_spec != null) {
+	    path_spec.setSlot(slot);
 	} else if (frame_spec != null) {
 	    String path = attrs.getValue("path");
 	    if (path != null) {
-		VisitorPath vp = (VisitorPath) visitor_specs.get(path);
+		Path vp = (Path) path_specs.get(path);
 		frame_spec.putPath(slot, vp);
 	    } else {
 		String value = attrs.getValue("value");
@@ -337,7 +337,7 @@ public class FrameSetParser
 
     private void endFrameset()
     {
-	frame_set.setVisitors(visitor_specs);
+	frame_set.setPaths(path_specs);
     }
 
 }

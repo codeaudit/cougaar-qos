@@ -29,10 +29,10 @@ package org.cougaar.core.qos.frame;
 import java.util.Iterator;
 import java.util.Set;
 
-class VisitorPath
+class Path
 {
-    static class Entry {
-	Entry(String role, String relation)
+    static class Fork {
+	Fork(String role, String relation)
 	{
 	    this.role = role;
 	    this.relation = relation;
@@ -43,13 +43,13 @@ class VisitorPath
     }
 
     private String name;
-    private Entry[] entries;
+    private Fork[] forks;
     private String slot;
 
-    VisitorPath(String name, Entry[] entries, String slot)
+    Path(String name, Fork[] forks, String slot)
     {
 	this.name = name;
-	this.entries = entries;
+	this.forks = forks;
 	this.slot = slot;
     }
 
@@ -65,9 +65,9 @@ class VisitorPath
 
     private Object getNextValue(Frame frame, int index)
     {
-	if (index == entries.length) return frame.getValue(slot);
+	if (index == forks.length) return frame.getValue(slot);
 
-	Entry entry = entries[index];
+	Fork entry = forks[index];
 	Set frames = frame.findRelations(entry.role, entry.relation);
 	if (frames == null) return null;
 	Iterator itr = frames.iterator();

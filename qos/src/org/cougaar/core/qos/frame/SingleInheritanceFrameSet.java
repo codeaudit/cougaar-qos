@@ -51,7 +51,7 @@ public class SingleInheritanceFrameSet
     private ArrayList change_queue;
     private Object change_queue_lock;
     private String name;
-    private HashMap visitors;
+    private HashMap paths;
     private HashSet pending_parentage;
     private HashMap kb;
     private HashMap prototypes, parents;
@@ -111,9 +111,9 @@ public class SingleInheritanceFrameSet
     }
 
 
-    void setVisitors(HashMap visitors)
+    void setPaths(HashMap paths)
     {
-	this.visitors = visitors;
+	this.paths = paths;
     }
 
     private void addFrame(Frame frame)
