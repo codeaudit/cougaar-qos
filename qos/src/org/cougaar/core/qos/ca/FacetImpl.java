@@ -204,6 +204,8 @@ abstract public class FacetImpl // should be abstract
 
     protected void linkPlayer()
     {
+	if (log.isInfoEnabled())
+	    log.info("Linking " +player+ " to " +this);
 	player.facetAvailable(spec, this);
     }
 

@@ -41,7 +41,7 @@ import org.cougaar.util.UnaryPredicate;
 
 abstract public class ResponseFacet
     extends FacetImpl
-    implements CoordArtConstants, QueryCoordArtConstants
+    implements QueryCoordArtConstants
 {
     /**
      * The implementation of this method in instantiable extensions
@@ -217,7 +217,7 @@ abstract public class ResponseFacet
 	}
 
 	Fact fact = transformQuery(query);
-	getPlayer().factAsserted(fact);
+	getPlayer().factAsserted(fact, this);
     }
 
 

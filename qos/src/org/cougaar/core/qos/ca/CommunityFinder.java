@@ -57,8 +57,7 @@ abstract public class CommunityFinder
     {
 	this.svc = svc;
 	this.filter = filter;
-	logger = 
-	    Logging.getLogger("org.cougaar.robustness.dos.manager.CommunityFinder");
+	logger = Logging.getLogger("org.cougaar.core.qos.ca.CommunityFinder");
     }
 
 
@@ -73,7 +72,11 @@ abstract public class CommunityFinder
     {
 	if (logger.isDebugEnabled())
 	    logger.debug("CommunityChangeEvent " + e);
-	postQuery();
+	boolean repost; // only notify observers once
+	synchronized (this) {
+	    repost = this.community_name == null;
+	}
+	if (repost) postQuery();
     }
 
     private void foundCommunity(String community_found,
@@ -142,8 +145,19 @@ abstract public class CommunityFinder
 	int count = result.size();
 	if (count > 0) {
 	    handleResponse(result.iterator().next());
-	    if (count > 1 && logger.isWarnEnabled())
-		logger.warn("say something here");
+	    if (count > 1 && logger.isWarnEnabled()) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(filter);
+		buffer.append(" matched ");
+		buffer.append(Integer.toString(count));
+		buffer.append(" communities: ");
+		Iterator itr = result.iterator();
+		while (itr.hasNext()) {
+		    buffer.append(itr.next());
+		    buffer.append (" ");
+		}
+		logger.warn(buffer.toString());
+	    }
 	} else {
 	    if (logger.isDebugEnabled())
 		logger.debug("CommunityResponse is empty");

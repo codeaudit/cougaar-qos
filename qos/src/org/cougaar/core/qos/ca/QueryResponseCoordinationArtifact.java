@@ -58,7 +58,7 @@ import org.cougaar.core.component.ServiceBroker;
  */
 abstract public class QueryResponseCoordinationArtifact
     extends FacetProviderPlugin
-    implements CoordArtConstants
+    implements QueryCoordArtConstants
 {
     public QueryResponseCoordinationArtifact() 
     {
