@@ -28,9 +28,12 @@ import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.component.ServiceBroker;
 
 import com.bbn.quo.event.Connector;
+import com.bbn.quo.event.status.StatusTEC;
+import com.bbn.quo.event.topology.SimpleTopologyManager;
+
+import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 import org.omg.CORBA.ORB;
 
-import java.net.InetAddress;
 import java.util.TimerTask;
 
 public class STECMetricsUpdateServiceImpl
@@ -51,17 +54,8 @@ public class STECMetricsUpdateServiceImpl
 	String[] args = new String[0];
 	Connector.orb = ORB.init(args, null);
 
-	InetAddress addr = null;
-	try {
-	    addr = InetAddress.getLocalHost();
-	} catch (java.net.UnknownHostException weird) {
-	    System.err.println("This host is unknown!");
-	    return;
-	}
-	String host = addr.getHostAddress();
-	String url = System.getProperty(STEC_URL_PROPERTY);
-
-	sender = new STECSender(url, host, Connector.poa());
+	TypedEventChannel channel = getChannel();
+	sender = new STECSender(channel, Connector.poa());
 
 	Heartbeater beater = new Heartbeater(sender);
 	ThreadService threadService = (ThreadService)
@@ -70,6 +64,20 @@ public class STECMetricsUpdateServiceImpl
 	threadService.schedule(task, 0, 1000);
     }
 
+
+    private TypedEventChannel getChannel() {
+  	String url = System.getProperty(STEC_URL_PROPERTY);
+	String args[] = 
+	    { "-queue",
+	      "com.bbn.quo.event.status.PrioritizedStatusChunkingQ",
+	      "-policy",
+	      "com.bbn.quo.event.status.StatusValidatingCachingPolicy",
+	      "-url",
+	      url,
+	      "-id",
+	      "foo"};
+	return new StatusTEC(args)._this();
+    }
 
     public void updateValue(String key, String type, Metric value) {
 	sender.send(key, type, value);

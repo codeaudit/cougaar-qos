@@ -34,9 +34,9 @@ public class Heartbeater
     public final static String HEARTBEAT_TYPE = "Heartbeat";
     private HeartBeatStruct hb;
     private StatusPayloadStruct payload;
-    private StatusSupplierSharedSender sender;
+    private STECSender sender;
 
-    public Heartbeater(StatusSupplierSharedSender sender) {
+    public Heartbeater(STECSender sender) {
 	this.sender = sender;
 	hb = new HeartBeatStruct();
 	HeartBeatUtils.initialize(hb);

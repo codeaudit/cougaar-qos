@@ -25,19 +25,32 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.core.qos.metrics.Metric;
 
 import com.bbn.quo.event.status.HeartBeatUtils;
-import com.bbn.quo.event.status.StatusSupplierSharedSender;
+import com.bbn.quo.event.status.StatusTEC;
+import com.bbn.quo.event.status.corba.StatusPusher;
+import com.bbn.quo.event.status.corba.StatusPusherHelper;
 import com.bbn.quo.event.status.corba.StatusPayloadStruct;
 import com.bbn.quo.event.hb.corba.HeartBeatStruct;
 import com.bbn.quo.event.status.corba.payload_value_union;
 
+import org.omg.CosTypedEventChannelAdmin.InterfaceNotSupported;
+import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
+import org.omg.CosTypedEventChannelAdmin.TypedProxyPushConsumer;
+import org.omg.CosTypedEventChannelAdmin.TypedSupplierAdmin;
+import org.omg.CosEventChannelAdmin.AlreadyConnected;
+import org.omg.CosEventComm.PushSupplierPOA;
+
 import org.omg.PortableServer.POA;
 
-class STECSender extends StatusSupplierSharedSender 
+class STECSender extends PushSupplierPOA
 {
     private int sequenceNum = 0;
+    private boolean connected = false;
+    private TypedProxyPushConsumer proxy;
+    private StatusPusher consumer;
+    private TypedEventChannel channel;
 
-    STECSender(String url, String host, POA poa) {
-	super(url, null, host);
+    STECSender(TypedEventChannel channel, POA poa) {
+	this.channel = channel;
 	try {
 	    poa.activate_object(this);
 	} catch (Exception e) {
@@ -46,6 +59,30 @@ class STECSender extends StatusSupplierSharedSender
 	    return;
 	}
 	makeProxy();
+    }
+
+    void makeProxy() {
+	TypedSupplierAdmin admin = channel.for_suppliers();
+	try {
+	    proxy = admin.obtain_typed_push_consumer(StatusTEC.INTERFACE);
+	} catch (InterfaceNotSupported bad_interface) {
+	    System.err.println("Interface " + StatusTEC.INTERFACE + 
+			       "not supported");
+	    return;
+	}
+	
+
+	try {
+	    proxy.connect_push_supplier(_this());
+	    connected = true;
+	} catch (AlreadyConnected connected) {
+	    connected.printStackTrace();
+	    return;
+	}
+
+	org.omg.CORBA.Object raw = proxy.get_typed_consumer();
+	// System.out.println(raw);
+	consumer = StatusPusherHelper.narrow(raw);
     }
 
     void send(String key, String type, Metric value) {
@@ -73,6 +110,27 @@ class STECSender extends StatusSupplierSharedSender
 	hb.sequenceNum = sequenceNum++;
 	payload.heart_beat = hb;
 	sendMessage(payload);
+    }
+
+    void sendMessage(StatusPayloadStruct payload) {
+	try {
+	    consumer.provideStatus(payload);
+	} catch (Exception e) {
+	    System.err.println("push error: " + e);
+	}
+    }
+
+    public void disconnect_push_supplier() {
+	connected = false;
+    }
+
+
+    public void disconnect_consumer() {
+	proxy.disconnect_push_consumer();
+    }
+
+    public boolean isConnected() {
+	return connected;
     }
 
 }
