@@ -50,7 +50,7 @@ import org.cougaar.util.UnaryPredicate;
  * methods of this class.
  */
 abstract public class QueryFacet 
-    extends FacetImpl
+    extends CommunityFacetImpl
     implements QueryCoordArtConstants
 {
     private String managerAttr;
@@ -230,7 +230,7 @@ abstract public class QueryFacet
 
 
     private class QueryReceptacleImpl 
-	extends ReceptacleImpl
+	extends CommunityReceptacleImpl
 	implements QueryReceptacle
     {
 	public int getReceiverCount()

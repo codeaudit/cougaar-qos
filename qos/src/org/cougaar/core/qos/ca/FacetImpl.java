@@ -28,8 +28,6 @@ package org.cougaar.core.qos.ca;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Observable;
-import java.util.Observer;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
@@ -37,28 +35,20 @@ import org.cougaar.core.service.AgentIdentificationService;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
-import org.cougaar.core.service.community.CommunityService;
-import org.cougaar.core.service.community.Community;
 import org.cougaar.core.util.UID;
-import org.cougaar.multicast.AttributeBasedAddress;
 
 
 /**
  * Default implementation for Facet.
  */
 abstract public class FacetImpl
-    implements Facet, Observer
+    implements Facet
 {
     private RolePlayer player;
     private ConnectionSpec spec;
     private CoordinationArtifact owner;
     private SimpleQueue factQueue;
-    private Community community;
-    private String communityName;
-    private CommunityFinder finder;
-    private AttributeBasedAddress aba;
     private ServiceBroker sb;
-    private CommunityService commService;
     private UIDService uids;
     private MessageAddress agentId;
     private Receptacle receptacle;
@@ -71,13 +61,6 @@ abstract public class FacetImpl
 	    return removeFirst();
 	}
     }
-
-    /**
-     * Hook for domain-specific Facet implementations to construct an
-     * ABA given a community.
-     */
-    public abstract AttributeBasedAddress makeABA(String communityName);
-
 
     protected FacetImpl(CoordinationArtifact owner, 
 			ServiceBroker sb,
@@ -115,10 +98,6 @@ abstract public class FacetImpl
 	    throw new RuntimeException("Agent id is null");
 	}
 
-
-	commService = (CommunityService)
-	    sb.getService(this, CommunityService.class, null);
-
     }
 
 
@@ -148,6 +127,11 @@ abstract public class FacetImpl
 
 
     // Accessors
+    protected CoordinationArtifact getOwner()
+    {
+	return owner;
+    }
+
     protected RolePlayer getPlayer()
     {
 	return player;
@@ -160,52 +144,9 @@ abstract public class FacetImpl
     }
 
 
-    protected AttributeBasedAddress getABA()
-    {
-	return aba;
-    }
-
-
     protected UID nextUID()
     {
 	return uids.nextUID();
-    }
-
-    protected Community getCommunity()
-    {
-	return community;
-    }
-
-
-
-    // Community helpers
-    protected void findCommunityForAny(String filter)
-    {
-	finder = new CommunityFinder.ForAny(commService, filter);
-	finder.addObserver(this);
-    }
-
-    protected void findCommunityForAgent(String filter)
-    {
-	finder = new CommunityFinder.ForAgent(commService, filter, agentId);
-	finder.addObserver(this);
-    }
-
-
-    // Observer.  Used for CommunityFinder callbacks.
-    public void update(Observable obs, Object value)
-    {
-	if (log.isDebugEnabled())
-	    log.debug("CommunityFinder " +obs+ " callback returned " 
-		      + value);
-	if (obs instanceof CommunityFinder) {
-	    CommunityFinder finder = (CommunityFinder) obs;
-	    this.communityName = (String) value;
-	    this.community = finder.getCommunity();
-	    this.aba = makeABA(communityName);
-	    linkPlayer();
-	    owner.triggerExecute();
-	}
     }
 
 
@@ -289,10 +230,6 @@ abstract public class FacetImpl
 	    return FacetImpl.this.getArtifactKind();
 	}
 
-	public Community getCommunity()
-	{
-	    return community;
-	}
 
     }
 

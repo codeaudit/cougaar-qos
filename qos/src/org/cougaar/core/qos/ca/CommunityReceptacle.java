@@ -26,40 +26,10 @@
 
 package org.cougaar.core.qos.ca;
 
-import org.cougaar.core.service.BlackboardService;
+import org.cougaar.core.service.community.Community;
 
-/**
- * A Receptacle represents a {@link RolePlayer}'s viewport into some
- * role of a {@link CoordinationArtifact}.  This is the player's only
- * interface to the artifact.  The correspdonding entity in the
- * Artifact is a {@link Facet}.
- */
-public interface Receptacle
+public interface CommunityReceptacle extends Receptacle
 {
-    /**
-     * Used by clients to assert a new fact into the Facet's
-     * fact-base. The fact itself is a blackbox.
-     */
-    public void assertFact(Object fact);
-
-
-    /**
-     * Used by clients to retract a fact from the Facet's
-     * fact-base. The fact itself is a blackbox.
-     */
-    public void retractFact(Object fact);
-
-
-    /**
-     * Returns the kind of the {@link CoordinationArtifactTemplate}
-    */
-    public String getArtifactKind();
-
-    /**
-     * Returns the id of the specific {@link CoordinationArtifact}
-     * (not to be confused with the Template kind) which owns this
-     * Facet.
-    */
-    public String getArtifactId();
+    public Community getCommunity();
 
 }

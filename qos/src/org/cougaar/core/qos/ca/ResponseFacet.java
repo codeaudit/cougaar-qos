@@ -47,7 +47,7 @@ import org.cougaar.util.UnaryPredicate;
  * methods of this class.
  */
 abstract public class ResponseFacet
-    extends FacetImpl
+    extends CommunityFacetImpl
     implements QueryCoordArtConstants
 {
     private String managerRole;

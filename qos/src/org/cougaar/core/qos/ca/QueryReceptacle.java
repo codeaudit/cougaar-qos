@@ -26,7 +26,7 @@
 
 package org.cougaar.core.qos.ca;
 
-public interface QueryReceptacle extends Receptacle
+public interface QueryReceptacle extends CommunityReceptacle
 {
     public int getReceiverCount();
 }
