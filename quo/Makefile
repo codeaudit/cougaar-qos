@@ -35,7 +35,7 @@ developers: gen $(jar)
 
 gen:
 	mkdir -p $(classes)
-	cd dev; make
+
 
 
 #$(stub_file): $(rmic_file)
