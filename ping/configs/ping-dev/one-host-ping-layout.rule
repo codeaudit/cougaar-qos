@@ -29,3 +29,5 @@ society.hosts['HOST1'].add_facet({'enclave' => 'REAR'})
 # make HOST2 the name server
 society.nodes['REAR-MGMT-NODE'].add_agent('REAR-NameServer')
 society.agents['REAR-NameServer'].add_facet({'role' => 'NameServer'})
+# Tempory fix for name server
+#society.nodes['REAR-MGMT-NODE'].add_facet({'role' => 'NameServer'})

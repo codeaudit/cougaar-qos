@@ -21,6 +21,21 @@ def addPinger(source, dest, pinger, args)
   end
 end 
 
+def addDefaultPinger(agentNumber, pingerNumber)
+    # send ping from Source<agentNumber> to Sink<agentNumber>
+    # eventMillis is interval beteen statistics events being logged
+  addPinger("Source#{agentNumber}", "Sink#{agentNumber}", pingerNumber,
+	  {'eventMillis' => '10000',
+	    'delayMillis' => '0',
+	    # Define Ping Size in bytes, 
+	    #'sendFillerSize' => '50000',
+	    # false means extra bytes will be compressable 
+	    #'sendFillerRand' => 'false',
+	    #'echoFillerSize' => '50000',
+	    #'echoFillerRand' => 'false',
+	  })
+end
+
 def managePings(wake_time,pinger)
   society.each_agent do |agent|
     agent.each_component do |c|
@@ -37,37 +52,56 @@ def managePings(wake_time,pinger)
   end
 end
 
-def addDefaultPinger(agentNumber, pingerNumber)
-    # send ping from Agent1 to Agent2
-    # eventMillis is interval beteen statistics events being logged
-  addPinger("Source#{agentNumber}", "Sink#{agentNumber}", pingerNumber,
-	  {'eventMillis' => '10000',
-	    'delayMillis' => '0',
-	    # Define Ping Size in bytes, 
-	    #'sendFillerSize' => '50000',
-	    # false means extra bytes will be compressable 
-	    #'sendFillerRand' => 'false',
-	    #'echoFillerSize' => '50000',
-	    #'echoFillerRand' => 'false',
-	  })
+def addFalseSubscriber(source, subscriberNumber)
+  srcAgent = society.agents[source]
+  if !srcAgent
+    srcAgent = society.nodes['NODE1'].add_agent(source)
+  end
+  srcAgent.add_component do |c|
+    c.classname = "org.cougaar.ping.PingFalseSubscriberPlugin"
+    c.add_argument("subscriber=#{subscriberNumber}")
+  end
+end 
+
+def addExtraSubscriber(source, subscriberNumber)
+  srcAgent = society.agents[source]
+  if !srcAgent
+    srcAgent = society.nodes['NODE1'].add_agent(source)
+  end
+  srcAgent.add_component do |c|
+    c.classname = "org.cougaar.ping.PingExtraSubscriberPlugin"
+    c.add_argument("subscriber=#{subscriberNumber}")
+  end
+end 
+
+def addSubscriber(agentNumber, falseSubscriberNumber,extraSubscriberNumber)
+    # Add subscribers to  Source<agentNumber> 
+  if (falseSubscriberNumber > 0) then
+    addFalseSubscriber("Source#{agentNumber}", falseSubscriberNumber)
+  end
+  if (extraSubscriberNumber > 0) then
+    addExtraSubscriber("Source#{agentNumber}", extraSubscriberNumber)
+  end
 end
 
 society.add_host('HOST1') do |host|
   host.add_node('NODE1') do |node|
   end
 end
-  
-for i in 1..250 do
-  addDefaultPinger(i,1)
-# addDefaultPinger(1,i)
-# addDefaultPinger(2,i)
-# addDefaultPinger(3,i)
-# addDefaultPinger(4,i)
-# addDefaultPinger(5,i)
+
+#add pingers
+for i in 1..5 do
+  addDefaultPinger(i,1) # (agent, pinger)
+#  addDefaultPinger(1,i)
 end
+
 # add ping managers to all agents that send pings
-#
 # wake once every second to check ping timeouts
 managePings(1000,1)
+
+# add subscribers
+for i in 1..1 do
+ #addSubscriber(1,0,i) #agent, falseSub#, extraSub#
+end
 
 
