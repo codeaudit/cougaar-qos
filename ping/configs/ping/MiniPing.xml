@@ -164,7 +164,7 @@ for additional usage and testing notes.
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
           <argument>target=AgentB</argument>
-          <argument>delayMillis=0</argument>
+          <argument>delayMillis=1000</argument>
 	  <argument>eventMillis=10000</argument>
         </component>
 

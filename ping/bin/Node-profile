@@ -22,6 +22,8 @@
 #-Dorg.cougaar.core.logging.log4j.category.org.cougaar.ping=INFO
 
 COUGAAR_JAVA_ARGS="
+-Xms1m
+-Xmx500m
 -Dorg.cougaar.planning.ldm.lps.ComplainingLP.level=0 
 -Dorg.cougaar.core.load.planning=false
 -Dorg.cougaar.society.xsl.param.planning=false
@@ -29,14 +31,11 @@ COUGAAR_JAVA_ARGS="
 -Dorg.cougaar.core.agent.quiet=true
 -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping=DEBUG
 -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.core.agent=DEBUG
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.BeginLogger=DEBUG
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.EndLogger=DEBUG
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.relayx=DETAIL#org.cougaar.util.log.log4j.DetailPriority
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.blackboardx=DETAIL#org.cougaar.util.log.log4j.DetailPriority
 -Dorg.cougaar.society.xsl.param.communities=false
--Dorg.cougaar.class.path=/home/jzinky/cougaar/HEAD/core/newcore.jar:
-"
-
+-Dorg.cougaar.core.persistence.lazyInterval=5000
+-Dorg.cougaar.core.persistence.enable=false
+-Dorg.cougaar.core.persistence.clear=true
+-Dorg.cougaar.class.path=/home/jzinky/cougaar/HEAD/core/newcore.jar"
 
 #### now Minimal Options 
 #-Dorg.cougaar.society.xsl.param.communities=false
@@ -55,19 +54,14 @@ COUGAAR_JAVA_ARGS="
 # Metrics differencators (rate)
 # -Dorg.cougaar.class.path=/home/jzinky/cougaar/HEAD/core/newcore.jar:/home/jzinky/cougaar/HEAD/mtsstd/newmts.jar:/home/jzinky/cougaar/HEAD/qos/newqos.jar:/home/jzinky/cougaar/HEAD/quo/newquo.jar:/home/jzinky/cougaar/HEAD/util/newutil.jar:/home/jzinky/cougaar/robustness/bbn/robustness.jar:/home/jzinky/cougaar/HEAD/quo/dev/3rdparty/quoSumo.jar:/home/jzinky/cougaar/HEAD/ping/newping.jar
 
-### Logging
+# Logging
 # -Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.service.alarm=DEBUG
 #-Dorg.cougaar.core.logging.log4j.category.org.cougaar.ping.PingTimerPlugin=DEBUG
-#-Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.BeginLogger=DEBUG
-#-Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.EndLogger=DEBUG
-
-### VM
-#-Xms1m
-#-Xmx500m
 
 export COUGAAR_JAVA_ARGS
 
-#echo "ARGS => ${COUGAAR_JAVA_ARGS}"
-#exec ${COUGAAR_SRC_PATH}/base/bin/Node -v $*
+echo "ARGS => ${COUGAAR_JAVA_ARGS}"
 
-exec ${COUGAAR_INSTALL_PATH}/bin/Node -v $*
+
+#exec ${COUGAAR_INSTALL_PATH}/bin/Node -v $*
+exec ${COUGAAR_SRC_PATH}/base/bin/Node-profile -v $*

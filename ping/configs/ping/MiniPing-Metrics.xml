@@ -89,18 +89,6 @@
         </argument>
       </component>
       <component
-        name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
-        class='org.cougaar.core.servlet.SimpleServletComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          org.cougaar.planning.servlet.PlanViewServlet
-        </argument>
-        <argument>
-          /tasks
-        </argument>
-      </component>
-      <component
         name='org.cougaar.core.thread.AgentLoadRatePlugin'
         class='org.cougaar.core.thread.AgentLoadRatePlugin'
         priority='LOW'
@@ -117,6 +105,12 @@
         class='org.cougaar.core.qos.metrics.MetricsServletPlugin'
         priority='COMPONENT'
         insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
+        class='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
       </component>
       <component
         name='org.cougaar.core.thread.AgentLoadSensorPlugin'
@@ -288,18 +282,6 @@
           </argument>
         </component>
         <component
-          name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
-          class='org.cougaar.core.servlet.SimpleServletComponent'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>
-            org.cougaar.planning.servlet.PlanViewServlet
-          </argument>
-          <argument>
-            /tasks
-          </argument>
-        </component>
-        <component
           name='org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)'
           class='org.cougaar.ping.PingTimerPlugin'
           priority='COMPONENT'
@@ -368,18 +350,6 @@
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
           <argument>
             /wp
-          </argument>
-        </component>
-        <component
-          name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
-          class='org.cougaar.core.servlet.SimpleServletComponent'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>
-            org.cougaar.planning.servlet.PlanViewServlet
-          </argument>
-          <argument>
-            /tasks
           </argument>
         </component>
         <component

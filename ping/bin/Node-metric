@@ -29,12 +29,7 @@ COUGAAR_JAVA_ARGS="
 -Dorg.cougaar.core.agent.quiet=true
 -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping=DEBUG
 -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.core.agent=DEBUG
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.BeginLogger=DEBUG
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.EndLogger=DEBUG
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.relayx=DETAIL#org.cougaar.util.log.log4j.DetailPriority
--Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.blackboardx=DETAIL#org.cougaar.util.log.log4j.DetailPriority
 -Dorg.cougaar.society.xsl.param.communities=false
--Dorg.cougaar.class.path=/home/jzinky/cougaar/HEAD/core/newcore.jar:
 "
 
 
@@ -58,8 +53,6 @@ COUGAAR_JAVA_ARGS="
 ### Logging
 # -Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.service.alarm=DEBUG
 #-Dorg.cougaar.core.logging.log4j.category.org.cougaar.ping.PingTimerPlugin=DEBUG
-#-Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.BeginLogger=DEBUG
-#-Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.agent.EndLogger=DEBUG
 
 ### VM
 #-Xms1m
@@ -67,7 +60,8 @@ COUGAAR_JAVA_ARGS="
 
 export COUGAAR_JAVA_ARGS
 
-#echo "ARGS => ${COUGAAR_JAVA_ARGS}"
-#exec ${COUGAAR_SRC_PATH}/base/bin/Node -v $*
+echo "ARGS => ${COUGAAR_JAVA_ARGS}"
 
-exec ${COUGAAR_INSTALL_PATH}/bin/Node -v $*
+
+#exec ${COUGAAR_INSTALL_PATH}/bin/Node -v $*
+exec ${COUGAAR_SRC_PATH}/base/bin/Node -v $*

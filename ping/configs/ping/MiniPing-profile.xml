@@ -1,0 +1,118 @@
+<?xml version='1.0'?>
+
+<!--
+Minimum example of core's ping support, useful for infrastructure
+and message transport baseline performance.
+
+See "<agent name='AgentA'>..</agent>" for notes on how to configure
+the pings.  The provided configuration will send an endless series of
+pings from AgentA to AgentB, one every second.  The "PingAdder"
+component arguments can be modified increase the number of pings or
+change their frequency.
+
+See the package-level javadocs in
+  core/src/org/cougaar/ping/package.html
+for additional usage and testing notes.
+-->
+
+<society name='MiniPing'
+  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+  xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2003/society.xsd'>
+  <host name='localhost'>
+    <node name='NodeA'>
+
+      <!-- 
+      XMLNode command-line options, ignored for now (bug 3466)
+
+      You may need to copies these "vm_parameter" values into your
+      "XMLNode.bat/Node" scripts.
+      -->
+      <class>org.cougaar.bootstrap.Bootstrapper</class>
+      <prog_parameter>org.cougaar.core.node.Node</prog_parameter>
+      <!-- make sure these are correct! -->
+      <vm_parameter>-Dorg.cougaar.node.name=NodeA</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.society.file=MiniPing-minimum.xml</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.name.server=localhost:8888</vm_parameter>
+      <!-- enable ping logging using system properties instead of "loggingConfig.conf" -->
+      <!--
+      <vm_parameter>-Dorg.cougaar.core.logging.config.filename=loggingConfig.conf</vm_parameter>
+      -->
+      <vm_parameter>-Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping=DEBUG</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.core.logging.log4j.category.org.cougaar.ping=INFO</vm_parameter>
+      <!-- disable planning and communities (bug 2522) -->
+      <vm_parameter>-Dorg.cougaar.core.load.planning=false</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.core.load.community=false</vm_parameter>
+      <!-- minimal config path, excludes "configs/common" -->
+      <vm_parameter>-Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/ping/configs/ping</vm_parameter>
+      <!-- the rest is probably okay as-is -->
+      <vm_parameter>-XX:ThreadStackSize=256</vm_parameter>
+      <vm_parameter>-Xms16m</vm_parameter>
+      <vm_parameter>-Xmx128m</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.core.node.InitializationComponent=XML</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.install.path=$COUGAAR_INSTALL_PATH</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.workspace=$COUGAAR_INSTALL_PATH/workspace</vm_parameter>
+      <vm_parameter>-Dorg.cougaar.system.path=$COUGAAR_INSTALL_PATH/sys</vm_parameter>
+      <vm_parameter>-Djava.class.path=$COUGAAR_INSTALL_PATH/lib/bootstrap.jar</vm_parameter>
+      <vm_parameter>-Xbootclasspath/p:$COUGAAR_INSTALL_PATH/lib/javaiopatch.jar</vm_parameter>
+
+      <component
+	 name="org.cougaar.profiler.servlet.ProfilerServlet()"
+	 class="org.cougaar.profiler.servlet.ProfilerServlet"
+	 priority="COMPONENT"
+	 insertionpoint="Node.AgentManager.Agent.PluginManager.Plugin"/>
+
+      <!-- "AgentA", which sends pings to "AgentB" -->
+      <agent name='AgentA' >
+        <!-- 
+        Ping specific plugins.
+
+        See the package javadocs for core/src/org/cougaar/core/mobility/ping
+        for important usage notes.
+        -->
+
+        <!-- required ping timer, set for every second-->
+        plugin = org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)
+        <component
+          name='org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)'
+          class='org.cougaar.ping.PingTimerPlugin'
+          priority='COMPONENT'
+          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+          <argument>wakeMillis=1000</argument>
+        </component>
+
+        <!--
+        Config plugin that defines the pings.
+
+        Creates an endless series of pings from this agent to AgentB,
+        sent one per second and statistics reports every 10 seconds
+	See the javadocs for additional options.
+        -->
+        <component
+          name='org.cougaar.ping.PingAdderPlugin(target=AgentB, delayMillis=1000)'
+          class='org.cougaar.ping.PingAdderPlugin'
+          priority='COMPONENT'
+          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+          <argument>target=AgentB</argument>
+          <argument>delayMillis=0</argument>
+	  <argument>eventMillis=10000</argument>
+        <!--
+	  <argument>sendFillerSize=10000</argument>
+	  <argument>sendRand=false</argument>
+	  <argument>echoFillerSize=10000</argument>
+	  <argument>echoRand=false</argument>
+        -->
+        </component>
+      </agent>
+
+      <!--
+      "AgentB", which receives pings from "AgentA".
+
+      To make run a multi-node test, copy the "<node ..>..</node>" information
+      from above and create a second node.
+      -->
+      <agent name='AgentB'>
+        <!-- no ping plugins needed on the target agent -->
+      </agent>
+    </node>
+  </host>
+</society>
