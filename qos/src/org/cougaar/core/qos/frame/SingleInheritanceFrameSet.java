@@ -465,7 +465,7 @@ public class SingleInheritanceFrameSet
     // Synchronized for a shorter time but doesn't work reliably.
     // Sometimes items are added while this is in progress and
     // execute doesn't run again.
-    public void processQueueSometimes()
+    public void processQueue()
     {
 	ArrayList changes = null;
 	synchronized (change_queue_lock) {
@@ -475,6 +475,8 @@ public class SingleInheritanceFrameSet
 	int count = changes.size();
 	for (int i=0; i<count; i++) {
 	    Object change = changes.get(i);
+	    if (log.isDebugEnabled())
+		log.debug("about to publish " + change);
 	    if (change instanceof Change) {
 		Change chng = (Change) change;
 		bbs.publishChange(chng.object, chng.changes);
@@ -488,7 +490,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    public void processQueue()
+    public void processQueueSlow()
     {
 	synchronized (change_queue_lock) {
 	    int count = change_queue.size();

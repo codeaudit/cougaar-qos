@@ -79,7 +79,7 @@ abstract public class FrameToFactFacetImpl
 
     public void execute(BlackboardService bbs)
     {
-	if (sub == null || !sub.hasChanged()) {
+	if (sub == null /* || !sub.hasChanged() */) {
 	    if (log.isDebugEnabled())
 		log.debug("No Frame changes");
 	    return;

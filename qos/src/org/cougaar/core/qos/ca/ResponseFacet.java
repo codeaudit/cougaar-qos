@@ -108,7 +108,7 @@ abstract public class ResponseFacet
 
     public void execute(BlackboardService blackboard)
     {
-	if (querySub == null || !querySub.hasChanged()) return;
+	if (querySub == null /* || !querySub.hasChanged() */) return;
 
 	Enumeration en;
 	// observe added relays

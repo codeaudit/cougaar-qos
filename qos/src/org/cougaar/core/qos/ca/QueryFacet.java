@@ -115,7 +115,7 @@ abstract public class QueryFacet
 
     public void execute(BlackboardService blackboard)
     {
-	if (responseSub == null || !responseSub.hasChanged()) return;
+	if (responseSub == null /* || !responseSub.hasChanged() */) return;
 
 	Enumeration en;
 		
