@@ -1,0 +1,7 @@
+#Don't show message sending and receiving feed back
+# That is no +- in logs
+
+society.each_node do |node|
+    node.override_parameter("-Dorg.cougaar.core.agent.showtraffic","false")
+    node.override_parameter("-Dorg.cougaar.core.agent.quiet","true")
+end

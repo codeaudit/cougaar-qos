@@ -1,0 +1,26 @@
+#Single Node configuration
+#Remove standard services and replace them with trivial versions
+
+society.each_node do |node|
+
+    #Remove  Planning and Communities
+    #node.override_parameter("-Dorg.cougaar.core.load.planning","false")
+    #node.override_parameter("-Dorg.cougaar.planning.ldm.lps.ComplainingLP.level","0")
+    #node.override_parameter("-Dorg.cougaar.society.xsl.param.planning","false")
+    node.override_parameter("-Dorg.cougaar.society.xsl.param.communities","false")
+
+    #Remove Basic Services
+    node.override_parameter("-Dorg.cougaar.society.xsl.param.servlets","false")
+    node.override_parameter("-Dorg.cougaar.society.xsl.param.metrics","trivial")
+    node.override_parameter("-Dorg.cougaar.thread.service.type","single")
+    node.override_parameter("-Dorg.cougaar.society.xsl.param.mts","singlenode")
+
+    #Remove Persistence
+    node.override_parameter("-Dorg.cougaar.core.persistence.enable","false")
+    node.override_parameter("-Dorg.cougaar.core.persistence.clear","false")
+
+    #Java Virtual Machine Parameters
+    #node.replace_parameter(/\-Xms/, "-Xms50m")
+    #node.replace_parameter(/\-Xmx/, "-Xmx256m")
+    #node.replace_parameter(/\-XX\:ThreadStackSize/, "-XX:ThreadStackSize=256")
+end

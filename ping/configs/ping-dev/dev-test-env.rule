@@ -1,0 +1,13 @@
+# Use  Development Logging, jars, and trust
+
+society.each_node do |node|
+  node.override_parameter("-Dorg.cougaar.core.logging.config.filename","$HOME/cougaar/robustness/bbn/csmart/bbn_testing/logging.props")
+
+  node.override_parameter("-Dorg.cougaar.class.path","$COUGAAR_SRC_PATH/core/newcore.jar:$COUGAAR_SRC_PATH/mtsstd/newmts.jar:$COUGAAR_SRC_PATH/qos/newqos.jar:$COUGAAR_SRC_PATH/quo/newquo.jar:$COUGAAR_SRC_PATH/util/newutil.jar:$COUGAAR_SRC_PATH/quo/dev/3rdparty/quoSumo.jar:$COUGAAR_SRC_PATH/ping/newping.jar:$HOME/cougaar/robustness/bbn/robustness.jar:$HOME/cougaar/robustness/bbn/dev/3rdparty/deconfliction.jar")
+    
+  node.override_parameter("-Djavax.net.ssl.trustStore","$HOME/keystore")
+  node.override_parameter("-Djavax.net.ssl.trustStorePassword","password")
+  node.override_parameter("-Djavax.net.ssl.keyStore","$HOME/keystore")
+  node.override_parameter("-Djavax.net.ssl.keyStorePassword","password")
+
+end

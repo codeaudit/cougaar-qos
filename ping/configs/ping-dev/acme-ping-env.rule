@@ -1,8 +1,7 @@
-
 #
 # Basically identical to the standard TIC env rule, except:
 #   - added default node classname
-#   - reduced JVM stack size to (50M - 256M)
+#   - reducHEAD/ping/configs/ping-dev/ed JVMHEAD/ping/configs/ping-dev/ stack size to (50M - 256M)
 #
 
 society.each_node do |node|
@@ -11,14 +10,20 @@ society.each_node do |node|
       node.classname = 'org.cougaar.bootstrap.Bootstrapper'
     end
 
-    node.override_parameter("-Dorg.cougaar.core.load.planning","false")
-
     node.add_prog_parameter("org.cougaar.core.node.Node") unless node.prog_parameters.include?("org.cougaar.core.node.Node")
     
     node.override_parameter("-Dorg.cougaar.core.node.InitializationComponent","XML")
+#   node.override_parameter("-Dorg.cougaar.core.logging.config.filename","loggingConfig.conf")
+    node.override_parameter("-Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping","DEBUG")
+
+
+    node.override_parameter("-Dorg.cougaar.core.load.planning","false")
+    node.override_parameter("-Dorg.cougaar.planning.ldm.lps.ComplainingLP.level","0")
+    node.override_parameter("-Dorg.cougaar.society.xsl.param.planning","false")
+  # node.override_parameter("-Dorg.cougaar.society.xsl.param.communities","false")
     node.override_parameter("-Dorg.cougaar.core.persistence.enable","false")
     node.override_parameter("-Dorg.cougaar.core.persistence.clear","false")
-#    node.override_parameter("-Dorg.cougaar.core.logging.config.filename","loggingConfig.conf")
+
 
     
     # Add start time/timezone if startTime parameter is not present
