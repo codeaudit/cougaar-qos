@@ -143,27 +143,12 @@
         insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
       </component>
       <component
-        name='org.cougaar.core.qos.metrics.AgentFlowRatePlugin'
-        class='org.cougaar.core.qos.metrics.AgentFlowRatePlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
         name='org.cougaar.mts.std.StatisticsAspect()'
         class='org.cougaar.mts.std.StatisticsAspect'
         priority='COMPONENT'
         insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
         <order>
           140
-        </order>
-      </component>
-      <component
-        name='org.cougaar.mts.std.AgentFlowAspect()'
-        class='org.cougaar.mts.std.AgentFlowAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-        <order>
-          210
         </order>
       </component>
       <component
