@@ -220,10 +220,7 @@ public final class SyscondFactory
 		// See if the Node has moved
 		String node = entry.getNode();
 		String old_node_host = (String) node_hosts.get(node);
-		String new_node_host =
-		    topologyService.getParentForChild(TopologyReaderService.HOST, 
-						      TopologyReaderService.NODE, 
-						      node);
+		String new_node_host = entry.getHost();
 		if (old_node_host == null || !old_node_host.equals(new_node_host)) {
 		    // node has moved. 
 		    Object[] params = { node };

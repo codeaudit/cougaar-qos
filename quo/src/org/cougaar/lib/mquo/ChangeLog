@@ -1,0 +1,10 @@
+2002-07-03  Ray Tomlinson  <RTomlinson@bbn.com>
+
+	* SyscondFactory.java:
+	Bug #1590 -- Extensive Name Server processing load
+	Diagnosis: Excessive fetching of (topology entity) attributes to
+	implement Syscond topology polling. The algorithm is O(N^3) in
+	number of agents (assuming a fixed Node/Agent ratio). Clearly,
+	this is not scalable.
+	Changed the algorithm to be O(N^2). Still not scalable, but blows
+	up less rapidly. Polling is _not_ a good idea.
