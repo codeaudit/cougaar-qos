@@ -52,9 +52,7 @@ abstract public class CoordinationArtifactTemplatePlugin
      *  Instantiable subclasses must provide this method.  Its job is
      *  to create new CoordinationArtifacts, given a ConnectionSpec.
      */
-    abstract public CoordinationArtifact 
-	makeArtifact(CoordinationArtifactTemplate owner, 
-		     ConnectionSpec spec);
+    abstract public CoordinationArtifact makeArtifact(ConnectionSpec spec);
 
     protected CoordinationArtifactTemplatePlugin()
     {
@@ -84,7 +82,7 @@ abstract public class CoordinationArtifactTemplatePlugin
 	    }
 	    
 	    // None around yet; make a new one
-	    CoordinationArtifact ca = makeArtifact(this, spec);
+	    CoordinationArtifact ca = makeArtifact(spec);
 	    artifacts.add(ca);
 	    return ca;
 	}
