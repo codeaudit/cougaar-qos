@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+
+<body>
+
+<h3>Introduction</h3>
+
+<p><i>Coordination Artifacts</i> are designed to separate out an abstract
+communication pattern, on the one hand, and the domain-specific
+clients of the communication on the other. A generic or abstract
+Artifact is concerned with organizing Communities, Relays and other
+COUGAAR infrastructure in a structured way in order to represent a
+pattern of inter-Agent chatter.  A specific Artifact completes a
+generic artifact by supplying Community names, data types etc.
+
+<p> An Artifact includes a set of <i>Roles</i> that define the
+functions performed by each client.  For example in an Artifact that
+implements a multicast request (one request, multiple replies), the
+two Roles are queryer and responder.  Every Role has a corresponding
+interface that specifies the operations that can be performed on the
+Artifact by clients playing that Role.   These interfaces are
+therefore very much like <i>Facets</i> in the CORBA Component Model:
+they present a specific viewport into the Artifact as a whole.  The
+Artifact itself can then be thought of as a provider of Facets.
+
+<p>  This leads to the following Java interfaces:
+
+<ul>
+
+ <li><strong>RolePlayer</strong>: From the Artifact's perspective, each
+     client plays one of the Artifacts defined roles.  This interface
+     specifies that abstracion.</li>
+
+ <li><strong>Facet</strong>: The generic viewport that RolePlayers
+     have into the Artifact is specified by this interface.  For
+     particular roles, this interface might be extended.
+ </li>
+
+ <li><strong>FacetProvider</strong>:  The provision of Facets to
+     RolePlayers is described by this interface.</li>
+
+ <li><strong>FacetBroker</strong>: This interface defines a COUGAAR
+     service that provides the top-level entry point into CAs: the
+     methods that allow FacetProviders and RolePlayer to be linked
+     together.</li>
+
+</ul>
+
+<p> In the current design, the assumption is that RolePlayers and
+Facets communicate through a shared fact base, eventually including
+Jess-like rules defined in terms of facts.  For now
+<strong>Fact</strong> is defined locally, and Fact instances are
+handled through ordinary method calls between Facets and RolePlayers.
+
+<p>More detailed descriptions of these classes and interfaces follow.
+
+
+<h3> RolePlayer</h3>
+
+<h3>Facet</h3>
+
+<h3> FacetProvider</h3>
+
+<h3> FacetBroker</h3>
+
+<h3>Fact</h3>
+
+<h3> ConnectionSpec</h3>
+
+
+
+</body>
+</html>

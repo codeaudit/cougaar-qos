@@ -174,7 +174,7 @@
     <property name="compile.abs.jarlist" value=""/>
 
     <!-- javadoc package spec for building javadocs -->
-    <property name="javadoc.packages" value="org.cougaar.core.qos.gossip,org.cougaar.core.qos.rss"/>
+    <property name="javadoc.packages" value="org.cougaar.core.qos.ca,org.cougaar.core.qos.gossip,org.cougaar.core.qos.rss"/>
 
     <!-- Extra jars needed at run / unit-test time. -->
     <!-- WARNING: Only relative paths work here. -->
