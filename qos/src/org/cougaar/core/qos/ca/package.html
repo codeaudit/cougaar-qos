@@ -29,21 +29,25 @@
     CoordinationArtifactBroker.  A CoordinationArtifactProvider is
     like a COUGAAR ServiceProvider: its primary job is to find or make
     CoordinationArtifacts of some particular kind.  But it also
-    implicitly defines a set of <i>Roles</i> that describe the
-    functions performed by clients of this kind of Artifact.  For
-    example in Artifacts that implement a multicast request (one
-    request, multiple replies), the two Roles are queryer and
-    responder.
+    defines a set of <i>Roles</i> that describe the functions
+    performed by clients of this kind of Artifact.  For example in
+    Artifacts that implement a multicast request (one request,
+    multiple replies), the two Roles are queryer and responder. A
+    Provider also implicitly defines a set of parameters that
+    distinguish the individual instances of that kind of Artifact from
+    one another.
   </p>
 
-  <p>Every Role has a corresponding interface that specifies the
-    operations that can be performed on the Artifact by clients
-    playing that Role.  These interfaces are therefore very much
-    like <i>Facets</i> in the CORBA Component Model: they present a
-    Role-specific viewport into the Artifact as a whole.  Likewise,
-    the client's handle on a Facet is similar to a <i>Receptacle</i>
-    in CCM.  A Provider also defines a set of parameters that
-    distinguish the individuals of that kind of Artifact.
+  <p>Every Role in an Artifact can be seen from two perspectives: that
+    of the Artifact and that of a Role player.  Borrowing some
+    terminology from the CORBA Component Model, we refer to these
+    as <i>Facets</i> and <i>Receptacles</i>, respectively.  The
+    analogy is only approximate, however.  Unlike CCM, both Facets and
+    Receptacles are interfaces, and typically these interfaces overlap
+    without being identical.  On the other hand, a Receptacle is
+    always bound to exactly one Facet, as in CCM, and is the client's
+    only handle into the Artifact (which in this analogy is like a
+    Component in CCM), also as in CCM.
   </p>
   
 
