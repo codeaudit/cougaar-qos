@@ -152,7 +152,7 @@ public class TrafficMaskAspect extends QuoAspect
 	    qk.initContract(name);
 	    qoskets.put(node_ref, qk);
 	} catch (java.rmi.RemoteException ex) {
-	    debugService.error(null, ex);
+	    loggingService.error(null, ex);
 	}
     }
 

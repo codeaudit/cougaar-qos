@@ -79,7 +79,7 @@ public class QuoProxyAspect extends StandardAspect
 	    wrapper_class = Class.forName(wrapper_classname);
 	}
 	catch (ClassNotFoundException class_not_found) {
-	    debugService.error("makeClientAdapter", class_not_found);
+	    loggingService.error("makeClientAdapter", class_not_found);
 	    return null;
 	}
 
@@ -87,18 +87,18 @@ public class QuoProxyAspect extends StandardAspect
 	    raw_instance = wrapper_class.newInstance();
 	}
 	catch (InstantiationException instantiation) {
-	    debugService.error("makeClientAdapter", instantiation);
+	    loggingService.error("makeClientAdapter", instantiation);
 	    return null;
 	}
 	catch (IllegalAccessException illegal_access) {
-	    debugService.error("makeClientAdapter", illegal_access);
+	    loggingService.error("makeClientAdapter", illegal_access);
 	    return null;
 	}
 
 	if (raw_instance instanceof CougaarWrapper) {
 	    wrapper = (CougaarWrapper) raw_instance;
 	} else {
-	   debugService.error(raw_instance + " is not an CougaarWrapper");
+	   loggingService.error(raw_instance + " is not an CougaarWrapper");
 	    return null;
 	}
 
@@ -116,18 +116,18 @@ public class QuoProxyAspect extends StandardAspect
 		CougaarWrapper wrapper = makeClientAdapter();
 		if (wrapper != null) {
 		    wrapper.connect(quo_proxy.mt, quo_proxy.mti,
-				    debugService);
+				    loggingService);
 		}
 		return (MT) wrapper;
 	    } else if (remote instanceof MT) {
 		return (MT) remote;
 	    } else {
-		debugService.error("Object is neither an MT nor a QuoProxy: "
+		loggingService.error("Object is neither an MT nor a QuoProxy: "
 				   +  remote);
 		return null;
 	    }
 	} catch (java.rmi.RemoteException re) {
-	    debugService.error(null, re);
+	    loggingService.error(null, re);
 	    return null;
 	}
     }
@@ -150,7 +150,7 @@ public class QuoProxyAspect extends StandardAspect
 	    wrapper.connect(kernel, mt);
 	    return new QuoProxy(mt, wrapper);
 	} catch (java.rmi.RemoteException ex) {
-	    debugService.error(null, ex);
+	    loggingService.error(null, ex);
 	    return mt;
 	}
     }

@@ -37,9 +37,10 @@ import com.bbn.quo.data.RSS;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
-import org.cougaar.core.mts.DebugService;
+import org.cougaar.core.mts.Debug;
 import org.cougaar.core.mts.DebugFlags;
 import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
+import org.cougaar.core.service.LoggingService;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
     private HashMap effectiveJipsSysconds = new HashMap();
     private HashMap bandwidthSysconds = new HashMap();
     private HashMap capacitySysconds = new HashMap();
-    private DebugService debugService;
+    private LoggingService loggingService;
 
     abstract private class AgentHostUpdaterListener 
     {
@@ -94,7 +95,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	    try {
 		updateHost(host);
 	    } catch (java.rmi.RemoteException remote_ex) {
-		debugService.error(null, remote_ex);
+		loggingService.error(null, remote_ex);
 	    }
 	}
 
@@ -216,7 +217,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 			new_host = (String) new_host_attr.get();
 			agent = (MessageAddress) agent_attr.get();
 		    } catch (javax.naming.NamingException name_ex) {
-			debugService.error(null, name_ex);
+			loggingService.error(null, name_ex);
 			continue;
 		    }
 
@@ -224,8 +225,8 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 
 		    if (host == null || !host.equals(new_host)) {
 			hosts.put(agent, new_host);
-			if (debugService.isDebugEnabled(RMS))
-			    debugService.debug("===== New host " 
+			if (Debug.isDebugEnabled(RMS))
+			    loggingService.debug("===== New host " 
 						      +new_host+
 						      " for agent " 
 						      +agent);
@@ -254,8 +255,8 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	kernel = Utils.getKernel(props);
 	updater = new AgentHostUpdater();
 	timer.schedule(updater, 0, PERIOD);
-	debugService =
-	    (DebugService) sb.getService(this, DebugService.class, null);
+	loggingService =
+	    (LoggingService) sb.getService(this, LoggingService.class, null);
     }
 
 
@@ -299,7 +300,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 				   "com.bbn.quo.data.ExpectedMaxJipsSCImpl");
 	    return (ExpectedMaxJipsSC) syscond;
 	} catch (java.rmi.RemoteException ex) {
-	    debugService.error(null, ex);
+	    loggingService.error(null, ex);
 	    return null;
 	}
     }
@@ -360,7 +361,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 				   "com.bbn.quo.data.ExpectedAvailableJipsSCImpl");
 	    return (ExpectedAvailableJipsSC) syscond;
 	} catch (java.rmi.RemoteException ex) {
-	    debugService.error(null, ex);
+	    loggingService.error(null, ex);
 	    return null;
 	}
     }
@@ -423,7 +424,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	    ((ExpectedBandwidthSC) syscond).doubleValue(1.0);
 	    return (ExpectedBandwidthSC) syscond;
 	} catch (java.rmi.RemoteException ex) {
-	    debugService.error(null, ex);
+	    loggingService.error(null, ex);
 	    return null;
 	}
     }
@@ -486,7 +487,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	
 	    return (ExpectedCapacitySC) syscond;
 	} catch (java.rmi.RemoteException ex) {
-	    debugService.error(null, ex);
+	    loggingService.error(null, ex);
 	    return null;
 	}
     }

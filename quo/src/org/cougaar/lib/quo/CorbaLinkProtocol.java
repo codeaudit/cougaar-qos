@@ -63,7 +63,7 @@ public class CorbaLinkProtocol
 	    poa = POAHelper.narrow(raw);
 	    poa.the_POAManager().activate();
 	} catch (Exception error) {
-	    debugService.error(null, error);
+	    loggingService.error(null, error);
 	}
 	
     }
@@ -94,7 +94,7 @@ public class CorbaLinkProtocol
 	try {
 	    poa.activate_object(impl);
 	} catch (Exception ex) {
-	    debugService.error(null, ex);
+	    loggingService.error(null, ex);
 	}
 	myProxy = getServerSideProxy(impl._this());
     }
@@ -105,7 +105,7 @@ public class CorbaLinkProtocol
 	    Object proxy = orb.object_to_string(myProxy);
 	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
-	    debugService.error("Error registering MessageTransport", e);
+	    loggingService.error("Error registering MessageTransport", e);
 	}
     }
 
@@ -117,7 +117,7 @@ public class CorbaLinkProtocol
 	    MessageAddress addr = client.getMessageAddress();
 	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
-	    debugService.error("Error registering MessageTransport", e);
+	    loggingService.error("Error registering MessageTransport", e);
 	}
     }
 
@@ -129,7 +129,7 @@ public class CorbaLinkProtocol
 	    MessageAddress addr = client.getMessageAddress();
 	    getNameSupport().unregisterAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
-	    debugService.error("Error unregistering MessageTransport", e);
+	    loggingService.error("Error unregistering MessageTransport", e);
 	}
     }
 
@@ -139,7 +139,7 @@ public class CorbaLinkProtocol
 	try {
 	    return lookupObject(address) != null;
 	} catch (Exception e) {
-	    //debugService.error("Failed in addressKnown", e);
+	    //loggingService.error("Failed in addressKnown", e);
 	}
 	return false;
     }

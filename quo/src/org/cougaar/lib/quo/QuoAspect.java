@@ -84,7 +84,7 @@ abstract public class QuoAspect extends StandardAspect
 		    try {
 			TRUST.longValue(trust);
 		    } catch (java.rmi.RemoteException remote_ex) {
-			debugService.error(null, remote_ex);
+			loggingService.error(null, remote_ex);
 		    }
 		}
 	    }
@@ -108,7 +108,7 @@ abstract public class QuoAspect extends StandardAspect
 
 		new TrustObserver();
 	    } catch (java.rmi.RemoteException remote_ex) {
-		debugService.error(null, remote_ex);
+		loggingService.error(null, remote_ex);
 	    }
 
 	}
