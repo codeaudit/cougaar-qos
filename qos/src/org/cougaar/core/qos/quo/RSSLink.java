@@ -39,9 +39,9 @@ import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.mts.Debug;
 import org.cougaar.core.mts.DebugFlags;
-import org.cougaar.core.mts.ThreadService;
 import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.core.service.ThreadService;
 
 import java.util.HashMap;
 import java.util.ArrayList;

@@ -14,7 +14,7 @@ import java.io.*;
 
 import org.cougaar.core.util.UID;
 import org.cougaar.core.mts.Message;
-import org.cougaar.core.mts.ThreadService;
+import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.blackboard.DirectiveMessage;
 import org.cougaar.planning.ldm.plan.Directive;
 import org.cougaar.planning.ldm.plan.Notification;
