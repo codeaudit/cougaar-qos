@@ -11,11 +11,10 @@ import org.cougaar.lib.quo.*;
 
 
 import java.io.*;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.cougaar.core.util.UID;
 import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.ThreadService;
 import org.cougaar.core.blackboard.DirectiveMessage;
 import org.cougaar.planning.ldm.plan.Directive;
 import org.cougaar.planning.ldm.plan.Notification;
@@ -31,7 +30,6 @@ public class Utils
     private static String TAG;
     private static Rusage lastUsage = new Rusage();
     private static long lastThreadTime = System.currentTimeMillis();;
-    private static Timer timer = new Timer();
 
     static {
 	TAG = System.getProperty("org.cougaar.lib.quo.tag", "COUGAAR");
@@ -57,16 +55,19 @@ public class Utils
     }
 
     // Nobody calls this anymore.  
-    public static void StartProcessStatistics () {
+    public static void StartProcessStatistics (Object who, 
+					       ThreadService threadService)
+    {
 	UnixUtils.ensureLib(); // load jni lib
 	lastUsage.update();
-	TimerTask task = new TimerTask() {
+	Runnable logger = new Runnable() {
 		public void run() {
 		    logProcessorUsage();
 		    logThreadCount();
 		}
 	    };
-	timer.schedule(task, 0, 1000);
+	java.util.TimerTask task = threadService.getTimerTask(who, logger);
+	threadService.schedule(task, 0, 1000);
     }
 
     public static synchronized void logMessageWithLength(long startTime, 

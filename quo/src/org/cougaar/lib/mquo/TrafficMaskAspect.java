@@ -28,7 +28,6 @@ import org.cougaar.core.mts.MulticastMessageAddress;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Timer;
 import java.util.TimerTask;
 
 
@@ -41,16 +40,15 @@ public class TrafficMaskAspect extends QuoAspect
     private static final int TRAFFIC_SIZE = 3000;
 
     private HashMap qoskets;
-    private Timer timer = new Timer(true);
     private ValueSC USE_MASKING;
-    private TimerTask nodeUpdater;
+    private NodeUpdater nodeUpdater;
 
 
     public TrafficMaskAspect() {
 	super();
     }
 
-    private class NodeUpdater extends TimerTask {
+    private class NodeUpdater implements Runnable {
 	public void run() {
 	    MulticastMessageAddress addr = 
 		(MulticastMessageAddress) MessageAddress.SOCIETY;
@@ -139,7 +137,8 @@ public class TrafficMaskAspect extends QuoAspect
 	qoskets = new HashMap();
 
 	nodeUpdater = new NodeUpdater();
-	timer.schedule(nodeUpdater, 0, NODE_PERIOD);
+	TimerTask task = threadService.getTimerTask(this, nodeUpdater);
+	threadService.schedule(task, 0, NODE_PERIOD);
 
 	return true;
 

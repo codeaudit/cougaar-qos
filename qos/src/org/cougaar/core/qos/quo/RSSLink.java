@@ -39,6 +39,7 @@ import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.mts.Debug;
 import org.cougaar.core.mts.DebugFlags;
+import org.cougaar.core.mts.ThreadService;
 import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
 import org.cougaar.core.service.LoggingService;
 
@@ -46,7 +47,6 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Observable;
 import javax.naming.directory.Attribute;
@@ -66,7 +66,6 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	    local_host = "127.0.0.1";
 	}
     }
-    private Timer timer = new Timer(true);
     private RSS rss;
     private QuoKernel kernel;
     private AgentHostUpdater updater;
@@ -166,7 +165,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 
 
     private class AgentHostUpdater 
-	extends TimerTask 
+	implements Runnable
     {
 	private HashMap listeners;
 	private HashMap hosts;
@@ -253,8 +252,13 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	Utils.readRSSProperties(props);
 	rss = RSS.makeInstance(props);
 	kernel = Utils.getKernel(props);
+
+	ThreadService threadService = (ThreadService)
+	    sb.getService(this, ThreadService.class, null);
 	updater = new AgentHostUpdater();
-	timer.schedule(updater, 0, PERIOD);
+	TimerTask task = threadService.getTimerTask(this, updater);
+	threadService.schedule(task, 0, PERIOD);
+
 	loggingService =
 	    (LoggingService) sb.getService(this, LoggingService.class, null);
     }
