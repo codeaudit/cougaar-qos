@@ -1,7 +1,7 @@
 src=$(shell find .  -name "*.java")
 classes=.classes
 jar=newquo.jar
-core=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
+core=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_SRC_PATH}/util/newutil.jar
 qos=${COUGAAR_SRC_PATH}/qos/newqos.jar
 quo=dev/3rdparty/quoSumo.jar
 
@@ -23,16 +23,12 @@ compile: $(src)
 	javac  -d $(classes) $(src)
 
 
-
-
 # Developers do this
 
 developers:  $(jar)
 
 $(classes):
 	mkdir -p $(classes)
-
-
 
 
 $(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
@@ -44,8 +40,6 @@ $(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
 $(jar): $(classes) $(src) 
 	javac -deprecation -d $(classes) $(src)
 	jar cf $(jar) -C $(classes) .
-
-
 
 
 clean:
