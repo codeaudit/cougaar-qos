@@ -51,7 +51,7 @@ public class TrafficMaskAspect extends QuoAspect
     private class NodeUpdater extends TimerTask {
 	public void run() {
 	    MulticastMessageAddress addr = 
-		(MulticastMessageAddress) MessageAddress.SOCIETY;
+		(MulticastMessageAddress) MessageAddress.MULTICAST_SOCIETY;
 	    Iterator itr = getRegistry().findRemoteMulticastTransports(addr);
 	    while (itr.hasNext()) {
 		MessageAddress node_ref = (MessageAddress) itr.next();

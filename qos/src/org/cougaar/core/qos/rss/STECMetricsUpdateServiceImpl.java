@@ -25,7 +25,7 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.naming.NS;
 import org.cougaar.core.node.NodeIdentificationService;
-import org.cougaar.core.node.NodeIdentifier;
+import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
@@ -157,7 +157,7 @@ public class STECMetricsUpdateServiceImpl
 
 	    NodeIdentificationService nis = (NodeIdentificationService)
 		sb.getService(this, NodeIdentificationService.class, null);
-	    NodeIdentifier id = nis.getNodeIdentifier();
+	    MessageAddress id = nis.getMessageAddress();
 
 	    channel = makeChannel(id);
 
@@ -272,7 +272,7 @@ public class STECMetricsUpdateServiceImpl
 	return real_ior;
     }
 
-    private TypedEventChannel makeChannel(NodeIdentifier id) {
+    private TypedEventChannel makeChannel(MessageAddress id) {
 	String ior = null;
 	String channel_id = null;
 	StatusTEC channel = null;

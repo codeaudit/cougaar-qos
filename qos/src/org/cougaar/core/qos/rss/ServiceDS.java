@@ -60,7 +60,7 @@ public class ServiceDS
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
 	NodeIdentificationService node_id_svc = (NodeIdentificationService)
 	    sb.getService(this, NodeIdentificationService.class, null);
-	String nodeID = node_id_svc.getNodeIdentifier().toString();
+	String nodeID = node_id_svc.getMessageAddress().toString();
 
 	Object[] params = { nodeID };
 	DataScopeSpec spec = new DataScopeSpec("Node", params);
