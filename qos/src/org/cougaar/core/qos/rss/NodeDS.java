@@ -38,6 +38,7 @@ public class NodeDS extends DataScope
 {
     static final String NODENAME = "nodename".intern();
     static final String TOPOLOGY = "topology";
+    static final String UNKNOWN_HOST_IP = "169.0.0.1";//DHCP No Address from server
 
     public NodeDS(Object[] parameters, DataScope parent) 
 	throws DataScope.ParameterError
@@ -63,13 +64,13 @@ public class NodeDS extends DataScope
 	    AddressEntry entry = svc.get(nodename, TOPOLOGY);
 	    if (entry == null) {
 		System.err.println("# Can't find host for node " +nodename);
-		host = "10.0.0.0"; // nice
+		host = UNKNOWN_HOST_IP;
 	    } else {
 		host = entry.getURI().getHost();
 	    }
 	} catch (Exception ex) {
 	    ex.printStackTrace();
-	    host = "10.0.0.0"; // nice
+	    host = UNKNOWN_HOST_IP;
 	}
 
 	Object[] params = { host };
