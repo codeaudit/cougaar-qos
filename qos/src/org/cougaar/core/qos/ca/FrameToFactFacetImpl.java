@@ -26,6 +26,8 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.util.Collection;
+
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
@@ -57,7 +59,8 @@ abstract public class FrameToFactFacetImpl
 	linkPlayer();
     }
 
-    abstract protected Object frame2Fact(Frame frame);
+    abstract protected Object frameToFact(Frame frame);
+    abstract protected Object changesToFact(Frame frame, Collection changes);
 
     public void setupSubscriptions(BlackboardService bbs) 
     {
@@ -77,28 +80,29 @@ abstract public class FrameToFactFacetImpl
 
 	java.util.Enumeration en;
 		
-	// observe added relays
+	// New Frames
 	en = sub.getAddedList();
 	while (en.hasMoreElements()) {
 	    Frame frame = (Frame) en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed added b"+frame);
 	    }
-	    player.assertFact(frame2Fact(frame));
+	    player.assertFact(frameToFact(frame));
 	}
 		
 		
-	// observe changed relays
+	// Changed Frames
 	en = sub.getChangedList();
 	while (en.hasMoreElements()) {
 	    Frame frame = (Frame) en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed changed "+frame);
 	    }
-	    player.assertFact(frame2Fact(frame));
+	    Collection changes = sub.getChangeReports(frame);
+	    player.assertFact(changesToFact(frame, changes));
 	}
 		
-	// removed relays
+	// Remove Frames.  TBD/
 	en = sub.getRemovedList();
 	while (en.hasMoreElements()) {
 	    Frame frame = (Frame) en.nextElement();
