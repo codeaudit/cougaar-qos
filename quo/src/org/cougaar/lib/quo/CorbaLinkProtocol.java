@@ -90,7 +90,7 @@ public class CorbaLinkProtocol
     private void makeMT() {
 	if (myProxy != null) return;
 	MessageAddress myAddress = getNameSupport().getNodeMessageAddress();
-	MTImpl impl = new MTImpl(myAddress, deliverer);
+	MTImpl impl = new MTImpl(myAddress, getDeliverer());
 	try {
 	    poa.activate_object(impl);
 	} catch (Exception ex) {
