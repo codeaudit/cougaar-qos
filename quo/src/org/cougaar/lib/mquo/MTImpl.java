@@ -19,11 +19,13 @@ package org.cougaar.lib.mquo;
 
 import org.cougaar.lib.quo.*;
 
-import org.cougaar.core.mts.MessageDeliverer;
-import org.cougaar.core.mts.MisdeliveredMessageException;
 import org.cougaar.core.mts.AttributedMessage;
-import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.mts.MessageAttributes;
+import org.cougaar.core.mts.MessageDeliverer;
+import org.cougaar.core.mts.MessageSecurityException;
+import org.cougaar.core.mts.MisdeliveredMessageException;
+import org.cougaar.core.mts.SerializationUtils;
 
 public class MTImpl extends MTPOA
 {
@@ -38,18 +40,50 @@ public class MTImpl extends MTPOA
 	this.deliverer = deliverer;
     }
 
-    public byte[] rerouteMessage(byte[] message_bytes) 
-	throws CorbaMisdeliveredMessage
+
+    private void securityException(MessageSecurityException mex)
+	throws CorbaMessageSecurityException
     {
-	AttributedMessage message = (AttributedMessage) 
-	    Zippy.fromByteArray(message_bytes);
 	try {
-	    MessageAttributes metadata = 
-		deliverer.deliverMessage(message, message.getTarget());
-	    return Zippy.toByteArray(metadata);
+	    byte[] exception = SerializationUtils.toByteArray(mex);
+	    throw new CorbaMessageSecurityException(exception);
+	} catch  (java.io.IOException iox) {
+	}
+	
+	throw new CorbaMessageSecurityException();
+    }
+
+    public byte[] rerouteMessage(byte[] message_bytes) 
+	throws CorbaMisdeliveredMessage, CorbaMessageSecurityException
+    {
+	AttributedMessage message = null;
+	try {
+	    message = (AttributedMessage) 
+		SerializationUtils.fromByteArray(message_bytes);
+	} catch (MessageSecurityException mex) {
+	    securityException(mex);
+	} catch (java.io.IOException iox) {
+	} catch (ClassNotFoundException cnf) {
+	}
+
+
+	MessageAttributes metadata = null;
+	try {
+	    metadata = deliverer.deliverMessage(message, message.getTarget());
 	} catch (MisdeliveredMessageException ex) {
 	    throw new CorbaMisdeliveredMessage();
 	}
+
+	byte[] reply_bytes = null;
+	try {
+	    reply_bytes = SerializationUtils.toByteArray(metadata);
+	} catch (MessageSecurityException mex) {
+	    securityException(mex);
+	} catch (java.io.IOException iox) {
+	}
+
+	return reply_bytes;
+
     }
   
 }

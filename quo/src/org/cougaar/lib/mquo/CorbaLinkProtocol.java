@@ -25,16 +25,18 @@ import org.cougaar.lib.quo.*;
 
 
 import org.cougaar.core.mts.AspectSupport;
+import org.cougaar.core.mts.AttributedMessage;
+import org.cougaar.core.mts.CommFailureException;
 import org.cougaar.core.mts.DestinationLink;
 import org.cougaar.core.mts.LinkProtocol;
-import org.cougaar.core.mts.MessageTransportClient;
-import org.cougaar.core.mts.NameLookupException;
-import org.cougaar.core.mts.UnregisteredNameException;
-import org.cougaar.core.mts.CommFailureException;
-import org.cougaar.core.mts.MisdeliveredMessageException;
-import org.cougaar.core.mts.AttributedMessage;
-import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.mts.MessageAttributes;
+import org.cougaar.core.mts.MessageSecurityException;
+import org.cougaar.core.mts.MessageTransportClient;
+import org.cougaar.core.mts.MisdeliveredMessageException;
+import org.cougaar.core.mts.NameLookupException;
+import org.cougaar.core.mts.SerializationUtils;
+import org.cougaar.core.mts.UnregisteredNameException;
 
 import org.omg.CORBA.ORB;
 import org.omg.PortableServer.POA;
@@ -243,22 +245,45 @@ public class CorbaLinkProtocol
 		   MisdeliveredMessageException
 	{
 	    cacheRemote();
+	    byte[] bytes = null;
 	    try {
-		byte[] bytes = Zippy.toByteArray(message);
-		byte[] res = remote.rerouteMessage(bytes);
-		return (MessageAttributes) Zippy.fromByteArray(res);
-	    } 
-	    catch (CorbaMisdeliveredMessage mis) {
+		bytes = SerializationUtils.toByteArray(message);
+	    } catch (MessageSecurityException mex) {
+		throw new CommFailureException(mex);
+	    } catch (java.io.IOException iox) {
+		// What would this mean?
+	    }
+
+	    byte[] res = null;
+	    try {
+		res = remote.rerouteMessage(bytes);
+	    } catch (CorbaMisdeliveredMessage mis) {
 		// force recache of remote
 		remote = null;
 		throw new MisdeliveredMessageException(message);
+	    } catch (CorbaMessageSecurityException mex) {
+		byte[] ex_bytes = mex.security_exception;
+		try {
+		    MessageSecurityException mse = (MessageSecurityException)
+			SerializationUtils.fromByteArray(ex_bytes);
+		    throw new CommFailureException(mse);
+		} catch (Exception ex) {
+		    // ???
+		}
 	    }
-	    catch (Exception ex) {
-		// force recache of remote
-		remote = null;
-		// Assume anything else is a comm failure
-		throw new CommFailureException(ex);
+	    
+	    MessageAttributes attrs = null;
+	    try {
+		attrs = (MessageAttributes) 
+		    SerializationUtils.fromByteArray(res);
+	    } catch (MessageSecurityException mex) {
+		throw new CommFailureException(mex);
+	    } catch (java.io.IOException iox) {
+		// What would this mean?
+	    } catch (ClassNotFoundException cnf) {
 	    }
+
+	    return attrs;
 	}
 
 

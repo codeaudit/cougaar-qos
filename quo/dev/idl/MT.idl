@@ -16,10 +16,14 @@ module cougaar {
     exception CorbaMisdeliveredMessage {
     };
 
+    exception CorbaMessageSecurityException {
+	bytes security_exception;
+    };
+
 
     interface MT {
 	bytes rerouteMessage(in bytes message) 
-	    raises(CorbaMisdeliveredMessage);
+	    raises(CorbaMisdeliveredMessage, CorbaMessageSecurityException);
     };
 
 };
