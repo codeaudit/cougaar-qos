@@ -166,7 +166,7 @@ abstract public class QueryFacet
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {
 	    if (log.isDebugEnabled()) 
 		log.debug("Processing fact " + frev.getFact());
-	    if (frev.isAssertion()) {
+	    if (frev instanceof FactAssertion) {
 		Object fact = frev.getFact();
 		// Should only be one and should be a RequestFact
 		sendQuery(fact, blackboard);
@@ -216,7 +216,7 @@ abstract public class QueryFacet
 	if (log.isDebugEnabled())
 	    log.debug("Tranformed " +response+ " into " +responseFact);
 	if (responseFact != null) 
-	    getPlayer().factAsserted(responseFact, getReceptacle());
+	    getPlayer().assertFact(responseFact, getReceptacle());
     }
 
 

@@ -67,7 +67,7 @@ abstract public class SleeperFacet
     {
 	if (!factsHaveChanged()) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {
-	    if (frev.isAssertion()) {
+	    if (frev instanceof FactAssertion) {
 		Object fact = frev.getFact();
 		// Should only be one and should be a RequestFact
 		Alarm alarm = makeAlarm(fact);

@@ -34,12 +34,12 @@ public interface RolePlayer
     /**
      * Informs the player that a new Fact has been asserted.
      */
-    public void factAsserted(Object fact, Receptacle receptacle);
+    public void assertFact(Object fact, Receptacle receptacle);
 
     /**
      * Informs the player that a new Fact has been retracted.
      */
-    public void factRetracted(Object fact, Receptacle receptacle);
+    public void retractFact(Object fact, Receptacle receptacle);
 
     /**
      * Informs the player that a {@link Facet} it requested is now

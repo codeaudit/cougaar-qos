@@ -42,8 +42,4 @@ public abstract class FactRevision
     {
 	return fact;
     }
-
-
-    abstract public boolean isAssertion();
-
 }

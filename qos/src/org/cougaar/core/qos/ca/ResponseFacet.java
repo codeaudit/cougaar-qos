@@ -137,7 +137,7 @@ abstract public class ResponseFacet
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {
 	    if (log.isDebugEnabled()) 
 		log.debug("Processing fact " + frev.getFact());
-	    if (frev.isAssertion()) {
+	    if (frev instanceof FactAssertion) {
 		Object fact = frev.getFact();
 		sendReply(fact, blackboard);
 	    } else {
@@ -203,7 +203,7 @@ abstract public class ResponseFacet
 	Object fact = query.getQuery();
 	if (log.isDebugEnabled())
 	    log.debug("Updated Fact" +fact);
-	getPlayer().factAsserted(fact, getReceptacle());
+	getPlayer().assertFact(fact, getReceptacle());
     }
 
 

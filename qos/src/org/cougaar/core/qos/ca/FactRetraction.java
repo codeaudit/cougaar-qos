@@ -31,14 +31,11 @@ package org.cougaar.core.qos.ca;
  */
 public class FactRetraction extends FactRevision 
 {
-    FactRetraction(Object fact) {
+    FactRetraction(Object fact) 
+    {
 	super(fact);
     }
  
-    public boolean isAssertion()
-    {
-	return false;
-    }
 }
 	
 
