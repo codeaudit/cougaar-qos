@@ -35,16 +35,17 @@ package org.cougaar.core.qos.ca;
 public interface CoordinationArtifact
 {
     /**
-     * Returns true iff the Artifact can handle the given spec.  This
-     * will only be called with specs that the Artifact's provider has
+     * Returns true iff the Artifact matches given spec.  This will
+     * only be called with specs that the Artifact's provider has
      * already said it supports.  The default implementation in {@link
-     * CoordinationArtifactImpl} therefore returns true for all specs.
+     * CoordinationArtifactImpl} therefore returns true for all specs
+     * in which the artifact-id field matches the artifact's id.
     */
     public boolean matches(ConnectionSpec spec);
 
     /**
      * Does the linkage between a {@link Facet}, which is generally
-     * created on the fly based on the spec and the player. The
+     * created on the fly based on the spec, and the player. The
      * default implementation in {@link CoordinationArtifactImpl}
      * handles this by deferring the creation to an abstract method.
      * 

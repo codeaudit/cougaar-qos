@@ -44,10 +44,11 @@ import org.cougaar.multicast.AttributeBasedAddress;
 import org.cougaar.util.UnaryPredicate;
 
 /**
- * An abstraction of the query role in the {@link
- * QueryResponseCoordinationArtifactProvider}.  The {@link Facet} methods are
- * implemented here, leaving subclasses only to implement the abstract
- * methods of this class.
+ * An abstraction of the query role in
+ * QueryResponseCoordinationArtifacts, as provided by {@link
+ * QueryResponseCoordinationArtifactProvider}.  The {@link Facet}
+ * methods are implemented here, leaving subclasses only to implement
+ * the abstract methods of this class.
  */
 abstract public class QueryFacet 
     extends CommunityFacetImpl

@@ -38,10 +38,7 @@ import org.cougaar.util.log.Logging;
 
 /**
  * This class is the standard base implementation of {@link
- * CoordinationArtifact} some.  It acts an intermediary between {@link
- * Facet}s, which it creates, and the {@link
- * CoordinationArtifactProvider} they 'implement' (conceptually, not
- * in the Java sense).
+ * CoordinationArtifact}.  
  *
  */
 abstract public class CoordinationArtifactImpl

@@ -41,8 +41,8 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
 /**
- * This plugin provides the CoordinationArtifactBroker service, which is
- * implemented by an inner class.
+ * This plugin provides the {@link CoordinationArtifactBroker}
+ * service, which is implemented by an inner class.
  */
 public class CoordinationArtifactBrokerPlugin
     extends ParameterizedPlugin

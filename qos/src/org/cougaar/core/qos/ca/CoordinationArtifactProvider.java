@@ -27,10 +27,9 @@
 package org.cougaar.core.qos.ca;
 
 /**
- * See xxx for more detailes on CoordinationArtifactProviders.
- * Providers provide the general description of a family of
- * {@link CoordinationArtifact}s, all of which have the same set of
- * roles and parameters.
+ * See xxx for more detailes on CoordinationArtifactProviders.  They
+ * provide a family of {@link CoordinationArtifact}s, all of which
+ * have the same set of roles and parameters.
  */
 public interface CoordinationArtifactProvider
 {

@@ -28,6 +28,9 @@ package org.cougaar.core.qos.ca;
 
 import org.cougaar.core.service.community.Community;
 
+/**
+ * This interface adds Community support to {@link Receptacle}.
+ */
 public interface CommunityReceptacle extends Receptacle
 {
     public Community getCommunity();

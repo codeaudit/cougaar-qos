@@ -41,10 +41,11 @@ import org.cougaar.util.UnaryPredicate;
 
 
 /**
- * An abstraction of the response role in the {@link
- * QueryResponseCoordinationArtifactProvider}.  The {@link Facet} methods are
- * implemented here, leaving subclasses only to implement the abstract
- * methods of this class.
+ * An abstraction of the response role in the
+ * QueryResponseCoordinationArtifact, as provided by {@link
+ * QueryResponseCoordinationArtifactProvider}.  The {@link Facet}
+ * methods are implemented here, leaving subclasses only to implement
+ * the abstract methods of this class.
  */
 abstract public class ResponseFacet
     extends CommunityFacetImpl

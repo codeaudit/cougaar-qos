@@ -31,7 +31,7 @@ import org.cougaar.core.component.ServiceBroker;
 /**
  * This plugin is the generic implementation of a multicast
  * query/response rpc {@link CoordinationArtifactProvider}.  The
- * {@link CoordinationArtifact}s it creates handles the Community and
+ * {@link CoordinationArtifact}s it creates handle the Community and
  * Relay muck, leaving instantiable extensions only a few
  * domain-specific tasks to deal with, as described in the abtract
  * methods.

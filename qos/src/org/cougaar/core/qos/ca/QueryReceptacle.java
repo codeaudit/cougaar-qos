@@ -26,6 +26,11 @@
 
 package org.cougaar.core.qos.ca;
 
+/**
+ * This interface adds one method to CommunityReceptacle that allows
+ * RolePlayers to find out how many recipients a given message is
+ * expected to have.
+ */
 public interface QueryReceptacle extends CommunityReceptacle
 {
     public int getReceiverCount();

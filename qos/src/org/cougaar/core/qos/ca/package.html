@@ -15,25 +15,25 @@
   kind of Artifact completes this by supplying Community names, data
   types etc.
 
-<p> A CoordinationArtifactTemplate defines a set of <i>Roles</i> that
-  describe the functions performed by each client.  For example in
+<p>Coordination Artifacts are created by a
+  CoordinationArtifactProvider, via requests made to the
+  CoordinationArtifactBroker.  A CoordinationArtifactProviders is like
+  a COUGAAR ServiceProvider: its primary job is to find or make
+  CoordinationArtifacts of some particular kind.  But it also
+  implicitly defines a set of <i>Roles</i> that describe the functions
+  performed by clients of this kind of Artifact.  For example in
   Artifacts that implement a multicast request (one request, multiple
-  replies), the two Roles are queryer and responder.  Every Role has a
-  corresponding interface that specifies the operations that can be
-  performed on the Artifact by clients playing that Role.  These
-  interfaces are therefore very much like <i>Facets</i> in the CORBA
-  Component Model: they present a Role-specific viewport into the
-  Artifact as a whole.  Likewise, the client's handle on a Facet is
-  similar to a <i>Receptacle</i> in CCM.  A Template also defines a
-  set of parameters that distinguish the individuals of that kind of
-  Artifact.
+  replies), the two Roles are queryer and responder.  
 
-<p>An instance of a CoordinationArtifactTemplate is something like a
-  Java class: it defines a <i>kind</i> of Artifact, in terms of its
-  Facets and parameters, and it has the responsibiliy for creating
-  individual CoordinationArtifacts of that kind, each of which has its
-  own state.  These stateful parameterizations are mainly concerned
-  with creating Facets for each Role and matching them to clients. 
+<p>Every Role has a corresponding interface that specifies the
+  operations that can be performed on the Artifact by clients playing
+  that Role.  These interfaces are therefore very much
+  like <i>Facets</i> in the CORBA Component Model: they present a
+  Role-specific viewport into the Artifact as a whole.  Likewise, the
+  client's handle on a Facet is similar to a <i>Receptacle</i> in CCM.
+  A Provider also defines a set of parameters that distinguish the
+  individuals of that kind of Artifact.
+
   
 
 
@@ -54,13 +54,11 @@
  </li>
 
  <li><strong>CoordinationArtifact</strong>: The creation of Facets and
-     the linkage between Facets RolePlayers is handled at this layer.
-     This is also the holder of state for a given instance of some
-     Template</li>
+     the linkage between Facets RolePlayers is handled at this
+     layer.</li>
 
- <li><strong>CoordinationArtifactTemplate</strong>: An abstract
-   specification of what Artifacts of this kind.  The main job of the
-   Template is to define the logical Roles and parameters, and to
+ <li><strong>CoordinationArtifactProvider</strong>: The main job of
+   the Provider is to define the logical Roles and parameters, and to
    create and manage CoordinationArtifacts as needed.
  </li>
 
@@ -71,22 +69,6 @@
 </ul>
 
 
-<p>More detailed descriptions of these classes and interfaces follow.
-<i>TO BE DONE</i>
-
-<h3>RolePlayer</h3>
-
-<h3>Facet</h3>
-
-<h3>CoordinationArtifact</h3>
-
-<h3>CoordinationArtifactTemplate</h3>
-
-<h3>CoordinationArtifactBroker</h3>
-
-<h3>Fact</h3>
-
-<h3>ConnectionSpec</h3>
 
 
 

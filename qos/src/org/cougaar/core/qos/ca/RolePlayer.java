@@ -32,9 +32,20 @@ package org.cougaar.core.qos.ca;
  */
 public interface RolePlayer
 {
+    /**
+     * Informs the player that a new Fact has been asserted.
+     */
     public void factAsserted(Object fact, Receptacle receptacle);
 
+    /**
+     * Informs the player that a new Fact has been retracted.
+     */
     public void factRetracted(Object fact, Receptacle receptacle);
 
+    /**
+     * Informs the player that a {@link Facet} it requested is now
+     * ready for use.  The Facet's receptacle is provided, along with
+     * the spec that described the original request.
+     */
     public void facetAvailable(ConnectionSpec spec, Receptacle receptacle);
 }

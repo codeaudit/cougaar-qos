@@ -29,30 +29,30 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * TBD
+ * This interface is the common base between {@link Receptacle}s and
+ * {@link Facet}s.  These are always paired, with the former
+ * acccessible only to a {@link RolePlayer} and the latter
+ * accessible only to a {@link CoordinationArtifact}.
  */
 public interface Executor
 {
     /**
      * Process any queued facts.  This should be run in a blackboard
-     * transaction.  Usually invoked by the {@link
-     * CoordinationArtifact} that owns the facet.
+     * transaction.
     */
     public void processFactBase(BlackboardService blackboard);
 
 
     /**
      * Handle subscription updates. This should be run in a blackboard
-     * transaction.  Usually invoked by the {@link
-     * CoordinationArtifact} that owns the Facet.
+     * transaction. 
      */
     public void execute(BlackboardService blackboard);
 
 
     /**
      * Handle blackboard subscriptions.  This should be run in a
-     * blackboard transaction.  Usually invoked by the {@link
-     * CoordinationArtifact} that owns the Facet.
+     * blackboard transaction.
     */
     public void setupSubscriptions(BlackboardService blackboard);
 

@@ -34,11 +34,7 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 
 /**
- * This class represents the base implementation of a {@link
- * CoordinationArtifactProvider}. It registers the Provider with the
- * broker and provides basic bookkeepiing for the {@link
- * CoordinationArtifact}s.  Instantiation of CoordinationArtifactss
- * must be handled in subclasses, via the makeArtifact method.
+ * This is a simple Plugin wrapper for a {@link CoordinationArtifactProvider}.
  *
  */
 abstract public class CoordinationArtifactProviderPlugin

@@ -29,7 +29,7 @@ package org.cougaar.core.qos.ca;
 
 /**
  * A Facet represents a role in {@link CoordinationArtifact}.  {@link
- * RolePlayer}s interact with Facets throuh a {@link Receptacle}
+ * RolePlayer}s interact with Facets through a {@link Receptacle}
  * handle.
  */
 public interface Facet extends Executor

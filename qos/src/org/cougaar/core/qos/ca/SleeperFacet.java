@@ -31,6 +31,11 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.AlarmService;
 import org.cougaar.core.service.BlackboardService;
 
+/**
+ * Does the main work of the Alarm Coordinaton Artifact.  In
+ * particular, it schedules cougaar Alarms with the
+ * AlarmService. Subclasses are responsible for creating the Alarm.
+ */
 abstract public class SleeperFacet 
     extends FacetImpl
 {
