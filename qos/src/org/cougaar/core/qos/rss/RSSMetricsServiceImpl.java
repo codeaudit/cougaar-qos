@@ -35,10 +35,13 @@ import com.bbn.quo.event.data.StatusConsumerFeed;
 
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.metrics.DataProvider;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
+import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.node.NodeIdentifier;
+import org.cougaar.core.service.LoggingService;
 
 import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
@@ -47,7 +50,8 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-public final class RSSMetricsServiceImpl 
+public class RSSMetricsServiceImpl 
+    extends QosComponent
     implements MetricsService 
 {
 
@@ -71,7 +75,9 @@ public final class RSSMetricsServiceImpl
 
     private static final String RSS_PROPERTIES =
 	"org.cougaar.metrics.properties";
-
+    
+    private LoggingService loggingService;
+    private STECMetricsUpdateServiceImpl metricsUpdateService;
 
     static class DataWrapper implements Metric {
 	private DataValue data;
@@ -105,7 +111,9 @@ public final class RSSMetricsServiceImpl
     }
 
 
-    private static class DataValueObserver implements Observer {
+    private static class DataValueObserver 
+	implements Observer, DataProvider
+    {
 	Observer observer;
 	BoundDataFormula bdf;
 
@@ -125,11 +133,26 @@ public final class RSSMetricsServiceImpl
 	void unsubscribe() {
 	    bdf.deleteObserver(this);
 	}
+
+	public String getPath() {
+	    return bdf.getPath();
+	}
     }
 
-    public RSSMetricsServiceImpl(ServiceBroker sb, 
-				 MetricsUpdateService mus) 
-    {
+    public RSSMetricsServiceImpl() {
+    }
+
+    public void load() {
+	super.load();
+
+	ServiceBroker sb = getServiceBroker();
+	loggingService = (LoggingService)
+	    sb.getService(this, LoggingService.class, null);
+
+	MetricsUpdateService mus = (MetricsUpdateService)
+	    sb.getService(this, MetricsUpdateService.class, null);
+	this.metricsUpdateService = (STECMetricsUpdateServiceImpl) mus;
+
 	Properties properties = new Properties();
 	String propertiesURL = System.getProperty(RSS_PROPERTIES);
 	if (propertiesURL != null) {
@@ -142,28 +165,27 @@ public final class RSSMetricsServiceImpl
 	    }
 	}
 	properties.put("ServiceBroker", sb);
+	properties.put("rss.timer", new CougaarTimer(sb)); 
 	DataFeed feed = null;
 	String feedName = null;
 	TypedEventChannel channel = null;
-	if (mus instanceof STECMetricsUpdateServiceImpl) {
-	    channel =
-		((STECMetricsUpdateServiceImpl) mus).getChannel();
-	    if (channel != null) {
-		String ior = Connector.orb().object_to_string(channel);
-// 		String feeds = properties.getProperty("rss.DataFeeds", "");
-// 		feeds += " STEC_Channel";
-// 		properties.put("rss.DataFeeds", feeds);
-// 		properties.put("STEC_Channel.class", 
-// 			       "com.bbn.quo.event.data.StatusConsumerFeed");
-// 		properties.put("STEC_Channel.args", "-ior " +ior);
-		String[] args = { "-ior", ior };
-		feed = new StatusConsumerFeed(args);
-		feedName = "Local_STEC_Channel";
-	    } else {
-		feed = ((STECMetricsUpdateServiceImpl) mus).getMetricsFeed();
-		feedName = "MetricsDataFeed";
-	    }
-	} 
+	channel = metricsUpdateService.getChannel();
+	if (channel != null) {
+	    String ior = Connector.orb().object_to_string(channel);
+	    // 		String feeds = properties.getProperty("rss.DataFeeds", "");
+	    // 		feeds += " STEC_Channel";
+	    // 		properties.put("rss.DataFeeds", feeds);
+	    // 		properties.put("STEC_Channel.class", 
+	    // 			       "com.bbn.quo.event.data.StatusConsumerFeed");
+	    // 		properties.put("STEC_Channel.args", "-ior " +ior);
+	    String[] args = { "-ior", ior };
+	    feed = new StatusConsumerFeed(args);
+	    feedName = "Local_STEC_Channel";
+	} else {
+	    feed = metricsUpdateService.getMetricsFeed();
+	    feedName = "MetricsDataFeed";
+	}
+
 	RSS.makeInstance(properties);
 	if (feed != null) {
 	    feed.setName(feedName);
@@ -196,8 +218,13 @@ public final class RSSMetricsServiceImpl
     }
 
     public Object subscribeToValue(String path, Observer observer) {
-	BoundDataFormula bdf = new BoundDataFormula(path);
-	return new DataValueObserver(observer, bdf);
+	try {
+	    BoundDataFormula bdf = new BoundDataFormula(path);
+	    return new DataValueObserver(observer, bdf);
+	} catch (com.bbn.quo.data.NullFormulaException ex) {
+	    loggingService.error(path+ " is not valid");
+	    return null;
+	}
     }
 
     public void unsubscribeToValue(Object key) {

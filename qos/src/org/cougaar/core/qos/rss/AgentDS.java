@@ -33,6 +33,7 @@ import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
+import com.bbn.quo.data.RSSUtils;
 
 public class AgentDS 
     extends DataScope 
@@ -100,10 +101,12 @@ public class AgentDS
 	extends DataFormula
     {
 
-	private DataFormula feedMerger;
-
 	abstract String getKey();
-	abstract DataValue defaultValue();
+	
+	protected DataValue defaultValue() {
+	    return new DataValue(0);
+	}
+	
 
 	protected void initialize(DataScope scope) {
 	    super.initialize(scope);
@@ -130,13 +133,96 @@ public class AgentDS
 
     }
 
+    abstract static class MonotonicLongFormula extends Formula {
+	int granularity = 1000;
+	protected DataValue doCalculation(DataFormula.Values vals){
+	    DataValue newValue = vals.get("Formula");
+	    DataValue cachedValue= getCachedValue();
+	    long  longNew = newValue.getLongValue();
+	    long  longCached = cachedValue.getLongValue();
+	    if (longNew - longCached > granularity) {
+		return newValue; 
+	    } else {
+		return cachedValue;
+	    }	    
+	}
+    }
+
+    abstract static class AlarmFormula extends DataFormula {
+
+	abstract String getKey();
+	
+	protected DataValue defaultValue() {
+	    return new DataValue(0);
+	}
+	
+
+	protected void initialize(DataScope scope) {
+	    super.initialize(scope);
+	    DataFormula baseFormula=getScope().getFormula(getKey());
+	    registerDependency(baseFormula, "Formula");
+	    DataFormula alarm = RSSUtils.getPathFormula("Alarm():OneSecond");
+	    registerDependency(alarm, "Alarm");
+	}
+
+	protected DataValue doCalculation(DataFormula.Values vals)
+	{
+	    long sendTime = vals.get("Formula").getLongValue();
+	    long alarmTime = vals.get("Alarm").getLongValue();
+	    DataValue elapsed = new DataValue(0);
+
+// 	    String agentName = (String) getScope().getValue(AGENTNAME);
+// 	    System.err.println("Agent "+agentName+ 
+// 			       " send="+sendTime+
+// 			       " alarm="+alarmTime+
+// 			       " delta=" + (alarmTime - sendTime));
+
+	    if (alarmTime > sendTime) {
+		long seconds= (long) Math.floor((alarmTime-sendTime)/1000.0);
+		elapsed.setValue(seconds);
+	    }
+	    elapsed.setCredibility(vals.minCredibility());
+	    return elapsed;
+	}
+
+	
+    }
+
+
+    public static class LastHeard extends AlarmFormula {
+	String getKey() {
+	    return "HeardTime";
+	}
+    }
+
+    public static class LastSpoke extends AlarmFormula {
+	String getKey() {
+	    return "SpokeTime";
+	}
+    }
+
+
     public static class OneSecondLoadAvg extends Formula {
 	String getKey() {
 	    return Constants.ONE_SEC_LOAD_AVG;
 	}
+    }	
 
-	DataValue defaultValue() {
-	    return new DataValue(0);
+    // JAZ both HeardTime and SpokeTime need to be Monotonic, and they
+    // need to be hooked into LastHeard and LastSpoke
+
+    //The raw integrater values can not be used because there is no
+    //ordering between threads, so an old thread could publish a
+    //HeardTime that is actually before the current HeardTime
+    public static class HeardTime extends MonotonicLongFormula {
+	String getKey() {
+	    return "HeardTime";
+	}
+    }	
+
+    public static class SpokeTime extends MonotonicLongFormula {
+	String getKey() {
+	    return "SpokeTime";
 	}
     }	
 

@@ -55,7 +55,7 @@ class STECSender extends PushSupplierPOA
     private TypedEventChannel channel;
     private CircularQueue queue;
     private Schedulable thread;
-    private boolean useThreads = true;
+    private boolean useThreads = false; // broken right now
 
     private  class Provider implements Runnable {
 
@@ -64,12 +64,14 @@ class STECSender extends PushSupplierPOA
 
 	public void run() {
 	    StatusPayloadStruct payload = null;
-	    synchronized (queue) {
-		if (queue != null)
+	    while (true) {
+		synchronized (queue) {
+		    if (queue.isEmpty()) break;
 		    payload = (StatusPayloadStruct) queue.next();
+		}
+		if (payload == null) continue;
+		sendPayload(payload);
 	    }
-	    if (payload == null) return;
-	    sendPayload(payload);
 	}
     }
 

@@ -47,26 +47,21 @@ public class TrivialDataFeed
     private CircularQueue queue;
     private Schedulable thread;
 
-    private static class KeyValuePair {
-	String key;
-	DataValue value;
-	
-	KeyValuePair(String key, DataValue value) {
-	    this.key = key;
-	    this.value = value;
-	}
-    }
-
 
     private class Notifier implements Runnable {
 	public void run() { 
-	    KeyValuePair payload = null;
-	    synchronized (queue) {
-		if (queue != null)
-		    payload = (KeyValuePair) queue.next();
+	    String key = null;
+	    DataValue value = null;
+	    while (true) {
+		synchronized (queue) {
+		    if (queue.isEmpty()) break;
+		    key = (String) queue.next();
+		}
+		if (key == null) continue;
+		value = lookup(key);
+		if (value == null) continue;
+		notifyListeners(key, value); 
 	    }
-	    if (payload == null) return;
-	    notifyListeners(payload.key, payload.value); 
 	}
     }
 
@@ -131,9 +126,14 @@ public class TrivialDataFeed
 	    Object val = metric.getRawValue();
 	    DataValue value = new DataValue(val, credibility, units, prov);
 	    data.put(key, value);
-	    KeyValuePair pair = new KeyValuePair(key, value);
-	    synchronized (queue) { queue.add(pair); }
-	    thread.start();
+	    boolean new_queue_entry = false;
+	    synchronized (queue) {
+		if (!queue.contains(key)) {
+		    queue.add(key);
+		    new_queue_entry = true;
+		}
+	    }
+	    if (new_queue_entry) thread.start();
 	}
     }
 

@@ -28,6 +28,7 @@ import org.cougaar.core.node.NodeIdentificationService;
 import org.cougaar.core.node.NodeIdentifier;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
+import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.NamingService;
 import org.cougaar.core.service.ThreadService;
 
@@ -45,6 +46,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.BasicAttributes;
 
 public class STECMetricsUpdateServiceImpl
+    extends QosComponent
     implements MetricsUpdateService
 {
     private static final String RSS_DIR = "RSS";
@@ -53,14 +55,18 @@ public class STECMetricsUpdateServiceImpl
     private static final String TOPOLOGY_DUMP_IORFILE_PROPERTY = 
 	"org.cougaar.metrics.topology.iorfile";
     
-    private ServiceBroker sb;
     private STECSender sender;
     private NamingService namingService;
     private TypedEventChannel channel;
     private TrivialDataFeed dataFeed;
 
-    public STECMetricsUpdateServiceImpl(ServiceBroker sb) {
-	this.sb = sb;
+    public STECMetricsUpdateServiceImpl() {
+    }
+
+    public void load() {
+	super.load();
+
+	ServiceBroker sb = getServiceBroker();
 
 	// make sure jacorb is configured
 	String orbclass = System.getProperty("org.omg.CORBA.ORBClass");

@@ -1,22 +1,32 @@
 #!/bin/sh
 
+iorfile=${IORFILE:-topology.ior}
+
+
+#key=${KEY:-Host_128.89.72.1_CPU_Jips}
+#callback=${METRIC:-"Host(128.89.72.1):Jips"}
+query=${METRIC:-"Host(`hostname`):Jips"}
+
+key=${KEY:-Agent_foo_HeardTime}
+callback=${METRIC:-"Agent(foo):HeardTime"}
+
 #  $COUGAAR_INSTALL_PATH/bin/eventgenerator.sh generates multicast traffic
 
-# The standard Node script should do this:
+# Enable STEC FEED and Probe
 orb="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB -Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton -Djacorb.verbosity=0"
 
-iorfile=${IORFILE:-topology.ior}
-key=${KEY:-Host_128.89.72.1_CPU_Jips}
-metric=${METRIC:-"Host(128.89.72.1):Jips"}
-#metric=${METRIC:-"Host(`hostname`):Jips"}
+
+stec=" -Dorg.cougaar.metrics.properties=http://stout/~statusquo/Metrics-Stec.conf -Dorg.cougaar.metrics.stec.mesh=true -Dorg.cougaar.metrics.topology.iorfile=$iorfile"
+
+query="-Dorg.cougaar.metrics.query=$query -Dorg.cougaar.metrics.key=$key -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MetricsTestAspect"
+
+subscribe="-Dorg.cougaar.metrics.callback=$callback -Dorg.cougaar.metrics.key=$key -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MetricsTestAspect"
+
+blaster="-Dorg.cougaar.metrics.callback=$callback -Dorg.cougaar.metrics.key=$key -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MetricsBlastTestAspect"
 
 
-stec=" -Dorg.cougaar.metrics.properties=http://stout/~statusquo/Metrics-Stec.conf -Dorg.cougaar.metrics.topology.iorfile=$iorfile"
 
-test="-Dorg.cougaar.metrics.test=$metric -Dorg.cougaar.metrics.key=$key -Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.MetricsTestAspect"
-
-
-COUGAAR_JAVA_ARGS="$orb "
+COUGAAR_JAVA_ARGS="$blaster $orb $stec  "
 export COUGAAR_JAVA_ARGS
 
 

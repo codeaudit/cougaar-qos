@@ -3,7 +3,10 @@
 # Serialization aspect prints status at INFO level of logging service,
 # not DEBUG level.
 
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.SerializationAspect"
+logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_INSTALL_PATH/quo/bin/props/cougaar/logging.props
+aspects="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.SerializationAspect"
+
+COUGAAR_JAVA_ARGS="$logging $aspects"
 export COUGAAR_JAVA_ARGS
 
 
