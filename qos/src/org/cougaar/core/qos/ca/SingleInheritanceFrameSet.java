@@ -256,7 +256,7 @@ public class SingleInheritanceFrameSet
 	// Publish the frame itself as the change, or just a change
 	// record for the specific attribute?
 	ArrayList changes = new ArrayList(1);
-	Change change = new Change(attribute, value);
+	Frame.Change change = new Frame.Change(attribute, value);
 	changes.add(change);
 	if (bbs != null) bbs.publishChange(frame, changes);
     }

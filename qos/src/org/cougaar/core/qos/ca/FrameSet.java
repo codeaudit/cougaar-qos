@@ -30,16 +30,6 @@ import java.util.Properties;
 
 public interface FrameSet
 {
-    public static class Change {
-	public String attribute;
-	public Object value;
-	public Change(String attr, Object val)
-	{
-	    this.attribute = attr;
-	    this.value = val;
-	}
-    }
-
     public Frame findFrame(String kind, String slot, Object value);
 
     public Object getFrameValue(Frame frame, String attribute);

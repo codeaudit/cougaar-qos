@@ -28,6 +28,8 @@ package org.cougaar.core.qos.ca;
 
 import java.util.Properties;
 
+
+import org.cougaar.core.blackboard.ChangeReport;
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
 
@@ -108,6 +110,23 @@ public final class Frame
     {
 	return uid.hashCode();
     }
+
+
+
+    public static class Change implements ChangeReport {
+	public String attribute;
+	public Object value;
+	public Change(String attr, Object val)
+	{
+	    this.attribute = attr;
+	    this.value = val;
+	}
+	
+	public String getAttribute() { return attribute; }
+
+	public Object getValue() { return value; }
+    }
+
 
 }
 
