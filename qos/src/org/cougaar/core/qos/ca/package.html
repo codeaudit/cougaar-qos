@@ -15,24 +15,24 @@
   kind of Artifact completes this by supplying Community names, data
   types etc.
 
-<p> An Artifact defines a set of <i>Roles</i> that define the
-  functions performed by each client.  For example in an Artifact that
-  implements a multicast request (one request, multiple replies), the
-  two Roles are queryer and responder.  Every Role has a corresponding
-  interface that specifies the operations that can be performed on the
-  Artifact by clients playing that Role.  These interfaces are
-  therefore very much like <i>Facets</i> in the CORBA Component Model:
-  they present a Role-specific viewport into the Artifact as a whole.
-  An Artifact also defines a set of parameters that, for kind of
-  Artifact, distinguish the individuals of that kind from one another.
+<p> A CoordinationArtifactTemplate defines a set of <i>Roles</i> that
+  define the functions performed by each client.  For example in
+  Artifacts that implement a multicast request (one request, multiple
+  replies), the two Roles are queryer and responder.  Every Role has a
+  corresponding interface that specifies the operations that can be
+  performed on the Artifact by clients playing that Role.  These
+  interfaces are therefore very much like <i>Facets</i> in the CORBA
+  Component Model: they present a Role-specific viewport into the
+  Artifact as a whole.  An Artifact also defines a set of parameters
+  that, for kind of Artifact, distinguish the individuals of that kind
+  from one another.
 
-<p>An instance of a Coordination Artifact is something like a Java
-  class: it defines a <i>kind</i> of Artifact, in terms of its Facets
-  and parameters, and it has the responsibiliy for creating individual
-  parameterizations of that kind, each of which has its own state.
-  These stateful parameterizations are mainly concerned with creating
-  Facets for each Role and matching them to clients.  In other words,
-  their main job is to be a Facet <i>provider</i>.
+<p>An instance of a CoordinationArtifactTemplate is something like a
+  Java class: it defines a <i>kind</i> of Artifact, in terms of its
+  Facets and parameters, and it has the responsibiliy for creating
+  individual CoordinationArtifacts of that kind, each of which has its
+  own state.  These stateful parameterizations are mainly concerned
+  with creating Facets for each Role and matching them to clients. 
   
 
 
@@ -49,26 +49,23 @@
      is effectively a definition of the role.
  </li>
 
- <li><strong>FacetProvider</strong>: The creation of Facets and the
-     linkage between Facets RolePlayers is handled at this layer.
-     This is also the holder of state for parameterizations for any
-     given kind of Artifact</li>
+ <li><strong>CoordinationArtifact</strong>: The creation of Facets and
+     the linkage between Facets RolePlayers is handled at this layer.
+     This is also the holder of state for a given instance of some
+     Template</li>
 
- <li><strong>CoordinationArtifact</strong>: The artifact itself, whose
-   job is to define the logical Roles and parameters, and to create
-   and manage parameterizations (ie FacetProviders) as needed.
+ <li><strong>CoordinationArtifactTemplate</strong>: An abstract
+   specification of what Artifacts of this kind.  The main job of the
+   Template is to define the logical Roles and parameters, and to
+   create and manage CoordinationArtifacts as needed.
  </li>
 
- <li><strong>FacetBroker</strong>: This interface defines a COUGAAR
-     service that provides the top-level entry point into CAs.</li>
+ <li><strong>CoordinationArtifactBroker</strong>: This interface
+     defines a COUGAAR service that provides the top-level entry point
+     into CAs.</li>
 
 </ul>
 
-<p> In the current design, the assumption is that RolePlayers and
-Facets communicate through a shared fact base, eventually including
-Jess-like rules defined in terms of facts.  For now
-<strong>Fact</strong> is defined locally, and Fact instances are
-handled through ordinary method calls between Facets and RolePlayers.
 
 <p>More detailed descriptions of these classes and interfaces follow.
 <i>TO BE DONE</i>
@@ -77,15 +74,15 @@ handled through ordinary method calls between Facets and RolePlayers.
 
 <h3>Facet</h3>
 
-<h3>FacetProvider</h3>
-
 <h3>CoordinationArtifact</h3>
 
-<h3>FacetBroker</h3>
+<h3>CoordinationArtifactTemplate</h3>
+
+<h3>CoordinationArtifactBroker</h3>
 
 <h3>Fact</h3>
 
-<h3> ConnectionSpec</h3>
+<h3>ConnectionSpec</h3>
 
 
 

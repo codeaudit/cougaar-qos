@@ -35,21 +35,22 @@ import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This class represents the state of a particular parameterizarion of
- * some {@link CoordinationArtifact}.  It acts an intermediary between
- * {@link Facet}s, which it creates, and the Artifact they 'implement'
- * (conceptually, not in the Java sense).
+ * This class is the standard base implementation of {@link
+ * CoordinationArtifact} some.  It acts an intermediary between {@link
+ * Facet}s, which it creates, and the {@link
+ * CoordinationArtifactTemplate} they 'implement' (conceptually, not
+ * in the Java sense).
  *
  */
-abstract public class FacetProviderImpl
-    implements FacetProvider
+abstract public class CoordinationArtifactImpl
+    implements CoordinationArtifact
 {
     private Properties parameters;
     private List facets = new ArrayList();
-    private CoordinationArtifact owner;
+    private CoordinationArtifactTemplate owner;
 
-    protected FacetProviderImpl(CoordinationArtifact owner, 
-				ConnectionSpec spec)
+    protected CoordinationArtifactImpl(CoordinationArtifactTemplate owner, 
+				       ConnectionSpec spec)
     {
 	if (spec.ca_parameters != null)
 	    this.parameters = new Properties(spec.ca_parameters);
@@ -66,7 +67,7 @@ abstract public class FacetProviderImpl
 
 
 
-    // FacetProvider
+    // CoordinartionArtifact
     public boolean matches(ConnectionSpec spec)
     {
 	if (spec.ca_parameters == null && parameters == null) return true;

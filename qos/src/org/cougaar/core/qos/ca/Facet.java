@@ -49,14 +49,16 @@ public interface Facet
 
     /**
      * Process any queued facts.  This should be run in a blackboard
-     * transacion.  Usually invoked by the {@link FacetProvider}.
+     * transacion.  Usually invoked by the {@link
+     * CoordinationArtifact} that owns the facet.
     */
     public void processFactBase(BlackboardService blackboard);
 
 
     /**
      * Handle subscription updates. This should be run in a blackboard
-     * transacion.  Usually invoked by the {@link FacetProvider}.
+     * transacion.  Usually invoked by the {@link
+     * CoordinationArtifact} that owns the Facet.
      */
     public void execute(BlackboardService blackboard);
 

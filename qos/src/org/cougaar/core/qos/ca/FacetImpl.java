@@ -50,7 +50,7 @@ abstract public class FacetImpl // should be abstract
 {
     private RolePlayer player;
     private ConnectionSpec spec;
-    private FacetProvider owner;
+    private CoordinationArtifact owner;
     private SimpleQueue factQueue;
     private Community community;
     private String communityName;
@@ -77,7 +77,7 @@ abstract public class FacetImpl // should be abstract
     public abstract AttributeBasedAddress makeABA(String communityName);
 
 
-    protected FacetImpl(FacetProvider owner, 
+    protected FacetImpl(CoordinationArtifact owner, 
 			ServiceBroker sb,
 			ConnectionSpec spec, 
 			RolePlayer player)
@@ -136,7 +136,7 @@ abstract public class FacetImpl // should be abstract
 	return player;
     }
 
-    FacetProvider getOwner()
+    CoordinationArtifact getOwner()
     {
 	return owner;
     }
@@ -220,7 +220,6 @@ abstract public class FacetImpl // should be abstract
     }
 
 
-    // Artifact-specific Providers get at the new facts this way.
     protected FactRevision nextFact()
     {
 	synchronized (factQueue) {

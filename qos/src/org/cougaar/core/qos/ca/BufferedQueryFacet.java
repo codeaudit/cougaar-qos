@@ -43,7 +43,7 @@ import org.cougaar.core.service.community.Entity;
 import org.cougaar.core.util.UID;
 
 /**
- * Part of the {@link QueryResponseCoordinationArtifact}, this
+ * Part of the {@link QueryResponseCoordinationArtifactTemplate}, this
  * extension of {@link QueryFacet} buffers replies until all active
  * members have responded, finally transforming the collection
  * responses rather than each response as it arrives.  The number of
@@ -66,7 +66,7 @@ abstract public class BufferedQueryFacet
     private String responderRole;
     private LoggingService log;
 
-    protected BufferedQueryFacet(FacetProviderImpl owner,
+    protected BufferedQueryFacet(CoordinationArtifact owner,
 				 ServiceBroker sb,
 				 ConnectionSpec spec, 
 				 RolePlayer player)

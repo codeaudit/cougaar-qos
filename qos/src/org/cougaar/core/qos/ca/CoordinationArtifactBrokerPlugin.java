@@ -41,14 +41,14 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
 /**
- * This plugin provides the FacetBroker service, which is
+ * This plugin provides the CoordinationArtifactBroker service, which is
  * implemented by an inner class.
  */
-public class FacetBrokerPlugin
+public class CoordinationArtifactBrokerPlugin
     extends ParameterizedPlugin
     implements ServiceProvider
 {
-    private FacetBroker impl;
+    private CoordinationArtifactBroker impl;
     private LoggingService log;
 
     public void load()
@@ -57,7 +57,7 @@ public class FacetBrokerPlugin
 
 	ServiceBroker sb = getServiceBroker();
 	impl = new Impl(sb);
-	sb.addService(FacetBroker.class, this); // should be root-level
+	sb.addService(CoordinationArtifactBroker.class, this);
 
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
@@ -80,7 +80,7 @@ public class FacetBrokerPlugin
 			     Object requestor, 
 			     Class serviceClass) 
     {
-	if (serviceClass == FacetBroker.class) {
+	if (serviceClass == CoordinationArtifactBroker.class) {
 	    return impl;
 	} else {
 	    return null;
@@ -95,11 +95,11 @@ public class FacetBrokerPlugin
     }
 
 	
-    private class Impl implements FacetBroker
+    private class Impl implements CoordinationArtifactBroker
     {
 	ThreadService tsvc;
 	HashMap pendingRequests;
-	HashMap artifacts;
+	ArrayList templates;
 	Schedulable requestsThread;
 	ServiceBroker sb;
 
@@ -108,13 +108,13 @@ public class FacetBrokerPlugin
 	    tsvc = (ThreadService)
 		sb.getService(this, ThreadService.class, null);
 	    pendingRequests = new HashMap();
-	    artifacts = new HashMap();
+	    templates = new ArrayList();
 	    Runnable runner = new Runnable() {
 		    public void run() {
 			checkPendingRequests();
 		    }
 		};
-	    requestsThread = tsvc.getThread(this, runner, "FacetBroker");
+	    requestsThread = tsvc.getThread(this, runner, "ArtifactBroker");
 	    this.sb = sb;
 	}
 
@@ -136,19 +136,13 @@ public class FacetBrokerPlugin
 
 
 
-	public void registerCoordinationArtifact(CoordinationArtifact ca)
+	public void registerCoordinationArtifactTemplate(CoordinationArtifactTemplate cat)
 	{
-	    String kind = ca.getArtifactKind();
-	    synchronized (artifacts) {
-		List afacts = (List) artifacts.get(kind);
-		if (afacts == null) {
-		    afacts = new ArrayList();
-		    artifacts.put(kind, afacts);
-		}
-		afacts.add(ca);
+	    synchronized (templates) {
+		templates.add(cat);
 	    }
 	    if (log.isDebugEnabled())
-		log.debug("Registered provider for " + kind);
+		log.debug("Registered artifact for " + cat.getArtifactKind());
 	    requestsThread.start();
 	}
 
@@ -171,28 +165,19 @@ public class FacetBrokerPlugin
 	{
 	    if (log.isDebugEnabled())
 		log.debug("Looking for " +spec.ca_kind+ " " +spec.role);
-	    synchronized (artifacts) {
-		List afacts = (List) artifacts.get(spec.ca_kind);
-		if (afacts != null) {
-		    if (log.isDebugEnabled())
-			log.debug(afacts.size() + 
-				  " registered artifacts for " +spec.ca_kind);
-		    for (int i=0; i<afacts.size(); i++) {
-			CoordinationArtifact ca = (CoordinationArtifact) 
-			    afacts.get(i);
-
-			if (ca.matches(spec)) {
-			    if (log.isDebugEnabled())
-				log.debug("Found " +spec.ca_kind+ " " 
-					  +spec.role);
-			    ca.provideFacet(spec, player);
-			    return true;
-
-			}
+	    synchronized (templates) {
+		for (int i=0; i<templates.size(); i++) {
+		    CoordinationArtifactTemplate cat = (CoordinationArtifactTemplate) 
+			templates.get(i);
+		    
+		    if (cat.supports(spec)) {
+			if (log.isDebugEnabled())
+			    log.debug("Found " +spec.ca_kind+ " " 
+				      +spec.role);
+			cat.provideFacet(spec, player);
+			return true;
+			
 		    }
-		} else {
-		    if (log.isDebugEnabled())
-			log.debug("No registered providers for " +spec.ca_kind);
 		}
 	    }
 	    if (log.isDebugEnabled())

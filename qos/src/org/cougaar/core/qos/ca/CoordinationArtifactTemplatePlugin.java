@@ -36,56 +36,57 @@ import org.cougaar.core.service.BlackboardService;
 
 /**
  * This class represents the base implementation of a {@link
- * CoordinationArtifact}. It registers the Artifact with the broker
- * and provides basic bookkeepiing for the {@link FacetProvider}s.
- * Instantiation of FacetProviders must be handled in subclasses, via
- * the makeFacetProvider method.
+ * CoordinationArtifactTemplate}. It registers the Template with the
+ * broker and provides basic bookkeepiing for the {@link
+ * CoordinationArtifact}s.  Instantiation of CoordinationArtifactss
+ * must be handled in subclasses, via the makeArtifact method.
  *
  */
-abstract public class AbstractArtifactPlugin
+abstract public class CoordinationArtifactTemplatePlugin
     extends ParameterizedPlugin
-    implements CoordinationArtifact
+    implements CoordinationArtifactTemplate
 {
 
     private ArrayList artifacts;
     /**
      *  Instantiable subclasses must provide this method.  Its job is
-     *  to create new FacetProviders, given a ConnectionSpec.
+     *  to create new CoordinationArtifacts, given a ConnectionSpec.
      */
-    abstract public FacetProvider makeFacetProvider(CoordinationArtifact owner, 
-						    ConnectionSpec spec);
+    abstract public CoordinationArtifact 
+	makeArtifact(CoordinationArtifactTemplate owner, 
+		     ConnectionSpec spec);
 
-    protected AbstractArtifactPlugin()
+    protected CoordinationArtifactTemplatePlugin()
     {
 	this.artifacts = new ArrayList();
     }
 
-    // By default an ArtifactProvider can handle any spec
-    public boolean matches(ConnectionSpec spec)
+    // By default handle all specs of the right kind
+    public boolean supports(ConnectionSpec spec)
     {
-	return true;
+	return spec.ca_kind.equals(getArtifactKind());
     }
 
 
     public void provideFacet(ConnectionSpec spec, RolePlayer player)
     {
-	FacetProvider provider = findOrMakeFacetProvider(spec);
-	if (provider != null) provider.provideFacet(spec, player, blackboard);
+	CoordinationArtifact artifact = findOrMakeArtifact(spec);
+	if (artifact != null) artifact.provideFacet(spec, player, blackboard);
     }
 
-    private FacetProvider findOrMakeFacetProvider(ConnectionSpec spec)
+    private CoordinationArtifact findOrMakeArtifact(ConnectionSpec spec)
     {
 	synchronized (artifacts) {
 	    for (int i=0; i<artifacts.size(); i++) {
-		FacetProvider fp = (FacetProvider) 
+		CoordinationArtifact ca = (CoordinationArtifact) 
 		    artifacts.get(i);
-		if (fp.matches(spec)) return fp;
+		if (ca.matches(spec)) return ca;
 	    }
 	    
 	    // None around yet; make a new one
-	    FacetProvider fp = makeFacetProvider(this, spec);
-	    artifacts.add(fp);
-	    return fp;
+	    CoordinationArtifact ca = makeArtifact(this, spec);
+	    artifacts.add(ca);
+	    return ca;
 	}
     }
 
@@ -94,11 +95,11 @@ abstract public class AbstractArtifactPlugin
 	super.start();
 
 	ServiceBroker sb = getServiceBroker();
-	FacetBroker fb = (FacetBroker) 
-	    sb.getService(this, FacetBroker.class, null);
+	CoordinationArtifactBroker cab = (CoordinationArtifactBroker) 
+	    sb.getService(this, CoordinationArtifactBroker.class, null);
 	String kind = getArtifactKind();
-	fb.registerCoordinationArtifact(this);
-	sb.releaseService(this, FacetBroker.class, fb);
+	cab.registerCoordinationArtifactTemplate(this);
+	sb.releaseService(this, CoordinationArtifactBroker.class, cab);
     }
 
     public void triggerExecute()
@@ -124,8 +125,8 @@ abstract public class AbstractArtifactPlugin
 	    copy = new ArrayList(artifacts);
 	}
 	for (int i=0; i<copy.size(); i++) {
-	    FacetProvider fp = (FacetProvider) copy.get(i);
-	    fp.execute(blackboard);
+	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
+	    ca.execute(blackboard);
 	}
     }
 

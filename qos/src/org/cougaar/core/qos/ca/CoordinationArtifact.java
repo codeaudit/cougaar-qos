@@ -26,6 +26,8 @@
 
 package org.cougaar.core.qos.ca;
 
+import org.cougaar.core.service.BlackboardService;
+
 /**
  * See xxx for more detailes on CoordinationArtifacts.  At the most
  * abstract level it has three jobs.  It must be able to identity its
@@ -36,16 +38,10 @@ package org.cougaar.core.qos.ca;
 public interface CoordinationArtifact
 {
     /**
-     * Returns the logical kind/type of the Artifact (not to be
-     * confused with the class).
-    */
-    public String getArtifactKind();
-
-    /**
      * Returns true iff the Artifact can handle the given spec.  This
      * will only be called with specs whose ca_kind field is already
      * known to match the Artifact's kind.  The default implementation
-     * in {@link AbstractArtifactPlugin} therefore returns true
+     * in {@link CoordinationArtifactImpl} therefore returns true
      * for all specs.
     */
     public boolean matches(ConnectionSpec spec);
@@ -53,12 +49,12 @@ public interface CoordinationArtifact
     /**
      * Does the linkage between a {@link Facet}, which is generally
      * created on the fly based on the spec and the player. The
-     * default implementation in {@link AbstractArtifactPlugin}
-     * handles this by deferring the creation of {@link
-     * FacetProvider}s to an abstract method.
+     * default implementation in {@link CoordinationArtifactImpl}
+     * handles this by deferring the creation to an abstract method.
      * 
     */
-    public void provideFacet(ConnectionSpec spec, RolePlayer player);
+    public void provideFacet(ConnectionSpec spec, RolePlayer player,
+			     BlackboardService blackboard);
 
 
     /**
@@ -66,5 +62,15 @@ public interface CoordinationArtifact
      * transaction.
     */
     public void triggerExecute();
+
+
+    /**
+     * Runs code in a Blackboard transaction.  This will be invoked
+     * from within the corresponding {@link
+     * CoordinationArtifactTemplate} plugin's execute method.
+     */
+    public void execute(BlackboardService service);
+
+    public String getArtifactId();
 
 }

@@ -39,7 +39,7 @@ import org.cougaar.util.UnaryPredicate;
 
 /**
  * An abstraction of the query role in the {@link
- * QueryResponseCoordinationArtifact}.  The {@link Facet} methods are
+ * QueryResponseCoordinationArtifactTemplate}.  The {@link Facet} methods are
  * implemented here, leaving subclasses only to implement the abstract
  * methods of this class.
  */
@@ -66,8 +66,8 @@ abstract public class QueryFacet
     /**
      * The implementation of this method in instantiable extensions
      * would transform the given response, as received from a
-     * ResponseCoordArtPlugin via relay, into a Fact that will be
-     * propagated out to the querying RolePlayer.
+     * QueryResponseCoordinationArtifact via relay, into a Fact that
+     * will be propagated out to the querying RolePlayer.
      */
     public abstract Fact transformResponse(ResponseRelay response);
 
@@ -76,7 +76,7 @@ abstract public class QueryFacet
     private String communityRole;
     private IncrementalSubscription responseSub;
 
-    protected QueryFacet(FacetProviderImpl owner,
+    protected QueryFacet(CoordinationArtifact owner,
 			 ServiceBroker sb,
 			 ConnectionSpec spec, 
 			 RolePlayer player)
