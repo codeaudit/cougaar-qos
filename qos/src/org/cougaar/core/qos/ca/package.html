@@ -96,14 +96,34 @@
     play.  Although the purposes and structure of these two sorts of
     coordination differ, they share one important feature: the logical
     structure of both can be described declaratively as set of
-    dependencies between and actions among the parts.  Rule languages
-    are particularly good at this, and the Coordination Artifact above
-    is explicitly designed to work with rule systems, though it's
-    written in a language neutral way.  The assumption is that a
-    collection of implementation classes of the abstract interfaces
-    above can be written to use a given rule language, while the
-    common infrastructure can deal in general with facts, assertions,
-    etc.
+    dependencies between and actions among the parts.  Furthermore,
+    the interactions between a Role Player and an Artifact can be
+    expressed as assertions, retractions or modifications of facts.
+  </p>
+
+  <p>
+    Rule languages are particularly good at expressing facts and
+    dependencies, and the Coordination Artifact code is explicitly
+    designed to work with rule systems, though it's written in a
+    language neutral way.  The assumption is that a collection of
+    implementation classes of the abstract Artifacts and Role Players
+    can be written to use a specific rule language and rule engine,
+    while the common infrastructure can deal in general with facts,
+    assertions, etc.
+  </p>
+
+  <p>
+    In this scenario, the rule engine is owned by the Role Player, and
+    its collection of facts at runtime is partitioned by the Artifacts
+    with which it interacts.  Once a Player is bound to an Artifact,
+    the primary means of interaction between them by means of facts: a
+    given Player sends fact assertions, modifications and retractions
+    into its Receptacle for a given Artifact in order to propogate
+    those assertions etc to other Player's in the same Artifact; the
+    Artifact in turn propogates assertions, retractions etc by sending
+    them to the appropriate Player.  Thus the RolePlayer and
+    Receptacle interfaces are very similar, precisely because of this
+    duality.
   </p>
 
   <p>A working example of using COUGAAR with Coordination Artifacts and
