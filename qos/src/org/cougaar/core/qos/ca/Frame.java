@@ -38,13 +38,13 @@ public final class Frame
 {
     private final UID uid;
     private final String kind;
-    private Properties properties;
+    private VisibleProperties properties;
 
     Frame(String kind, UID uid, Properties properties)
     {
 	this.uid = uid;
 	this.kind = kind;
-	this.properties = properties;
+	this.properties = new VisibleProperties(properties);
     }
 
 
@@ -60,7 +60,8 @@ public final class Frame
 	return kind;
     }
 
-    public Properties getAttributes()
+    // Only here for the Tasks servlet
+    public VisibleProperties getProperties()
     {
 	return properties;
     }
@@ -111,6 +112,21 @@ public final class Frame
 	return uid.hashCode();
     }
 
+
+    // Hack for servlet
+    public static class VisibleProperties extends Properties
+    {
+	VisibleProperties(Properties properties) 
+	{
+	    super();
+	    putAll(properties);
+	}
+
+	public String getContents()
+	{
+	    return this.toString();
+	}
+    }
 
 
     public static class Change implements ChangeReport {
