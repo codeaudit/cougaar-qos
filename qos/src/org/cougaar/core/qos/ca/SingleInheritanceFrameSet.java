@@ -27,11 +27,13 @@
 package org.cougaar.core.qos.ca;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.BlackboardService;
+import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
 import org.cougaar.core.util.UID;
 
@@ -41,8 +43,10 @@ public class SingleInheritanceFrameSet
 {
     private final static String PROTOTYPE = "frame::prototype";
 
+    private LoggingService log;
     private UIDService uids;
     private BlackboardService bbs;
+    private HashSet pendingParentage;
     private HashMap kbs;
     private HashMap prototypes, parents;
     private String 
@@ -66,9 +70,12 @@ public class SingleInheritanceFrameSet
 				     String child_value_slot)
     {
 	this.bbs = bbs;
+	log = (LoggingService)
+	    sb.getService(this, LoggingService.class, null);
 	uids = (UIDService)
 	    sb.getService(this, UIDService.class, null);
 
+	this.pendingParentage = new HashSet();
 	this.kbs = new HashMap();
 	this.prototypes = new HashMap();
 	this.parents = new HashMap();
@@ -111,11 +118,13 @@ public class SingleInheritanceFrameSet
 
     private void addFrame(Frame frame)
     {
+	if (log.isInfoEnabled())
+	    log.info("Adding frame " +frame);
 	HashMap kb = frameKB(frame);
 	synchronized (kb) {
 	    kb.put(frame.getUID(), frame);
 	}
-	if (bbs != null) bbs.publishAdd(frame);
+	checkForPendingParentage(); // yuch
     }
 
     private Frame getParent(Frame frame)
@@ -132,7 +141,22 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private void establishParentage(Frame relationship)
+    private void checkForPendingParentage()
+    {
+	synchronized (pendingParentage) {
+	    Iterator itr = pendingParentage.iterator();
+	    while (itr.hasNext()) {
+		Frame frame = (Frame) itr.next();
+		boolean success = establishParentage(frame);
+		if (success) {
+		    itr.remove();
+		    return;
+		}
+	    }
+	}
+    }
+
+    private boolean establishParentage(Frame relationship)
     {
 	synchronized (parents) {
 	    // cache a parent-child relationship
@@ -150,7 +174,21 @@ public class SingleInheritanceFrameSet
 
 	    Frame parent = findFrame(parent_kind, parent_slot, parent_value);
 	    Frame child = findFrame(child_kind, child_slot, child_value);
-	    parents.put(child, parent);
+	    if (parent == null || child == null) {
+		// Queue for later? 
+		if (log.isInfoEnabled())
+		    log.info("Parent or child is missing");
+		synchronized (pendingParentage) {
+		    pendingParentage.add(relationship);
+		}
+		return false;
+	    } else {
+		parents.put(child, parent);
+		if (log.isInfoEnabled())
+		    log.info("Parent of " +child+ " is " +parent);
+		return true;
+	    }
+
 	}
     }
 
@@ -164,7 +202,10 @@ public class SingleInheritanceFrameSet
 		relationship.getValue(child_slot_slot);
 	    Object child_value = relationship.getValue(child_value_slot);
 	    Frame child = findFrame(child_kind, child_slot, child_value);
-	    parents.remove(child);
+	    if (child != null) parents.remove(child);
+	}
+	synchronized (pendingParentage) {
+	    pendingParentage.remove(relationship);
 	}
     }
 
@@ -215,22 +256,38 @@ public class SingleInheritanceFrameSet
 	if (bbs != null) bbs.publishChange(frame);
     }
 
-    public Frame makeFrame(Frame frame)
+    public void replaceFrame(Frame frame)
     {
-	String kind = frame.getKind();
-	Properties values = frame.cloneValues();
-	return makeFrame(kind, values);
+	UID uid = frame.getUID();
+	HashMap kb = frameKB(frame);
+	Frame old = null;
+	synchronized (kb) {
+	    old = (Frame) kb.get(frame.getUID());
+	    if (old != null) {
+		old.mergeValues(frame);
+		if (log.isInfoEnabled())
+		    log.info("Replacing frame " +old+ " with " +frame);
+	    } else {
+		addFrame(frame);
+	    }
+	}
+	if (frame.getKind().equals(parent_relation)) {
+	    // ???
+	    establishParentage(old == null ? frame : old);
+	}
+
     }
 
     public Frame makeFrame(String kind, Properties values)
     {
 	UID uid = uids.nextUID();
-	Frame result = new Frame(kind, uid, values);
+	Frame frame = new Frame(kind, uid, values);
 
-	if (kind.equals(parent_relation)) establishParentage(result);
+	if (kind.equals(parent_relation)) establishParentage(frame);
 
-	addFrame(result);
-	return result;
+	addFrame(frame);
+	if (bbs != null) bbs.publishAdd(frame);
+	return frame;
     }
 
     // In this case the kind argument refers to what the prototype
@@ -239,10 +296,11 @@ public class SingleInheritanceFrameSet
     public Frame makePrototype(String kind, Properties values)
     {
 	UID uid = uids.nextUID();
-	Frame result = new Frame(PROTOTYPE, uid, values);
-	synchronized (prototypes) { prototypes.put(kind, result); }
-	addFrame(result);
-	return result;
+	Frame frame = new Frame(PROTOTYPE, uid, values);
+	synchronized (prototypes) { prototypes.put(kind, frame); }
+	addFrame(frame);
+	if (bbs != null) bbs.publishAdd(frame);
+	return frame;
     }
 
     public void removeFrame(Frame frame)
@@ -257,7 +315,7 @@ public class SingleInheritanceFrameSet
 	}
 
 	// Handle the removal of parent-child relationship frames
-	if (frame.getKind().equals(parent_relation)) 
+	if (frame.getKind().equals(parent_relation))
 	    disestablishParentage(frame);
 
 	if (bbs != null) bbs.publishRemove(frame);

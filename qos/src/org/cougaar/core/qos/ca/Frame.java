@@ -46,6 +46,10 @@ public final class Frame
     }
 
 
+    public String toString()
+    {
+	return "<Frame " +kind+ " " +uid+ ">";
+    }
 
     // Basic accessors
 
@@ -58,9 +62,9 @@ public final class Frame
     // These should only be called from the FrameSet owning the
     // frame. 
 
-    Properties cloneValues()
+    void mergeValues(Frame frame)
     {
-	return new Properties(properties);
+	properties.putAll(frame.properties);
     }
 
     void setValue(String attribute, Object object)

@@ -36,7 +36,7 @@ public interface FrameSet
 
     public void setFrameValue(Frame frame, String attribute, Object value);
 
-    public Frame makeFrame(Frame frame);
+    public void replaceFrame(Frame frame);
 
     public Frame makeFrame(String kind, Properties attributes);
 
