@@ -164,7 +164,7 @@ public class RSSMetricsServiceImpl
 	// Make a ServiceBroker available to AgentDS and HostDS.
 	properties.put("ServiceBroker", sb);
 
-	RSSUtils.addClassPackage("org.cougaar.core.qos.rss.");
+	RSSUtils.registerPackage("org.cougaar.core.qos.rss");
 
 	// Make a Timer available to RSS and TEC
 	Timer timer = new CougaarTimer(sb);

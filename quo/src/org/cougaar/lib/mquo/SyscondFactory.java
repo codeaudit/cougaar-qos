@@ -67,7 +67,7 @@ public final class SyscondFactory
 
     private static SyscondFactory factory;
 
-    static SyscondFactory getFactory() {
+    public static SyscondFactory getFactory() {
 	return factory;
     }
 

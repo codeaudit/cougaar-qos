@@ -28,10 +28,13 @@ import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.mts.MessageAddress;
 
+import java.util.Enumeration;
+import java.util.Vector;
 import java.rmi.server.RMISocketFactory;
 
 public class QuoProxyAspect extends StandardAspect
 {
+
 
     /**
      * Bundle up an MT and an MTInstrumented into a QuoProxy instance,
@@ -66,10 +69,12 @@ public class QuoProxyAspect extends StandardAspect
     }
 
 
-
     private CougaarWrapper makeClientAdapter() {
-	String wrapper_classname = 
-	    System.getProperty("org.cougaar.lib.quo.wrapper");
+	String wrapper_classname = getParameter("wrapper");
+	if (wrapper_classname == null)
+	    wrapper_classname = 
+		System.getProperty("org.cougaar.lib.quo.wrapper");
+
 	if (wrapper_classname ==  null || wrapper_classname.equals(""))
 	    return null;
 
