@@ -139,18 +139,16 @@ public final class QueryRelayImpl
 
     public Object getResponse()
     {
+        // don't respond to a query relay, let the
+        // plugin send a separate ResponseRelay
 	return null;
     }
 
     public int updateContent(Object content, Token token) 
     {
-	// assert content != null
-	if (content == null ? query == null : content.equals(query)) {
-	    return Relay.NO_CHANGE;
-	}
-
+        // set query field, don't respond to a query relay
 	this.query = content;
-	return Relay.CONTENT_CHANGE;
+	return Relay.NO_CHANGE;
     }
 
     // Object:

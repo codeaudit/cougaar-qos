@@ -147,23 +147,15 @@ implements ResponseRelay, Relay.Source, Relay.Target,
 
     public Object getResponse() 
     {
-	return reply;
+        // don't respond to a response relay, let the
+        // plugin send a separate QueryRelay
+	return null;
     }
-    /* public int updateContent(Object content, Token token) {
-    // assert content != null
-    this.query = content;
-    return Relay.CONTENT_CHANGE;
-    }
-    */
     public int updateContent(Object content, Token token) 
     {
-	// assert content != null
-	if (content == null ? reply == null : content.equals(reply)) {
-	    return Relay.NO_CHANGE;
-	}
-
+        // set reply field, don't respond to a response relay
 	this.reply = content;
-	return Relay.CONTENT_CHANGE;
+	return Relay.NO_CHANGE;
     }
 
 

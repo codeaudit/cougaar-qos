@@ -55,8 +55,8 @@ abstract public class QueryFacet
     implements QueryCoordArtConstants
 {
     private String managerAttr;
-    private RelayReclaimer reclaimer = null;
     private String communityRole;
+    private QueryRelay lastQuery; // for cleaning up
     private IncrementalSubscription responseSub;
 
     protected QueryFacet(CoordinationArtifact owner,
@@ -82,7 +82,6 @@ abstract public class QueryFacet
 	    log.debug("Value of " +RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE+ " is "
 		      +communityRole);
 	}
-	reclaimer = new RelayReclaimer(sb);
 
 	String filter = 
 	    CommunityFinder.makeFilter(COMMUNITY_TYPE_ATTRIBUTE, 
@@ -199,8 +198,11 @@ abstract public class QueryFacet
 
     protected void publishQuery(QueryRelay query, BlackboardService blackboard)
     {
+        if (lastQuery != null) {
+           blackboard.publishRemove(lastQuery);
+        }
 	blackboard.publishAdd(query);
-	reclaimer.add(query, blackboard);
+        lastQuery = query;
     }
 
 
