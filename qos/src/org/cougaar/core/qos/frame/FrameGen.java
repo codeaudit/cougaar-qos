@@ -393,7 +393,7 @@ public class FrameGen
 	writer.println("\n\n    public Object " +reader_name+ "()");
 	writer.println("    {");
 	writer.println("       " +container_class+  " ___parent___ = ("
-		       +container_class+ ") getParent();");
+		       +container_class+ ") parentFrame();");
 	writer.println("       if ( ___parent___ == null) return null;");
 	writer.println("       return ___parent___." +reader_name+ "();");
 	writer.println("    }");

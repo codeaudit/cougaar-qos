@@ -138,7 +138,7 @@ abstract public class Frame
 
     public Properties getIndirectSlots()
     {
-	Frame parent = getParent();
+	Frame parent = parentFrame();
 	if (parent == null) return null;
 
 	Properties props = new VisibleProperties();
@@ -165,7 +165,7 @@ abstract public class Frame
 
     public String getParentKind()
     {
-	Frame parent = getParent();
+	Frame parent = parentFrame();
 	return parent == null ? null : parent.getKind();
     }
 
@@ -179,7 +179,8 @@ abstract public class Frame
 	return result;
     }
 
-    public Frame getParent()
+    // Don't use a beany name here...
+    public Frame parentFrame()
     {
 	if (frameSet == null) return null;
 	Frame result = frameSet.getParent(this);

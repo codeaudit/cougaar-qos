@@ -433,7 +433,7 @@ public class FrameViewerServlet extends ComponentServlet {
           (proto == null ? "<i>null</i>" :
            proto.getKind()+" ("+linkToUID(proto.getUID())+")")+
           "</td></tr>\n");
-      Frame parent = f.getParent();
+      Frame parent = f.parentFrame();
       out.print(
           "<tr><td>Parent: &nbsp;</td><td colspan=3>"+
           (parent == null ? "<i>null</i>" :
