@@ -19,30 +19,41 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.rss;
+package org.cougaar.core.qos.gossip;
 
-import org.cougaar.core.qos.metrics.Metric;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import com.bbn.quo.data.DataInterpreter;
-import com.bbn.quo.data.DataValue;
-
-
-public class MetricInterpreter implements DataInterpreter 
+class Gossip implements Serializable
 {
-    public double getCredibility(Object x) {
-	return ((Metric) x).getCredibility();
+    private HashMap map = new HashMap();
+    
+    Iterator iterator() {
+	return map.entrySet().iterator();
     }
-	
-    public DataValue getDataValue(Object x) {
-	Metric metric = (Metric) x;
-	double credibility = metric.getCredibility();
-	String prov = metric.getProvenance();
-	String units = metric.getUnits();
-	Object val = metric.getRawValue();
-	long ts = metric.getTimestamp();
-	long hl = metric.getHalflife();
-	return new DataValue(val, credibility, units, prov, ts, hl);
+
+    boolean hasEntry(Object key) {
+	return map.containsKey(key);
+    }
+
+    void removeEntry(Object key) {
+	map.remove(key);
+    }
+
+    void addEntry(Object key, Object value) {
+	map.put(key, value);
+    }
+
+    Object lookupValue(Object key) {
+	return map.get(key);
+    }
+
+    int size() {
+	return map.size();
+    }
+
+    boolean isEmpty() {
+	return map.isEmpty();
     }
 }
-
-

@@ -19,22 +19,13 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.rss;
+package org.cougaar.core.qos.gossip;
 
-import com.bbn.quo.data.DataScope;
-import com.bbn.quo.data.IntegraterDS;
+import org.cougaar.core.component.Service;
 
-public class GossipIntegraterDS extends IntegraterDS 
+public interface GossipKeyDistributionService extends Service
 {
-
-    public GossipIntegraterDS(Object[] keys, DataScope parent) 
-	throws DataScope.ParameterError
-    {
-	super(keys, parent);
-    }
-
-
-    public static class GossipFormula extends IntegraterDS.Formula {
-    }
-
+    public void addKey(String key, int propagationDistance);
+    public void removeKey(String key);
 }
+

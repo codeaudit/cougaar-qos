@@ -19,30 +19,10 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.rss;
+package org.cougaar.core.qos.gossip;
 
-import org.cougaar.core.qos.metrics.Metric;
-
-import com.bbn.quo.data.DataInterpreter;
-import com.bbn.quo.data.DataValue;
-
-
-public class MetricInterpreter implements DataInterpreter 
+public interface GossipStatisticsService
 {
-    public double getCredibility(Object x) {
-	return ((Metric) x).getCredibility();
-    }
-	
-    public DataValue getDataValue(Object x) {
-	Metric metric = (Metric) x;
-	double credibility = metric.getCredibility();
-	String prov = metric.getProvenance();
-	String units = metric.getUnits();
-	Object val = metric.getRawValue();
-	long ts = metric.getTimestamp();
-	long hl = metric.getHalflife();
-	return new DataValue(val, credibility, units, prov, ts, hl);
-    }
+    GossipTrafficRecord getStatistics();
 }
-
 

@@ -158,6 +158,7 @@ public class RSSMetricsServiceImpl
 	properties.put("ServiceBroker", sb);
 
 	RSSUtils.registerPackage("org.cougaar.core.qos.rss");
+	RSSUtils.registerPackage("org.cougaar.core.qos.gossip");
 
 	// Make a Timer available to RSS and TEC
 	CougaarTimer timer = new CougaarTimer(sb);

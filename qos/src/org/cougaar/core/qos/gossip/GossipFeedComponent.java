@@ -19,19 +19,19 @@
  * </copyright>
  */
 
-package org.cougaar.core.qos.rss;
+package org.cougaar.core.qos.gossip;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.node.NodeControlService;
 import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
-import org.cougaar.core.qos.metrics.GossipKeyDistributionService;
-import org.cougaar.core.qos.metrics.GossipUpdateService;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
+
+import org.cougaar.core.qos.rss.MetricInterpreter;
 
 import com.bbn.quo.data.DataFeedListener;
 import com.bbn.quo.data.SimpleQueueingDataFeed;
