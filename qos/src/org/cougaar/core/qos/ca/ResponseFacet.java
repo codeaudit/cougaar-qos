@@ -233,7 +233,7 @@ abstract public class ResponseFacet
 	Fact updated_fact = new Fact(fact, updates);
 	if (log.isDebugEnabled())
 	    log.debug("Updated Fact" +updated_fact.debugString());
-	getPlayer().factAsserted(updated_fact, this);
+	getPlayer().factAsserted(updated_fact, getReceptacle());
     }
 
 

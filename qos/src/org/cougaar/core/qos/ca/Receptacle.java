@@ -29,34 +29,23 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This represents a {@link CoordinationArtifact}'s viewport into a
- * Facet/Receptacle pair.
+ * A Facet represents a {@link RolePlayer}'s viewport into a {@link
+ * CoordinationArtifact}.  This is the player's only interface to the
+ * artifact.
  */
-public interface Facet
+public interface Receptacle
 {
-
     /**
-     * Process any queued facts.  This should be run in a blackboard
-     * transaction.  Usually invoked by the {@link
-     * CoordinationArtifact} that owns the facet.
-    */
-    public void processFactBase(BlackboardService blackboard);
-
-
-    /**
-     * Handle subscription updates. This should be run in a blackboard
-     * transaction.  Usually invoked by the {@link
-     * CoordinationArtifact} that owns the Facet.
+     * Used by clients to assert a new fact into the Facet's
+     * fact-base. 
      */
-    public void execute(BlackboardService blackboard);
+    public void assertFact(Fact fact);
 
 
     /**
-     * Handle blackboard subscriptions.  This should be run in a
-     * blackboard transaction.  Usually invoked by the {@link
-     * CoordinationArtifact} that owns the Facet.
-    */
-    public void setupSubscriptions(BlackboardService blackboard);
+     * Used by clients to retract a fact from the Facet's fact-base.
+     */
+    public void retractFact(Fact fact);
 
 
     /**
@@ -65,5 +54,6 @@ public interface Facet
      * Facet.
     */
     public String getArtifactId();
-    
+
+
 }

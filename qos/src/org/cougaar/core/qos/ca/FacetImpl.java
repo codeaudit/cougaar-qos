@@ -46,7 +46,7 @@ import org.cougaar.multicast.AttributeBasedAddress;
  * Default implementation for Facet.
  */
 abstract public class FacetImpl // should be abstract
-    implements Facet,  Observer
+    implements Facet, Observer
 {
     private RolePlayer player;
     private ConnectionSpec spec;
@@ -203,11 +203,18 @@ abstract public class FacetImpl // should be abstract
 
 
 
+    private Receptacle receptacle;
+    protected Receptacle getReceptacle()
+    {
+	return receptacle;
+    }
+
     protected void linkPlayer()
     {
 	if (log.isInfoEnabled())
 	    log.info("Linking " +player+ " to " +this);
-	player.facetAvailable(spec, this);
+	receptacle = new ReceptacleImpl();
+	player.facetAvailable(spec, receptacle);
     }
 
 
@@ -240,26 +247,31 @@ abstract public class FacetImpl // should be abstract
 	owner.triggerExecute();
     }
 
-
-    // The next two methods are up calls from facets.  The actual
-    // handling of facts runs in its own thread, associated with the
-    // queue.   See the two subsequent methods.
-    public void assertFact(Fact fact)
-    {
-	FactRevision entry = new FactAssertion(fact);
-	addRevision(entry);
-    }
-
-
-    public void retractFact(Fact fact)
-    {
-	FactRevision entry = new FactRetraction(fact);
-	addRevision(entry);
-    }
-
-
     public String getArtifactId()
     {
 	return owner.getArtifactId();
     }
+
+    // Receptacle
+    private class ReceptacleImpl implements Receptacle {
+	public void assertFact(Fact fact)
+	{
+	    FactRevision entry = new FactAssertion(fact);
+	    addRevision(entry);
+	}
+
+
+	public void retractFact(Fact fact)
+	{
+	    FactRevision entry = new FactRetraction(fact);
+	    addRevision(entry);
+	}
+
+	public String getArtifactId()
+	{
+	    return FacetImpl.this.getArtifactId();
+	}
+
+    }
+
 }

@@ -226,7 +226,8 @@ abstract public class QueryFacet
 	Fact responseFact = transformResponse(response);
 	if (log.isDebugEnabled())
 	    log.debug("Tranformed " +response+ " into " +responseFact);
-	if (responseFact != null) getPlayer().factAsserted(responseFact, this);
+	if (responseFact != null) 
+	    getPlayer().factAsserted(responseFact, getReceptacle());
     }
 
 
