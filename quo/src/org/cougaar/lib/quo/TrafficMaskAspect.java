@@ -32,9 +32,11 @@ import java.util.TimerTask;
 
 public class TrafficMaskAspect extends QuoAspect
 {
-    private static String CONTRACT_IFACE = 
+    private static final String CONTRACT_IFACE = 
 	"org::cougaar::lib::quo::TrafficMask";
-    private static int PERIOD = 30000;
+    private static final int NODE_PERIOD = 30000;
+    private static final int TRAFFIC_PERIOD = 15000;
+    private static final int TRAFFIC_SIZE = 3000;
 
     private HashMap qoskets;
     private Timer timer = new Timer(true);
@@ -72,14 +74,14 @@ public class TrafficMaskAspect extends QuoAspect
 	    }
 
 	    public void turnOn() {
-		tmgs.setRequestParameters(destination, 1000, 1000);
-		System.err.println(destination + " masking on");
+		tmgs.setRequestParameters(destination, 
+					  TRAFFIC_PERIOD, 
+					  TRAFFIC_SIZE);
 	    }
 
 
 	    public void turnOff() {
 		tmgs.setRequestParameters(destination, -1, 0);
-		System.err.println(destination + " masking off");
 	    }
 	
 	}
@@ -141,7 +143,7 @@ public class TrafficMaskAspect extends QuoAspect
 	qoskets = new HashMap();
 
 	nodeUpdater = new NodeUpdater();
-	timer.schedule(nodeUpdater, 0, PERIOD);
+	timer.schedule(nodeUpdater, 0, NODE_PERIOD);
 
 	return true;
 
