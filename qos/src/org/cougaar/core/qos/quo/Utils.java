@@ -14,9 +14,10 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.util.Properties;
 
+import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.Debug;
 import org.cougaar.core.mts.DebugFlags;
-import org.cougaar.core.mts.MessageTransportRegistry;
+import org.cougaar.core.mts.MessageTransportRegistryService;
 
 public class Utils implements DebugFlags
 {
@@ -52,12 +53,12 @@ public class Utils implements DebugFlags
 	return getKernel(kprops);
     }
 
-    public synchronized static QuoKernel getKernel(Properties kprops) {
+    public synchronized static QuoKernel getKernel(Properties kprops) 
+    {
 	kprops.put("quoKernel.EvaluatorThread", "false");
-	MessageTransportRegistry registry = 
-	    MessageTransportRegistry.getRegistry();
-	String name = "QuO Kernel: " + registry.getLocalAddress().toString();
-	kprops.put("quoKernel.Title", name);
+	String nodeName = System.getProperty("org.cougaar.node.name");
+  	kprops.put("quoKernel.Title",  "QuO Kernel: " +  nodeName);
+
 	QuoKernel kernel = KernelImpl.getKernelReference(kprops);
 
 
