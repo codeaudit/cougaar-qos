@@ -28,6 +28,7 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.HostDS;
 import com.bbn.quo.data.RSS;
 
+import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.qos.monitor.ResourceMonitorServiceImpl;
@@ -39,8 +40,8 @@ public class RSSLink extends ResourceMonitorServiceImpl
     private static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
     private RSS rss;
     
-    public RSSLink(NameSupport nameSupport) {
-	super(nameSupport);
+    public RSSLink(NameSupport nameSupport, ServiceBroker sb) {
+	super(nameSupport, sb);
 	String propfile = System.getProperty(RSS_PROPFILE);
 	rss = RSS.makeInstance(propfile);
     }
