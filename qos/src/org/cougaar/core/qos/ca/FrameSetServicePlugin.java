@@ -69,6 +69,7 @@ public class FrameSetServicePlugin
     // plugin
     protected synchronized void execute()
     {
+	handleCallbacks();
     }
 
     protected void setupSubscriptions() 
@@ -104,17 +105,40 @@ public class FrameSetServicePlugin
 	SaxParser parser = new SaxParser(sb, bbs);
 	FrameSet set = parser.parseFrameSetFile(xml_filename);
 	sets.put(xml_filename, set);
-	HashSet callbacks = (HashSet) pending.get(xml_filename);
-	if (callbacks != null) {
-	    Iterator itr = callbacks.iterator();
-	    while (itr.hasNext()) {
-		FrameSetService.Callback cb = (FrameSetService.Callback)
-		    itr.next();
-		cb.frameSetAvailable(xml_filename, set);
-	    }
-	    pending.remove(xml_filename);
-	}
+
+	BlackboardService my_bbs = getBlackboardService();
+	my_bbs.signalClientActivity();
+
 	return set;
+    }
+
+    private void doCallback(FrameSetService.Callback cb,
+			    String xml_filename,
+			    FrameSet set)
+    {
+	// Should give the callback a read-only proxy, since writes
+	// will invoke operations on the creator's BBS.
+	cb.frameSetAvailable(xml_filename, new ReadOnlyFrameSetProxy(set));
+    }
+
+    private synchronized void handleCallbacks()
+    {
+	Iterator itr = pending.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String xml_filename = (String) entry.getKey();
+	    FrameSet set = (FrameSet) entry.getValue();
+	    HashSet callbacks = (HashSet) pending.get(xml_filename);
+	    if (callbacks != null) {
+		Iterator sub_itr = callbacks.iterator();
+		while (sub_itr.hasNext()) {
+		    FrameSetService.Callback cb = (FrameSetService.Callback)
+			sub_itr.next();
+		    doCallback(cb, xml_filename, set);
+		}
+		pending.remove(xml_filename);
+	    }
+	}
     }
 
 
@@ -123,7 +147,7 @@ public class FrameSetServicePlugin
     {
 	FrameSet set = (FrameSet) sets.get(xml_filename);
 	if (set != null) {
-	    cb.frameSetAvailable(xml_filename, set);
+	    doCallback(cb, xml_filename, set);
 	} else {
 	    HashSet callbacks = (HashSet) pending.get(xml_filename);
 	    if (callbacks == null) {
@@ -131,7 +155,7 @@ public class FrameSetServicePlugin
 		pending.put(xml_filename, callbacks);
 	    }
 	    callbacks.add(cb);
-	}
+ 	}
     }
 
     private class Impl implements FrameSetService
