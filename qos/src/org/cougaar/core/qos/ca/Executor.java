@@ -26,39 +26,34 @@
 
 package org.cougaar.core.qos.ca;
 
+import org.cougaar.core.service.BlackboardService;
 
 /**
- * A Receptacle represents a {@link RolePlayer}'s viewport into some
- * role of a {@link CoordinationArtifact}.  This is the player's only
- * interface to the artifact.  The correspdonding entity in the
- * Artifact is a {@link Facet}.
+ * TBD
  */
-public interface Receptacle extends Executor
+public interface Executor
 {
     /**
-     * Used by clients to assert a new fact into the Facet's
-     * fact-base. The fact itself is a blackbox.
-     */
-    public void assertFact(Object fact);
-
-
-    /**
-     * Used by clients to retract a fact from the Facet's
-     * fact-base. The fact itself is a blackbox.
-     */
-    public void retractFact(Object fact);
-
-
-    /**
-     * Returns the kind of the {@link CoordinationArtifactProvider}
+     * Process any queued facts.  This should be run in a blackboard
+     * transaction.  Usually invoked by the {@link
+     * CoordinationArtifact} that owns the facet.
     */
-    public String getArtifactKind();
+    public void processFactBase(BlackboardService blackboard);
+
 
     /**
-     * Returns the id of the specific {@link CoordinationArtifact}
-     * (not to be confused with the Provider kind) which owns this
-     * Facet.
+     * Handle subscription updates. This should be run in a blackboard
+     * transaction.  Usually invoked by the {@link
+     * CoordinationArtifact} that owns the Facet.
+     */
+    public void execute(BlackboardService blackboard);
+
+
+    /**
+     * Handle blackboard subscriptions.  This should be run in a
+     * blackboard transaction.  Usually invoked by the {@link
+     * CoordinationArtifact} that owns the Facet.
     */
-    public String getArtifactId();
+    public void setupSubscriptions(BlackboardService blackboard);
 
 }

@@ -87,13 +87,13 @@ abstract public class ResponseFacet
     }
 
 
-    protected void setupSubscriptions(BlackboardService blackboard) 
+    public void setupSubscriptions(BlackboardService blackboard) 
     {
 	querySub = (IncrementalSubscription)
 	    blackboard.subscribe(QueryPred);
     }
 
-    protected void execute(BlackboardService blackboard)
+    public void execute(BlackboardService blackboard)
     {
 	if (querySub == null || !querySub.hasChanged()) return;
 
@@ -129,7 +129,7 @@ abstract public class ResponseFacet
     }
 
     // Process facts
-    protected void processFactBase(BlackboardService blackboard)
+    public void processFactBase(BlackboardService blackboard)
     {
 	if (!factsHaveChanged()) return;
 

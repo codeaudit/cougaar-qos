@@ -174,7 +174,6 @@ abstract public class FacetImpl
 	synchronized (factQueue) {
 	    factQueue.add(entry);
 	}
-	player.triggerExecute();
     }
 
 
@@ -199,15 +198,15 @@ abstract public class FacetImpl
 	player.facetAvailable(spec, receptacle);
     }
 
-    protected void setupSubscriptions(BlackboardService blackboard)
+    public void setupSubscriptions(BlackboardService blackboard)
     {
     }
 
-    protected void execute(BlackboardService blackboard)
+    public void execute(BlackboardService blackboard)
     {
     }
 
-    protected void processFactBase(BlackboardService blackboard)
+    public void processFactBase(BlackboardService blackboard)
     {
     }
 

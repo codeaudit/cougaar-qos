@@ -109,13 +109,13 @@ abstract public class QueryFacet
     /*
      * 	subscribe to ResponseRelays from yourself & all DOSNODEs
      */
-    protected void setupSubscriptions(BlackboardService blackboard) 
+    public void setupSubscriptions(BlackboardService blackboard) 
     {
 	responseSub = (IncrementalSubscription)
 	    blackboard.subscribe(ResponsePred);
     }
 
-    protected void execute(BlackboardService blackboard)
+    public void execute(BlackboardService blackboard)
     {
 	if (responseSub == null || !responseSub.hasChanged()) return;
 
@@ -161,7 +161,7 @@ abstract public class QueryFacet
 
 
     // Fact processing
-    protected void processFactBase(BlackboardService blackboard)
+    public void processFactBase(BlackboardService blackboard)
     {
 	if (!factsHaveChanged()) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {

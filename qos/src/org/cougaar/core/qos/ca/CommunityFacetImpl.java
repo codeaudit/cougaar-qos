@@ -107,7 +107,6 @@ abstract public class CommunityFacetImpl
 	    this.community = finder.getCommunity();
 	    this.aba = makeABA(communityName);
 	    linkPlayer();
-	    getPlayer().triggerExecute();
 	}
     }
 

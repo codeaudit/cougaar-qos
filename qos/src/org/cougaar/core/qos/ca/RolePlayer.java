@@ -37,6 +37,4 @@ public interface RolePlayer
     public void factRetracted(Object fact, Receptacle receptacle);
 
     public void facetAvailable(ConnectionSpec spec, Receptacle receptacle);
-
-    public void triggerExecute();
 }
