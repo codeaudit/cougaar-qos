@@ -11,6 +11,11 @@ LINKS += instrumentation.jar
 #LINKS += remos.jar
 LINKS += jacorb.jar
 
+JAR = quoSumo.jar
+LINKS += $(JAR)
+
+VERSION=version.txt
+
 install: $(LINKS)
 
 QuoInstr.jar:
@@ -37,6 +42,13 @@ instrumentation.jar:
 jacorb.jar:
 	ln -s ${JACORB_DIR}/lib/jacorb.jar .
 
+perpVersion:
+	version.sh
+
+quoSumo.jar:
+	jar -cvf $(JAR) $(VERSION) 
+
 clean:
-	rm -f $(LINKS)
+	rm -f $(LINKS) $(JAR) $(VERSION)
+
 

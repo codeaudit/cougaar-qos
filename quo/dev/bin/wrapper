@@ -5,12 +5,12 @@
 #!/bin/sh
 
 module=quo
-COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/${module}/dev/3rdparty
-export COUGAAR3RDPARTY
+#COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/${module}/dev/3rdparty
+#export COUGAAR3RDPARTY
 
 newcore=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
-newquo=${COUGAAR_SRC_PATH}/${module}/dev/newquo.jar
-perf=${COUGAAR_SRC_PATH}/${module}/test/src/perf-society.jar
+newquo=${COUGAAR_SRC_PATH}/${module}/src/newquo.jar
+perf=${COUGAAR_SRC_PATH}/glm/src/performance.jar
 
 #Putting perf-jar temporarily perf-society.jar
 COUGAAR_DEV_PATH=${newcore}:${newquo}:${perf}

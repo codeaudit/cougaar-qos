@@ -24,7 +24,7 @@ mt_flags += -interface org.cougaar.core.society.MessageAddress
 
 mt_inst_idl=MTInstrumented.idl
 
-mt_inst_files=../$(srcdir)/MTInstrumented.java
+mt_inst_files=$(src)/$(srcdir)/MTInstrumented.java
 #mt_inst_files=$(COUGAAR_SRC_PATH)/$(module)/$(srcdir)/MTInstrumented.java
 
 mt_inst_flags := -rmi
@@ -42,6 +42,7 @@ qdl_flags := --debuglevel=warnings
 qdl_flags += --language=java
 qdl_flags += --middleware=rmi
 qdl_flags += --package=org.cougaar.lib.quo
+qdl_flags += --prefixdir=$(src)
 qdl_flags += $(includes)
 qdl_flags += $(idl2pkg)
 
@@ -59,10 +60,10 @@ $(mt_inst_idl): $(mt_inst_files)
 
 
 # arbitrary generated files, one per csl
-compress := $(srcdir)/Compress.java
-diagnose := $(srcdir)/Diagnose.java
-logging := $(srcdir)/Logging.java
-instserver := $(srcdir)/MTInstrumentedServerAdapter.java
+compress := $(src)/$(srcdir)/Compress.java
+diagnose := $(src)/$(srcdir)/Diagnose.java
+logging := $(src)/$(srcdir)/Logging.java
+instserver := $(src)/$(srcdir)/MTInstrumentedServerAdapter.java
 
 
 
@@ -76,7 +77,7 @@ $(diagnose): $(mt_idl) $(mt_inst_idl)  Qosket.idl Diagnose.asl
 	--idl=Qosket.idl \
 	--idl=quo_corba.idl \
 	--business=org::cougaar::core::mts::MT \
-	--businessqosket=org::cougaar::lib::quo::MTDiagnose \
+	--adapter=MTDiagnoseAdapter \
 	--qosketimpl=org.cougaar.lib.quo.DiagnoseQosketImpl \
 	--adapterqosket=org::cougaar::lib::quo::DiagnoseQosket \
 	--delegateqosket=org::cougaar::lib::quo::DiagnoseDelegateQosket \
@@ -94,7 +95,7 @@ $(compress): $(mt_idl) $(mt_inst_idl)  Qosket.idl Compress.asl
 	--idl=Qosket.idl \
 	--idl=$(mt_idl) \
 	--business=org::cougaar::core::mts::MT \
-	--businessqosket=org::cougaar::lib::quo::MTCompress \
+	--adapter=MTCompressAdapter \
 	--qosketimpl=org.cougaar.lib.quo.CompressQosketImpl \
 	--adapterqosket=org::cougaar::lib::quo::CompressQosket \
 	--delegateqosket=org::cougaar::lib::quo::CompressDelegateQosket \
@@ -110,7 +111,7 @@ $(logging):$(mt_idl) $(mt_inst_idl)  Qosket.idl Logging.asl
 	--idl=Qosket.idl \
 	--idl=$(mt_idl) \
 	--business=org::cougaar::core::mts::MT \
-	--businessqosket=org::cougaar::lib::quo::MTLogging \
+	--adapter=MTLoggingAdapter \
 	--qosketimpl=org.cougaar.lib.quo.LoggingQosketImpl \
 	--adapterqosket=org::cougaar::lib::quo::LoggingQosket \
 	--asl=Logging.asl \
@@ -126,7 +127,7 @@ $(instserver): $(mt_idl) $(mt_inst_idl) Qosket.idl InstrumentedServer.asl Server
 	--idl=$(mt_inst_idl) \
 	--idl=quo_corba.idl \
 	--business=org::cougaar::lib::quo::MTInstrumented \
-	--businessqosket=org::cougaar::lib::quo::MTInstrumentedServer \
+	--adapter=MTInstrumentedServerAdapter \
 	--adapterqosket=qosket::instrumentation::ServerInstrumentationQosket \
 	--delegateqosket=qosket::instrumentation::ServerInstrumentationDelegateQosket \
 	--properties=$(qosketroot)/instrumentation/qdl/ServerInstrumentationRmi.prop \
@@ -138,14 +139,10 @@ $(instserver): $(mt_idl) $(mt_inst_idl) Qosket.idl InstrumentedServer.asl Server
 
 
 $(tag): $(logging) $(diagnose)  $(compress) $(instserver)
-	install -d $(classes)
-	$(JAVAC) -d $(classes) $(srcdir)/*.java
 	touch $(tag)
-# force rebuild of main jar
-	cd ..; make clean
 
 clean:
-	rm -rf org $(tag)  $(mt_idl) $(mt_inst_idl)
+	rm -rf $(tag)  $(mt_idl) $(mt_inst_idl)
 
 realclean: clean
 
