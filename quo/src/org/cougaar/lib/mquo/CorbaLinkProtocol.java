@@ -267,6 +267,17 @@ public class CorbaLinkProtocol
 	}
 
 	
+	public void addMessageAttributes(MessageAttributes attrs) {
+	    attrs.addValue(MessageAttributes.IS_STREAMING_ATTRIBUTE,
+			   Boolean.TRUE);
+	    
+
+	    // Always FALSE for now
+	    attrs.addValue(MessageAttributes.ENCRYPTED_SOCKET_ATTRIBUTE,
+			   Boolean.FALSE);
+
+	}
+
 
     }
 

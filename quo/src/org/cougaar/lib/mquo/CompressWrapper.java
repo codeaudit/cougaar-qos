@@ -49,7 +49,6 @@ class CompressWrapper extends MTCompressAdapter implements CougaarWrapper
 		loggingService.error(null, unknown_host);
 	    }
 	} else {
-	    // System.err.println("### Server " +server+ " is local!");
 	    serverHost = clientHost;
 	}
 

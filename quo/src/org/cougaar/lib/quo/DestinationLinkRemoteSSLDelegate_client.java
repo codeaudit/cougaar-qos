@@ -147,5 +147,8 @@ quo_curRegs_RemoteSSL = quo_RemoteSSL.signalAndEvalAndGetCurrentRegion(quo_sig1)
     public java.lang.Object getRemoteReference() {
     return(remote.getRemoteReference());
   }
+    public void addMessageAttributes(org.cougaar.core.mts.MessageAttributes attrs) {
+    remote.addMessageAttributes(attrs);
+  }
 };
 
