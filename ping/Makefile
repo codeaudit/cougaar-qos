@@ -14,7 +14,7 @@ all: $(jar)
 
 $(jar): $(classes) $(src) 
 	javac -d $(classes) $(src) 
-	jar cf $(jar) $(classes)
+	jar cf $(jar) -C $(classes) .
 
 $(classes):
 	mkdir -p $(classes)

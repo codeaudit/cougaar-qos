@@ -19,7 +19,7 @@
  * </copyright>
  */
 
-package org.cougaar.core.mobility.ping;
+package org.cougaar.ping;
 
 import java.io.Serializable;
 import java.util.Collections;
