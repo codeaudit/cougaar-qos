@@ -32,23 +32,32 @@ class CompressWrapper extends MTCompressAdapter implements CougaarWrapper
 	QuoKernel kernel = Utils.getKernel();
 	String clientHost = null;
 	String serverHost = null; 
-	ParsedReference remoteRef =  RmiUtilities.parseReference(server);
+
+	try {
+	    clientHost = 
+		Utilities.canonicalizeAddress(NetUtilities.getHostAddress());
+	} catch (java.net.UnknownHostException unknown_host) {
+	    loggingService.error(null, unknown_host);
+	}
+
+	if (server instanceof java.rmi.server.RemoteStub) {
+	    ParsedReference remoteRef = RmiUtilities.parseReference(server);
+	    serverHost = remoteRef.host;
+	    try {
+		serverHost = Utilities.canonicalizeAddress(serverHost);
+	    } catch (java.net.UnknownHostException unknown_host) {
+		loggingService.error(null, unknown_host);
+	    }
+	} else {
+	    // System.err.println("### Server " +server+ " is local!");
+	    serverHost = clientHost;
+	}
 
 	linkRemoteObject(server);
 	setInstrumentedServer(delegate);
 	setLoggingService(loggingService);
 	initSysconds(kernel);
 	initCallbacks();
-
-	try {
-	    clientHost = 
-		Utilities.canonicalizeAddress(NetUtilities.getHostAddress());
-	    serverHost = Utilities.canonicalizeAddress(remoteRef.host);
-	} catch (java.net.UnknownHostException unknown_host) {
-	    loggingService.error(null, unknown_host);
-	} catch (Throwable t) {
-	    loggingService.error(null, t);
-	}
 
 
 	try {
