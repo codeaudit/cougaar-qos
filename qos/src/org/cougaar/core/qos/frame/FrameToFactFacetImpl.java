@@ -48,13 +48,8 @@ abstract public class FrameToFactFacetImpl
     // This should check the frameset_name!!!
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
-	       boolean result = (o instanceof Frame) &&
+	       return (o instanceof Frame) &&
 		    ((Frame) o).getFrameSet().getName().equals(frameset_name);
-		if (log.isDebugEnabled())
-		    log.debug("Executing frame predicate on " +o+
-			      " result = " +result);
-		
-	       return result;
 	    }
 	};
     private IncrementalSubscription sub;
