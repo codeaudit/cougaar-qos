@@ -31,6 +31,7 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.RSSUtils;
 import com.bbn.quo.event.Connector;
+import com.bbn.quo.event.EventUtils;
 import com.bbn.quo.event.data.StatusConsumerFeed;
 
 
@@ -49,6 +50,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Timer;
 
 /**
  * The implementation of MetricsService, and a child component of
@@ -172,8 +174,15 @@ public class RSSMetricsServiceImpl
 	    } catch (Exception ex) {
 	    }
 	}
+
+	// Make a ServiceBroker available to AgentDS and HostDS.
 	properties.put("ServiceBroker", sb);
-	properties.put("rss.timer", new CougaarTimer(sb)); 
+
+	// Make a Timer available to RSS and TEC
+	Timer timer = new CougaarTimer(sb);
+	RSSUtils.setTimer(timer);
+	EventUtils.setTimer(timer);
+
 	DataFeed feed = null;
 	String feedName = null;
 	TypedEventChannel channel = null;
