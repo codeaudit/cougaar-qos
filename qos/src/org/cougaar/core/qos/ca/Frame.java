@@ -42,7 +42,7 @@ public final class Frame
     {
 	this.uid = uid;
 	this.kind = kind;
-	this.properties = new Properties(properties); // ?
+	this.properties = properties;
     }
 
 

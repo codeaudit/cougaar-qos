@@ -58,12 +58,12 @@ public class SingleInheritanceFrameSet
     public SingleInheritanceFrameSet(ServiceBroker sb,
 				     BlackboardService bbs,
 				     String parent_relation,
-				     String parent_slot,
-				     String child_slot,
-				     String parent_kind,
-				     String child_kind,
-				     String parent_id_slot,
-				     String child_id_slot)
+				     String parent_kind_slot,
+				     String parent_slot_slot,
+				     String parent_value_slot,
+				     String child_kind_slot,
+				     String child_slot_slot,
+				     String child_value_slot)
     {
 	this.bbs = bbs;
 	uids = (UIDService)
