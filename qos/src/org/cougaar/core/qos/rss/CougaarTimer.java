@@ -34,7 +34,7 @@ import org.cougaar.core.thread.Schedulable;
 import com.bbn.rss.TaskScheduler;
 
 /**
- * Allows RSS tasks to use the COUGAAR ThreadService.
+ * This entity allows RSS tasks to use the COUGAAR ThreadService.
  */
 public class CougaarTimer implements TaskScheduler
 {

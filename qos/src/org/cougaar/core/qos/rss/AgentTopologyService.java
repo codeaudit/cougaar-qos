@@ -29,6 +29,10 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.core.component.Service;
 import org.cougaar.core.mts.MessageAddress;
 
+/**
+ * This Service provides basic topology information for Agents and
+ * Nodes. 
+ */
 public interface AgentTopologyService extends Service
 {
     public String getAgentHost(MessageAddress agent);

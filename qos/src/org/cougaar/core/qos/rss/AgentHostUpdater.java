@@ -29,10 +29,15 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.core.component.Service;
 import org.cougaar.core.mts.MessageAddress;
 
+/**
+ * This Service handles subscriptions for Agent/Host topology
+ * events.  See also {@link AgentHostUpdaterListener} and {@link AgentTopologyService}.
+ */
 public interface AgentHostUpdater extends Service
 {
     public void addListener(AgentHostUpdaterListener listener,
 			    MessageAddress agent);
+
     public  void removeListener(AgentHostUpdaterListener listener,
 				MessageAddress agent);
 }

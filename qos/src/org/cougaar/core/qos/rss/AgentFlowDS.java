@@ -37,6 +37,13 @@ import com.bbn.rss.ResourceContext;
 import com.bbn.ResourceStatus.ResourceNode;
 
 
+/**
+ * This RSS ResourceContext represents message flow between two
+ * Agents.  This is a top-level context in the RSS inheritance tree,
+ * and is identified by a pair of Agent names (source and destination,
+ * in that order).  It supports two messaging rate formulas, for byte
+ * counst and message counts respectively
+ */
 public class AgentFlowDS 
     extends CougaarDS 
 {

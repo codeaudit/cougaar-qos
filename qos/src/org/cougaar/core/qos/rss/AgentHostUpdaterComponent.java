@@ -49,6 +49,12 @@ import com.bbn.rss.EventSubscriber;
 import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
 
+/**
+ * This Component provides the {@link AgentHostUpdater} service.
+ * Inner classes implement that service as well as the {@link
+ * AgentTopologyService}.  The implementations uses a combination of
+ * RSS events and a poller that gets data from the WhitePages.
+ */
 public final class AgentHostUpdaterComponent
     extends QosComponent
     implements ServiceProvider

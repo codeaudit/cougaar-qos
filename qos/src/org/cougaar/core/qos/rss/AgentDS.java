@@ -42,6 +42,13 @@ import com.bbn.rss.ResourceContext;
 import com.bbn.ResourceStatus.ResourceNode;
 
 
+/**
+ * This RSS ResourceContext represents an Agent.  In the RSS
+ * inheritance tree, the parent of an Agent context is a Node context
+ * (see {@link NodeDS}).  Agent contexts are identified by name and support a
+ * variety of messaging and cpu related formulas, described in detail
+ * elsewhere.
+ */
 public class AgentDS 
     extends CougaarDS
 {
@@ -279,19 +286,19 @@ public class AgentDS
     }
 
 
-    public static class LastHeard extends AlarmFormula {
+    static class LastHeard extends AlarmFormula {
 	String getKey() {
 	    return "HeardTime";
 	}
     }
 
-    public static class LastSpoke extends AlarmFormula {
+    static class LastSpoke extends AlarmFormula {
 	String getKey() {
 	    return "SpokeTime";
 	}
     }
 
-    public static class LastSpokeError extends AlarmFormula {
+    static class LastSpokeError extends AlarmFormula {
 	String getKey() {
 	    return "SpokeErrorTime";
 	}
@@ -303,19 +310,19 @@ public class AgentDS
     //The raw integrater values can not be used because there is no
     //ordering between threads, so an old thread could publish a
     //HeardTime that is actually before the current HeardTime
-    public static class HeardTime extends MonotonicLongFormula {
+    static class HeardTime extends MonotonicLongFormula {
 	String getKey() {
 	    return "HeardTime";
 	}
     }	
 
-    public static class SpokeTime extends MonotonicLongFormula {
+    static class SpokeTime extends MonotonicLongFormula {
 	String getKey() {
 	    return "SpokeTime";
 	}
     }	
 
-    public static class SpokeErrorTime extends MonotonicLongFormula {
+    static class SpokeErrorTime extends MonotonicLongFormula {
 	String getKey() {
 	    return "SpokeErrorTime";
 	}
@@ -323,7 +330,7 @@ public class AgentDS
 
 
 
-    public static class PersistSizeLast extends Formula {
+    static class PersistSizeLast extends Formula {
 	String getKey() {
 	    return Constants.PERSIST_SIZE_LAST;
 	}

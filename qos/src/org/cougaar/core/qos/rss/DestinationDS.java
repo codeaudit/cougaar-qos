@@ -113,7 +113,7 @@ public class DestinationDS
 	}
     }
 
-    public static class AgentIpAddress extends DataFormula
+    static class AgentIpAddress extends DataFormula
     {
 	protected void initialize(ResourceContext context) 
 	{
@@ -155,7 +155,7 @@ public class DestinationDS
     }
 
 
-    public static class CapacityMax extends DataFormula
+    static class CapacityMax extends DataFormula
     {
 	private static final DataValue UnknownCapacityMax =
 	    new DataValue(0, 0.0);
@@ -212,7 +212,7 @@ public class DestinationDS
 
     private static final double LAN_CAPACITY= 10000.0;
 
-    public static class OnSameSecureLAN extends DataFormula
+    static class OnSameSecureLAN extends DataFormula
     {
 	protected void initialize(ResourceContext context) 
 	{

@@ -39,6 +39,11 @@ import org.cougaar.util.log.Logging;
 
 import com.bbn.rss.PropertiesDataFeed;
 
+/**
+ * This Components uses the {@link DataFeedRegistrationService} to
+ * register an RSS properties feed that uses the {@link ConfigFinder}
+ * to resolve the URL.
+ */
 public class ConfigFinderDataFeedComponent
     extends QosComponent
 {

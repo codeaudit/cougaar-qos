@@ -30,6 +30,9 @@ import org.cougaar.core.qos.metrics.Metric;
 
 import com.bbn.rss.DataValue;
 
+/**
+ * This class wraps RSS DataValues in the {@link Metric} API.
+ */
 public class DataWrapper implements Metric, java.io.Serializable
 {
     private DataValue data;
