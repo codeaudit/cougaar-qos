@@ -93,16 +93,19 @@ abstract public class Frame
 
     public boolean isa(String kind)
     {
+	if (frameSet == null) return kind.equals(this.kind);
 	return frameSet.descendsFrom(this, kind);
     }
 
     public Frame relationshipParent()
     {
+	if (frameSet == null) return null;
 	return frameSet.getRelationshipParent(this);
     }
 
     public Frame relationshipChild()
     {
+	if (frameSet == null) return null;
 	return frameSet.getRelationshipChild(this);
     }
 
@@ -161,6 +164,7 @@ abstract public class Frame
 
     Frame getPrototype()
     {
+	if (frameSet == null) return null;
 	Frame result = frameSet.getPrototype(this);
 	if (result == null) {
 	    if (log.isWarnEnabled()) log.warn(this + " has no prototype!");
@@ -170,6 +174,7 @@ abstract public class Frame
 
     Frame getParent()
     {
+	if (frameSet == null) return null;
 	Frame result = frameSet.getParent(this);
 	if (result == null) {
 	    if (log.isDebugEnabled()) log.debug(this + " has no parent!");
@@ -240,6 +245,7 @@ abstract public class Frame
 
     protected Object getInheritedValue(Frame origin, String slot)
     {
+	if (frameSet == null) return null;
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) {
 	    Object result = prototype.getValue(origin, slot);
@@ -284,6 +290,7 @@ abstract public class Frame
 
     public Set findRelations(String role, String relation)
     {
+	if (frameSet == null) return null;
 	return frameSet.findRelations(this, role, relation);
     }
 
