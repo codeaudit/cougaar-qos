@@ -26,13 +26,17 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.TopologyEntry;
 import org.cougaar.core.service.TopologyReaderService;
+import org.cougaar.core.qos.metrics.Constants;
 
-
+import com.bbn.quo.data.DataFormula;
 import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
+import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 
-public class AgentDS extends DataScope
+public class AgentDS 
+    extends DataScope 
+    implements Constants
 {
     private static final String AGENTNAME = "agentname".intern();
 
@@ -59,7 +63,7 @@ public class AgentDS extends DataScope
 	    node = ""; // nice
 	}
 
-	System.out.println("Node of " +agentname+ "=" +node);
+	// System.err.println("### Node of " +agentname+ "=" +node);
 
 
 
@@ -83,9 +87,59 @@ public class AgentDS extends DataScope
 	} else {
 	    // could canonicalize here
 	    String agentname = (String) parameters[0];
+	    // System.err.println("#### Created AgentDS for " +agentname);
 	    bindSymbolValue(AGENTNAME, agentname);
 	}
     }
+
+
+    abstract static class Formula 
+	extends DataFormula implements Constants
+    {
+
+	private DataFormula feedMerger;
+
+	abstract String getKey();
+	abstract DataValue defaultValue();
+
+	protected void initialize(DataScope scope) {
+	    super.initialize(scope);
+	    String agentName = (String) scope.getValue(AGENTNAME);
+	    String key = "Agent" +KEY_SEPR+ agentName +KEY_SEPR+ getKey()
+		+KEY_SEPR+ THREAD_SENSOR;
+
+	    Object[] parameters = { key };
+	    DataScopeSpec spec = new DataScopeSpec("com.bbn.quo.data.IntegraterDS", 
+						   parameters);
+	    DataScope dependency = RSS.instance().getDataScope(spec);
+	    registerDependency(dependency, "Formula");
+	}
+
+	protected DataValue doCalculation(DataFormula.Values values) {
+	    // System.err.println("### Recalculating " +getKey());
+	    DataValue computedValue = values.get("Formula");
+	    DataValue defaultValue = defaultValue();
+	    if (computedValue.atLeastAsCredibleAs(defaultValue)) {
+		return computedValue; 
+	    } else {
+		return defaultValue;
+	    }
+	}
+
+    }
+
+
+    public static class OneSecondLoadAvg extends Formula {
+	String getKey() {
+	    return ONE_SEC_LOAD_AVG;
+	}
+
+	DataValue defaultValue() {
+	    return new DataValue(0);
+	}
+    }	
+
+
 
 }
 
