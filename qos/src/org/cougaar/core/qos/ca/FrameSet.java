@@ -30,8 +30,6 @@ import java.util.Properties;
 
 public interface FrameSet
 {
-    public final static String PROTOTYPE = "frame::prototype";
-
     public Frame findFrame(String kind, String slot, Object value);
 
     public Object getFrameValue(Frame frame, String attribute);
@@ -40,10 +38,8 @@ public interface FrameSet
 
     public Frame makeFrame(String kind, Properties attributes);
 
-    public Frame makePrototype(Properties properties);
+    public Frame makePrototype(String kind, Properties properties);
 
     public void removeFrame(Frame frame);
-
-    public Frame getPrototype(Frame frame);
 
 }

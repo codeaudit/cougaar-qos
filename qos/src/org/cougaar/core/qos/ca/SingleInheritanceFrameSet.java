@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.UIDService;
 import org.cougaar.core.util.UID;
 
@@ -38,7 +39,10 @@ import org.cougaar.core.util.UID;
 public class SingleInheritanceFrameSet
     implements FrameSet
 {
+    private final static String PROTOTYPE = "frame::prototype";
+
     private UIDService uids;
+    private BlackboardService bbs;
     private HashSet kb;
     private HashMap prototypes, parents;
     private String 
@@ -52,6 +56,7 @@ public class SingleInheritanceFrameSet
     
 
     public SingleInheritanceFrameSet(ServiceBroker sb,
+				     BlackboardService bbs,
 				     String parent_relation,
 				     String parent_slot,
 				     String child_slot,
@@ -60,6 +65,7 @@ public class SingleInheritanceFrameSet
 				     String parent_id_slot,
 				     String child_id_slot)
     {
+	this.bbs = bbs;
 	uids = (UIDService)
 	    sb.getService(this, UIDService.class, null);
 
@@ -111,6 +117,8 @@ public class SingleInheritanceFrameSet
 	frame.setValue(attribute, value);
 	// **** TBD ****
 	// handle the modification of parent-child relationship frames
+
+	if (bbs != null) bbs.publishRemove(frame);
     }
 
     public Frame makeFrame(String kind, Properties values)
@@ -142,12 +150,14 @@ public class SingleInheritanceFrameSet
 	return result;
     }
 
-    public Frame makePrototype(Properties values)
+    // In this case the kind argument refers to what the prototype
+    // should be a prototype of.  The prototype Frame itself always
+    // has a kind of PROTOTYPE.
+    public Frame makePrototype(String kind, Properties values)
     {
 	UID uid = uids.nextUID();
 	Frame result = new Frame(PROTOTYPE, uid, values);
-	String name = (String) result.getValue("name");
-	synchronized (prototypes) { prototypes.put(name, result); }
+	synchronized (prototypes) { prototypes.put(kind, result); }
 	addFrame(result);
 	return result;
     }
@@ -157,6 +167,7 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    kb.add(frame);
 	}
+	if (bbs != null) bbs.publishAdd(frame);
     }
 
     public void removeFrame(Frame frame)
@@ -170,6 +181,9 @@ public class SingleInheritanceFrameSet
 	}
 	// ***** TBD *****
 	// Handle the removal of parent-child relationship frames
+
+
+	if (bbs != null) bbs.publishRemove(frame);
     }
 
     private Frame getParent(Frame frame)
@@ -179,7 +193,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    public Frame getPrototype(Frame frame)
+    private Frame getPrototype(Frame frame)
     {
 	synchronized (prototypes) {
 	    return (Frame) prototypes.get(frame.getKind());

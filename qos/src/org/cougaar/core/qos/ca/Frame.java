@@ -38,7 +38,7 @@ public final class Frame
     private final String kind;
     private Properties properties;
 
-    public Frame(String kind, UID uid, Properties properties)
+    Frame(String kind, UID uid, Properties properties)
     {
 	this.uid = uid;
 	this.kind = kind;
@@ -48,18 +48,22 @@ public final class Frame
 
 
     // Basic accessors
+
     public String getKind()
     {
 	return kind;
     }
 
-    public void setValue(String attribute, Object object)
+
+    // These should only be called from the FrameSet owning the
+    // frame. 
+    void setValue(String attribute, Object object)
     {
 	properties.put(attribute, object);
     }
 
 
-    public Object getValue(String attribute)
+    Object getValue(String attribute)
     {
 	return properties.get(attribute);
     }
