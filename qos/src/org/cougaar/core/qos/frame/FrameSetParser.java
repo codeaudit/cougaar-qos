@@ -120,7 +120,9 @@ public class FrameSetParser
 
 	Path makePath()
 	{
-	    Path.Fork[] array = (Path.Fork[]) path.toArray();
+	    Path.Fork[] array = new Path.Fork[path.size()];
+	    for (int i=0; i<path.size(); i++)
+		array[i] = (Path.Fork) path.get(i);
 	    return new Path(name, array, slot);
 	}
 
