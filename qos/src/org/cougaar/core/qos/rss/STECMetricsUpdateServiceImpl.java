@@ -29,7 +29,10 @@ import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
-import org.cougaar.core.service.NamingService;
+import org.cougaar.core.service.wp.AddressEntry;
+import org.cougaar.core.service.wp.Application;
+import org.cougaar.core.service.wp.Cert;
+import org.cougaar.core.service.wp.WhitePagesService;
 import org.cougaar.core.service.ThreadService;
 
 import com.bbn.quo.event.Connector;
@@ -40,6 +43,7 @@ import com.bbn.quo.event.sysstat.DirectSysStatSupplier;
 
 import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
+import java.net.URI;
 import java.util.StringTokenizer;
 import java.util.TimerTask;
 import javax.naming.Name;
@@ -94,7 +98,6 @@ public class STECMetricsUpdateServiceImpl
     extends QosComponent
     implements MetricsUpdateService
 {
-    private static final String RSS_DIR = "RSS";
     private static final String SYSSTAT_KINDS_PROPERTY = 
 	"org.cougaar.metrics.probes";
     private static final String USE_TEC_PROPERTY = 
@@ -104,8 +107,11 @@ public class STECMetricsUpdateServiceImpl
     private static final String TOPOLOGY_DUMP_IORFILE_PROPERTY = 
 	"org.cougaar.metrics.topology.iorfile";
     
+    private static final long TTL = Long.MAX_VALUE;
+    private static final Cert CERT = Cert.NULL;
+
     private STECSender sender;
-    private NamingService namingService;
+    private WhitePagesService wpService;
     private TypedEventChannel channel;
     private TrivialDataFeed dataFeed;
     private com.bbn.quo.data.DataInterpreter interpreter;
@@ -152,8 +158,8 @@ public class STECMetricsUpdateServiceImpl
 	}
 
 	if (use_tec()) {
-	    namingService = (NamingService)
-		sb.getService(this, NamingService.class, null);
+	    wpService = (WhitePagesService)
+		sb.getService(this, WhitePagesService.class, null);
 
 	    NodeIdentificationService nis = (NodeIdentificationService)
 		sb.getService(this, NodeIdentificationService.class, null);
@@ -190,86 +196,47 @@ public class STECMetricsUpdateServiceImpl
 	return channel;
     }
 
-    private Object grabKey(String key, Object value) {
-	DirContext ctx = null;
-	Name name = null;
-	try {
-	    ctx = namingService.getRootContext();
-	    name = ctx.getNameParser("").parse(key);
-	    while (name.size() > 1) {
-		Name prefix = name.getPrefix(1);
-		name = name.getSuffix(1);
-		try {
-		    ctx = (DirContext) ctx.lookup(prefix);
-		} catch (NamingException ne) {
-		    BasicAttributes empty_attr = new BasicAttributes();
-		    ctx = (DirContext) 
-			ctx.createSubcontext(prefix, empty_attr);
-		} catch (Exception e) {
-		    throw new NamingException(e.toString());
-		}
-	    }
-	} catch (NamingException ex) {
-	    return null;
-	}
-
-	try {
-	    ctx.bind(name, value, new BasicAttributes());
-	    return value;
-	} catch (NamingException bind_ex) {
-	    try { return ctx.lookup(name); }
-	    catch (NamingException lookup_ex) { return null; }
-	}
-    }
-
-    private Object lookupKey(String key) {
-	try {
-	    DirContext ctx = namingService.getRootContext();
-	    Name name = ctx.getNameParser("").parse(key);
-	    while (name.size() > 1) {
-		Name prefix = name.getPrefix(1);
-		name = name.getSuffix(1);
-		try {
-		    ctx = (DirContext) ctx.lookup(prefix);
-		} catch (NamingException ne) {
-		    BasicAttributes empty_attr = new BasicAttributes();
-		    ctx = (DirContext) 
-			ctx.createSubcontext(prefix, empty_attr);
-		} catch (Exception e) {
-		    throw new NamingException(e.toString());
-		}
-	    }
-	    return ctx.lookup(key);
-	} catch (NamingException ex) {
-	    return null;
-	}
-
-    }
-
 
     // Silly approach, but the only one I can think of: make a
     // topology manager; register it in the name server if no other
     // process has created; kill it and grab whatever's registered if
     // some other process has created one.
     private String topologyIOR() {
-	String key = RSS_DIR +NS.DirSeparator+ "TopologyIOR";
-	String ior = (String) lookupKey(key);
-	if (ior != null) {
-	    // System.out.println("Found TopologyManager " +ior);
-	    return ior;
+	Connector.orb(); // ensure orb exists
+
+	TopologyRing mgr = new TopologyRing();
+	String iorstring = Connector.orb().object_to_string(mgr._this());
+	URI ref = URI.create(iorstring);
+	String key = "TopologyIOR";
+	Application app = Application.getApplication("IOR");
+	AddressEntry entry = new AddressEntry(key, app, ref, CERT, TTL);
+	
+	try {
+	    wpService.bind(entry);
+	    // if success, we should start the mgr and return
+	    String iorfile = 
+		System.getProperty(TOPOLOGY_DUMP_IORFILE_PROPERTY);
+	    mgr.start(iorfile);
+	    return iorstring;
+	} catch (Exception bind_ex) {
+	    // continue
 	}
 
-	Connector.orb(); // ensure orb exists
-	TopologyRing mgr = new TopologyRing();
-	ior = Connector.orb().object_to_string(mgr._this());
-	String real_ior = (String) grabKey(key, ior);
-	if (real_ior == ior) {
-	    String iorfile = System.getProperty(TOPOLOGY_DUMP_IORFILE_PROPERTY);
-	    mgr.start(iorfile);
-	} else {
-	    // System.out.println("Found TopologyManager " +real_ior);
+	// We're assuming here that bind will fail if the name is
+	// already bound.
+	try {
+	    AddressEntry[] entries = wpService.get(key);
+	    if (entries != null && entries.length >= 0) {
+		ref = entries[0].getAddress();
+		return ref.toString();
+	    } 
+	} catch (Exception ex) {
+	    // not supposed to happen...
+	    ex.printStackTrace();
 	}
-	return real_ior;
+
+	// fall through
+	return null;
     }
 
     private TypedEventChannel makeChannel(MessageAddress id) {
