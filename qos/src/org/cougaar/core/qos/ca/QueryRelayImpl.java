@@ -59,7 +59,7 @@ final public class QueryRelayImpl
 	public Relay.Target create(
 				   UID uid, MessageAddress source, Object content,
 				   Relay.Token token) {
-	    return new QueryRelayImpl(uid, source, target, content);
+	    return new QueryRelayImpl(uid, source, null, content);
 	}
     }
 }

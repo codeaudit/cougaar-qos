@@ -58,7 +58,7 @@ final public class ResponseRelayImpl
 	public Relay.Target create(
 				   UID uid, MessageAddress source, Object content,
 				   Relay.Token token) {
-	    return new ResponseRelayImpl(uid, source, target, content);
+	    return new ResponseRelayImpl(uid, source, null, content);
 	}
     }
 

@@ -113,7 +113,7 @@ abstract public class SimplestRelayImpl
     }
     public int updateResponse(
 			      MessageAddress target, Object response) {
-	throw new RuntimeException("no no no");
+	throw new RuntimeException("Attempt to update response!");
     }
 
     // Relay.Target:
@@ -122,7 +122,8 @@ abstract public class SimplestRelayImpl
 	return null;
     }
     public int updateContent(Object content, Token token) {
-       	throw new RuntimeException("no no no");
+	this.content = content;
+	return Relay.CONTENT_CHANGE;
     }
 
     // Object:

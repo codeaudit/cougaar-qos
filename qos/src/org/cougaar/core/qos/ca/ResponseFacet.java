@@ -71,9 +71,16 @@ abstract public class ResponseFacet
 	managerRole = 
 	    role_parameters.getProperty(MANAGER_ATTRIBUTE);
 
-	String filter = 
-	    CommunityFinder.makeFilter(COMMUNITY_TYPE_ATTRIBUTE, 
-				       communityType);
+// 	String filter = 
+// 	    CommunityFinder.makeFilter(COMMUNITY_TYPE_ATTRIBUTE, 
+// 				       communityType);
+	// (& (type-attr type) (! (manager-attr agentId)))
+	String agentId = getAgentID().getAddress();
+	String filter =
+	    "(& (" +COMMUNITY_TYPE_ATTRIBUTE+ "=" +communityType+ ")" +
+	    "(!(" +managerRole+ "=" +agentId+ ")))";
+	if (log.isDebugEnabled())
+	    log.debug("Response filter is " + filter);
 	findCommunityForAgent(filter);
     }
 
