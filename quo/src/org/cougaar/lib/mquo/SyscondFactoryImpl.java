@@ -71,7 +71,6 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	{
 	    this.syscond = syscond;
 	    this.agentAddress = address;
-	    updater.addListener(this, address);
 	}
 
 	abstract protected String path(String host);
@@ -206,9 +205,11 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	if (syscond == null) {
 	    String name = "Bandwidth " +local_host+ " to " +addr;
 	    syscond = makeMetricSC(name);
-//	    rst -- Commented out unused new BandwidthSyscondListener
-//          BandwidthSyscondListener syscondListener = 
-//		new BandwidthSyscondListener(syscond, addr);
+
+	    BandwidthSyscondListener syscondListener = 
+		new BandwidthSyscondListener(syscond, addr);
+	    updater.addListener(syscondListener, addr);
+
 	    bandwidthSysconds.put(addr, syscond);
 	}
 	return syscond;
@@ -235,10 +236,13 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	if (syscond == null) {
 	    String name = "Max Bandwidth " +local_host+ " to " +addr;
 	    syscond = makeMetricSC(name);
-//	    rst commented out unused new CapacitySyscondListener
-//          CapacitySyscondListener syscondListener = 
-//		new CapacitySyscondListener(syscond, addr);
+
+	    CapacitySyscondListener syscondListener = 
+		new CapacitySyscondListener(syscond, addr);
+	    updater.addListener(syscondListener, addr);
+
 	    capacitySysconds.put(addr, syscond);
+
 	}
 	return syscond;
     }
