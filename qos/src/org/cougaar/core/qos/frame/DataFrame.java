@@ -29,15 +29,58 @@ package org.cougaar.core.qos.frame;
 import java.util.Properties;
 
 import org.cougaar.core.util.UID;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 public class DataFrame 
     extends Frame
 {
-    public DataFrame(FrameSet frameSet, 
-		     String kind, 
-		     UID uid, 
-		     Properties properties)
+    private static transient Logger log = 
+	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
+
+    protected DataFrame(FrameSet frameSet, 
+			String kind, 
+			UID uid)
     {
-	super(frameSet, kind, uid, properties);
+	super(frameSet, kind, uid);
     }
+
+    public static DataFrame newFrame(FrameSet frameSet,
+				     String proto, 
+				     UID uid,
+				     Properties values)
+    {
+	String pkg = frameSet.getPackageName();
+	return newFrame(pkg, frameSet, proto, uid, values);
+    }
+
+    private static final Class[] CTYPES = { FrameSet.class, 
+					    String.class,
+					    UID.class};
+
+    public static DataFrame newFrame(String pkg,
+				     FrameSet frameSet,
+				     String proto, 
+				     UID uid,
+				     Properties values)
+    {
+	// use reflection here!
+	DataFrame frame = null;
+	try {
+	    Object[] args = { frameSet, proto, uid };
+	    String fixed_proto = FrameGen.fix_name(proto, true);
+	    String classname = pkg +"."+ fixed_proto;
+	    Class klass = Class.forName(classname);
+	    java.lang.reflect.Constructor cons = klass.getConstructor(CTYPES);
+	    frame = (DataFrame) cons.newInstance(args);
+	    if (log.isInfoEnabled())
+		log.info("Made frame " +frame);
+	} catch (Exception ex) {
+	    log.error("Error making frame", ex);
+	    return null;
+	}
+	frame.setValues(values);
+	return frame;
+    }
+
 }

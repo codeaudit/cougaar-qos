@@ -249,6 +249,7 @@ public class FrameSetParser
 	    log.debug("startFrameset");
 	
 	String name = attrs.getValue("name");
+	String pkg_prefix = attrs.getValue("package");
 
 	if (frame_set != null) {
 	    // add to existing set, as long as the name is the same
@@ -272,7 +273,8 @@ public class FrameSetParser
 	String child_slot = attrs.getValue("child-slot");
 	String child_value = attrs.getValue("child-value");
 
-	frame_set = new SingleInheritanceFrameSet(sb, bbs,
+	frame_set = new SingleInheritanceFrameSet(pkg_prefix,
+						  sb, bbs,
 						  name,
 						  relation_name,
 						  parent_proto,

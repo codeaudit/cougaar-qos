@@ -40,21 +40,47 @@ import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
 abstract public class Frame
-    implements UniqueObject
+    implements UniqueObject, Cloneable
 {
+    private static final Class[] TYPES0 = {};
+    private static final Object[] ARGS0 = {};
+
+    private static final Class[] TYPES1 = { Object.class };
+
+
     private final UID uid;
     private final String kind;
-    private VisibleProperties properties;
     private transient FrameSet frameSet;
-    private transient Logger log = Logging.getLogger(getClass().getName());
+    private transient Set localSlots;
+    private static Logger log = 
+	Logging.getLogger(org.cougaar.core.qos.frame.Frame.class);
 
-    Frame(FrameSet frameSet, String kind, UID uid, Properties properties)
+    Frame(FrameSet frameSet, String kind, UID uid)
     {
 	this.frameSet = frameSet;
 	this.uid = uid;
 	this.kind = kind;
-	this.properties = new VisibleProperties(properties);
+	this.localSlots = new HashSet();
     }
+
+    protected void addLocalSlot(String slot)
+    {
+	synchronized (localSlots) {
+	    localSlots.add(slot);
+	}
+    }
+
+    void copyToFrameSet(FrameSet frameSet)
+    {
+	try {
+	    Frame copy = (Frame) this.clone();
+	    copy.frameSet = frameSet;
+	    frameSet.makeFrame(copy);
+	} catch (CloneNotSupportedException ex) {
+	    // Is this possible?
+	}
+    }
+
 
 
     public String toString()
@@ -85,35 +111,44 @@ abstract public class Frame
     }
 
     // Only here for the Tasks servlet
-    public VisibleProperties getLocalSlots()
+    Properties getLocalSlots()
     {
-	return properties;
+	Properties props = new VisibleProperties();
+	synchronized (localSlots) {
+	    Iterator itr = localSlots.iterator();
+	    while (itr.hasNext()) {
+		String slot =  (String) itr.next();
+		Object value = getLocalValue(slot);
+		props.put(slot, value);
+	    }
+	}
+	return props;
     }
 
-
-    public VisibleProperties getDerivedSlots()
+    public Properties getIndirectSlots()
     {
-	VisibleProperties props = new VisibleProperties();
+	Frame parent = getParent();
+	if (parent == null) return null;
+
+	Properties props = new VisibleProperties();
+	Class klass = parent.getClass();
 	try {
-	    Set slot_names = getAllSlotNames();
-	    Iterator itr = slot_names.iterator();
-	    while (itr.hasNext()) {
-		String slot_name = (String) itr.next();
-		if (!properties.containsKey(slot_name)) {
-		    Object value = getValue(slot_name);
-		    if (value != null) {
-			props.put(slot_name, value);
-		    } else {
-			if (log.isInfoEnabled())
-			    log.info("Derived slot " +slot_name+
-				     " has no value");
-		    }
+	    java.lang.reflect.Method[] meths = klass.getMethods();
+	    for (int i=0; i<meths.length; i++) {
+		java.lang.reflect.Method meth = meths[i];
+		Class ret_type = meth.getReturnType();
+		Class[] params = meth.getParameterTypes();
+		String name = meth.getName();
+		if (name.startsWith("get") &&
+		    ret_type == Object.class &&
+		    params.length == 0) {
+		    Object value = meth.invoke(parent, ARGS0);
+		    props.put(name.substring(3), value);
 		}
 	    }
-	} catch (Throwable t) {
-	    log.error("Error computing derived slots", t);
+	} catch (Exception ex) {
+	    // do we care?
 	}
-
 	return props;
     }
 
@@ -146,11 +181,6 @@ abstract public class Frame
 	return frameSet;
     }
 
-    void copyToFrameSet(FrameSet frameSet)
-    {
-	frameSet.makeFrame(kind, properties, uid);
-    }
-
     boolean matchesSlots(Properties slot_value_pairs)
     {
 	Iterator itr = slot_value_pairs.entrySet().iterator();
@@ -167,25 +197,51 @@ abstract public class Frame
     // These should only be called from the FrameSet owning the
     // frame. 
 
-    public void setValue(String slot, Object object)
+
+    private Object getLocalValue(String slot)
     {
-	properties.put(slot, object);
-	frameSet.valueUpdated(this, slot, object);
+	// reflection
+	Class klass = getClass();
+	String mname = "get" + FrameGen.fix_name(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
+	    Object result = meth.invoke(this, ARGS0);
+	    if (log.isInfoEnabled())
+		log.info("Slot " +slot+ " of " +this+ " = " +result);
+	    return result;
+	} catch (Exception ex) {
+	    // This is not necessarily an error.  It could mean one of
+	    // our children was supposed to have this value and
+	    // didn't, so it asked us.
+	    if (log.isInfoEnabled())
+		log.info("Couldn't get slot " +slot+ " of " +this+
+			  " via " +mname);
+	    return null;
+	}
     }
 
-
-    public Object getValue(String slot)
+    private void setLocalValue(String slot, Object value)
     {
-	return getValue(this, slot);
+	// reflection
+	Class klass = getClass();
+	String mname = "set" + FrameGen.fix_name(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
+	    Object[] args1 = { value };
+	    meth.invoke(this, args1);
+	    if (log.isInfoEnabled())
+		log.info("Set slot " +slot+ " of " +this+ " to " + value);
+	} catch (Exception ex) {
+	    log.error("Error setting slot " +slot+ " of " +this+
+		      " via " +mname);
+	}
     }
 
-    Object getValue(Frame origin, String slot)
+    protected Object getInheritedValue(Frame origin, String slot)
     {
-	Object result = properties.get(slot);
-	if (result != null) return result;
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) {
-	    result = prototype.getValue(origin, slot);
+	    Object result = prototype.getValue(origin, slot);
 	    if (result != null) return result;
 	}
 	Frame parent = frameSet.getParent(this);
@@ -195,44 +251,35 @@ abstract public class Frame
 	return null;
     }
 
-    public Frame getSource(String slot)
-    {
-	if (properties.containsKey(slot)) return this;
 
-	Frame result = null;
-	Frame prototype = frameSet.getPrototype(this);
-	if (prototype != null) {
-	    result = prototype.getSource(slot);
-	    if (result != null) return result;
+    public void setValue(String slot, Object value)
+    {
+	setLocalValue(slot, value);
+    }
+
+    public void setValues(Properties values)
+    {
+	Iterator itr = values.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    setLocalValue((String) entry.getKey(), entry.getValue());
 	}
-	Frame parent = frameSet.getParent(this);
-	if (parent != null) {
-	    return parent.getSource(slot);
-	}
-	return null;
     }
 
-    void addLocalSlotNames(Set set)
+    public Object getValue(String slot)
     {
-	if (properties != null) set.addAll(properties.keySet());
+	return getValue(this, slot);
     }
 
-    private void addSlotNames(Set set)
+    Object getValue(Frame origin, String slot)
     {
-	addLocalSlotNames(set);
-	Frame prototype = frameSet.getPrototype(this);
-	if (prototype != null) prototype.addSlotNames(set);
-	Frame parent =  frameSet.getParent(this);
-	if (parent != null) parent.addSlotNames(set);
+	Object result = getLocalValue(slot);
+	if (result != null) 
+	    return result;
+	else
+	    return getInheritedValue(origin, slot);
     }
 
-    public Set getAllSlotNames()
-    {
-	HashSet set = new HashSet();
-	addSlotNames(set);
-	return set;
-    }
-    
 
     public Set findRelations(String role, String relation)
     {
@@ -266,25 +313,26 @@ abstract public class Frame
 	return uid.hashCode();
     }
 
-    // Hack for servlet
+
     public static class VisibleProperties extends Properties
     {
 	VisibleProperties()
 	{
 	    super();
 	}
-
+ 
 	VisibleProperties(Properties properties) 
 	{
 	    super();
 	    putAll(properties);
 	}
-
+ 
 	public String getContents()
 	{
 	    return this.toString();
 	}
     }
+
 
 
     public static class Change implements ChangeReport {

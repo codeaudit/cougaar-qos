@@ -117,7 +117,7 @@ public class FrameGen
 
 
 
-    private String fix_name(String name, boolean is_class)
+    static String fix_name(String name, boolean is_class)
     {
 	if (is_class) {
 	    // camelize, or at least initial cap
@@ -165,7 +165,6 @@ public class FrameGen
     private void beginPrototypeClass(String name, String parent)
     {
 	writer.println("package " +package_name+ ";\n");
-	writer.println("import java.util.Properties;");
 	writer.println("import org.cougaar.core.util.UID;");
 	writer.println("import org.cougaar.core.qos.frame.FrameSet;");
 	if (parent == null)
@@ -179,14 +178,20 @@ public class FrameGen
 	writer.println("{");
     }
 
-    private void writeConstructor(String name)
+    private void writeConstructors(String name)
     {
-	writer.println("\n\n    public " +name + "(FrameSet frameSet,");
-	writer.println("               String kind,");
-	writer.println("               UID uid,");
-	writer.println("               Properties properties)");
+	String cname = fix_name(name, true);
+	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
+	writer.println("               UID uid)");
 	writer.println("    {");
-	writer.println("        super(frameSet, kind, uid, properties);");
+	writer.println("        super(frameSet, \"" +name+ "\", uid);");
+	writer.println("    }");
+
+	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
+	writer.println("               String kind,");
+	writer.println("               UID uid)");
+	writer.println("    {");
+	writer.println("        super(frameSet, kind, uid);");
 	writer.println("    }");
     }
 
@@ -199,19 +204,20 @@ public class FrameGen
 	writer.println("        if (" +fixed_name+ " != null)");
 	writer.println("            return " +fixed_name+ ";");
 	writer.println("        else");
-	writer.println("            return getValue(\"" +slot+ "\");");
+	writer.println("            return getInheritedValue(this, \"" +slot+ "\");");
 	writer.println("    }");
 
 	writer.println("\n\n    public void set" +accessor_name+
 		       "(Object new_value)");
 	writer.println("    {");
 	writer.println("        this." +fixed_name+ " = new_value;");
+	writer.println("        addLocalSlot(\"" +slot+ "\");");
 	writer.println("    }");
     }
 
     private void endPrototypeClass()
     {
-	writeConstructor(fix_name(current_prototype, true));
+	writeConstructors(current_prototype);
 	// dump accessors
 	for (int i=0; i<slots.size(); i++) {
 	    String slot = (String) slots.get(i);

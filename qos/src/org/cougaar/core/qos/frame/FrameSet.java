@@ -35,6 +35,8 @@ public interface FrameSet
 {
     public String getName();
 
+    public String getPackageName();
+
     public boolean descendsFrom(Frame frame, String prototype);
 
     public Frame findFrame(String kind, String slot, Object value);
@@ -50,6 +52,8 @@ public interface FrameSet
 			  boolean includePrototypes);
 
     public Set findRelations(Frame root, String role, String relation);
+
+    public Frame makeFrame(Frame frame);
 
     public Frame makeFrame(String kind, Properties slots);
 

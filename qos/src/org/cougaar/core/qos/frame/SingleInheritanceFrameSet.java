@@ -56,6 +56,7 @@ public class SingleInheritanceFrameSet
     private HashMap kb;
     private HashMap prototypes, parents;
     private HashSet parent_relations;
+    private String pkg;
     private String 
 	parent_relation,
 	parent_proto_slot,
@@ -66,7 +67,8 @@ public class SingleInheritanceFrameSet
 	child_value_slot;
     
 
-    public SingleInheritanceFrameSet(ServiceBroker sb,
+    public SingleInheritanceFrameSet(String pkg_prefix,
+				     ServiceBroker sb,
 				     BlackboardService bbs,
 				     String name,
 				     String parent_relation,
@@ -78,6 +80,7 @@ public class SingleInheritanceFrameSet
 				     String child_value_slot)
     {
 	this.name = name;
+	this.pkg = pkg_prefix +"."+ name;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
 	this.change_queue_lock = new Object();
@@ -152,7 +155,6 @@ public class SingleInheritanceFrameSet
 		if (slot == null) {
 		    log.warn("Relationship " +relationship+
 			     " has no value for " +slot_slot);
-		    Thread.dumpStack();
 		}
 		if (proto == null) {
 		    log.warn("Relationship " +relationship+
@@ -183,6 +185,11 @@ public class SingleInheritanceFrameSet
 	}
     }
 
+
+    public String getPackageName()
+    {
+	return pkg;
+    }
 
     public Frame getRelationshipParent(Frame relationship)
     {
@@ -524,7 +531,7 @@ public class SingleInheritanceFrameSet
 
     public Frame makeFrame(String proto, Properties values, UID uid)
     {
-	Frame frame = new DataFrame(this, proto, uid, values);
+	Frame frame = DataFrame.newFrame(this, proto, uid, values);
 
 	if (isParentageRelation(frame)) establishParentage(frame);
 
@@ -532,6 +539,16 @@ public class SingleInheritanceFrameSet
 	publishAdd(frame);
 	return frame;
     }
+
+    public Frame makeFrame(Frame frame)
+    {
+	if (isParentageRelation(frame)) establishParentage(frame);
+
+	addObject(frame);
+	publishAdd(frame);
+	return frame;
+    }
+
 
     public Path makePath(String name, Path.Fork[] forks, String slot)
     {
@@ -581,7 +598,7 @@ public class SingleInheritanceFrameSet
 		    log.warn("Ignoring prototype " +proto);
 		return null;
 	    } else {
-		frame = new PrototypeFrame(this, proto, parent, uid, values);
+		frame = new PrototypeFrame(this, proto, parent, uid);
 		if (log.isDebugEnabled())
 		    log.debug("Adding prototype " +frame+
 			      " for " +proto);

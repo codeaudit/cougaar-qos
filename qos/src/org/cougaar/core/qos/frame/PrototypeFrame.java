@@ -47,9 +47,9 @@ public class PrototypeFrame
     private transient HashSet required_slots;
 
     PrototypeFrame(FrameSet frameSet, String prototype_name,
-		   String parent, UID uid, Properties properties)
+		   String parent, UID uid)
     {
-	super(frameSet, parent, uid, properties);
+	super(frameSet, parent, uid);
 	this.prototype_name = prototype_name;
 	this.required_slots = new HashSet();
 	this.paths = new HashMap();
@@ -69,16 +69,20 @@ public class PrototypeFrame
     {
 	Path path = (Path) paths.get(slot);
 	if (path != null) {
-	    Object result = path.getValue(origin);
-	    if (result != null) return result;
-	} else if (required_slots.contains(slot)) {
-	    if (log.isWarnEnabled())
+	    return path.getValue(origin);
+	} else {
+	    if (required_slots.contains(slot) &&
+		log.isWarnEnabled())
 		log.warn("Slot " +slot+ " is required by prototype "
 			 +prototype_name+ " but was never provided in frame "
 			 +origin);
 	    return null;
 	}
-	return super.getValue(origin, slot);
+    }
+
+    public String getName()
+    {
+	return prototype_name;
     }
 
     public String getPrototypeName()
@@ -98,10 +102,10 @@ public class PrototypeFrame
 			       getUID());
     }
 
-    void addLocalSlotNames(Set set)
-    {
-	super.addLocalSlotNames(set);
-	if (paths != null) set.addAll(paths.keySet());
-    }
+//     void addLocalSlotNames(Set set)
+//     {
+// 	super.addLocalSlotNames(set);
+// 	if (paths != null) set.addAll(paths.keySet());
+//     }
 
 }
