@@ -44,7 +44,7 @@ public interface QueryRelay extends UniqueObject {
   UID getUID();
   void setUID(UID uid);
     
-    String getCommunity();
+    String getArtifactId();
 
   /** The agent that created the query */
   MessageAddress getSource();

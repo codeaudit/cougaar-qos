@@ -66,4 +66,7 @@ public interface FacetProvider
      * implementation in {@link FacetProviderImpl}.
      */
     public void triggerExecute();
+
+
+    public String getArtifactId();
 }

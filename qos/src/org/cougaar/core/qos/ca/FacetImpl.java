@@ -259,4 +259,8 @@ abstract public class FacetImpl // should be abstract
     }
 
 
+    public String getArtifactId()
+    {
+	return owner.getArtifactId();
+    }
 }

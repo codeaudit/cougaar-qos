@@ -39,7 +39,8 @@ public interface QueryCoordArtConstants
     public static final String SourceAttr = "source";
     public static final String PayloadAttr = "payload";
     public static final String UidAttr = "uid";
-    public static final String CommunityAttr = "community";
+    public static final String ArtifactIdAttr = "artifact-id";
+    public static final String CommunityAttr = "community"; // deprecated
     public static final String COMMUNITY_TYPE_ATTRIBUTE = "CommunityType";
     public static final String MANAGER_ATTRIBUTE = "Manager";
     public static final String RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE =

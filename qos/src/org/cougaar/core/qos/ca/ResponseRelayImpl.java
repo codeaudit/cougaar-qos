@@ -53,7 +53,7 @@ implements ResponseRelay, Relay.Source, Relay.Target,
   private Object query;
   private Object reply;
     private UID origUID;
-    private String community;
+    private String artifactId;
 
   private transient Set _targets;
   private transient Relay.TargetFactory _factory;
@@ -74,14 +74,14 @@ implements ResponseRelay, Relay.Source, Relay.Target,
 				    MessageAddress target,
 				    Object query, 
 				    UID origUID,
-				    String community,
+				    String artifactId,
 				    long timestamp) {
 	this.uid = uid;
 	this.source = source;
 	this.target = target;
 	this.query = query;
 	this.origUID = origUID;
-	this.community = community;
+	this.artifactId = artifactId;
 	this.timestamp = timestamp;
 	cacheTargets();
     }
@@ -127,7 +127,7 @@ implements ResponseRelay, Relay.Source, Relay.Target,
   private void cacheTargets() {
     _targets = Collections.singleton(target);
     _factory = new ResponseRelayImplFactory(target, timestamp, origUID, 
-					    community);
+					    artifactId);
   }
   public Set getTargets() {
     return _targets;
@@ -200,7 +200,7 @@ implements ResponseRelay, Relay.Source, Relay.Target,
       " reply="+reply+
 	"origUID="+origUID+
 	"timestamp="+timestamp+
-	"community="+community+
+	"artifactId="+artifactId+
 	")";
   }
 
@@ -208,8 +208,8 @@ implements ResponseRelay, Relay.Source, Relay.Target,
 	return timestamp;
     }
 
-    public String getCommunity() {
-	return community;
+    public String getArtifactId() {
+	return artifactId;
     }
     
   // factory method:
@@ -219,16 +219,16 @@ implements ResponseRelay, Relay.Source, Relay.Target,
       private final MessageAddress target;
       private final long timestamp;
       private final UID origUID;
-      private String community;
+      private String artifactId;
       public ResponseRelayImplFactory(MessageAddress target,
 				      long timestamp,
 				      UID origUID,
-				      String community) 
+				      String artifactId) 
       {
         this.target = target;
 	this.timestamp = timestamp;
 	this.origUID = origUID;
-	this.community = community;
+	this.artifactId = artifactId;
       }
       public Relay.Target create(
           UID uid, MessageAddress source, Object content,
@@ -238,7 +238,7 @@ implements ResponseRelay, Relay.Source, Relay.Target,
 // 	UID origUID = null;
         // bug 3824, pass null aba-target to avoid n^2 peer copies
         return new ResponseRelayImpl(uid, source, null, query, origUID, 
-				     community, timestamp);
+				     artifactId, timestamp);
       }
   }
 }

@@ -73,7 +73,7 @@ abstract public class QueryFacet
 
     private String managerAttr;
     private RelayReclaimer reclaimer = null;
-    private String communityRole, communityType;
+    private String communityRole;
     private IncrementalSubscription responseSub;
 
     protected QueryFacet(FacetProviderImpl owner,
@@ -86,7 +86,7 @@ abstract public class QueryFacet
 
 
 
-	communityType = 
+	String communityType = 
 	    spec.ca_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
 
 	Properties role_parameters = spec.role_parameters;
@@ -198,7 +198,8 @@ abstract public class QueryFacet
 	Object query = transformQuery(fact);
 	long timestamp = System.currentTimeMillis();
 	QueryRelay qr = 
-	    new QueryRelayImpl(uid, getAgentID(), aba, query, communityType,
+	    new QueryRelayImpl(uid, getAgentID(), aba, query, 
+			       getArtifactId(),
 			       timestamp);
 	if (log.isInfoEnabled()) {
 	    log.info("Sending QueryRelay from " +getAgentID() +
@@ -242,8 +243,8 @@ abstract public class QueryFacet
 		    ResponseRelay relay = (ResponseRelay) o;
 		    if (log.isDebugEnabled())
 			log.debug("testing response relay" +relay);
-		    String responseCommunity = relay.getCommunity();
-		    return responseCommunity.equals(communityType) &&
+		    String id = relay.getArtifactId();
+		    return id.equals(getArtifactId()) &&
 			acceptResponse(relay);
 		} else {
 		    return false;

@@ -115,7 +115,4 @@ abstract public class FacetProviderImpl
     {
 	owner.triggerExecute();
     }
-
-
-
 }

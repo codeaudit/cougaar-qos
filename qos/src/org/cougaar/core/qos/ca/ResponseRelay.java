@@ -91,5 +91,5 @@ public interface ResponseRelay extends UniqueObject {
 
     long getTimestamp();
 
-    String getCommunity();
+    String getArtifactId();
 }

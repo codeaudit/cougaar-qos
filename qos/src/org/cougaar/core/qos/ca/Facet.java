@@ -66,4 +66,7 @@ public interface Facet
      * blackboard transacion.  Usually invoked by the FacetProvider.
     */
     public void setupSubscriptions(BlackboardService blackboard);
+
+
+    public String getArtifactId();
 }

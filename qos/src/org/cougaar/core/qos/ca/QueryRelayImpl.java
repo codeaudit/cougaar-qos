@@ -37,7 +37,7 @@ import org.cougaar.core.persist.NotPersistable;
 
 /**
  * Implementation of a generic QueryRelay.  <p> Resides on the
- * Manager and sends QueryRelays to all members in its community,
+ * Manager and sends QueryRelays to all members in its artifactId,
  * receives ResponseRelays and collates them.
  */
 public final class QueryRelayImpl
@@ -52,7 +52,7 @@ public final class QueryRelayImpl
   private Object query;
   private Object reply;
 
-    private String community;
+    private String artifactId;
 
   private transient Set _targets;
   private transient Relay.TargetFactory _factory;
@@ -73,14 +73,14 @@ public final class QueryRelayImpl
 			    MessageAddress source,
 			    MessageAddress target,
 			    Object query, 
-			    String community,
+			    String artifactId,
 			    long timestamp) {
 	this.uid = uid;
 	this.source = source;
 	this.target = target;
 	this.query = query;
 	this.timestamp = timestamp;
-	this.community = community;
+	this.artifactId = artifactId;
 	cacheTargets();
     }
     
@@ -119,7 +119,7 @@ public final class QueryRelayImpl
 
   private void cacheTargets() {
     _targets = Collections.singleton(target);
-    _factory = new QueryRelayImplFactory(target, timestamp, community);
+    _factory = new QueryRelayImplFactory(target, timestamp, artifactId);
   }
   public Set getTargets() {
     return _targets;
@@ -183,7 +183,7 @@ public final class QueryRelayImpl
       " query="+query+
       " reply="+reply+
 	"timestamp="+timestamp+
-	"community="+community+
+	"artifactId="+artifactId+
 	")";
   }
     
@@ -191,8 +191,8 @@ public final class QueryRelayImpl
 	return timestamp;
     }
     
-    public String getCommunity() {
-	return community;
+    public String getArtifactId() {
+	return artifactId;
     }
 
   // factory method:
@@ -201,14 +201,14 @@ public final class QueryRelayImpl
     implements Relay.TargetFactory, Serializable {
       private final MessageAddress target;
       private long timestamp;
-      private String community;
+      private String artifactId;
       public QueryRelayImplFactory(MessageAddress target,
 				   long timestamp,
-				   String community)
+				   String artifactId)
       {
         this.target = target;
 	this.timestamp = timestamp;
-	this.community = community;
+	this.artifactId = artifactId;
       }
       public Relay.Target create(
           UID uid, MessageAddress source, Object content,
@@ -216,7 +216,7 @@ public final class QueryRelayImpl
         Object query = content;
 	// long timestamp = System.currentTimeMillis();
         // bug 3824, pass null aba-target to avoid n^2 peer copies
-        return new QueryRelayImpl(uid, source, null, query, community, timestamp);
+        return new QueryRelayImpl(uid, source, null, query, artifactId, timestamp);
       }
     }
 }

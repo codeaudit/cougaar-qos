@@ -66,4 +66,5 @@ public interface CoordinationArtifact
      * transaction.
     */
     public void triggerExecute();
+
 }

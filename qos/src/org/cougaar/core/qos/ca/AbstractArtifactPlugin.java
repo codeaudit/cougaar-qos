@@ -48,7 +48,6 @@ abstract public class AbstractArtifactPlugin
 {
 
     private ArrayList artifacts;
-
     /**
      *  Instantiable subclasses must provide this method.  Its job is
      *  to create new FacetProviders, given a ConnectionSpec.

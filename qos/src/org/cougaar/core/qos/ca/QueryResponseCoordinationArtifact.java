@@ -66,6 +66,9 @@ abstract public class QueryResponseCoordinationArtifact
     abstract protected class QueryResponseFacetProvider 
 	extends FacetProviderImpl
     {
+	private String artifactId;
+
+
 	/**
 	 * Make a CA-specific QueryFacet.
 	 */
@@ -86,7 +89,16 @@ abstract public class QueryResponseCoordinationArtifact
 					     ConnectionSpec spec)
 	{
 	    super(owner, spec);
+
+	    // User the community type as the artifactId for now
+	    this.artifactId = spec.ca_parameters.getProperty(ArtifactIdAttr);
 	}
+	
+	public String getArtifactId()
+	{
+	    return artifactId;
+	}
+
 
 	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
 	{

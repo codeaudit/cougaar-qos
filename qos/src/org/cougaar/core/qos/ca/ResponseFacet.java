@@ -74,7 +74,6 @@ abstract public class ResponseFacet
     public abstract Object transformResponse(Fact fact);
 
     private String managerRole;
-    private String communityType;
     private HashSet completedUIDs;
     private ResponseRelay lastResponse; // for cleaning up
     private IncrementalSubscription querySub;
@@ -88,7 +87,7 @@ abstract public class ResponseFacet
 	Properties role_parameters = spec.role_parameters;
 	completedUIDs = new HashSet();
 
-	communityType = 
+	String communityType = 
 	    spec.ca_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
 	managerRole = 
 	    role_parameters.getProperty(MANAGER_ATTRIBUTE);
@@ -171,7 +170,7 @@ abstract public class ResponseFacet
     private void sendReply(Fact fact, BlackboardService blackboard)
     {
 	UID queryUID = (UID) fact.getAttribute(UidAttr);
-	String queryCommunity = (String) fact.getAttribute(CommunityAttr);
+	String artifactID = (String) fact.getAttribute(ArtifactIdAttr);
 	// Pass back response relay
 	UID uid = nextUID();
 	//String s = "Response Matrix";
@@ -187,7 +186,7 @@ abstract public class ResponseFacet
 	ResponseRelay response = 
 	    new ResponseRelayImpl(uid, getAgentID(), getABA(), 
 				  payload, queryUID, 
-				  queryCommunity,
+				  artifactID,
 				  timestamp);
 	    
 	    
@@ -230,7 +229,7 @@ abstract public class ResponseFacet
 	Fact fact = transformQuery(query);
 	HashMap updates = new HashMap();
 	updates.put(UidAttr, query.getUID());
-	updates.put(CommunityAttr, query.getCommunity());
+	updates.put(ArtifactIdAttr, query.getArtifactId());
 	Fact updated_fact = new Fact(fact, updates);
 	if (log.isDebugEnabled())
 	    log.debug("Updated Fact" +updated_fact.debugString());
@@ -248,8 +247,8 @@ abstract public class ResponseFacet
 	    public boolean execute(Object o) {
 		if (o instanceof QueryRelay) {
 		    QueryRelay relay = (QueryRelay) o;
-		    String queryCommunity = relay.getCommunity();
-		    return queryCommunity.equals(communityType) &&
+		    String id = relay.getArtifactId();
+		    return id.equals(getArtifactId()) &&
 			acceptQuery(relay);
 		} else {
 		    return false;
