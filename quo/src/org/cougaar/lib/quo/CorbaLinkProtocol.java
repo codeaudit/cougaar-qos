@@ -72,7 +72,7 @@ public class CorbaLinkProtocol
 
     private MT lookupObject(MessageAddress address) throws Exception {
 	Object object = 
-	    nameSupport.lookupAddressInNameServer(address, PROTOCOL_TYPE);
+	    getNameSupport().lookupAddressInNameServer(address, PROTOCOL_TYPE);
 
 	if (object == null) {
 	    return null;
@@ -89,7 +89,7 @@ public class CorbaLinkProtocol
 
     private void makeMT() {
 	if (myProxy != null) return;
-	MessageAddress myAddress = nameSupport.getNodeMessageAddress();
+	MessageAddress myAddress = getNameSupport().getNodeMessageAddress();
 	MTImpl impl = new MTImpl(myAddress, deliverer);
 	try {
 	    poa.activate_object(impl);
@@ -103,7 +103,7 @@ public class CorbaLinkProtocol
 	makeMT();
 	try {
 	    Object proxy = orb.object_to_string(myProxy);
-	    nameSupport.registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
+	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
 	    System.err.println("Error registering MessageTransport:");
 	    e.printStackTrace();
@@ -115,7 +115,7 @@ public class CorbaLinkProtocol
 	    // Assume node-redirect
 	    Object proxy = orb.object_to_string(myProxy);
 	    MessageAddress addr = client.getMessageAddress();
-	    nameSupport.registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
+	    getNameSupport().registerAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
 	    System.err.println("Error registering MessageTransport:");
 	    e.printStackTrace();
@@ -128,7 +128,7 @@ public class CorbaLinkProtocol
 	    // Assume node-redirect
 	    Object proxy = orb.object_to_string(myProxy);
 	    MessageAddress addr = client.getMessageAddress();
-	    nameSupport.unregisterAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
+	    getNameSupport().unregisterAgentInNameServer(proxy,addr,PROTOCOL_TYPE);
 	} catch (Exception e) {
 	    System.err.println("Error unregistering MessageTransport:");
 	    e.printStackTrace();
