@@ -35,7 +35,7 @@ import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
-import org.cougaar.core.plugin.ComponentPlugin;
+import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
@@ -44,7 +44,7 @@ import org.cougaar.core.thread.Schedulable;
  * implemented by an inner class.
  */
 public class FacetBrokerPlugin
-    extends ComponentPlugin
+    extends ParameterizedPlugin
     implements ServiceProvider
 {
     private FacetBroker impl;

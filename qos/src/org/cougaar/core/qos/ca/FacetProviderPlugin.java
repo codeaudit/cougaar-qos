@@ -34,7 +34,7 @@ import java.util.Set;
 
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.plugin.ComponentPlugin;
+import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 import org.cougaar.util.CircularQueue;
@@ -52,7 +52,7 @@ import org.cougaar.util.CircularQueue;
  * queue of fact revisions (assertions and retractions).
  */
 abstract public class FacetProviderPlugin
-    extends ComponentPlugin
+    extends ParameterizedPlugin
     implements Runnable, FacetProvider
 {
     private Properties parameters;
@@ -93,16 +93,30 @@ abstract public class FacetProviderPlugin
     }
 	
 
-    protected FacetProviderPlugin(Properties properties, ServiceBroker sb)
+    protected FacetProviderPlugin()
     {
-	this.parameters = properties;
+	this.parameters = new Properties();
+
 	this.facets = new HashMap();
 	this.queue = new CircularQueue();
+    }
+
+
+    public void load()
+    {
+	super.load();
+
+	// TBD: fill in this.parameters from the plugin params
+	String name = getParameter("name");
+	parameters.put("name", name);
+
+	ServiceBroker sb = getServiceBroker();
 	ThreadService tsvc = (ThreadService)
 	    sb.getService(this, ThreadService.class, null);
 	this.sched = tsvc.getThread(this, this, "Fact Propagater");
 	this.sched.start();
     }
+
 
     // FacetProvider
     public boolean matches(ConnectionSpec spec)
