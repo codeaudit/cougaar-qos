@@ -62,7 +62,11 @@ public class FrameSetSubscriberPlugin
     // plugin
     protected void execute()
     {
-	if (sub == null || !sub.hasChanged()) return;
+	if (sub == null || !sub.hasChanged()) {
+	    if (log.isDebugEnabled())
+		log.debug("No Frame changes");
+	    return;
+	}
 
 	java.util.Enumeration en;
 		

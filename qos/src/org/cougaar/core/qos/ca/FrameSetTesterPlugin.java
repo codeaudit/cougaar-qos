@@ -46,7 +46,7 @@ public class FrameSetTesterPlugin
 
 	public MyAlarm (long expirationTime) 
 	{
-	    expiresAt = expirationTime;
+	    expiresAt = System.currentTimeMillis()+expirationTime;
 	}
 
 	public long getExpirationTime() 
