@@ -32,6 +32,8 @@ import org.cougaar.core.util.UID;
 
 public interface FrameSet
 {
+    public String getName();
+
     public Frame findFrame(String kind, String slot, Object value);
 
     public Frame findFrame(UID uid);

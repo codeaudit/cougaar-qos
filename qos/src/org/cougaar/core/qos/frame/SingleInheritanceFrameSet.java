@@ -48,6 +48,7 @@ public class SingleInheritanceFrameSet
     private LoggingService log;
     private UIDService uids;
     private BlackboardService bbs;
+    private String name;
     private HashSet pendingParentage;
     private HashMap kbs;
     private HashMap prototypes, parents;
@@ -63,6 +64,7 @@ public class SingleInheritanceFrameSet
 
     public SingleInheritanceFrameSet(ServiceBroker sb,
 				     BlackboardService bbs,
+				     String name,
 				     String parent_relation,
 				     String parent_kind_slot,
 				     String parent_slot_slot,
@@ -71,6 +73,7 @@ public class SingleInheritanceFrameSet
 				     String child_slot_slot,
 				     String child_value_slot)
     {
+	this.name = name;
 	this.bbs = bbs;
 	log = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
@@ -197,6 +200,12 @@ public class SingleInheritanceFrameSet
 	}
     }
 
+
+
+    public String getName()
+    {
+	return name;
+    }
 
     public Frame findFrame(UID uid)
     {

@@ -39,6 +39,11 @@ final class ReadOnlyFrameSetProxy
 	this.frameSet = frameSet;
     }
 
+    public String getName()
+    {
+	return frameSet.getName();
+    }
+
     public Frame findFrame(String kind, String slot, Object value)
     {
 	return frameSet.findFrame(kind, slot, value);
@@ -67,6 +72,11 @@ final class ReadOnlyFrameSetProxy
     }
 
     public Frame makeFrame(String kind, Properties attributes)
+    {
+	throw new RuntimeException("Write operation on read-only object");
+    }
+
+    public Frame makeFrame(String kind, Properties attributes, UID uid)
     {
 	throw new RuntimeException("Write operation on read-only object");
     }

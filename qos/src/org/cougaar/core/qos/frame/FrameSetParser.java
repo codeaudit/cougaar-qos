@@ -172,6 +172,7 @@ public class FrameSetParser
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
+	String name = attrs.getValue("name");
 	String relation_name = attrs.getValue("parent-relation");
 	String parent_kind = attrs.getValue("parent-kind");
 	String parent_slot = attrs.getValue("parent-slot");
@@ -181,6 +182,7 @@ public class FrameSetParser
 	String child_value = attrs.getValue("child-value");
 
 	frame_set = new SingleInheritanceFrameSet(sb, bbs,
+						  name,
 						  relation_name,
 						  parent_kind,
 						  parent_slot,
