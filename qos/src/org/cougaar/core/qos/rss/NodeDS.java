@@ -39,6 +39,11 @@ import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
 import com.bbn.ResourceStatus.ResourceNode;
 
+/**
+ * This RSS ResourceContext represents a COUGGAR Node.  Its parent in
+ * the RSS hierarchy tree is the context for the Node's host.  It's
+ * identified by the Node's name and has no locally defined formulas.
+ */
 public class NodeDS 
     extends CougaarDS
 {

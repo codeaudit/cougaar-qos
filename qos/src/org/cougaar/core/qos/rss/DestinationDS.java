@@ -39,6 +39,13 @@ import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
 import com.bbn.ResourceStatus.ResourceNode;
 
+/**
+ * This RSS ResourceContext represents a remote Agent to which this
+ * Node is communicating.  Its parent context in the RSS inheritance
+ * tree should be a Node ({@link NodeDS}).  It's identified by the
+ * name of the destination Agent.  It supports a range of messaging
+ * and ip-resource formulas, described in more detail elsewhere.
+ */
 public class DestinationDS 
     extends CougaarDS
 {

@@ -32,6 +32,9 @@ import com.bbn.rss.DataInterpreter;
 import com.bbn.rss.DataValue;
 
 
+/**
+ * This class is a converter from {@link Metric}s to RSS DataValues.
+ */
 public class MetricInterpreter implements DataInterpreter 
 {
     public double getCredibility(Object x) {

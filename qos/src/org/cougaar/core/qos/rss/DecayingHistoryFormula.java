@@ -35,6 +35,10 @@ import com.bbn.ResourceStatus.ResourceNode;
 import org.cougaar.core.qos.metrics.Constants;
 
 
+/**
+ * Thie RSS formula class encapsules the use of data published into
+ * the RSS by {@link org.cougaar.core.qos.metrics.DecayingHistory}.
+ */
 public class DecayingHistoryFormula 
     extends DataFormula 
 {
