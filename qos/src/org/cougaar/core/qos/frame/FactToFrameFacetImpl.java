@@ -89,6 +89,12 @@ abstract public class FactToFrameFacetImpl
     }
 
 
+    // Make the FrameSet available to subclasses
+    protected FrameSet getFrameSet()
+    {
+	return frameSet;
+    }
+
     private synchronized void ensureFrameSet(BlackboardService bbs)
     {
 	if (frameSet != null) return;
@@ -137,8 +143,7 @@ abstract public class FactToFrameFacetImpl
 		} else if (isModifiedFrame(fact)) {
 		    processModifiedFrame(fact);
 		} else {
-		    if (log.isWarnEnabled())
-			log.warn(fact + " is neither a new frame nor a modification to an existing frame");
+		    // subclass is using it for some other purpose
 		}
 	    } else {
 		// no retractions yet

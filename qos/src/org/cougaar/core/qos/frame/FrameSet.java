@@ -35,6 +35,8 @@ public interface FrameSet
 {
     public String getName();
 
+    public boolean descendsFrom(Frame frame, String prototype);
+
     public Frame findFrame(String kind, String slot, Object value);
 
     public Frame findFrame(UID uid);
@@ -64,6 +66,10 @@ public interface FrameSet
     public Frame getParent(Frame frame);
 
     public Frame getPrototype(Frame frame);
+
+    public Frame getRelationshipParent(Frame relationship);
+
+    public Frame getRelationshipChild(Frame relationship);
 
     public void valueUpdated(Frame frame, String slot, Object value);
 

@@ -94,7 +94,7 @@ abstract public class FrameToFactFacetImpl
 	while (en.hasMoreElements()) {
 	    Frame frame = (Frame) en.nextElement();
 	    if (log.isDebugEnabled()) {
-		log.debug("Observed added b"+frame);
+		log.debug("Observed added "+frame);
 	    }
 	    Object fact = frameToFact(frame);
 	    if (fact instanceof Collection) {

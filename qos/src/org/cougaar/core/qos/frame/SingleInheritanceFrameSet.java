@@ -183,6 +183,23 @@ public class SingleInheritanceFrameSet
     }
 
 
+    public Frame getRelationshipParent(Frame relationship)
+    {
+	return getRelate(relationship, 
+			 parent_proto_slot,
+			 parent_slot_slot,
+			 parent_value_slot);
+    }
+
+    public Frame getRelationshipChild(Frame relationship)
+    {
+	return getRelate(relationship,
+			 child_proto_slot,
+			 child_slot_slot,
+			 child_value_slot);
+    }
+
+
 
 
     private boolean establishParentage(Frame relationship)
@@ -524,7 +541,7 @@ public class SingleInheritanceFrameSet
 	return path;
     }
 
-    private boolean descendsFrom(Frame frame, String prototype)
+    public boolean descendsFrom(Frame frame, String prototype)
     {
 	String proto = frame.getKind();
 	if (proto == null) return false;
