@@ -5,10 +5,11 @@
 module=quo
 ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePassword=password -Djavax.net.ssl.keyStore=$HOME/keystore -Djavax.net.ssl.keyStorePassword=password"
 
+naming="-Dorg.cougaar.core.naming.useSSL=true"
 
 quo="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/quo/test/configs/adaptdemo.props"
 
-COUGAAR_JAVA_ARGS="$quo $ssl"
+COUGAAR_JAVA_ARGS="$quo $ssl $naming"
 export COUGAAR_JAVA_ARGS
 
 

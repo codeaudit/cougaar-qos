@@ -34,6 +34,7 @@ public class TrafficMaskAspect extends QuoAspect
 {
     private static String CONTRACT_IFACE = 
 	"org::cougaar::lib::quo::TrafficMask";
+    private static int PERIOD = 30000;
 
     private HashMap qoskets;
     private Timer timer = new Timer(true);
@@ -140,7 +141,7 @@ public class TrafficMaskAspect extends QuoAspect
 	qoskets = new HashMap();
 
 	nodeUpdater = new NodeUpdater();
-	timer.schedule(nodeUpdater, 0, 5000);
+	timer.schedule(nodeUpdater, 0, PERIOD);
 
 	return true;
 
