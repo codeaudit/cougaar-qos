@@ -8,7 +8,7 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.HostDS;
 import com.bbn.quo.data.RSS;
 
-import org.cougaar.core.mts.RMIMessageTransport;
+import org.cougaar.core.mts.RMILinkProtocol;
 import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
@@ -54,7 +54,7 @@ public class RSSLink implements ResourceMonitorService
 
 
     private String addressToHost(MessageAddress agentAddress) {
-	String ttype = RMIMessageTransport.TRANSPORT_TYPE;
+	String ttype = RMILinkProtocol.PROTOCOL_TYPE;
 	Object stub = nameSupport.lookupAddressInNameServer(agentAddress, ttype);
 	if (stub == null || !(stub instanceof Remote)) return null;
 	return extractHost(stub.toString());
