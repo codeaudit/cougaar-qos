@@ -32,7 +32,7 @@ import com.bbn.quo.data.RSS;
 
 public class AgentDS extends DataScope
 {
-    private static final String NAME = "name".intern();
+    private static final String AGENTNAME = "agentname".intern();
 
 
     public AgentDS(Object[] parameters, DataScope parent) 
@@ -48,15 +48,15 @@ public class AgentDS extends DataScope
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
 	QosMonitorService qms = (QosMonitorService)
 	    sb.getService(this, QosMonitorService.class, null);
-	String name = (String) getSymbolValue(NAME);
-	String node = qms.getNodeForAgent(new MessageAddress(name));
+	String agentname = (String) getSymbolValue(AGENTNAME);
+	String node = qms.getNodeForAgent(new MessageAddress(agentname));
 
 	// What do we do if the node isn't known?
 	if (node == null) {
 	    node = ""; // nice
 	}
 
-	System.out.println("Node of " +name+ "=" +node);
+	System.out.println("Node of " +agentname+ "=" +node);
 
 
 
@@ -79,8 +79,8 @@ public class AgentDS extends DataScope
 	    throw new DataScope.ParameterError("NodeDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
-	    String name = (String) parameters[0];
-	    bindSymbolValue(NAME, name);
+	    String agentname = (String) parameters[0];
+	    bindSymbolValue(AGENTNAME, agentname);
 	}
     }
 

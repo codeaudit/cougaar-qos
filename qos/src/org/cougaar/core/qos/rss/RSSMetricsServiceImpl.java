@@ -28,6 +28,7 @@ import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
+import com.bbn.quo.data.RSSUtils;
 
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
@@ -128,49 +129,9 @@ public final class RSSMetricsServiceImpl
     }
 
 
-    private DataScopeSpec[] getSpec(String[] path) 
-	throws ClassNotFoundException
-    {
-	DataScopeSpec[] newpath = new DataScopeSpec[path.length-1];
-	for (int i=0; i<path.length-1; i++) {
-	    String specstring = path[i];
-	    StringTokenizer tk = new StringTokenizer(specstring, "(,)");
-	    String type = (String) tk.nextToken();
-	    Object[] args = new Object[tk.countTokens()];
-	    int j = 0;
-	    while (tk.hasMoreTokens()) args[j++] = tk.nextToken();
-	    newpath[i] = new DataScopeSpec(type, args);
-	}
-	return newpath;
-    }
-
-    private String getField(String[] path) {
-	return path[path.length-1];
-    }
-
-    private String[] tokenize(String path) {
-	StringTokenizer tk = new StringTokenizer(path, ":");
-	String[] result = new String[tk.countTokens()];
-	int i = 0;
-	while (tk.hasMoreTokens()) 	result[i++] = tk.nextToken();
-	return result;
-    }
 
     public Metric getValue(String path) {
-	String[] parsedPath = tokenize(path);
-	DataScopeSpec[] spec = null;
-	try {
-	    spec = getSpec(parsedPath);
-	} catch (ClassNotFoundException ex) {
-	    System.err.println("Bogus path " +path+
-			       ": " + ex);
-	    return null;
-	}
-	DataScope scope = RSS.instance().getDataScope(spec);
-	if (scope == null) return null;
-
-	String fieldName = getField(parsedPath);
-	Object rawValue = scope.getValue(fieldName);
+	Object rawValue = RSSUtils.getPathValue(path);
 	
 	if (rawValue == null) {
 	    return null;
@@ -192,22 +153,7 @@ public final class RSSMetricsServiceImpl
     }
 
     public Object subscribeToValue(String path, Observer observer) {
-	String[] parsedPath = tokenize(path);
-	DataScopeSpec[] spec = null;
-
-	try {
-	    spec = getSpec(parsedPath);
-	} catch (ClassNotFoundException ex) {
-	    System.err.println("Bogus path " +path+
-			       ": " + ex);
-	    return null;
-	}
-
-	DataScope scope = RSS.instance().getDataScope(spec);
-	if (scope == null) return null;
-
-	String formulaName = getField(parsedPath);
-	DataFormula formula = scope.getFormula(formulaName);
+	DataFormula formula = RSSUtils.getPathFormula(path);
 	if (formula == null) return null;
 
 	BoundDataFormula bdf = new BoundDataFormula(formula);

@@ -31,7 +31,7 @@ import com.bbn.quo.data.RSS;
 
 public class NodeDS extends DataScope
 {
-    private static final String NAME = "name".intern();
+    private static final String NODENAME = "nodename".intern();
 
 
     public NodeDS(Object[] parameters, DataScope parent) 
@@ -47,8 +47,8 @@ public class NodeDS extends DataScope
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
 	QosMonitorService qms = (QosMonitorService)
 	    sb.getService(this, QosMonitorService.class, null);
-	String name = (String) getSymbolValue(NAME);
-	String host = qms.getHostForNode(name);
+	String nodename = (String) getSymbolValue(NODENAME);
+	String host = qms.getHostForNode(nodename);
 
 	// What do we do if the host isn't known?
 	if (host == null) {
@@ -74,8 +74,8 @@ public class NodeDS extends DataScope
 	    throw new DataScope.ParameterError("NodeDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
-	    String name = (String) parameters[0];
-	    bindSymbolValue(NAME, name);
+	    String nodename = (String) parameters[0];
+	    bindSymbolValue(NODENAME, nodename);
 	}
     }
 
