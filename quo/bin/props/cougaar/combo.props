@@ -1,7 +1,0 @@
-org.cougaar.message.protocol.classes=org.cougaar.mts.std.LoopbackLinkProtocol,org.cougaar.lib.mquo.CorbaLinkProtocol
-
-org.cougaar.message.security=org.cougaar.core.node.DummyMessageSecurityManager
-
-org.cougaar.message.transport.debug=aspects
-
-org.cougaar.message.transport.aspects=org.cougaar.mts.std.SerializationAspect,org.cougaar.mts.std.SequenceAspect,org.cougaar.mts.std.SecurityAspect
