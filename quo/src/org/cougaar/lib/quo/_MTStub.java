@@ -16,7 +16,7 @@ public class _MTStub
 	}
 
 	public final static java.lang.Class _opsClass = org.cougaar.lib.quo.MTOperations.class;
-	public void rerouteMessage(byte[] m) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage
+	public byte[] rerouteMessage(byte[] message) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage
 	{
 		while(true)
 		{
@@ -26,9 +26,10 @@ public class _MTStub
 			try
 			{
 				org.omg.CORBA.portable.OutputStream _os = _request( "rerouteMessage", true);
-				org.cougaar.lib.quo.bytesHelper.write(_os,m);
+				org.cougaar.lib.quo.bytesHelper.write(_os,message);
 				_is = _invoke(_os);
-				return;
+				byte[] _result = org.cougaar.lib.quo.bytesHelper.read(_is);
+				return _result;
 			}
 			catch( org.omg.CORBA.portable.RemarshalException _rx ){}
 			catch( org.omg.CORBA.portable.ApplicationException _ax )
@@ -52,15 +53,15 @@ public class _MTStub
 			if( _so == null )
 				throw new org.omg.CORBA.UNKNOWN("local invocations not supported!");
 			MTOperations _localServant = (MTOperations)_so.servant;
-			try
+			byte[] _result;			try
 			{
-			_localServant.rerouteMessage(m);
+			_result = _localServant.rerouteMessage(message);
 			}
 			finally
 			{
 				_servant_postinvoke(_so);
 			}
-			return;
+			return _result;
 		}
 
 		}

@@ -15,6 +15,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.cougaar.core.mts.AttributedMessage;
+import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.mts.MessageAddress;
 
 public interface MTInstrumented extends Remote 
@@ -30,13 +31,13 @@ public interface MTInstrumented extends Remote
 	throws RemoteException;
 
 
-    void receiveOnlyCompressedMessage(Zippy compressedMessage)
+    MessageAttributes receiveOnlyCompressedMessage(Zippy compressedMessage)
 	throws RemoteException;
 
-    void receiveOnlyCompressedBytes(byte[] compressedMessage)
+    MessageAttributes receiveOnlyCompressedBytes(byte[] compressedMessage)
 	throws RemoteException;
 
-    void receiveOnlyBytes(byte[] message)
+    MessageAttributes receiveOnlyBytes(byte[] message)
 	throws RemoteException;
 
 

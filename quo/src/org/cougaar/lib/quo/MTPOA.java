@@ -40,7 +40,7 @@ public abstract class MTPOA
 			{
 				byte[] _arg0=org.cougaar.lib.quo.bytesHelper.read(_input);
 				_out = handler.createReply();
-				rerouteMessage(_arg0);
+				org.cougaar.lib.quo.bytesHelper.write(_out,rerouteMessage(_arg0));
 			}
 			catch(org.cougaar.lib.quo.CorbaMisdeliveredMessage _ex0)
 			{

@@ -62,8 +62,8 @@ public class DestinationLinkRemoteSSLDelegate_client implements org.cougaar.core
   final static int REMOTESSLADAPTIVESSLCAREFREE__SAMELAN = 1;
   final static int REMOTESSLADAPTIVESSLCAREFREE__WAN = 2;
 
-  public void forwardMessage(org.cougaar.core.mts.AttributedMessage message)  throws org.cougaar.core.mts.UnregisteredNameException, org.cougaar.core.mts.NameLookupException, org.cougaar.core.mts.CommFailureException, org.cougaar.core.mts.MisdeliveredMessageException {
-    remote.forwardMessage(message);
+  public org.cougaar.core.mts.MessageAttributes forwardMessage(org.cougaar.core.mts.AttributedMessage message)  throws org.cougaar.core.mts.UnregisteredNameException, org.cougaar.core.mts.NameLookupException, org.cougaar.core.mts.CommFailureException, org.cougaar.core.mts.MisdeliveredMessageException {
+    return(remote.forwardMessage(message));
   }
   public int cost(org.cougaar.core.mts.AttributedMessage message) {
     // Default declarations and setup of quo introduced variables local to method:

@@ -14,5 +14,5 @@ package org.cougaar.lib.quo;
 public interface DiagnoseDelegateQosket
        extends com.bbn.quo.qosket.instrumentation.InstrumentationDelegateQosket
 {
-  public void runDiagnostic(org.cougaar.core.mts.AttributedMessage m, org.cougaar.core.mts.MT mt);
+  public org.cougaar.core.mts.MessageAttributes runDiagnostic(org.cougaar.core.mts.AttributedMessage m, org.cougaar.core.mts.MT mt);
 }

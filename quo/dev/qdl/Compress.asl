@@ -10,14 +10,16 @@ behavior Compression ()
     remote_object org::cougaar::core::mts::MT remote;
     qosket org::cougaar::lib::quo::CompressDelegateQosket qk;
 
-    void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::mts::AttributedMessage m) {
+    org::cougaar::core::mts::MessageAttributes
+      org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::mts::AttributedMessage m) {
+      return_value org::cougaar::core::mts::MessageAttributes attr;
 	inplaceof METHODCALL {
 	    region Normal {
-	      remote.rerouteMessage(m);
+	      attr = remote.rerouteMessage(m);
 	    }
 
 	    region Compress {
-		qk.runSerializeAndCompress(m);
+	      attr = qk.runSerializeAndCompress(m);
 	    }
 	}
 

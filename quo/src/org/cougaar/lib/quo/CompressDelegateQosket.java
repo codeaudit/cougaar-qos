@@ -13,7 +13,7 @@ package org.cougaar.lib.quo;
 
 public interface CompressDelegateQosket
 {
-  public void runCompression(org.cougaar.core.mts.AttributedMessage message);
-  public void runSerializeOnly(org.cougaar.core.mts.AttributedMessage message);
-  public void runSerializeAndCompress(org.cougaar.core.mts.AttributedMessage message);
+  public org.cougaar.core.mts.MessageAttributes runCompression(org.cougaar.core.mts.AttributedMessage message);
+  public org.cougaar.core.mts.MessageAttributes runSerializeOnly(org.cougaar.core.mts.AttributedMessage message);
+  public org.cougaar.core.mts.MessageAttributes runSerializeAndCompress(org.cougaar.core.mts.AttributedMessage message);
 }

@@ -37,9 +37,9 @@ public class MTPOATie
 	{
 		_delegate = delegate;
 	}
-	public void rerouteMessage(byte[] m) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage
+	public byte[] rerouteMessage(byte[] message) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage
 	{
-_delegate.rerouteMessage(m);
+		return _delegate.rerouteMessage(message);
 	}
 
 }

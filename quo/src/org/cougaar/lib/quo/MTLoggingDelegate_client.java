@@ -38,9 +38,10 @@ public class MTLoggingDelegate_client implements org.cougaar.core.mts.MT {
 
   final static int LOGGING__NORMAL = 0;
 
-  public void rerouteMessage(org.cougaar.core.mts.AttributedMessage m) throws RemoteException {
+  public org.cougaar.core.mts.MessageAttributes rerouteMessage(org.cougaar.core.mts.AttributedMessage m) throws RemoteException {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_Logging = null;
+    org.cougaar.core.mts.MessageAttributes attr;
     com.bbn.quo.corba.Association[] signal =
         new com.bbn.quo.corba.Association[0];
     com.bbn.quo.corba.SignalEvent quo_sig1;
@@ -53,7 +54,7 @@ quo_curRegs_Logging = quo_Logging.signalAndEvalAndGetCurrentRegion(quo_sig1);
       // Adaptive code for inplaceof methodcall
       long startTime;
       startTime = System.currentTimeMillis();
-      remote.rerouteMessage(m);
+      attr = remote.rerouteMessage(m);
       
 	    org.cougaar.lib.mquo.Utils.logMessage(startTime,m); 
 	  
@@ -62,19 +63,19 @@ quo_curRegs_Logging = quo_Logging.signalAndEvalAndGetCurrentRegion(quo_sig1);
       try { 
 quo_curRegs_Logging = quo_Logging.signalAndEvalAndGetCurrentRegion(quo_sig2);
              } catch( java.rmi.RemoteException post_meth_ceval_ex) {} 
-        return;
+        return(attr);
       }
       public org.cougaar.core.mts.MessageAddress getMessageAddress() throws RemoteException {
         // Default declarations and setup of quo introduced variables local to method:
         int[] quo_curRegs_Logging = null;
         com.bbn.quo.corba.Association[] signal =
             new com.bbn.quo.corba.Association[0];
-        org.cougaar.core.mts.MessageAddress quo_retval;
+        org.cougaar.core.mts.MessageAddress attr;
         com.bbn.quo.corba.SignalEvent quo_sig1;
         com.bbn.quo.corba.SignalEvent quo_sig2;
 
-        quo_retval = remote.getMessageAddress();
-        return(quo_retval);
+        attr = remote.getMessageAddress();
+        return(attr);
       }
 };
 

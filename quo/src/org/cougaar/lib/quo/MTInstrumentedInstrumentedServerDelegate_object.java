@@ -143,9 +143,10 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
     result = rec;
     return(result);
   }
-  public void receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy compressedMessage) throws RemoteException   {
+  public org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy compressedMessage) throws RemoteException   {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_InstrumentedServer;
+    org.cougaar.core.mts.MessageAttributes attr;
     com.bbn.quo.corba.Association[] sig =
         new com.bbn.quo.corba.Association[0];
     com.bbn.quo.corba.SignalEvent quo_sig1;
@@ -156,13 +157,15 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
     
 		    org.cougaar.core.mts.AttributedMessage msg = 
 			(org.cougaar.core.mts.AttributedMessage) compressedMessage.getData();
-		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
+		    attr  = 
+		      ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		
-    return;
+    return(attr);
   }
-  public void receiveOnlyCompressedBytes(byte [] compressedMessage) throws RemoteException   {
+  public org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedBytes(byte [] compressedMessage) throws RemoteException   {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_InstrumentedServer;
+    org.cougaar.core.mts.MessageAttributes attr;
     com.bbn.quo.corba.Association[] sig =
         new com.bbn.quo.corba.Association[0];
     com.bbn.quo.corba.SignalEvent quo_sig1;
@@ -174,14 +177,15 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
 		    org.cougaar.core.mts.AttributedMessage msg = 
 		      (org.cougaar.core.mts.AttributedMessage) 
 		      org.cougaar.lib.mquo.Zippy.unzip(compressedMessage);
-		    ((org.cougaar.core.mts.MT) 
-		     qk.getServer()).rerouteMessage(msg);
+		    attr = ((org.cougaar.core.mts.MT) 
+			    qk.getServer()).rerouteMessage(msg);
 		
-    return;
+    return(attr);
   }
-  public void receiveOnlyBytes(byte [] message) throws RemoteException   {
+  public org.cougaar.core.mts.MessageAttributes receiveOnlyBytes(byte [] message) throws RemoteException   {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_InstrumentedServer;
+    org.cougaar.core.mts.MessageAttributes attr;
     com.bbn.quo.corba.Association[] sig =
         new com.bbn.quo.corba.Association[0];
     com.bbn.quo.corba.SignalEvent quo_sig1;
@@ -193,10 +197,10 @@ class MTInstrumentedInstrumentedServerDelegate_object extends java.rmi.server.Un
 		org.cougaar.core.mts.AttributedMessage msg = 
 		    (org.cougaar.core.mts.AttributedMessage) 
 		  org.cougaar.lib.mquo.Zippy.fromByteArray(message);
-		((org.cougaar.core.mts.MT) 
+		attr = ((org.cougaar.core.mts.MT) 
 		 qk.getServer()).rerouteMessage(msg);
 	    
-    return;
+    return(attr);
   }
   public void ignoreCompressedMessage(org.cougaar.lib.mquo.Zippy compressedMessage) throws RemoteException   {
     // Default declarations and setup of quo introduced variables local to method:

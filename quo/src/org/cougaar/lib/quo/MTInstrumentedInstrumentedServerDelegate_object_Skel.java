@@ -12,13 +12,13 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 	new java.rmi.server.Operation("void ignoreCompressedBytes(byte[])"),
 	new java.rmi.server.Operation("void ignoreCompressedMessage(org.cougaar.lib.mquo.Zippy)"),
 	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec receiveCompressedMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.lib.mquo.Zippy)"),
-	new java.rmi.server.Operation("void receiveOnlyBytes(byte[])"),
-	new java.rmi.server.Operation("void receiveOnlyCompressedBytes(byte[])"),
-	new java.rmi.server.Operation("void receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy)"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAttributes receiveOnlyBytes(byte[])"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedBytes(byte[])"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy)"),
 	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.core.mts.AttributedMessage)")
     };
     
-    private static final long interfaceHash = 6533291143575432253L;
+    private static final long interfaceHash = 404600095234642596L;
     
     public java.rmi.server.Operation[] getOperations() {
 	return (java.rmi.server.Operation[]) operations.clone();
@@ -38,11 +38,11 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 		opnum = 3;
 	    } else if (hash == -3541469534832191741L) {
 		opnum = 4;
-	    } else if (hash == -8825285440700275413L) {
+	    } else if (hash == 7951337734032436383L) {
 		opnum = 5;
-	    } else if (hash == 5513937421549448622L) {
+	    } else if (hash == 4754728335128754214L) {
 		opnum = 6;
-	    } else if (hash == -6557596854227280392L) {
+	    } else if (hash == -8662485581536817629L) {
 		opnum = 7;
 	    } else if (hash == -3214341764718700490L) {
 		opnum = 8;
@@ -173,9 +173,10 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 	    } finally {
 		call.releaseInputStream();
 	    }
-	    server.receiveOnlyBytes($param_arrayOf_byte_1);
+	    org.cougaar.core.mts.MessageAttributes $result = server.receiveOnlyBytes($param_arrayOf_byte_1);
 	    try {
-		call.getResultStream(true);
+		java.io.ObjectOutput out = call.getResultStream(true);
+		out.writeObject($result);
 	    } catch (java.io.IOException e) {
 		throw new java.rmi.MarshalException("error marshalling return", e);
 	    }
@@ -195,9 +196,10 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 	    } finally {
 		call.releaseInputStream();
 	    }
-	    server.receiveOnlyCompressedBytes($param_arrayOf_byte_1);
+	    org.cougaar.core.mts.MessageAttributes $result = server.receiveOnlyCompressedBytes($param_arrayOf_byte_1);
 	    try {
-		call.getResultStream(true);
+		java.io.ObjectOutput out = call.getResultStream(true);
+		out.writeObject($result);
 	    } catch (java.io.IOException e) {
 		throw new java.rmi.MarshalException("error marshalling return", e);
 	    }
@@ -217,9 +219,10 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Skel
 	    } finally {
 		call.releaseInputStream();
 	    }
-	    server.receiveOnlyCompressedMessage($param_Zippy_1);
+	    org.cougaar.core.mts.MessageAttributes $result = server.receiveOnlyCompressedMessage($param_Zippy_1);
 	    try {
-		call.getResultStream(true);
+		java.io.ObjectOutput out = call.getResultStream(true);
+		out.writeObject($result);
 	    } catch (java.io.IOException e) {
 		throw new java.rmi.MarshalException("error marshalling return", e);
 	    }

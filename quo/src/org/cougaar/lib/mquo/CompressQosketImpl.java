@@ -19,6 +19,7 @@ import com.bbn.quo.rmi.DataSC;
 import com.bbn.quo.rmi.impl.RmiUtilities;
 
 import org.cougaar.core.mts.AttributedMessage;
+import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.service.LoggingService;
 
 import java.rmi.Remote;
@@ -42,14 +43,14 @@ public class CompressQosketImpl
 	this.loggingService = loggingService;
     }
 
-    public void runCompression(AttributedMessage message)
+    public MessageAttributes runCompression(AttributedMessage message)
     {
 	long startTime = System.currentTimeMillis(); 
-
+	MessageAttributes attr = null;
 	try {
 	    // Compressed Message (controls stream directly)
 	    Zippy compressedMessage = new Zippy(message);
-	    instrumentedServer.receiveOnlyCompressedMessage(compressedMessage);
+	    attr = instrumentedServer.receiveOnlyCompressedMessage(compressedMessage);
 	    int raw =  compressedMessage.getRawDataSize();
 	    int compressed = compressedMessage.getCompressedDataSize();
 	    Utils.logMessageWithLength(startTime, message, raw, compressed); 
@@ -61,17 +62,19 @@ public class CompressQosketImpl
 	catch (Exception ex) {
 	    loggingService.error("runCompression", ex);
 	}
+	return attr;
     }
 
-    public void runSerializeAndCompress(AttributedMessage message)
+    public MessageAttributes runSerializeAndCompress(AttributedMessage message)
     {
 	long startTime = System.currentTimeMillis(); 
+	MessageAttributes attr = null;
 
 	try {
 	    //Compressed Byte Array (makes array before streaming)
 	    Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
 	    byte[] compressedMessage = Zippy.zip(message, deflater);
-	    instrumentedServer.receiveOnlyCompressedBytes(compressedMessage);
+	    attr = instrumentedServer.receiveOnlyCompressedBytes(compressedMessage);
 	} 
 	catch (java.rmi.RemoteException remote_ex) {
 	    loggingService.error("runSerializeAndCompress RemoteException", 
@@ -80,17 +83,19 @@ public class CompressQosketImpl
 	catch (Exception ex) {
 	    loggingService.error("runSerializeAndCompress", ex);
 	}
+	return attr;
     }
 
-    public void runSerializeOnly(AttributedMessage message)
+    public MessageAttributes runSerializeOnly(AttributedMessage message)
     {
 	long startTime = System.currentTimeMillis(); 
+	MessageAttributes attr = null;
 
 	try {
 
 	    // Uncompressed Byte array
 	    byte[] msg = Zippy.toByteArray(message);
-	    instrumentedServer.receiveOnlyBytes(msg);
+	    attr = instrumentedServer.receiveOnlyBytes(msg);
 
 	} 
 	catch (java.rmi.RemoteException remote_ex) {
@@ -100,6 +105,8 @@ public class CompressQosketImpl
 	catch (Exception ex) {
 	    loggingService.error("runSerializeOnly", ex);
 	}
+	
+	return attr;
     }
 
 

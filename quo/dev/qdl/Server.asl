@@ -75,24 +75,29 @@ behavior MTInst ()
 	}
 
 
-    void org::cougaar::lib::mquo::MTInstrumented::receiveOnlyCompressedMessage 
+    org::cougaar::core::mts::MessageAttributes
+      org::cougaar::lib::mquo::MTInstrumented::receiveOnlyCompressedMessage 
 	(in org::cougaar::lib::mquo::Zippy compressedMessage)
 	{
+	  return_value org::cougaar::core::mts::MessageAttributes attr;
 	    inplaceof PREMETHODCONTRACTEVAL {
 	    }
 	    inplaceof METHODCALL {
 		java_code #{
 		    org.cougaar.core.mts.AttributedMessage msg = 
 			(org.cougaar.core.mts.AttributedMessage) compressedMessage.getData();
-		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
+		    attr  = 
+		      ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		}#;
 	    }
 	}
 
 
-    void org::cougaar::lib::mquo::MTInstrumented::receiveOnlyCompressedBytes 
+    org::cougaar::core::mts::MessageAttributes
+      org::cougaar::lib::mquo::MTInstrumented::receiveOnlyCompressedBytes 
 	(in byteSeq compressedMessage)
 	{
+	  return_value org::cougaar::core::mts::MessageAttributes attr;
 	    inplaceof PREMETHODCONTRACTEVAL {
 	    }
 
@@ -101,14 +106,16 @@ behavior MTInst ()
 		    org.cougaar.core.mts.AttributedMessage msg = 
 		      (org.cougaar.core.mts.AttributedMessage) 
 		      org.cougaar.lib.mquo.Zippy.unzip(compressedMessage);
-		    ((org.cougaar.core.mts.MT) 
-		     qk.getServer()).rerouteMessage(msg);
+		    attr = ((org.cougaar.core.mts.MT) 
+			    qk.getServer()).rerouteMessage(msg);
 		}#;
 	    }
 	}
 
 
-    void org::cougaar::lib::mquo::MTInstrumented::receiveOnlyBytes (in byteSeq message) {
+    org::cougaar::core::mts::MessageAttributes
+      org::cougaar::lib::mquo::MTInstrumented::receiveOnlyBytes (in byteSeq message) {
+	  return_value org::cougaar::core::mts::MessageAttributes attr;
 	inplaceof PREMETHODCONTRACTEVAL {
 	}
 	inplaceof METHODCALL {
@@ -116,7 +123,7 @@ behavior MTInst ()
 		org.cougaar.core.mts.AttributedMessage msg = 
 		    (org.cougaar.core.mts.AttributedMessage) 
 		  org.cougaar.lib.mquo.Zippy.fromByteArray(message);
-		((org.cougaar.core.mts.MT) 
+		attr = ((org.cougaar.core.mts.MT) 
 		 qk.getServer()).rerouteMessage(msg);
 	    }#;
 	}

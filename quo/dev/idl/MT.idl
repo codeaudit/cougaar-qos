@@ -18,7 +18,8 @@ module cougaar {
 
 
     interface MT {
-	void rerouteMessage(in bytes m) raises(CorbaMisdeliveredMessage);
+	bytes rerouteMessage(in bytes message) 
+	    raises(CorbaMisdeliveredMessage);
     };
 
 };

@@ -45,13 +45,14 @@ public class MTDiagnoseDelegate_client implements org.cougaar.core.mts.MT {
   }
   final static int DIAGNOSE__NORMAL = 0;
 
-  public void rerouteMessage(org.cougaar.core.mts.AttributedMessage m) throws RemoteException {
+  public org.cougaar.core.mts.MessageAttributes rerouteMessage(org.cougaar.core.mts.AttributedMessage m) throws RemoteException {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_Diagnose = null;
     com.bbn.quo.corba.Association [] sig;
     java.lang.String methodID;
     int length;
     com.bbn.quo.instr.corba.Trace_rec rec;
+    org.cougaar.core.mts.MessageAttributes attr;
     com.bbn.quo.corba.SignalEvent quo_sig1;
     com.bbn.quo.corba.SignalEvent quo_sig2;
 
@@ -70,7 +71,7 @@ quo_curRegs_Diagnose = quo_Diagnose.signalAndEvalAndGetCurrentRegion(quo_sig1);
       // Adaptive code for after premethodcontracteval
       qk.clientRequestOut1(rec, length);
       // Adaptive code for inplaceof methodcall
-      qk.runDiagnostic(m, remote);
+      attr = qk.runDiagnostic(m, remote);
       // Adaptive code for after methodcall
       length = 0;
       // Adaptive code for before postmethodcontracteval
@@ -84,19 +85,19 @@ quo_curRegs_Diagnose = quo_Diagnose.signalAndEvalAndGetCurrentRegion(quo_sig2);
         // Adaptive code for before methodreturn
         qk.clientReplyOut1(rec, length);
         qk.registerCall(rec);
-        return;
+        return(attr);
       }
       public org.cougaar.core.mts.MessageAddress getMessageAddress() throws RemoteException {
         // Default declarations and setup of quo introduced variables local to method:
         int[] quo_curRegs_Diagnose = null;
         com.bbn.quo.corba.Association[] sig =
             new com.bbn.quo.corba.Association[0];
-        org.cougaar.core.mts.MessageAddress quo_retval;
+        org.cougaar.core.mts.MessageAddress attr;
         com.bbn.quo.corba.SignalEvent quo_sig1;
         com.bbn.quo.corba.SignalEvent quo_sig2;
 
-        quo_retval = remote.getMessageAddress();
-        return(quo_retval);
+        attr = remote.getMessageAddress();
+        return(attr);
       }
 };
 

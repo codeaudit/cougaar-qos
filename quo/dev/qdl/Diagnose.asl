@@ -13,13 +13,14 @@ behavior Diagnose ()
 
     void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::mts::AttributedMessage m) {
 	extern long length;
+      return_value org::cougaar::core::mts::MessageAttributes attr;
 
 	after METHODENTRY {
 	    length = 0;
 	}
 
 	inplaceof METHODCALL {
-	    qk.runDiagnostic(m, remote);
+	    attr = qk.runDiagnostic(m, remote);
 	}
 
 	after METHODCALL {

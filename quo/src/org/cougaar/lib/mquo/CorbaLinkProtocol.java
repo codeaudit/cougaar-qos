@@ -33,6 +33,7 @@ import org.cougaar.core.mts.UnregisteredNameException;
 import org.cougaar.core.mts.CommFailureException;
 import org.cougaar.core.mts.MisdeliveredMessageException;
 import org.cougaar.core.mts.AttributedMessage;
+import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.mts.MessageAddress;
 
 import org.omg.CORBA.ORB;
@@ -235,7 +236,7 @@ public class CorbaLinkProtocol
 	}
 
 
-	public void forwardMessage(AttributedMessage message) 
+	public MessageAttributes forwardMessage(AttributedMessage message) 
 	    throws NameLookupException, 
 		   UnregisteredNameException, 
 		   CommFailureException,
@@ -244,7 +245,8 @@ public class CorbaLinkProtocol
 	    cacheRemote();
 	    try {
 		byte[] bytes = Zippy.toByteArray(message);
-		remote.rerouteMessage(bytes);
+		byte[] res = remote.rerouteMessage(bytes);
+		return (MessageAttributes) Zippy.fromByteArray(res);
 	    } 
 	    catch (CorbaMisdeliveredMessage mis) {
 		// force recache of remote

@@ -46,9 +46,10 @@ public class MTCompressDelegate_client implements org.cougaar.core.mts.MT {
   final static int COMPRESS__COMPRESS = 0;
   final static int COMPRESS__NORMAL = 1;
 
-  public void rerouteMessage(org.cougaar.core.mts.AttributedMessage m) throws RemoteException {
+  public org.cougaar.core.mts.MessageAttributes rerouteMessage(org.cougaar.core.mts.AttributedMessage m) throws RemoteException {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_Compress = null;
+    org.cougaar.core.mts.MessageAttributes attr;
     com.bbn.quo.corba.Association[] signal =
         new com.bbn.quo.corba.Association[0];
     com.bbn.quo.corba.SignalEvent quo_sig1;
@@ -61,13 +62,13 @@ quo_curRegs_Compress = quo_Compress.signalAndEvalAndGetCurrentRegion(quo_sig1);
       // Adaptive code for inplaceof methodcall
       switch (quo_curRegs_Compress[0]) {
       case COMPRESS__NORMAL:
-        remote.rerouteMessage(m);
+        attr = remote.rerouteMessage(m);
         break;
       case COMPRESS__COMPRESS:
-        qk.runSerializeAndCompress(m);
+        attr = qk.runSerializeAndCompress(m);
         break;
       default:
-        remote.rerouteMessage(m);
+      attr =   remote.rerouteMessage(m);
         break;
       };
       // Adaptive code for before postmethodcontracteval
@@ -75,19 +76,19 @@ quo_curRegs_Compress = quo_Compress.signalAndEvalAndGetCurrentRegion(quo_sig1);
       try { 
 quo_curRegs_Compress = quo_Compress.signalAndEvalAndGetCurrentRegion(quo_sig2);
              } catch( java.rmi.RemoteException post_meth_ceval_ex) {} 
-        return;
+        return(attr);
       }
       public org.cougaar.core.mts.MessageAddress getMessageAddress() throws RemoteException {
         // Default declarations and setup of quo introduced variables local to method:
         int[] quo_curRegs_Compress = null;
         com.bbn.quo.corba.Association[] signal =
             new com.bbn.quo.corba.Association[0];
-        org.cougaar.core.mts.MessageAddress quo_retval;
+        org.cougaar.core.mts.MessageAddress attr;
         com.bbn.quo.corba.SignalEvent quo_sig1;
         com.bbn.quo.corba.SignalEvent quo_sig2;
 
-        quo_retval = remote.getMessageAddress();
-        return(quo_retval);
+        attr = remote.getMessageAddress();
+        return(attr);
       }
 };
 

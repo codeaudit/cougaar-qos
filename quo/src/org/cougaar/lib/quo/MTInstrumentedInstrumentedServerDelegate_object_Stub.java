@@ -13,13 +13,13 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
 	new java.rmi.server.Operation("void ignoreCompressedBytes(byte[])"),
 	new java.rmi.server.Operation("void ignoreCompressedMessage(org.cougaar.lib.mquo.Zippy)"),
 	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec receiveCompressedMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.lib.mquo.Zippy)"),
-	new java.rmi.server.Operation("void receiveOnlyBytes(byte[])"),
-	new java.rmi.server.Operation("void receiveOnlyCompressedBytes(byte[])"),
-	new java.rmi.server.Operation("void receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy)"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAttributes receiveOnlyBytes(byte[])"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedBytes(byte[])"),
+	new java.rmi.server.Operation("org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy)"),
 	new java.rmi.server.Operation("com.bbn.quo.instr.corba.Trace_rec rerouteMessage(com.bbn.quo.instr.corba.Trace_rec, org.cougaar.core.mts.AttributedMessage)")
     };
     
-    private static final long interfaceHash = 6533291143575432253L;
+    private static final long interfaceHash = 404600095234642596L;
     
     private static final long serialVersionUID = 2;
     
@@ -223,12 +223,13 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
     }
     
     // implementation of receiveOnlyBytes(byte[])
-    public void receiveOnlyBytes(byte[] $param_arrayOf_byte_1)
+    public org.cougaar.core.mts.MessageAttributes receiveOnlyBytes(byte[] $param_arrayOf_byte_1)
 	throws java.rmi.RemoteException
     {
 	try {
 	    if (useNewInvoke) {
-		ref.invoke(this, $method_receiveOnlyBytes_5, new java.lang.Object[] {$param_arrayOf_byte_1}, -8825285440700275413L);
+		Object $result = ref.invoke(this, $method_receiveOnlyBytes_5, new java.lang.Object[] {$param_arrayOf_byte_1}, 7951337734032436383L);
+		return ((org.cougaar.core.mts.MessageAttributes) $result);
 	    } else {
 		java.rmi.server.RemoteCall call = ref.newCall((java.rmi.server.RemoteObject) this, operations, 5, interfaceHash);
 		try {
@@ -238,7 +239,18 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
 		    throw new java.rmi.MarshalException("error marshalling arguments", e);
 		}
 		ref.invoke(call);
-		ref.done(call);
+		org.cougaar.core.mts.MessageAttributes $result;
+		try {
+		    java.io.ObjectInput in = call.getInputStream();
+		    $result = (org.cougaar.core.mts.MessageAttributes) in.readObject();
+		} catch (java.io.IOException e) {
+		    throw new java.rmi.UnmarshalException("error unmarshalling return", e);
+		} catch (java.lang.ClassNotFoundException e) {
+		    throw new java.rmi.UnmarshalException("error unmarshalling return", e);
+		} finally {
+		    ref.done(call);
+		}
+		return $result;
 	    }
 	} catch (java.lang.RuntimeException e) {
 	    throw e;
@@ -250,12 +262,13 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
     }
     
     // implementation of receiveOnlyCompressedBytes(byte[])
-    public void receiveOnlyCompressedBytes(byte[] $param_arrayOf_byte_1)
+    public org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedBytes(byte[] $param_arrayOf_byte_1)
 	throws java.rmi.RemoteException
     {
 	try {
 	    if (useNewInvoke) {
-		ref.invoke(this, $method_receiveOnlyCompressedBytes_6, new java.lang.Object[] {$param_arrayOf_byte_1}, 5513937421549448622L);
+		Object $result = ref.invoke(this, $method_receiveOnlyCompressedBytes_6, new java.lang.Object[] {$param_arrayOf_byte_1}, 4754728335128754214L);
+		return ((org.cougaar.core.mts.MessageAttributes) $result);
 	    } else {
 		java.rmi.server.RemoteCall call = ref.newCall((java.rmi.server.RemoteObject) this, operations, 6, interfaceHash);
 		try {
@@ -265,7 +278,18 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
 		    throw new java.rmi.MarshalException("error marshalling arguments", e);
 		}
 		ref.invoke(call);
-		ref.done(call);
+		org.cougaar.core.mts.MessageAttributes $result;
+		try {
+		    java.io.ObjectInput in = call.getInputStream();
+		    $result = (org.cougaar.core.mts.MessageAttributes) in.readObject();
+		} catch (java.io.IOException e) {
+		    throw new java.rmi.UnmarshalException("error unmarshalling return", e);
+		} catch (java.lang.ClassNotFoundException e) {
+		    throw new java.rmi.UnmarshalException("error unmarshalling return", e);
+		} finally {
+		    ref.done(call);
+		}
+		return $result;
 	    }
 	} catch (java.lang.RuntimeException e) {
 	    throw e;
@@ -277,12 +301,13 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
     }
     
     // implementation of receiveOnlyCompressedMessage(Zippy)
-    public void receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy $param_Zippy_1)
+    public org.cougaar.core.mts.MessageAttributes receiveOnlyCompressedMessage(org.cougaar.lib.mquo.Zippy $param_Zippy_1)
 	throws java.rmi.RemoteException
     {
 	try {
 	    if (useNewInvoke) {
-		ref.invoke(this, $method_receiveOnlyCompressedMessage_7, new java.lang.Object[] {$param_Zippy_1}, -6557596854227280392L);
+		Object $result = ref.invoke(this, $method_receiveOnlyCompressedMessage_7, new java.lang.Object[] {$param_Zippy_1}, -8662485581536817629L);
+		return ((org.cougaar.core.mts.MessageAttributes) $result);
 	    } else {
 		java.rmi.server.RemoteCall call = ref.newCall((java.rmi.server.RemoteObject) this, operations, 7, interfaceHash);
 		try {
@@ -292,7 +317,18 @@ public final class MTInstrumentedInstrumentedServerDelegate_object_Stub
 		    throw new java.rmi.MarshalException("error marshalling arguments", e);
 		}
 		ref.invoke(call);
-		ref.done(call);
+		org.cougaar.core.mts.MessageAttributes $result;
+		try {
+		    java.io.ObjectInput in = call.getInputStream();
+		    $result = (org.cougaar.core.mts.MessageAttributes) in.readObject();
+		} catch (java.io.IOException e) {
+		    throw new java.rmi.UnmarshalException("error unmarshalling return", e);
+		} catch (java.lang.ClassNotFoundException e) {
+		    throw new java.rmi.UnmarshalException("error unmarshalling return", e);
+		} finally {
+		    ref.done(call);
+		}
+		return $result;
 	    }
 	} catch (java.lang.RuntimeException e) {
 	    throw e;

@@ -9,10 +9,12 @@ behavior Logging ()
     remote_object org::cougaar::core::mts::MT remote;
 
     void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::mts::AttributedMessage m) {
+      return_value org::cougaar::core::mts::MessageAttributes attr;
+
 	inplaceof METHODCALL {
 	  local long long startTime;
 	  startTime = System.currentTimeMillis();
-	  remote.rerouteMessage(m);
+	  attr = remote.rerouteMessage(m);
 	  java_code #{
 	    org.cougaar.lib.mquo.Utils.logMessage(startTime,m); 
 	  }#;

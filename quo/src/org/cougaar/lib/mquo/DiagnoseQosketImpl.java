@@ -10,6 +10,9 @@ package org.cougaar.lib.mquo;
 import org.cougaar.lib.quo.*;
 
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.core.mts.MessageAttributes;
+import org.cougaar.core.mts.AttributedMessage;
+import org.cougaar.core.mts.MT;
 
 import com.bbn.quo.corba.Association;
 import com.bbn.quo.instr.corba.Trace_rec;
@@ -34,8 +37,8 @@ public class DiagnoseQosketImpl
 	this.loggingService = loggingService;
     }
 
-    public void runDiagnostic(org.cougaar.core.mts.AttributedMessage m, 
-			      org.cougaar.core.mts.MT remoteObj)
+    public MessageAttributes runDiagnostic(AttributedMessage m, 
+					   MT remoteObj)
     {
 	try {
 	    // Compressed Message
@@ -58,16 +61,19 @@ public class DiagnoseQosketImpl
 	    Utils.logEvent(startTime,m,"PremarshalledBytes");
 	    // Real Call
 	    startTime = System.currentTimeMillis();
-	    remoteObj.rerouteMessage(m);
+	    MessageAttributes attr = remoteObj.rerouteMessage(m);
 	    Utils.logMessage(startTime,m);
 	    // Whole message
 	    Utils.logEvent(startWholeCallTime,m,"Whole Call");
+	    return attr;
 	} 
 	catch (java.rmi.RemoteException remote_ex) {
 	    loggingService.error(null, remote_ex);
+	    return null;
 	}
 	catch (Exception ex) {
 	    loggingService.error(null, ex);
+	    return null;
 	}
     }
 

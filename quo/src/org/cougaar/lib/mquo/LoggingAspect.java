@@ -37,16 +37,17 @@ public class LoggingAspect extends StandardAspect
 	    super(delegatee);
 	}
 
-	public void forwardMessage(AttributedMessage message) 
+	public MessageAttributes forwardMessage(AttributedMessage message) 
 	    throws UnregisteredNameException, 
 		   NameLookupException, 
 		   CommFailureException,
 		   MisdeliveredMessageException
 	{
 	    long startTime = System.currentTimeMillis();
-	    super.forwardMessage(message);
+	    MessageAttributes attr = super.forwardMessage(message);
 	    long endTime = System.currentTimeMillis();
 	    Utils.logMessage(startTime, endTime, message);
+	    return attr;
 	}
 
     }
