@@ -123,7 +123,7 @@ abstract public class Frame
 	    while (itr.hasNext()) {
 		String slot =  (String) itr.next();
 		Object value = getLocalValue(slot);
-		props.put(slot, value);
+		if (value != null) props.put(slot, value);
 	    }
 	}
 	return props;
