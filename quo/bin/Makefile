@@ -57,7 +57,7 @@ MulticastNode.dev:
 	ln -s devwrapper MulticastNode.dev
 
 MetricsNode.dev:
-	ln -s devwrapper MulticastNode.dev
+	ln -s devwrapper MetricsNode.dev
 
 NoisyNode.dev:
 	ln -s devwrapper NoisyNode.dev
