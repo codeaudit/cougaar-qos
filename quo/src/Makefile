@@ -5,7 +5,7 @@ cougaar=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
 qos=${COUGAAR_SRC_PATH}/qos/src/org/cougaar/core/qos.jar
 src=$(shell find .  -name "*.java")
 thirdparty=../dev/3rdparty
-depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoInstr.jar:$(thirdparty)/UnixUtils.jar:$(thirdparty)/instrumentation.jar:$(thirdparty)/jacorb.jar
+depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoRSS.jar:$(thirdparty)/QuoInstr.jar:$(thirdparty)/UnixUtils.jar:$(thirdparty)/instrumentation.jar:$(thirdparty)/jacorb.jar
 
 pkg=org.cougaar.lib.quo
 srcdir=org/cougaar/lib/quo

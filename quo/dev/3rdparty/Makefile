@@ -4,6 +4,7 @@
 
 LINKS := QuoInstr.jar
 LINKS += QuoKernel.jar
+LINKS += QuoRSS.jar
 LINKS += UnixUtils.jar
 LINKS += NTUtils.jar
 LINKS += event.jar
@@ -20,6 +21,9 @@ QuoInstr.jar:
 
 QuoKernel.jar:
 	ln -s ${QUO_ROOT}/lib/QuoKernel.jar .
+
+QuoRSS.jar:
+	ln -s ${QUO_ROOT}/lib/QuoRSS.jar .
 
 UnixUtils.jar:
 	ln -s ${QUO_ROOT}/lib/UnixUtils.jar .
