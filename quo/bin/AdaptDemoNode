@@ -12,7 +12,7 @@ quo="-Dorg.cougaar.properties.url=file:${COUGAAR_SRC_PATH}/quo/bin/props/cougaar
 
 rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
 
-rss="-Dorg.cougaar.rss.properties=$rssurl"
+rss="-Dorg.cougaar.metrics.properties=$rssurl"
 
 COUGAAR_JAVA_ARGS="$quo $rss $ssl $naming $firewall"
 export COUGAAR_JAVA_ARGS

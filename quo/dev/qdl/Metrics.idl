@@ -1,0 +1,27 @@
+#if !defined(METRICS)
+#define METRICS
+
+#include "quo.idl"
+
+// This should be generated via idlgen
+
+module org {
+    module cougaar {
+	module core {
+	    module qos {
+		module metrics {
+		    interface MetricsService;
+		};
+	    };
+	};
+    };
+};
+
+module metric {
+    interface MetricSC : quo::ReadOnlyValueSC {
+	void init(in org::cougaar::core::qos::metrics::MetricsService svc);
+	void newPath(in string path);
+    };
+    
+};
+#endif

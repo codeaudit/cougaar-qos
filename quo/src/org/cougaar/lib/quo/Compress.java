@@ -45,20 +45,20 @@ public class Compress extends com.bbn.quo.rmi.impl.ContractImpl
     com.bbn.quo.rmi.impl.SysCond  servant2 = com.bbn.quo.rmi.impl.SysCond.lookup(scParams[2]);
     com.bbn.quo.rmi.impl.SysCond  servant3 = com.bbn.quo.rmi.impl.SysCond.lookup(scParams[3]);
 
-    com.bbn.quo.rmi.DataSCTie tsc0 = (com.bbn.quo.rmi.DataSCTie) servant0;
-    com.bbn.quo.data.DataSCImpl expectedServerEffectiveMJipsSC = (com.bbn.quo.data.DataSCImpl) tsc0._delegate();
+    org.cougaar.core.qos.rss.MetricSCTie tsc0 = (org.cougaar.core.qos.rss.MetricSCTie) servant0;
+    org.cougaar.core.qos.rss.MetricSCImpl expectedServerEffectiveMJipsSC = (org.cougaar.core.qos.rss.MetricSCImpl) tsc0._delegate();
     syscond_objs[0] = expectedServerEffectiveMJipsSC;
     PrimitiveSF expectedServerEffectiveMJipsSF =
       new PrimitiveSF(expectedServerEffectiveMJipsSC);
 
-    com.bbn.quo.rmi.DataSCTie tsc1 = (com.bbn.quo.rmi.DataSCTie) servant1;
-    com.bbn.quo.data.DataSCImpl expectedClientEffectiveMJipsSC = (com.bbn.quo.data.DataSCImpl) tsc1._delegate();
+    org.cougaar.core.qos.rss.MetricSCTie tsc1 = (org.cougaar.core.qos.rss.MetricSCTie) servant1;
+    org.cougaar.core.qos.rss.MetricSCImpl expectedClientEffectiveMJipsSC = (org.cougaar.core.qos.rss.MetricSCImpl) tsc1._delegate();
     syscond_objs[1] = expectedClientEffectiveMJipsSC;
     PrimitiveSF expectedClientEffectiveMJipsSF =
       new PrimitiveSF(expectedClientEffectiveMJipsSC);
 
-    com.bbn.quo.rmi.DataSCTie tsc2 = (com.bbn.quo.rmi.DataSCTie) servant2;
-    com.bbn.quo.data.DataSCImpl expectedNetworkCapacitySC = (com.bbn.quo.data.DataSCImpl) tsc2._delegate();
+    org.cougaar.core.qos.rss.MetricSCTie tsc2 = (org.cougaar.core.qos.rss.MetricSCTie) servant2;
+    org.cougaar.core.qos.rss.MetricSCImpl expectedNetworkCapacitySC = (org.cougaar.core.qos.rss.MetricSCImpl) tsc2._delegate();
     syscond_objs[2] = expectedNetworkCapacitySC;
     PrimitiveSF expectedNetworkCapacitySF =
       new PrimitiveSF(expectedNetworkCapacitySC);

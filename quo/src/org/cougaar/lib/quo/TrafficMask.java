@@ -54,8 +54,8 @@ public class TrafficMask extends com.bbn.quo.rmi.impl.ContractImpl
     com.bbn.quo.rmi.impl.SysCond  servant1 = com.bbn.quo.rmi.impl.SysCond.lookup(scParams[1]);
     com.bbn.quo.rmi.impl.SysCond  servant2 = com.bbn.quo.rmi.impl.SysCond.lookup(scParams[2]);
 
-    com.bbn.quo.rmi.ExpectedBandwidthSCTie tsc0 = (com.bbn.quo.rmi.ExpectedBandwidthSCTie) servant0;
-    com.bbn.quo.data.ExpectedBandwidthSCImpl BandwidthSC = (com.bbn.quo.data.ExpectedBandwidthSCImpl) tsc0._delegate();
+    org.cougaar.core.qos.rss.MetricSCTie tsc0 = (org.cougaar.core.qos.rss.MetricSCTie) servant0;
+    org.cougaar.core.qos.rss.MetricSCImpl BandwidthSC = (org.cougaar.core.qos.rss.MetricSCImpl) tsc0._delegate();
     syscond_objs[0] = BandwidthSC;
     PrimitiveSF BandwidthSF =
       new PrimitiveSF(BandwidthSC);

@@ -6,7 +6,7 @@ ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePasswor
 
 rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
 
-rss="-Dorg.cougaar.rss.properties=$rssurl"
+rss="-Dorg.cougaar.metrics.properties=$rssurl"
 
 quo="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/ssl.props"
 

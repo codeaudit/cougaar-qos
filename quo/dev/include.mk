@@ -36,6 +36,7 @@ idl2pkg += -i2jpackage quo_corba:com.bbn.quo.corba
 idl2pkg += -i2jpackage qosket:com.bbn.quo.qosket
 idl2pkg += -i2jpackage instr:com.bbn.quo.instr.corba
 idl2pkg += -i2jpackage instr_shared:com.bbn.quo.instr
+idl2pkg += -i2jpackage metric:org.cougaar.core.qos.rss
 
 
 

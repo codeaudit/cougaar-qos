@@ -12,7 +12,7 @@ import org.cougaar.core.mts.DestinationLink;
 import org.cougaar.core.mts.SSLRMILinkProtocol;
 import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.qos.monitor.ResourceMonitorService;
+import org.cougaar.core.qos.rss.MetricSC;
 
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.ValueSC;
@@ -26,18 +26,14 @@ public class RemoteSSLQosketImpl
 	    
 
     private DestinationLink link;
-    private ResourceMonitorService rms;
 
 
     public void setDestinationLink(DestinationLink link) {
 	this.link = link;
     }
 
-    public void setServices(ResourceMonitorService rms,
-			    ValueSC trust,
-			    ValueSC useSSL)
+    public void setServices(ValueSC trust, ValueSC useSSL)
     {
-	this.rms = rms;
 
 	this.trust = trust;     // These two are from RemoteSSL.cdl
 	this.UseSSL = useSSL;
@@ -60,8 +56,8 @@ public class RemoteSSLQosketImpl
     {
 
 	MessageAddress destination = link.getDestination();
-	Bandwidth = 
-	    (ExpectedBandwidthSC) rms.getExpectedBandwidthForAgentSyscond(destination);
+	SyscondFactory factory = SyscondFactory.getFactory();
+	Bandwidth = factory.getExpectedBandwidthForAgentSyscond(destination);
     }
 
 }

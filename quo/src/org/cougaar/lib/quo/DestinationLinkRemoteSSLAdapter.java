@@ -64,9 +64,9 @@ public class DestinationLinkRemoteSSLAdapter
      qosket.setDestinationLink ( link );
   }
 
-  public void setServices(org.cougaar.core.qos.monitor.ResourceMonitorService rms, com.bbn.quo.rmi.ValueSC trust, com.bbn.quo.rmi.ValueSC useSSL)
+  public void setServices(com.bbn.quo.rmi.ValueSC trust, com.bbn.quo.rmi.ValueSC useSSL)
   {
-     qosket.setServices ( rms, trust, useSSL );
+     qosket.setServices ( trust, useSSL );
   }
 
 }

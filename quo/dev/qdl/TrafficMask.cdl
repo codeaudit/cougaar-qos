@@ -6,7 +6,7 @@
 
 contract TrafficMask
     (
-     syscond quo::ExpectedBandwidthSC quo_data::ExpectedBandwidthSCImpl Bandwidth,
+     syscond metric::MetricSC metric::MetricSCImpl Bandwidth,
      syscond quo::ValueSC ValueSCImpl useMask,
 
      syscond quo::ValueSC ValueSCImpl trust,

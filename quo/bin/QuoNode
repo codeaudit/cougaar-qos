@@ -4,7 +4,7 @@
 cougaar_quo_log=${QUO_LOG:-`hostname`-$1-`date +%y%m%d%H%M%S`.log}
 rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
 
-rss="-Dorg.cougaar.rss.properties=$rssurl"
+rss="-Dorg.cougaar.metrics.properties=$rssurl"
 
 COUGAAR_JAVA_ARGS="-Dorg.cougaar.properties.url=file:${COUGAAR_INSTALL_PATH}/quo/bin/props/cougaar/compression.props -Dorg.cougaar.lib.quo.logfile=${cougaar_quo_log} -Dorg.cougaar.useBootstrapper=true $rss"
 export COUGAAR_JAVA_ARGS

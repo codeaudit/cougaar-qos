@@ -11,7 +11,6 @@ module org {
 	module core {
 	    module qos {
 		module monitor {
-		    interface ResourceMonitorService;
 		    interface QosMonitorService;
 		};
 	    };
@@ -24,8 +23,7 @@ module org {
 
 		interface RemoteSSLQosket {
 		    void setDestinationLink(in org::cougaar::core::mts::DestinationLink link);
-		    void setServices(in org::cougaar::core::qos::monitor::ResourceMonitorService rms,
-				     in quo::ValueSC trust,
+		    void setServices(in quo::ValueSC trust,
 				     in quo::ValueSC useSSL);
 		};
 

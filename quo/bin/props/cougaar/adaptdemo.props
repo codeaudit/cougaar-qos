@@ -1,5 +1,4 @@
 # RSS/QuO
-# org.cougaar.rss.properties=http://stout.bbn.com/~statusquo/RSS-Property.conf
 org.cougaar.lib.quo.kernel.gui=true
 
 #Default Trust

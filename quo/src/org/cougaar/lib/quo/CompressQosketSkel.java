@@ -16,9 +16,9 @@ abstract public class CompressQosketSkel
          org.cougaar.lib.quo.CompressDelegateQosket
 {
   // Sysconds from contract arglist
-  protected com.bbn.quo.rmi.DataSC expectedServerEffectiveMJips;
-  protected com.bbn.quo.rmi.DataSC expectedClientEffectiveMJips;
-  protected com.bbn.quo.rmi.DataSC expectedNetworkCapacity;
+  protected org.cougaar.core.qos.rss.MetricSC expectedServerEffectiveMJips;
+  protected org.cougaar.core.qos.rss.MetricSC expectedClientEffectiveMJips;
+  protected org.cougaar.core.qos.rss.MetricSC expectedNetworkCapacity;
   protected com.bbn.quo.rmi.ValueSC UseCompression;
 
   // Callbacks from contract arglist

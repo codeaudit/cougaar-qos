@@ -67,7 +67,7 @@ public class RemoteSSLAspect extends QuoAspect
 	    setDestinationLink(link);
 
 	    try {
-		setServices(rms, Get_TRUST(), Get_USE_SSL());
+		setServices(Get_TRUST(), Get_USE_SSL());
 		initSysconds(kernel);
 		initCallbacks();
 		String name = "SSL_" + link.getDestination(); 

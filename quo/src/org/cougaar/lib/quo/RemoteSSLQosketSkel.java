@@ -16,7 +16,7 @@ abstract public class RemoteSSLQosketSkel
          org.cougaar.lib.quo.RemoteSSLDelegateQosket
 {
   // Sysconds from contract arglist
-  protected com.bbn.quo.rmi.ExpectedBandwidthSC Bandwidth;
+  protected org.cougaar.core.qos.rss.MetricSC Bandwidth;
   protected com.bbn.quo.rmi.ValueSC UseSSL;
   protected com.bbn.quo.rmi.ValueSC trust;
 

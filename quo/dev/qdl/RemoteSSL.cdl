@@ -6,9 +6,8 @@
 
 contract RemoteSSL
     (
-     syscond quo::ExpectedBandwidthSC quo_data::ExpectedBandwidthSCImpl Bandwidth,
+     syscond metric::MetricSC metric::MetricSCImpl Bandwidth,
      syscond quo::ValueSC ValueSCImpl UseSSL,
-
      syscond quo::ValueSC ValueSCImpl trust
      
      )

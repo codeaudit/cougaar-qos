@@ -26,9 +26,7 @@ import org.cougaar.core.node.TrustStatusService;
 import org.cougaar.core.node.TrustStatusServiceImpl;
 import org.cougaar.core.mts.StandardAspect;
 import org.cougaar.core.mts.TrafficMaskingGeneratorService;
-import org.cougaar.core.qos.quo.Utils;
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.monitor.ResourceMonitorService;
 import org.cougaar.core.qos.monitor.QosMonitorService;
 
 import java.util.Observer;
@@ -38,7 +36,6 @@ import java.util.Observable;
 abstract public class QuoAspect extends StandardAspect
 {
     protected QuoKernel kernel;
-    protected ResourceMonitorService rms;
     protected TrustStatusService tss;
     protected TrafficMaskingGeneratorService tmgs;
 
@@ -143,16 +140,7 @@ abstract public class QuoAspect extends StandardAspect
 	    }
 	}
 
-	if (rms == null) {
-	    Object svc = 
-		sb.getService(this, ResourceMonitorService.class, null);
-	    if (svc != null) {
-		rms = (ResourceMonitorService) svc;
-	    }
-	}
-
-
-	if (rms != null  && tss != null && tmgs != null) {
+	if (tss != null && tmgs != null) {
 	    inited = true;
 	}
     }

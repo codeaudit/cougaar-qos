@@ -20,7 +20,6 @@ package org.cougaar.lib.mquo;
 import org.cougaar.lib.quo.*;
 
 
-import org.cougaar.core.qos.quo.Utils;
 import org.cougaar.core.mts.MT;
 import org.cougaar.core.mts.MTImpl;
 import org.cougaar.core.mts.SocketFactory;

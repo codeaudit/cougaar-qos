@@ -25,6 +25,7 @@ import com.bbn.quo.rmi.ExpectedBandwidthSC;
 
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MulticastMessageAddress;
+import org.cougaar.core.qos.rss.MetricSC;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -91,9 +92,9 @@ public class TrafficMaskAspect extends QuoAspect
 	{
 	    useMask = Get_USE_MASKING();
 	    trust = Get_TRUST();
+	    SyscondFactory factory = SyscondFactory.getFactory();
 	    Bandwidth = 
-		(ExpectedBandwidthSC) 
-		rms.getExpectedBandwidthForAgentSyscond(destination);
+		factory.getExpectedBandwidthForAgentSyscond(destination);
 
 	}
 

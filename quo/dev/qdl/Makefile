@@ -110,6 +110,7 @@ $(traffic): RemoteSSL.idl TrafficMask.cdl $(traffic_idl) $(dl_idl)
 	--cdl=TrafficMask.cdl \
 	--idl=$(traffic_idl) \
 	--idl=RemoteSSL.idl \
+	--idl=Metrics.idl \
 	--idl=quo.idl \
 	--adapterqosket=org::cougaar::lib::quo::TrafficMaskQosket \
 	$(rmi_qdl_flags)
@@ -125,6 +126,7 @@ $(remotessl): RemoteSSL.idl RemoteSSL.cdl $(mt_idl) $(dl_idl) RemoteSSL.asl
 	--idl=$(dl_idl) \
 	--idl=RemoteSSL.idl \
 	--idl=quo.idl \
+	--idl=Metrics.idl \
 	--adapterqosket=org::cougaar::lib::quo::RemoteSSLQosket \
 	--delegateqosket=org::cougaar::lib::quo::RemoteSSLDelegateQosket \
 	--business=org::cougaar::core::mts::DestinationLink \
@@ -164,6 +166,7 @@ $(compress): $(mt_idl) $(mt_inst_idl)  Qosket.idl Compress.asl Compress.cdl
 	--cdl=Compress.cdl \
 	--idl=Qosket.idl \
 	--idl=$(mt_idl) \
+	--idl=Metrics.idl \
 	--business=org::cougaar::core::mts::MT \
 	--adapter=MTCompressAdapter \
 	--qosketimpl=org.cougaar.lib.mquo.CompressQosketImpl \

@@ -11,7 +11,6 @@ import org.cougaar.lib.quo.*;
 
 import java.rmi.Naming;
 
-import org.cougaar.core.qos.quo.Utils;
 import org.cougaar.core.service.LoggingService;
 
 import org.cougaar.core.mts.MT;

@@ -6,7 +6,7 @@ ssl="-Djavax.net.ssl.trustStore=$HOME/keystore -Djavax.net.ssl.trustStorePasswor
 
 rssurl=${RSS_CONFIG_URL:-http://stout.bbn.com/~statusquo/RSS-Property.conf}
 
-rss="-Dorg.cougaar.rss.properties=$rssurl"
+rss="-Dorg.cougaar.metrics.properties=$rssurl"
 
 ray=" -Dorg.cougaar.nameserver.verbosity=2 -Djavax.net.debug=all"
 

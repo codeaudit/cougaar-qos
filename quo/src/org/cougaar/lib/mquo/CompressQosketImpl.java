@@ -104,7 +104,7 @@ public class CompressQosketImpl
 
 
 
-    private void initRSSSysconds(QuoKernel kernel) 
+    private void initMetricSysconds(QuoKernel kernel) 
 	throws java.rmi.RemoteException
     {
 
@@ -124,27 +124,20 @@ public class CompressQosketImpl
 		Utilities.canonicalizeAddress(NetUtilities.getHostAddress());
 	    serverHost = Utilities.canonicalizeAddress(remoteRef.host);
 	} catch (java.net.UnknownHostException unknown_host) {
-	    loggingService.error("initRSSSysconds", unknown_host);
+	    loggingService.error("initMetricSysconds", unknown_host);
 	}
 
 
-	String scname = "Bandwidth " +clientHost+ "->" +serverHost;
-	expectedNetworkCapacity =  
-	    Utilities.expectedNetworkCapacitySyscond(remote,
-						     scname, 
-						     kernel);
+	SyscondFactory factory = SyscondFactory.getFactory();
+	
+	expectedNetworkCapacity = 
+	    factory.getExpectedBandwidthForHostSyscond(serverHost);
 
-	scname = "Server MJips " +serverHost;
 	expectedServerEffectiveMJips=
-	    Utilities.expectedServerEffectiveMJipsSyscond(remoteRef,
-							  scname, 
-							  iface,
-							  kernel);
+	    factory.getExpectedEffectiveMJipsForHostSyscond(serverHost);
 
-	scname = "Client MJips " + clientHost;
 	expectedClientEffectiveMJips=
-	    Utilities.expectedClientEffectiveMJipsSyscond(scname, 
-							  kernel);
+	    factory.getExpectedEffectiveMJipsForHostSyscond(clientHost);
 
     }
 
@@ -169,7 +162,7 @@ public class CompressQosketImpl
 	    boolean useCompression = 
 		Boolean.getBoolean("org.cougaar.lib.quo.UseCompression");
 	    UseCompression.booleanValue(useCompression);
-	    initRSSSysconds(kernel);
+	    initMetricSysconds(kernel);
 
 	}
 	catch (Exception ex) {

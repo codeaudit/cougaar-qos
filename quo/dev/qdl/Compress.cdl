@@ -6,9 +6,9 @@
 
 contract Compress 
     (
-     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedServerEffectiveMJips,
-     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedClientEffectiveMJips,
-     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedNetworkCapacity,
+     syscond metric::MetricSC metric::MetricSCImpl expectedServerEffectiveMJips,
+     syscond metric::MetricSC metric::MetricSCImpl expectedClientEffectiveMJips,
+     syscond metric::MetricSC metric::MetricSCImpl expectedNetworkCapacity,
      syscond quo::ValueSC ValueSCImpl UseCompression
 
      )
