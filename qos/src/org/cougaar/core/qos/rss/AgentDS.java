@@ -24,9 +24,10 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.service.TopologyEntry;
-import org.cougaar.core.service.TopologyReaderService;
 import org.cougaar.core.qos.metrics.Constants;
+import org.cougaar.core.service.wp.AddressEntry;
+import org.cougaar.core.service.wp.Application;
+import org.cougaar.core.service.wp.WhitePagesService;
 
 import com.bbn.quo.data.DataFormula;
 import com.bbn.quo.data.DataScope;
@@ -39,6 +40,8 @@ public class AgentDS
     extends DataScope 
 {
     private static final String AGENTNAME = "agentname".intern();
+    static final Application TOPOLOGY = Application.getApplication("topology");
+    static final String SCHEME = "node";
 
 
     public AgentDS(Object[] parameters, DataScope parent) 
@@ -56,20 +59,21 @@ public class AgentDS
     // preferred parent.
     protected DataScope preferredParent(RSS root) {
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	TopologyReaderService svc = (TopologyReaderService)
-	    sb.getService(this,TopologyReaderService.class, null);
+	WhitePagesService svc = (WhitePagesService)
+	    sb.getService(this, WhitePagesService.class, null);
 	String agentname = (String) getSymbolValue(AGENTNAME);
-	TopologyEntry entry = null;
+        String node = null;
 	try {
-	    entry = svc.getEntryForAgent(agentname);
-	} catch (Exception no_such_agent) {
-	    //  print a message?
-	}
-        String node = entry != null ? entry.getNode() : null;
-
-	// What do we do if the node isn't known?
-	if (node == null) {
-	    node = "FosterNode"; // nice
+	    AddressEntry entry = svc.get(agentname, TOPOLOGY, SCHEME);
+	    if (entry == null) {
+		System.err.println("# Can't find node for agent " +agentname);
+		node = "FosterNode";
+	    } else {
+		node = entry.getAddress().getPath().substring(1);
+	    }
+	} catch (Exception ex) {
+	    ex.printStackTrace();
+	    node = "FosterNode";
 	}
 
 	// System.err.println("### Node of " +agentname+ "=" +node);

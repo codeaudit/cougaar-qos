@@ -26,8 +26,6 @@ import org.cougaar.core.component.ServiceBroker;
 
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.node.NodeIdentificationService;
-import org.cougaar.core.service.TopologyEntry;
-import org.cougaar.core.service.TopologyReaderService;
 import org.cougaar.core.qos.metrics.Constants;
 
 import com.bbn.quo.data.DataFormula;

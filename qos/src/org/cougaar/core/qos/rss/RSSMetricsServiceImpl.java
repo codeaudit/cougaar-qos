@@ -31,9 +31,7 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.SitesDB;
 import com.bbn.quo.data.RSSUtils;
-import com.bbn.quo.event.Connector;
 import com.bbn.quo.event.EventUtils;
-import com.bbn.quo.event.data.StatusConsumerFeed;
 
 
 import org.cougaar.core.component.ServiceBroker;
@@ -47,8 +45,6 @@ import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
-
-import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -78,7 +74,7 @@ public class RSSMetricsServiceImpl
     
     private LoggingService loggingService;
     private ThreadService threadService;
-    private STECMetricsUpdateServiceImpl metricsUpdateService;
+    private RSSMetricsUpdateServiceImpl metricsUpdateService;
 
     private static class DataValueObserver 
 	implements Observer, DataProvider
@@ -122,7 +118,7 @@ public class RSSMetricsServiceImpl
 
 	MetricsUpdateService mus = (MetricsUpdateService)
 	    sb.getService(this, MetricsUpdateService.class, null);
-	this.metricsUpdateService = (STECMetricsUpdateServiceImpl) mus;
+	this.metricsUpdateService = (RSSMetricsUpdateServiceImpl) mus;
 
 	Properties properties = new Properties();
 	String propertiesURL = System.getProperty(RSS_PROPERTIES);
@@ -148,23 +144,8 @@ public class RSSMetricsServiceImpl
 
 	DataFeed feed = null;
 	String feedName = null;
-	TypedEventChannel channel = null;
-	channel = metricsUpdateService.getChannel();
-	if (channel != null) {
-	    String ior = Connector.orb().object_to_string(channel);
-	    // 		String feeds = properties.getProperty("rss.DataFeeds", "");
-	    // 		feeds += " STEC_Channel";
-	    // 		properties.put("rss.DataFeeds", feeds);
-	    // 		properties.put("STEC_Channel.class", 
-	    // 			       "com.bbn.quo.event.data.StatusConsumerFeed");
-	    // 		properties.put("STEC_Channel.args", "-ior " +ior);
-	    String[] args = { "-ior", ior };
-	    feed = new StatusConsumerFeed(args);
-	    feedName = "Local_STEC_Channel";
-	} else {
-	    feed = metricsUpdateService.getMetricsFeed();
-	    feedName = "MetricsDataFeed";
-	}
+	feed = metricsUpdateService.getMetricsFeed();
+	feedName = "MetricsDataFeed";
 
 	RSS.makeInstance(properties);
 	if (feed != null) {

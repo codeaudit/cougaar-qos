@@ -23,8 +23,9 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.TopologyEntry;
-import org.cougaar.core.service.TopologyReaderService;
+import org.cougaar.core.service.wp.AddressEntry;
+import org.cougaar.core.service.wp.Application;
+import org.cougaar.core.service.wp.WhitePagesService;
 
 
 import com.bbn.quo.data.DataScope;
@@ -37,7 +38,8 @@ import java.util.Set;
 public class NodeDS extends DataScope
 {
     static final String NODENAME = "nodename".intern();
-
+    static final Application TOPOLOGY = Application.getApplication("topology");
+    static final String SCHEME = "node";
 
     public NodeDS(Object[] parameters, DataScope parent) 
 	throws DataScope.ParameterError
@@ -55,20 +57,20 @@ public class NodeDS extends DataScope
     // preferred parent.
     protected DataScope preferredParent(RSS root) {
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	TopologyReaderService svc = (TopologyReaderService)
-	    sb.getService(this,TopologyReaderService.class, null);
+	WhitePagesService svc = (WhitePagesService)
+	    sb.getService(this, WhitePagesService.class, null);
 	String nodename = (String) getSymbolValue(NODENAME);
 	String host = null;
 	try {
-	    host = svc.getParentForChild(TopologyReaderService.HOST, 
-					 TopologyReaderService.NODE, 
-					 nodename);
-	} catch (Exception no_such_node) {
-	    // print message?
-	}
-
-	// What do we do if the host isn't known?
-	if (host == null) {
+	    AddressEntry entry = svc.get(nodename, TOPOLOGY, SCHEME);
+	    if (entry == null) {
+		System.err.println("# Can't find host for node " +nodename);
+		host = "10.0.0.0"; // nice
+	    } else {
+		host = entry.getAddress().getHost();
+	    }
+	} catch (Exception ex) {
+	    ex.printStackTrace();
 	    host = "10.0.0.0"; // nice
 	}
 
