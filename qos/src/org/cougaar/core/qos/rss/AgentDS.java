@@ -213,6 +213,30 @@ public class AgentDS
 	}
     }	
 
+    public static class MsgIn1SecAvg extends Formula {
+	String getKey() {
+	    return Constants.MSG_IN_1_SEC_AVG;
+	}
+    }	
+
+    public static class MsgIn10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.MSG_IN_10_SEC_AVG;
+	}
+    }	
+
+    public static class MsgIn100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.MSG_IN_100_SEC_AVG;
+	}
+    }	
+
+    public static class MsgIn1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.MSG_IN_1000_SEC_AVG;
+	}
+    }	
+
     // JAZ both HeardTime and SpokeTime need to be Monotonic, and they
     // need to be hooked into LastHeard and LastSpoke
 
