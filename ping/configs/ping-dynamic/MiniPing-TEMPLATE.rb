@@ -9,7 +9,7 @@ CIP = ENV['CIP']
 
 $:.unshift File.join(CIP, 'csmart', 'acme_scripting', 'src', 'lib')
 $:.unshift File.join(CIP, 'csmart', 'acme_service', 'src', 'redist')
-$:.unshift File.join(CIP, 'configs')
+$:.unshift File.join(CIP, 'ping', 'configs')
 
 require 'cougaar/scripting'
 require 'ultralog/scripting'
@@ -19,7 +19,7 @@ require 'ping-dynamic/scripting'
 include Cougaar
 
 # Vars
-PING_HOME = "#{CIP}/configs/ping-dynamic"
+PING_HOME = "#{CIP}/ping/configs/ping-dynamic"
 UC3_HOME = "#{CIP}/csmart/config/rules/robustness/UC3"
 COMMUNITY_RULE = "#{CIP}/csmart/config/rules/robustness/communities/community.rule"
 runcount=0
@@ -34,8 +34,8 @@ Cougaar.new_experiment().run(parameters[:ping_pairs].length) {
   do_action "LoadSocietyFromXML", "#{PING_HOME}/Empty.xml"
 
   # Select your society config here
-  do_action "InfoMessage", "#{parameters[:strategy]}, #{parameters[:ping_pairs][runcount]}"
-  do_action parameters[:strategy], parameters[:ping_pairs][runcount].to_i, "false", "false"
+  do_action "InfoMessage", "#{parameters[:strategy]}, #{parameters[:ping_pairs][runcount]}, false, #{parameters[:hosts]}"
+  do_action parameters[:strategy], parameters[:ping_pairs][runcount].to_i, "false", parameters[:hosts]
   do_action "MapHosts", HOSTS_FILE
 
   do_action "TransformSociety", false, *parameters[:rules]
@@ -57,6 +57,7 @@ Cougaar.new_experiment().run(parameters[:ping_pairs].length) {
 
   do_action "Sleep", parameters[:sleep_time].to_i + (runcount * parameters[:sleep_delta].to_i)
   #wait_for "Command", "shutdown"
+  do_action "PostMiniPingResults", "u111", "miniping", "ping", "p0ng", parameters[:ping_pairs][runcount]
   do_action "StopSociety"
   do_action "ArchiveLogs"
   do_action "CleanupSociety"  
