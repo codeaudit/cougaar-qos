@@ -116,9 +116,7 @@ public class FrameSetServicePlugin
 			    String name,
 			    FrameSet set)
     {
-	// Should give the callback a read-only proxy, since writes
-	// will invoke operations on the creator's BBS.
-	cb.frameSetAvailable(name, new ReadOnlyFrameSetProxy(set));
+	cb.frameSetAvailable(name, set);
     }
 
     private synchronized void handleCallbacks()
@@ -147,7 +145,7 @@ public class FrameSetServicePlugin
     {
 	FrameSet set = (FrameSet) sets.get(name);
 	if (set != null) {
-	    return new ReadOnlyFrameSetProxy(set);
+	    return set;
 	} else {
 	    HashSet callbacks = (HashSet) pending.get(name);
 	    if (callbacks == null) {
