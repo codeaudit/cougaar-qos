@@ -32,18 +32,26 @@ import com.bbn.quo.data.RSS;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.TopologyReaderService;
 import org.cougaar.core.service.TopologyEntry;
 import org.cougaar.core.service.ThreadService;
 
-class AgentHostUpdaterServiceProvider implements ServiceProvider
+public final class AgentHostUpdaterComponent
+    extends QosComponent
+    implements ServiceProvider
 {
     private static final int PERIOD = 3000;
 
     private AgentHostUpdaterImpl updater;
 
-    AgentHostUpdaterServiceProvider(ServiceBroker sb) {
+    public void load() {
+	super.load();
+	provideService(getServiceBroker());
+    }
+
+    void provideService(ServiceBroker sb) {
 	updater = new AgentHostUpdaterImpl(sb);
 
 	ThreadService threadService = (ThreadService)

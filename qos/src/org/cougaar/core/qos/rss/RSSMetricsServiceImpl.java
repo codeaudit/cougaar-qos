@@ -167,8 +167,9 @@ public class RSSMetricsServiceImpl
 	    RSS.instance().registerFeed(feed, feedName);
 	}
 
-	// start the updater
-	new AgentHostUpdaterServiceProvider(sb);
+	// Used to start this here.  Now do it via loadable Component.
+	// AgentHostUpdaterComponent comp = new AgentHostUpdaterComponent();
+	// comp.provideService(sb);
     }
 
     //Data Feed Registration Service
