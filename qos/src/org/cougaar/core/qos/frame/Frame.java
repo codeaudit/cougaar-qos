@@ -133,12 +133,29 @@ public class Frame
 	if (result != null) return result;
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) {
-	    return prototype.getValue(attribute);
+	    result = prototype.getValue(attribute);
+	    if (result != null) return result;
 	}
 	Frame parent = frameSet.getParent(this);
 	if (parent != null) {
-	    result = parent.getValue(attribute);
+	    return parent.getValue(attribute);
+	}
+	return null;
+    }
+
+    public Frame getSource(String attribute)
+    {
+	if (properties.containsKey(attribute)) return this;
+
+	Frame prototype = frameSet.getPrototype(this);
+	Frame result = null;
+	if (prototype != null) {
+	    result = prototype.getSource(attribute);
 	    if (result != null) return result;
+	}
+	Frame parent = frameSet.getParent(this);
+	if (parent != null) {
+	    return parent.getSource(attribute);
 	}
 	return null;
     }
