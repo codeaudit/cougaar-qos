@@ -52,6 +52,8 @@ public final class QueryRelayImpl
   private Object query;
   private Object reply;
 
+    private String community;
+
   private transient Set _targets;
   private transient Relay.TargetFactory _factory;
 
@@ -71,12 +73,14 @@ public final class QueryRelayImpl
 			    MessageAddress source,
 			    MessageAddress target,
 			    Object query, 
+			    String community,
 			    long timestamp) {
 	this.uid = uid;
 	this.source = source;
 	this.target = target;
 	this.query = query;
 	this.timestamp = timestamp;
+	this.community = community;
 	cacheTargets();
     }
     
@@ -115,7 +119,7 @@ public final class QueryRelayImpl
 
   private void cacheTargets() {
     _targets = Collections.singleton(target);
-    _factory = new QueryRelayImplFactory(target);
+    _factory = new QueryRelayImplFactory(target, timestamp, community);
   }
   public Set getTargets() {
     return _targets;
@@ -179,6 +183,7 @@ public final class QueryRelayImpl
       " query="+query+
       " reply="+reply+
 	"timestamp="+timestamp+
+	"community="+community+
 	")";
   }
     
@@ -186,21 +191,32 @@ public final class QueryRelayImpl
 	return timestamp;
     }
     
+    public String getCommunity() {
+	return community;
+    }
+
   // factory method:
 
   private static class QueryRelayImplFactory 
     implements Relay.TargetFactory, Serializable {
       private final MessageAddress target;
-      public QueryRelayImplFactory(MessageAddress target) {
+      private long timestamp;
+      private String community;
+      public QueryRelayImplFactory(MessageAddress target,
+				   long timestamp,
+				   String community)
+      {
         this.target = target;
+	this.timestamp = timestamp;
+	this.community = community;
       }
       public Relay.Target create(
           UID uid, MessageAddress source, Object content,
           Relay.Token token) {
         Object query = content;
-	long timestamp = System.currentTimeMillis();
+	// long timestamp = System.currentTimeMillis();
         // bug 3824, pass null aba-target to avoid n^2 peer copies
-        return new QueryRelayImpl(uid, source, null, query, timestamp);
+        return new QueryRelayImpl(uid, source, null, query, community, timestamp);
       }
     }
 }

@@ -67,7 +67,7 @@ abstract public class QueryFacet
 
     private String managerAttr;
     private RelayReclaimer reclaimer = null;
-    private String communityRole;
+    private String communityRole, communityType;
     private IncrementalSubscription responseSub;
 
     protected QueryFacet(FacetProviderImpl owner,
@@ -80,9 +80,10 @@ abstract public class QueryFacet
 
 
 
+	communityType = 
+	    spec.ca_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
+
 	Properties role_parameters = spec.role_parameters;
-	String communityType = 
-	    role_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
 	managerAttr = 
 	    role_parameters.getProperty(MANAGER_ATTRIBUTE);
 	communityRole = 
@@ -109,7 +110,7 @@ abstract public class QueryFacet
 
     public void execute(BlackboardService blackboard)
     {
-	if (!responseSub.hasChanged()) return;
+	if (responseSub == null || !responseSub.hasChanged()) return;
 
 	Enumeration en;
 		
@@ -191,7 +192,8 @@ abstract public class QueryFacet
 	Object query = transformQuery(fact);
 	long timestamp = System.currentTimeMillis();
 	QueryRelay qr = 
-	    new QueryRelayImpl(uid, getAgentID(), aba, query, timestamp);
+	    new QueryRelayImpl(uid, getAgentID(), aba, query, communityType,
+			       timestamp);
 	if (log.isInfoEnabled()) {
 	    log.info("Sending QueryRelay from " +getAgentID() +
 		      " to all nodes in community: " + getCommunity());
@@ -232,7 +234,11 @@ abstract public class QueryFacet
 	    public boolean execute(Object o) {
 		if (o instanceof ResponseRelay) {
 		    ResponseRelay relay = (ResponseRelay) o;
-		    return acceptResponse(relay);
+		    if (log.isDebugEnabled())
+			log.debug("testing response relay" +relay);
+		    String responseCommunity = relay.getCommunity();
+		    return responseCommunity.equals(communityType) &&
+			acceptResponse(relay);
 		} else {
 		    return false;
 		}

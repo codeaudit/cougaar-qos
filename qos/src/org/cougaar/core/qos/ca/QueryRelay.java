@@ -43,6 +43,8 @@ public interface QueryRelay extends UniqueObject {
   // from UniqueObject 
   UID getUID();
   void setUID(UID uid);
+    
+    String getCommunity();
 
   /** The agent that created the query */
   MessageAddress getSource();

@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.ca;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -67,6 +68,7 @@ abstract public class ResponseFacet
     public abstract Object transformResponse(Fact fact);
 
     private String managerRole;
+    private String communityType;
     private HashSet completedUIDs;
     private ResponseRelay lastResponse; // for cleaning up
     private IncrementalSubscription querySub;
@@ -80,8 +82,8 @@ abstract public class ResponseFacet
 	Properties role_parameters = spec.role_parameters;
 	completedUIDs = new HashSet();
 
-	String communityType = 
-	    role_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
+	communityType = 
+	    spec.ca_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
 	managerRole = 
 	    role_parameters.getProperty(MANAGER_ATTRIBUTE);
 
@@ -110,7 +112,7 @@ abstract public class ResponseFacet
 
     public void execute(BlackboardService blackboard)
     {
-	if (!querySub.hasChanged()) return;
+	if (querySub == null || !querySub.hasChanged()) return;
 
 	Enumeration en;
 	// observe added relays
@@ -163,6 +165,7 @@ abstract public class ResponseFacet
     private void sendReply(Fact fact, BlackboardService blackboard)
     {
 	UID queryUID = (UID) fact.getAttribute(UidAttr);
+	String queryCommunity = (String) fact.getAttribute(CommunityAttr);
 	// Pass back response relay
 	UID uid = nextUID();
 	//String s = "Response Matrix";
@@ -177,7 +180,9 @@ abstract public class ResponseFacet
 	    
 	ResponseRelay response = 
 	    new ResponseRelayImpl(uid, getAgentID(), getABA(), 
-				  payload, queryUID, timestamp);
+				  payload, queryUID, 
+				  queryCommunity,
+				  timestamp);
 	    
 	    
 	if (log.isDebugEnabled()) {
@@ -217,7 +222,13 @@ abstract public class ResponseFacet
 	}
 
 	Fact fact = transformQuery(query);
-	getPlayer().factAsserted(fact, this);
+	HashMap updates = new HashMap();
+	updates.put(UidAttr, query.getUID());
+	updates.put(CommunityAttr, query.getCommunity());
+	Fact updated_fact = new Fact(fact, updates);
+	if (log.isDebugEnabled())
+	    log.debug("Updated Fact" +updated_fact.debugString());
+	getPlayer().factAsserted(updated_fact, this);
     }
 
 
@@ -231,7 +242,9 @@ abstract public class ResponseFacet
 	    public boolean execute(Object o) {
 		if (o instanceof QueryRelay) {
 		    QueryRelay relay = (QueryRelay) o;
-		    return acceptQuery(relay);
+		    String queryCommunity = relay.getCommunity();
+		    return queryCommunity.equals(communityType) &&
+			acceptQuery(relay);
 		} else {
 		    return false;
 		}
