@@ -1,5 +1,5 @@
 org.cougaar.message.trafficGenerator.requestPeriod=3000
-#org.cougaar.lib.quo.UseMasking=true
+org.cougaar.lib.quo.UseMasking=true
 org.cougaar.lib.quo.kernel.gui=false
 org.cougaar.message.transport.aspects=org.cougaar.lib.mquo.TrafficMaskAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect
 org.cougaar.message.transport.debug=traffic_masking_generator

@@ -32,7 +32,7 @@ import org.cougaar.core.mts.NameLookupException;
 import org.cougaar.core.mts.UnregisteredNameException;
 import org.cougaar.core.mts.CommFailureException;
 import org.cougaar.core.mts.MisdeliveredMessageException;
-import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
 
 import org.omg.CORBA.ORB;
@@ -213,11 +213,13 @@ public class CorbaLinkProtocol
 	    return CorbaLinkProtocol.class;
 	}
 
-	public boolean retryFailedMessage(Message message, int retryCount) {
+	public boolean retryFailedMessage(AttributedMessage message, 
+					  int retryCount) 
+	{
 	    return true;
 	}
 
-	public int cost (Message message) {
+	public int cost (AttributedMessage message) {
 	    try {
 		cacheRemote();
 		return 1000;
@@ -233,7 +235,7 @@ public class CorbaLinkProtocol
 	}
 
 
-	public void forwardMessage(Message message) 
+	public void forwardMessage(AttributedMessage message) 
 	    throws NameLookupException, 
 		   UnregisteredNameException, 
 		   CommFailureException,

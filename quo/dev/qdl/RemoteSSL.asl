@@ -10,7 +10,7 @@ behavior RemoteSSL ()
   qosket org::cougaar::lib::quo::RemoteSSLDelegateQosket qk;
     
   long org::cougaar::core::mts::DestinationLink::cost
-    (in org::cougaar::core::mts::Message message)
+    (in org::cougaar::core::mts::AttributedMessage message)
     {
       return_value long cost;
       inplaceof METHODCALL {

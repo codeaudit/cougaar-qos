@@ -24,7 +24,7 @@ behavior MTInst ()
 	}
 
     instr::Trace_rec org::cougaar::lib::mquo::MTInstrumented::rerouteMessage
-	(in instr::Trace_rec record,  in org::cougaar::core::mts::Message m)
+	(in instr::Trace_rec record,  in org::cougaar::core::mts::AttributedMessage m)
 	{
 	    extern instr::Trace_rec rec;
 	    extern long length;
@@ -63,8 +63,8 @@ behavior MTInst ()
 
 	    inplaceof METHODCALL {
 		java_code #{
-		    org.cougaar.core.mts.Message msg = 
-			(org.cougaar.core.mts.Message) compressedMessage.getData();
+		    org.cougaar.core.mts.AttributedMessage msg = 
+			(org.cougaar.core.mts.AttributedMessage) compressedMessage.getData();
 		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		}#;
 	    }
@@ -82,8 +82,8 @@ behavior MTInst ()
 	    }
 	    inplaceof METHODCALL {
 		java_code #{
-		    org.cougaar.core.mts.Message msg = 
-			(org.cougaar.core.mts.Message) compressedMessage.getData();
+		    org.cougaar.core.mts.AttributedMessage msg = 
+			(org.cougaar.core.mts.AttributedMessage) compressedMessage.getData();
 		    ((org.cougaar.core.mts.MT) qk.getServer()).rerouteMessage(msg);
 		}#;
 	    }
@@ -98,8 +98,8 @@ behavior MTInst ()
 
 	    inplaceof METHODCALL {
 		java_code #{
-		    org.cougaar.core.mts.Message msg = 
-		      (org.cougaar.core.mts.Message) 
+		    org.cougaar.core.mts.AttributedMessage msg = 
+		      (org.cougaar.core.mts.AttributedMessage) 
 		      org.cougaar.lib.mquo.Zippy.unzip(compressedMessage);
 		    ((org.cougaar.core.mts.MT) 
 		     qk.getServer()).rerouteMessage(msg);
@@ -113,8 +113,8 @@ behavior MTInst ()
 	}
 	inplaceof METHODCALL {
 	    java_code #{
-		org.cougaar.core.mts.Message msg = 
-		    (org.cougaar.core.mts.Message) 
+		org.cougaar.core.mts.AttributedMessage msg = 
+		    (org.cougaar.core.mts.AttributedMessage) 
 		  org.cougaar.lib.mquo.Zippy.fromByteArray(message);
 		((org.cougaar.core.mts.MT) 
 		 qk.getServer()).rerouteMessage(msg);

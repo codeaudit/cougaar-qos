@@ -39,6 +39,7 @@ gen:
 $(jar): $(src) 
 	javac  -d $(classes) $(src)
 	rmic $(rmic_class) -d $(classes)
+	rmic -d $(classes)  org.cougaar.lib.mquo.ZippyTestServerImpl
 	jar cf $(jar) -C $(classes) .
 
 

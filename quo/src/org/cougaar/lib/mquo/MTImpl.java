@@ -21,7 +21,7 @@ import org.cougaar.lib.quo.*;
 
 import org.cougaar.core.mts.MessageDeliverer;
 import org.cougaar.core.mts.MisdeliveredMessageException;
-import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
 
 public class MTImpl extends MTPOA
@@ -40,7 +40,8 @@ public class MTImpl extends MTPOA
     public void rerouteMessage(byte[] message_bytes) 
 	throws CorbaMisdeliveredMessage
     {
-	Message message = (Message) Zippy.fromByteArray(message_bytes);
+	AttributedMessage message = (AttributedMessage) 
+	    Zippy.fromByteArray(message_bytes);
 	try {
 	    deliverer.deliverMessage(message, message.getTarget());
 	} catch (MisdeliveredMessageException ex) {

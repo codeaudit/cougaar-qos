@@ -25,7 +25,7 @@ import org.cougaar.core.mts.MT;
 import org.cougaar.core.mts.MTImpl;
 import org.cougaar.core.mts.SocketFactory;
 import org.cougaar.core.mts.StandardAspect;
-import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
 
 import java.rmi.server.RMISocketFactory;
@@ -52,7 +52,7 @@ public class QuoProxyAspect extends StandardAspect
 	}
 
 	// MT compatibility.  Not used but required.
-	public void rerouteMessage(Message m) 
+	public void rerouteMessage(AttributedMessage m) 
 	    throws java.rmi.RemoteException
 	{
 	    mt.rerouteMessage(m);

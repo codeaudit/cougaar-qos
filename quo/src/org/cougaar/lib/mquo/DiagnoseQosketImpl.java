@@ -34,7 +34,7 @@ public class DiagnoseQosketImpl
 	this.loggingService = loggingService;
     }
 
-    public void runDiagnostic(org.cougaar.core.mts.Message m, 
+    public void runDiagnostic(org.cougaar.core.mts.AttributedMessage m, 
 			      org.cougaar.core.mts.MT remoteObj)
     {
 	try {

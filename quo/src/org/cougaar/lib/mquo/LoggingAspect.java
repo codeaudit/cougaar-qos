@@ -37,7 +37,7 @@ public class LoggingAspect extends StandardAspect
 	    super(delegatee);
 	}
 
-	public void forwardMessage(Message message) 
+	public void forwardMessage(AttributedMessage message) 
 	    throws UnregisteredNameException, 
 		   NameLookupException, 
 		   CommFailureException,

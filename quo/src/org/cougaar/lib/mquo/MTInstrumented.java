@@ -14,14 +14,14 @@ import com.bbn.quo.instr.corba.Trace_rec;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
 
 public interface MTInstrumented extends Remote 
 {
     MessageAddress getMessageAddress() throws RemoteException;
 
-    Trace_rec rerouteMessage(Trace_rec record, Message m) 
+    Trace_rec rerouteMessage(Trace_rec record, AttributedMessage m) 
 	throws RemoteException;
 
 

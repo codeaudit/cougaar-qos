@@ -8,7 +8,7 @@ behavior Logging ()
 {
     remote_object org::cougaar::core::mts::MT remote;
 
-    void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::mts::Message m) {
+    void org::cougaar::core::mts::MT::rerouteMessage(in org::cougaar::core::mts::AttributedMessage m) {
 	inplaceof METHODCALL {
 	  local long long startTime;
 	  startTime = System.currentTimeMillis();

@@ -10,7 +10,7 @@ import org.cougaar.lib.quo.*;
 
 import org.cougaar.core.mts.DestinationLink;
 import org.cougaar.core.mts.SSLRMILinkProtocol;
-import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
 
@@ -43,7 +43,7 @@ public class RemoteSSLQosketImpl
 	this.UseSSL = useSSL;
     }
 
-    public int computeCost(Message message) 
+    public int computeCost(AttributedMessage message) 
     {
 	if (link.getProtocolClass() == SSLRMILinkProtocol.class) {
 	    return 1;

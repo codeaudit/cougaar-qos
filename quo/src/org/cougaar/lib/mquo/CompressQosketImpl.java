@@ -18,7 +18,7 @@ import com.bbn.quo.rmi.SysCond;
 import com.bbn.quo.rmi.DataSC;
 import com.bbn.quo.rmi.impl.RmiUtilities;
 
-import org.cougaar.core.mts.Message;
+import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.service.LoggingService;
 
 import java.rmi.Remote;
@@ -42,7 +42,7 @@ public class CompressQosketImpl
 	this.loggingService = loggingService;
     }
 
-    public void runCompression(Message message)
+    public void runCompression(AttributedMessage message)
     {
 	long startTime = System.currentTimeMillis(); 
 
@@ -63,7 +63,7 @@ public class CompressQosketImpl
 	}
     }
 
-    public void runSerializeAndCompress(Message message)
+    public void runSerializeAndCompress(AttributedMessage message)
     {
 	long startTime = System.currentTimeMillis(); 
 
@@ -82,7 +82,7 @@ public class CompressQosketImpl
 	}
     }
 
-    public void runSerializeOnly(Message message)
+    public void runSerializeOnly(AttributedMessage message)
     {
 	long startTime = System.currentTimeMillis(); 
 

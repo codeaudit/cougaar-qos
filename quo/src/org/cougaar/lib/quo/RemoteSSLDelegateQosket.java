@@ -13,5 +13,5 @@ package org.cougaar.lib.quo;
 
 public interface RemoteSSLDelegateQosket
 {
-  public int computeCost(org.cougaar.core.mts.Message msg);
+  public int computeCost(org.cougaar.core.mts.AttributedMessage msg);
 }

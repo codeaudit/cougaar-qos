@@ -46,7 +46,7 @@ public class MTCompressDelegate_client implements org.cougaar.core.mts.MT {
   final static int COMPRESS__COMPRESS = 0;
   final static int COMPRESS__NORMAL = 1;
 
-  public void rerouteMessage(org.cougaar.core.mts.Message m) throws RemoteException {
+  public void rerouteMessage(org.cougaar.core.mts.AttributedMessage m) throws RemoteException {
     // Default declarations and setup of quo introduced variables local to method:
     int[] quo_curRegs_Compress = null;
     com.bbn.quo.corba.Association[] signal =

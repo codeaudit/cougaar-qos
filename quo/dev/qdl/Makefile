@@ -23,7 +23,7 @@ dl_flags := -rmi
 dl_flags += -ifdef COUGAAR_DL
 dl_flags += $(idl2pkg)
 dl_flags += -idl $(dl_idl)
-dl_flags += -interface org.cougaar.core.mts.Message
+dl_flags += -interface org.cougaar.core.mts.AttributedMessage
 dl_flags += -interface org.cougaar.core.mts.MessageAddress
 dl_flags += -interface java.lang.Class
 dl_flags += -interface java.lang.Object
@@ -37,7 +37,7 @@ mt_flags := -rmi
 mt_flags += -ifdef COUGAAR_MT
 mt_flags += $(idl2pkg)
 mt_flags += -idl $(mt_idl)
-mt_flags += -interface org.cougaar.core.mts.Message
+mt_flags += -interface org.cougaar.core.mts.AttributedMessage
 mt_flags += -interface org.cougaar.core.mts.MessageAddress
 
 
@@ -53,7 +53,7 @@ mt_inst_flags += $(idl2pkg)
 mt_inst_flags += -include "quo.idl"
 mt_inst_flags += -include "quo_instr.idl"
 mt_inst_flags += -idl $(mt_inst_idl)
-mt_inst_flags += -interface org.cougaar.core.mts.Message
+mt_inst_flags += -interface org.cougaar.core.mts.AttributedMessage
 mt_inst_flags += -interface org.cougaar.core.mts.MessageAddress
 mt_inst_flags += -interface org.cougaar.lib.mquo.Zippy
 

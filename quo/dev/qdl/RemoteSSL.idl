@@ -30,7 +30,7 @@ module org {
 		};
 
 		interface RemoteSSLDelegateQosket {
-		    long computeCost(in org::cougaar::core::mts::Message msg);
+		    long computeCost(in org::cougaar::core::mts::AttributedMessage msg);
 		};
 	    };
 	};
