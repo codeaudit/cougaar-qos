@@ -36,7 +36,7 @@ import org.cougaar.core.service.BlackboardService;
  * the methods will be invoked on a Receptacle by a {@link
  * RolePlayer}, with its Blackboard.  Note that, unlike 'Facet' and
  * 'Receptacle', this interface is <i>not</i> analagous to the
- * 'Executor' entity in the CORBA Componeny Model,  But it seemed like
+ * 'Executor' entity in the CORBA Component Model,  But it seemed like
  * a good name anyway.
  */
 public interface BlackboardExecutor
