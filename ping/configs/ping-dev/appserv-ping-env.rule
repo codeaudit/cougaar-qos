@@ -1,0 +1,14 @@
+
+# usually ACME does this:
+
+# tell all nodes where the XML file is located
+society.each_node do |node|
+  node.override_parameter("-Dorg.cougaar.society.file","Ping.xml")
+end
+
+# find the host with the NameServer facet
+
+# tell all nodes where the name server is located
+#society.each_node do |node|
+#  node.override_parameter("-Dorg.cougaar.name.server","HOST1:8888")
+#end

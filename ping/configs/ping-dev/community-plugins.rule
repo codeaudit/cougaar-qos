@@ -1,0 +1,10 @@
+
+# add the community plugin to all agents and node agents
+
+society.each_agent(true) do |agent|
+  unless agent.has_component?('org.cougaar.community.CommunityPlugin')
+    agent.add_component('org.cougaar.community.CommunityPlugin') do |c|
+      c.classname = 'org.cougaar.community.CommunityPlugin'
+    end
+  end
+end

@@ -1,0 +1,19 @@
+######################################
+# Set the WP and MTS polling parameters to startup quickly
+# These setting will work well for small socities such as ping,
+# but may not work will for a large society.
+
+society.each_node do |node|
+ node.override_parameter(
+   "-Dorg.cougaar.core.wp.server.successTTD",90000)
+ node.override_parameter(
+   "-Dorg.cougaar.core.wp.server.failTTD",1000 )
+ node.override_parameter(
+   "-Dorg.cougaar.core.wp.resolver.rmi.minLookup",500)
+ node.override_parameter(
+   "-Dorg.cougaar.core.wp.resolver.rmi.maxLookup",2000 )
+ node.override_parameter(
+   "-Dorg.cougaar.core.mts.destq.retry.initialTimeout",250 )
+ node.override_parameter(
+   "-Dorg.cougaar.core.mts.destq.retry.maxTimeout",666 )
+end

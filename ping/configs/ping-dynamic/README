@@ -1,0 +1,50 @@
+#######
+#
+# READEME for dynamic ping society configuration
+# Resides in BBNCommons overlay in $CIP/configs/ping-dynamic/
+#######
+
+Included files: 
+this README
+Empty.xml
+CollectPingStats.rb
+PingSocietyBuilderUtils.rb
+scripting.rb
+RunMiniPingActions.rb
+
+Description & Operation: 
+This collection of files will allow one to specify a miniping society at run-time, from one of three
+standard configurations, allowing the user to also specify the number of agents/nodes in the society. 
+To do this, the user must uncomment one of the ping-builder actions in the RunMiniPingActions.rb:
+
+  #do_action "CreateOneToOnePing", 3
+  #do_action "CreateSrcToMultSinkPing", 3
+  #do_action "CreateMultSrcToSinkPing", 3
+
+
+The configuration options are:
+
+1. CreateOneToOnePing - Like the name insinuates, this is a pair-wise configuration, (src-to-sink), where all pingers(srcs) reside
+on one node and host, and all the pingees(sinks) reside on a separate single node/host.
+The argument to the action is the number of pairs of srcs&sinks. 
+
+2. CreateSrcToMultSinkPing - Creates multiple sinks to one src in the society configuration. The src resides on one node on one host, 
+while the multiple sinks reside on separate nodes on another host. The argument to the action is the number of sinks desired in configuration.
+
+3. CreateMultSrcToSinkPing - Similar named action to create multiple srcs to one sink the society configuration. The srcs reside on distinct
+nodes on one host, while the one sink resides on it's own node on a separate host. The argument to the action is the number of srcs desired 
+in the configuration. 
+
+To Run:
+move RunMiniPingActions.rb from $CIP/configs/ping-dynamic/ to $CIP/csmart/scripts
+cd to $CIP/csmart/scripts/
+run with $ruby RunMiniPingActions.rb
+
+Notes on configuration: 
+Currently the specification of multiple hosts is not implemented.  The nameserver node is specified in a the createPingManager rule 
+$PING_HOME. This is meant to create a manager node for the ping society, and assign it as the nameserver. If this rule is not applied, 
+the nameserver will be assigned randomly. 
+
+To Add Additional Configuration: 
+Include your rules in the TransformSociety action, add a similar rule to add another manager node/agent, assigning any facets
+or roles you wish. 
