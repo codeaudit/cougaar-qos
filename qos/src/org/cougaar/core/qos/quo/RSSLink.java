@@ -10,7 +10,7 @@ import com.bbn.quo.data.RSS;
 
 import org.cougaar.core.mts.RMIMessageTransport;
 import org.cougaar.core.society.MessageAddress;
-import org.cougaar.core.society.NameSupport;
+import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
 
 import java.rmi.Remote;
