@@ -50,6 +50,8 @@ class AgentHostUpdaterServiceProvider implements ServiceProvider
 	    sb.getService(this, ThreadService.class, null);
 	threadService.schedule(updater, 0, PERIOD);
 
+	sb.addService(AgentHostUpdater.class, this);
+
     }
 
     public Object getService(ServiceBroker sb, 
