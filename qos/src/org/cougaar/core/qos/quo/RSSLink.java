@@ -46,7 +46,7 @@ import java.util.Observable;
 
 public class RSSLink extends ResourceMonitorServiceImpl
 {
-    private static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
+    public static final String RSS_PROPFILE = "org.cougaar.rss.propfile";
     private static final int PERIOD = 5000;
 
     private Timer timer = new Timer(true);
@@ -121,13 +121,6 @@ public class RSSLink extends ResourceMonitorServiceImpl
 	String propfile = System.getProperty(RSS_PROPFILE);
 	rss = RSS.makeInstance(propfile);
 	kernel = Utils.getKernel();
-	if (Boolean.getBoolean("org.cougaar.lib.quo.kernel.gui")) {
-	    try {
-		kernel.newFrame();
-	    } catch (java.rmi.RemoteException ex) {
-		ex.printStackTrace();
-	    }
-	}
     }
 
 

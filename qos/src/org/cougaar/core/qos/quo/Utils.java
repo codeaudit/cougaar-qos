@@ -13,9 +13,9 @@ public class Utils
 {
 
 
-    public static QuoKernel getKernel() {
+    public synchronized static QuoKernel getKernel() {
 	java.util.Properties props = new java.util.Properties();
-	String kconf = System.getProperty("org.cougaar.lib.quo.kernel.config");
+	String kconf = System.getProperty(RSSLink.RSS_PROPFILE);
 	if (kconf != null) {
 	    try {
 		java.io.InputStream is = 
@@ -23,8 +23,7 @@ public class Utils
 		props.load(is);
 		is.close();
 	    } catch (Exception e) {
-		System.err.println("Error loading kernel properties from " + 
-				   kconf + ": " + e);
+		e.printStackTrace();
 	    }
 	}
 	props.put("EvaluatorThread", "false");
