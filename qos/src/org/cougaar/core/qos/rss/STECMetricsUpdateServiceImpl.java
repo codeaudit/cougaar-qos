@@ -77,7 +77,7 @@ public class STECMetricsUpdateServiceImpl
 	    channel = makeChannel(id);
 
 	    StatusSupplierSysStat sysstat =
-		new StatusSupplierSysStat(channel, 1000);
+		new StatusSupplierSysStat(channel, 3000);
 	    Thread sysstatThread = new Thread(sysstat, "SysStat");
 	    sysstatThread.start();
 
