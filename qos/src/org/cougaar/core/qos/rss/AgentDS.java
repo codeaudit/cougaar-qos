@@ -24,7 +24,9 @@ package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.qos.monitor.QosMonitorService;
+import org.cougaar.core.service.TopologyEntry;
+import org.cougaar.core.service.TopologyReaderService;
+
 
 import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
@@ -46,10 +48,11 @@ public class AgentDS extends DataScope
     // preferred parent.
     protected DataScope preferredParent(RSS root) {
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	QosMonitorService qms = (QosMonitorService)
-	    sb.getService(this, QosMonitorService.class, null);
+	TopologyReaderService svc = (TopologyReaderService)
+	    sb.getService(this,TopologyReaderService.class, null);
 	String agentname = (String) getSymbolValue(AGENTNAME);
-	String node = qms.getNodeForAgent(new MessageAddress(agentname));
+	TopologyEntry entry = svc.getEntryForAgent(agentname);
+        String node = entry != null ? entry.getNode() : null;
 
 	// What do we do if the node isn't known?
 	if (node == null) {

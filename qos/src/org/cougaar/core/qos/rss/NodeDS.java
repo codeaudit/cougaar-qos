@@ -23,11 +23,16 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.monitor.QosMonitorService;
+import org.cougaar.core.service.TopologyEntry;
+import org.cougaar.core.service.TopologyReaderService;
+
 
 import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.RSS;
+
+import java.util.Iterator;
+import java.util.Set;
 
 public class NodeDS extends DataScope
 {
@@ -45,10 +50,12 @@ public class NodeDS extends DataScope
     // preferred parent.
     protected DataScope preferredParent(RSS root) {
 	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	QosMonitorService qms = (QosMonitorService)
-	    sb.getService(this, QosMonitorService.class, null);
+	TopologyReaderService svc = (TopologyReaderService)
+	    sb.getService(this,TopologyReaderService.class, null);
 	String nodename = (String) getSymbolValue(NODENAME);
-	String host = qms.getHostForNode(nodename);
+	String host = svc.getParentForChild(TopologyReaderService.HOST, 
+					    TopologyReaderService.NODE, 
+					    nodename);
 
 	// What do we do if the host isn't known?
 	if (host == null) {
