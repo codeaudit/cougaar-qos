@@ -33,12 +33,11 @@ import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
 
-/**
- * Simple tester for FrameSets
- */
-public class FrameSetSubscriberPlugin
-    extends ParameterizedPlugin
+
+abstract public class FrameToFactFacetImpl
+    extends FacetImpl
 {
+
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
 		return (o instanceof Frame);
@@ -47,26 +46,33 @@ public class FrameSetSubscriberPlugin
     private IncrementalSubscription sub;
     private LoggingService log;
 
-    public void load()
+    protected FrameToFactFacetImpl(CoordinationArtifact owner,
+				   ServiceBroker sb,
+				   ConnectionSpec spec, 
+				   RolePlayer player)
     {
-	super.load();
-
-	ServiceBroker sb = getServiceBroker();
-
+	super(owner, sb, spec, player);
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
     }
 
+    abstract protected Object frame2Fact(Frame frame);
 
+    public void setupSubscriptions(BlackboardService bbs) 
+    {
+	sub = (IncrementalSubscription)
+	    bbs.subscribe(framePred);
+    }
 
-    // plugin
-    protected void execute()
+    public void execute(BlackboardService bbs)
     {
 	if (sub == null || !sub.hasChanged()) {
 	    if (log.isDebugEnabled())
 		log.debug("No Frame changes");
 	    return;
 	}
+
+	RolePlayer player = getPlayer();
 
 	java.util.Enumeration en;
 		
@@ -76,7 +82,8 @@ public class FrameSetSubscriberPlugin
 	    Frame frame = (Frame) en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed added b"+frame);
-	    }		    
+	    }
+	    player.assertFact(frame2Fact(frame));
 	}
 		
 		
@@ -87,6 +94,7 @@ public class FrameSetSubscriberPlugin
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed changed "+frame);
 	    }
+	    player.assertFact(frame2Fact(frame));
 	}
 		
 	// removed relays
@@ -99,16 +107,4 @@ public class FrameSetSubscriberPlugin
 	}
     }
 
-    
-
-    protected void setupSubscriptions() 
-    {
-	BlackboardService bbs = getBlackboardService();
-	sub = (IncrementalSubscription)
-	    blackboard.subscribe(framePred);
-    }
-
-
-
 }
-
