@@ -1,14 +1,10 @@
-COUGAARJAR=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_SRC_PATH}/util/newutil.jar
+core=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
+rss=${COUGAAR_SRC_PATH}/quo/dev/3rdparty/quoSumo.jar
 
-COUGAAR3RDPARTY=${COUGAAR_SRC_PATH}/quo/dev/3rdparty
-
-CLASSPATH=${COUGAARJAR}:${COUGAAR3RDPARTY}/quoSumo.jar
-#CLASSPATH=${COUGAAR_INSTALL_PATH}/lib/core.jar:${QUO_ROOT}/lib/quoSumo.jar
-
+CLASSPATH=$(core):$(rss)
 export CLASSPATH
-pathdir=org/cougaar/core/qos/rss
-srcdir=src/$(pathdir)
-src=$(srcdir)/*.java
+
+src=$(shell find src -name '*.java')
 
 jar=newqos.jar
 

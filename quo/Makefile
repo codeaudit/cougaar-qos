@@ -1,10 +1,9 @@
+src=$(shell find .  -name "*.java")
 classes=.classes
 jar=newquo.jar
-cougaar=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_SRC_PATH}/util/newutil.jar:${COUGAAR_INSTALL_PATH}/lib/planning.jar
+core=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_INSTALL_PATH}/lib/util.jar
 qos=${COUGAAR_SRC_PATH}/qos/newqos.jar
-src=$(shell find .  -name "*.java")
-thirdparty=dev/3rdparty
-depends=$(thirdparty)/quoSumo.jar
+quo=dev/3rdparty/quoSumo.jar
 
 
 # for rmic
@@ -12,7 +11,7 @@ pathdir=org/cougaar/lib/mquo
 srcdir=src/$(pathdir)
 
 
-CLASSPATH=$(cougaar):$(qos):$(depends):$(classes)
+CLASSPATH=$(core):$(qos):$(quo):$(classes)
 export CLASSPATH
 
 
@@ -28,9 +27,9 @@ compile: $(src)
 
 # Developers do this
 
-developers: gen $(jar)
+developers:  $(jar)
 
-gen:
+$(classes):
 	mkdir -p $(classes)
 
 
@@ -42,7 +41,7 @@ $(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
 	mv $(pathdir)/*.java $(srcdir)
 
 
-$(jar): $(src) 
+$(jar): $(classes) $(src) 
 	javac -deprecation -d $(classes) $(src)
 	jar cf $(jar) -C $(classes) .
 
