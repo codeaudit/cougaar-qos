@@ -1,11 +1,10 @@
 classes=.classes
 jar=newquo.jar
-#cougaar=${COUGAAR_INSTALL_PATH}/lib/core.jar
 cougaar=${COUGAAR_SRC_PATH}/core/newcore.jar:${COUGAAR_SRC_PATH}/util/newutil.jar:${COUGAAR_INSTALL_PATH}/lib/planning.jar
 qos=${COUGAAR_SRC_PATH}/qos/newqos.jar
 src=$(shell find .  -name "*.java")
 thirdparty=dev/3rdparty
-depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoRSS.jar:$(thirdparty)/jacorb.jar
+depends=$(thirdparty)/quoSumo.jar
 
 
 # for rmic
