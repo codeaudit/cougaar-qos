@@ -194,7 +194,8 @@ public class AgentDS
 	    if (alarmTime > sendTime) {
 		elapsed = (long) Math.floor((alarmTime-sendTime)/1000.0);
 	    }
-	    return new DataValue(elapsed, vals.minCredibility());
+	    return new DataValue(elapsed, vals.minCredibility(),
+				 "seconds", "unknown");
 	}
 
 	
