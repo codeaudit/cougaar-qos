@@ -9,7 +9,7 @@ export COUGAAR3RDPARTY
 
 newcore=${COUGAAR_SRC_PATH}/core/src/org/cougaar/core/newcore.jar
 newquo=${COUGAAR_SRC_PATH}/quo/newquo.jar
-newqos=${COUGAAR_SRC_PATH}/qos/src/org/cougaar/core/qos.jar
+newqos=${COUGAAR_SRC_PATH}/qos/newqos.jar
 #perf=${COUGAAR_SRC_PATH}/glm/src/performance.jar
 
 #Putting perf-jar temporarily perf-society.jar
