@@ -42,6 +42,7 @@ import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
 import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
+import org.cougaar.core.qos.metrics.VariableEvaluator;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
@@ -52,6 +53,8 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Timer;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * The implementation of MetricsService, and a child component of
@@ -196,8 +199,44 @@ public class RSSMetricsServiceImpl
 	}
     }
 
+
+    private String evaluateVariables(String path, VariableEvaluator eval) {
+	if (eval == null) return path;
+
+	StringBuffer buf = new StringBuffer();
+	Pattern pattern = Pattern.compile("\\$\\([^\\)]*\\)");
+	Matcher matcher = pattern.matcher(path);
+	while (matcher.find()) {
+	    String match = matcher.group();
+	    String var = match.substring(2, match.length()-1);
+	    String val = eval.evaluateVariable(var);
+	    matcher.appendReplacement(buf, val);
+	}
+	matcher.appendTail(buf);
+
+	return buf.toString();
+    }
+
     // Metric Service
     public Metric getValue(String path) {
+	return getValue(path, null, null);
+    }
+
+    public Metric getValue(String path, Properties qos_tags) {
+	return getValue(path, null,  qos_tags);
+    }
+
+    public Metric getValue(String path, VariableEvaluator evaluator) {
+	return getValue(path, evaluator, null);
+    }
+
+
+    // Qos properties not supported yet
+    public Metric getValue(String path, 
+			   VariableEvaluator evaluator,
+			   Properties qos_tags) 
+    {
+	path = evaluateVariables(path, evaluator);
 	Object rawValue = RSSUtils.getPathValue(path);
 	
 	if (rawValue == null) {
@@ -211,22 +250,35 @@ public class RSSMetricsServiceImpl
 			       " for path " + path);
 	    return null;
 	}
-
     }
 
-    public Metric getValue(String path, Properties qos_tags) {
-	// TO BE DONE
-	return getValue(path);
-    }
+
 
     public Object subscribeToValue(String path, Observer observer) {
-	return subscribeToValue(path, observer, null);
+	return subscribeToValue(path, observer, null, null);
+    }
+
+    public Object subscribeToValue(String path, 
+				   Observer observer,
+				   VariableEvaluator evaluator)
+    {
+	return subscribeToValue(path, observer, evaluator, null);
     }
 
     public Object subscribeToValue(String path, 
 				   Observer observer,
 				   MetricNotificationQualifier qualifier) 
     {
+	return subscribeToValue(path, observer, null, qualifier);
+    }
+
+
+    public Object subscribeToValue(String path, 
+				   Observer observer,
+				   VariableEvaluator evaluator,
+				   MetricNotificationQualifier qualifier)
+    {
+	path = evaluateVariables(path, evaluator);
 	try {
 	    Qualifier qual = 
 		qualifier == null ? null : new Qualifier(qualifier);
@@ -242,7 +294,10 @@ public class RSSMetricsServiceImpl
 	    loggingService.error(path+ " is not valid");
 	    return null;
 	}
+
     }
+
+
 
     public void unsubscribeToValue(Object key) {
 	DataValueObserver obs = (DataValueObserver) key;
