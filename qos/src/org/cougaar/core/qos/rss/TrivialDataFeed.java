@@ -34,6 +34,10 @@ import com.bbn.rss.DataValue;
 import com.bbn.rss.SimpleQueueingDataFeed;
 
 
+/**
+ * This entity implements a simple RSS DataFeed and is used by the
+ * {@link RSSMetricsUpdateServiceImpl} to push data into the RSS.
+ */
 public class TrivialDataFeed 
     extends SimpleQueueingDataFeed
 {

@@ -63,9 +63,9 @@ import com.bbn.rss.SitesDB;
 import com.bbn.ResourceStatus.ResourceNode;
 
 /**
- * The implementation of MetricsService, and a child component of
- * MetricsServiceProvider.  This implementation uses the RSS for data
- * lookup.
+ * This Component is an implementation of MetricsService that uses the
+ * RSS for data lookup.  Instantiated by and as child component of the
+ * {@link RSSMetricsServiceProvider}.
  *
  * @property org.cougaar.metrics.properties The name of an RSS config
  * file.

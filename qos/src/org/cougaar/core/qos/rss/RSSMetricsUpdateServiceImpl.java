@@ -37,8 +37,9 @@ import org.cougaar.core.qos.metrics.QosComponent;
 import com.bbn.rss.sysstat.DirectSysStatSupplier;
 
 /**
- * The implementation of MetricsUpdateService, and a child component
- * of MetricsServiceProvider.  This implementation uses the RSS.
+ * This Component is an implementation of MetricsUpdateService that
+ * uses the RSS.  Instantiated by and as child component of the {@link
+ * RSSMetricsServiceProvider}.
  *
  * @property org.cougaar.metrics.probes If provided, this should be a
  * comma-separated list of host probes, as understood by the QuO

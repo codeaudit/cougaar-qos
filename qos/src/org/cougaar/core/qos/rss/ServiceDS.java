@@ -39,6 +39,13 @@ import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
 import com.bbn.ResourceStatus.ResourceNode;
 
+/**
+ * This RSS ResourcContext represents ???? Its parent in the RSS
+ * hierarchy tree is a Node.  It's identified by the name of the
+ * service and defines two local formulas for CPU load.
+ *
+ * @see NodeDS
+ */
 public class ServiceDS 
     extends CougaarDS
 {

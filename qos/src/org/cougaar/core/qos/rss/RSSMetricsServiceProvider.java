@@ -40,6 +40,17 @@ import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.thread.ThreadServiceProvider;
 
+/**
+ * This Component/Container provides the RSS-based implementation of
+ * the MetricsService and MetricsUpdateService, and instantiates the
+ * implementations, RSSMetricsServiceImpl and
+ * RSSMetricsUpdateServiceImpl respectively, as child Components.
+ * 
+ * @see MetricsService
+ * @see MetricsUpdateService
+ * @see RSSMetricsServiceImpl
+ * @see RSSMetricsUpdateServiceImpl
+ */
 public final class RSSMetricsServiceProvider
     extends ContainerSupport
     implements ServiceProvider
