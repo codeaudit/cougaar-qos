@@ -33,7 +33,7 @@ import org.cougaar.core.util.UID;
 public class PrototypeFrame
     extends Frame
 {
-    private String prototype_name;
+    private final String prototype_name;
 
     PrototypeFrame(FrameSet frameSet, String prototype_name,
 		   String parent, UID uid, Properties properties)

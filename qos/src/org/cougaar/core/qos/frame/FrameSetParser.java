@@ -169,27 +169,30 @@ public class FrameSetParser
 
     private void startFrameset(Attributes attrs)
     {
-	String kind = attrs.getValue("kind");
-	if (!kind.equals("single-inheritance")) {
+	if (log.isDebugEnabled())
+	    log.debug("startFrameset");
+
+	String inheritance = attrs.getValue("frame-inheritance");
+	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
 	String name = attrs.getValue("name");
-	String relation_name = attrs.getValue("parent-relation");
-	String parent_kind = attrs.getValue("parent-kind");
+	String relation_name = attrs.getValue("frame-inheritance-relation");
+	String parent_proto = attrs.getValue("parent-prototype");
 	String parent_slot = attrs.getValue("parent-slot");
 	String parent_value = attrs.getValue("parent-value");
-	String child_kind = attrs.getValue("child-kind");
+	String child_proto = attrs.getValue("child-prototype");
 	String child_slot = attrs.getValue("child-slot");
 	String child_value = attrs.getValue("child-value");
 
 	frame_set = new SingleInheritanceFrameSet(sb, bbs,
 						  name,
 						  relation_name,
-						  parent_kind,
+						  parent_proto,
 						  parent_slot,
 						  parent_value,
-						  child_kind,
+						  child_proto,
 						  child_slot,
 						  child_value);
     }
@@ -197,31 +200,46 @@ public class FrameSetParser
 
     private void startPrototype(Attributes attrs)
     {
-	String kind = attrs.getValue("name");
+	if (log.isDebugEnabled())
+	    log.debug("startPrototype");
+
+	String name = attrs.getValue("name");
 	String parent = attrs.getValue("prototype");
-	frame_spec = new FrameSpec(kind, parent);
+	frame_spec = new FrameSpec(name, parent);
     }
 
     private void endPrototype()
     {
+	if (log.isDebugEnabled())
+	    log.debug("endPrototype");
+
 	frame_spec.makePrototype(frame_set);
 	frame_spec = null;
     }
 
     private void startFrame(Attributes attrs)
     {
-	String kind = attrs.getValue("prototype");
-	frame_spec = new FrameSpec(kind, null);
+	if (log.isDebugEnabled())
+	    log.debug("startFrame");
+
+	String prototype = attrs.getValue("prototype");
+	frame_spec = new FrameSpec(prototype, null);
     }
 
     private void endFrame()
     {
+	if (log.isDebugEnabled())
+	    log.debug("endFrame");
+
 	frame_spec.makeFrame(frame_set);
 	frame_spec = null;
     }
 
     private void attribute(Attributes attrs)
     {
+	if (log.isDebugEnabled())
+	    log.debug("attribute");
+
 	String attr = attrs.getValue("name");
 	String value = attrs.getValue("value");
 	frame_spec.put(attr, value);
