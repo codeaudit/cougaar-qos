@@ -47,6 +47,9 @@ import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Observable;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttributes;
 
 
 public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
@@ -65,7 +68,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
     private Timer timer = new Timer(true);
     private RSS rss;
     private QuoKernel kernel;
-    private HashMap updaters = new HashMap();
+    private AgentHostUpdater updater;
     private HashMap jipsSysconds = new HashMap();
     private HashMap effectiveJipsSysconds = new HashMap();
     private HashMap bandwidthSysconds = new HashMap();
@@ -75,11 +78,13 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
     abstract private class AgentHostUpdaterListener 
     {
 	protected SysCond syscond;
+	private MessageAddress agentAddress;
 
 	AgentHostUpdaterListener(SysCond syscond, MessageAddress address)
 	{
 	    this.syscond = syscond;
-	    getUpdater(address).addListener(this);
+	    this.agentAddress = address;
+	    updater.addListener(this, address);
 	}
 
 	abstract protected void updateHost(String host)
@@ -162,40 +167,80 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
     private class AgentHostUpdater 
 	extends TimerTask 
     {
-	private MessageAddress agent;
-	private String host;
-	private ArrayList listeners;
+	private HashMap listeners;
+	private HashMap hosts;
 
-	AgentHostUpdater(MessageAddress agent) {
-	    this.agent = agent;
-	    this.listeners = new ArrayList();
+	AgentHostUpdater() {
+	    this.listeners = new HashMap();
+	    this.hosts = new HashMap();
 	}
 
-	public void addListener(AgentHostUpdaterListener listener) {
-	    listeners.add(listener);
+	public synchronized void addListener(AgentHostUpdaterListener listener,
+					     MessageAddress agent) 
+	{
+	    ArrayList agentListeners = (ArrayList) listeners.get(agent);
+	    if (agentListeners == null) {
+		agentListeners = new ArrayList();
+		listeners.put(agent, agentListeners);
+	    }
+	    agentListeners.add(listener);
+	    String host = (String) hosts.get(agent);
 	    if (host != null) listener.newHost(host);
 	}
 
-	public void removeListener(AgentHostUpdaterListener listener) {
-	    listeners.remove(listener);
+	public synchronized void removeListener(AgentHostUpdaterListener listener,
+						MessageAddress agent) 
+	{
+	    ArrayList agentListeners = (ArrayList) listeners.get(agent);
+	    if (agentListeners != null) {
+		agentListeners.remove(listener);
+	    }
 	}
 
 	public void run() {
-	    String new_host = getHostForAgent(agent);
-	    if (new_host == null) return;
-	    if (host == null || !host.equals(new_host)) {
-		host = new_host;
-		if (Debug.debug(RMS))
-		    System.out.println("===== New host " + host +
-				       " for agent " + agent);
-		Iterator itr = listeners.iterator();
-		while (itr.hasNext()) {
-		    AgentHostUpdaterListener listener =
-			(AgentHostUpdaterListener) itr.next();
-		    listener.newHost(host);
+	    Attributes match = 
+		new BasicAttributes(NameSupport.STATUS_ATTR, 
+				    NameSupport.REGISTERED_STATUS);
+	    String[] attr =  { NameSupport.AGENT_ATTR, NameSupport.HOST_ATTR };
+	    Iterator itr = nameSupport.lookupInTopology(match, attr);
+	    while (itr.hasNext()) {
+		Attributes pair = (Attributes) itr.next();
+		if (pair != null) {
+		    Attribute new_host_attr = pair.get(NameSupport.HOST_ATTR);
+		    Attribute agent_attr = pair.get(NameSupport.AGENT_ATTR);
+		    if (new_host_attr == null || agent_attr == null) continue;
+		    String new_host = null;
+		    MessageAddress agent = null;
+
+		    try {
+			new_host = (String) new_host_attr.get();
+			agent = (MessageAddress) agent_attr.get();
+		    } catch (javax.naming.NamingException name_ex) {
+			name_ex.printStackTrace();
+			continue;
+		    }
+
+		    String host = (String) hosts.get(agent);
+
+		    if (host == null || !host.equals(new_host)) {
+			hosts.put(agent, new_host);
+			if (Debug.debug(RMS))
+			    System.out.println("===== New host " + new_host +
+					       " for agent " + agent);
+			ArrayList agentListeners = (ArrayList) listeners.get(agent);
+			if (agentListeners == null) continue;
+
+			Iterator litr = agentListeners.iterator();
+			while (litr.hasNext()) {
+			    AgentHostUpdaterListener listener =
+				(AgentHostUpdaterListener) litr.next();
+			    listener.newHost(new_host);
+			}
+		    }
 		}
 	    }
 	}
+
     }
 
 	    
@@ -204,19 +249,11 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 	String propfile = System.getProperty(RSS_PROPFILE);
 	rss = RSS.makeInstance(propfile);
 	kernel = Utils.getKernel();
+	updater = new AgentHostUpdater();
+	timer.schedule(updater, 0, PERIOD);
     }
 
 
-    private synchronized AgentHostUpdater getUpdater(MessageAddress address)
-    {
-	AgentHostUpdater updater = (AgentHostUpdater) updaters.get(address);
-	if (updater == null) {
-	    updater = new AgentHostUpdater(address);
-	    updaters.put(address, updater);
-	    timer.schedule(updater, 0, PERIOD);
-	}
-	return updater;
-    }
 
     private DataFormula jips(MessageAddress agentAddress) {
 	String host = getHostForAgent(agentAddress);
