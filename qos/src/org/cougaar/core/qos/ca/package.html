@@ -16,16 +16,15 @@
   types etc.
 
 <p> A CoordinationArtifactTemplate defines a set of <i>Roles</i> that
-  define the functions performed by each client.  For example in
+  describe the functions performed by each client.  For example in
   Artifacts that implement a multicast request (one request, multiple
   replies), the two Roles are queryer and responder.  Every Role has a
   corresponding interface that specifies the operations that can be
   performed on the Artifact by clients playing that Role.  These
   interfaces are therefore very much like <i>Facets</i> in the CORBA
   Component Model: they present a Role-specific viewport into the
-  Artifact as a whole.  An Artifact also defines a set of parameters
-  that, for kind of Artifact, distinguish the individuals of that kind
-  from one another.
+  Artifact as a whole.  A Template also defines a set of parameters
+  that distinguish the individuals of that kind of Artifact.
 
 <p>An instance of a CoordinationArtifactTemplate is something like a
   Java class: it defines a <i>kind</i> of Artifact, in terms of its

@@ -77,7 +77,8 @@ public interface Facet
 
     /**
      * Handle blackboard subscriptions.  This should be run in a
-     * blackboard transaction.  Usually invoked by the FacetProvider.
+     * blackboard transaction.  Usually invoked by the {@link
+     * CoordinationArtifact} that owns the Facet.
     */
     public void setupSubscriptions(BlackboardService blackboard);
 
