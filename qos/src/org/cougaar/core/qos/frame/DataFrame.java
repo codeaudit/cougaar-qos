@@ -36,7 +36,7 @@ public class DataFrame
     public DataFrame(FrameSet frameSet, 
 		     String kind, 
 		     UID uid, 
-			Properties properties)
+		     Properties properties)
     {
 	super(frameSet, kind, uid, properties);
     }
