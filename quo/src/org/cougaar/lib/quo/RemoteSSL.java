@@ -54,8 +54,8 @@ public class RemoteSSL extends com.bbn.quo.rmi.impl.ContractImpl
     com.bbn.quo.rmi.impl.SysCond  servant1 = com.bbn.quo.rmi.impl.SysCond.lookup(scParams[1]);
     com.bbn.quo.rmi.impl.SysCond  servant2 = com.bbn.quo.rmi.impl.SysCond.lookup(scParams[2]);
 
-    com.bbn.quo.rmi.ExpectedCapacitySCTie tsc0 = (com.bbn.quo.rmi.ExpectedCapacitySCTie) servant0;
-    com.bbn.quo.data.ExpectedCapacitySCImpl BandwidthSC = (com.bbn.quo.data.ExpectedCapacitySCImpl) tsc0._delegate();
+    com.bbn.quo.rmi.ExpectedBandwidthSCTie tsc0 = (com.bbn.quo.rmi.ExpectedBandwidthSCTie) servant0;
+    com.bbn.quo.data.ExpectedBandwidthSCImpl BandwidthSC = (com.bbn.quo.data.ExpectedBandwidthSCImpl) tsc0._delegate();
     syscond_objs[0] = BandwidthSC;
     PrimitiveSF BandwidthSF =
       new PrimitiveSF(BandwidthSC);

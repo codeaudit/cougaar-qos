@@ -27,6 +27,7 @@ import org.cougaar.core.society.TrustStatusService;
 import org.cougaar.core.society.TrustStatusServiceImpl;
 import org.cougaar.core.mts.MessageTransportRegistry;
 import org.cougaar.core.mts.StandardAspect;
+import org.cougaar.core.mts.TrafficMaskingGeneratorService;
 import org.cougaar.core.qos.quo.Utils;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
@@ -50,6 +51,7 @@ public class TrafficMaskAspect extends StandardAspect
     private ResourceMonitorService rms;
     private QosMonitorService qms;
     private TrustStatusService tss;
+    private TrafficMaskingGeneratorService tmgs;
     private String local_host;
     private Timer timer = new Timer(true);
     private boolean inited = false;
@@ -143,11 +145,13 @@ public class TrafficMaskAspect extends StandardAspect
 	    }
 
 	    public void turnOn() {
+		tmgs.setRequestParameters(destination, 1000, 1000);
 		System.err.println(destination + " masking on");
 	    }
 
 
 	    public void turnOff() {
+		tmgs.setRequestParameters(destination, -1, 0);
 		System.err.println(destination + " masking off");
 	    }
 	
@@ -245,6 +249,19 @@ public class TrafficMaskAspect extends StandardAspect
 	    }
 	}
 
+
+	if (tmgs == null) {
+	    System.out.println("%%% Looking for TMGS from " + sb);
+	    Object svc = 
+		sb.getService(this, TrafficMaskingGeneratorService.class, null);
+	    if (svc == null) {
+		System.err.println("### Can't find TrafficMaskingGeneratorService");
+	    } else {
+		tmgs = (TrafficMaskingGeneratorService) svc;
+		System.out.println("%%% Got TrafficMaskingGeneratorService!");
+	    }
+	}
+
 	if (rms == null) {
 	    System.out.println("%%% Looking for RMS");
 	    Object svc = 
@@ -268,7 +285,7 @@ public class TrafficMaskAspect extends StandardAspect
 	    }
 	}
 
-	if (rms != null && qms != null && tss != null) {
+	if (rms != null && qms != null && tss != null && tmgs != null) {
 	    inited = true;
 	}
     }

@@ -79,7 +79,7 @@ public class RemoteSSLQosketImpl
 	MessageAddress destination = link.getDestination();
 	UseSSL = Get_USE_SSL(kernel);
 	Bandwidth = 
-	    (ExpectedCapacitySC) rms.getExpectedCapacityForAgentSyscond(destination);
+	    (ExpectedBandwidthSC) rms.getExpectedBandwidthForAgentSyscond(destination);
     }
 
 }
