@@ -130,7 +130,7 @@ public class FrameSetParser
 
 
 
-    private SingleInheritanceFrameSet frame_set;
+    private FrameSet frame_set;
     private FrameSpec frame_spec;
     private PathSpec path_spec;
     HashMap path_specs;
@@ -148,8 +148,25 @@ public class FrameSetParser
 	path_specs = new HashMap();
     }
 
+    public FrameSet parseFrameSetFiles(String[] xml_filenames)
+    {
+	if (xml_filenames == null || xml_filenames.length == 0)  return null;
+
+	FrameSet fset = parseFrameSetFile(xml_filenames[0], null);
+	for (int i=1; i<xml_filenames.length; i++)
+	    parseFrameSetFile(xml_filenames[i], fset);
+	return fset;
+    }
+
     public FrameSet parseFrameSetFile(String xml_filename)
     {
+	return parseFrameSetFile(xml_filename, null);
+    }
+
+    public FrameSet parseFrameSetFile(String xml_filename,
+				      FrameSet frameSet)
+    {
+	this.frame_set = frameSet;
 	File xml_file = ConfigFinder.getInstance().locateFile(xml_filename);
 	if (xml_file == null) {
 	    if (log.isWarnEnabled())
@@ -221,13 +238,23 @@ public class FrameSetParser
     {
 	if (log.isDebugEnabled())
 	    log.debug("startFrameset");
+	
+	String name = attrs.getValue("name");
+
+	if (frame_set != null) {
+	    // add to existing set, as long as the name is the same
+	    if (!name.equals(frame_set.getName())) {
+		log.warn("Loading into FrameSet " +frame_set.getName()+
+			 " not FrameSet " +name+ "!");
+	    }
+	    return;
+	}
 
 	String inheritance = attrs.getValue("frame-inheritance");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	String name = attrs.getValue("name");
 	String relation_name = attrs.getValue("frame-inheritance-relation");
 	String parent_proto = attrs.getValue("parent-prototype");
 	String parent_slot = attrs.getValue("parent-slot");
@@ -339,7 +366,7 @@ public class FrameSetParser
 
     private void endFrameset()
     {
-	frame_set.setPaths(path_specs);
+	// frame_set.setPaths(path_specs);
     }
 
 }

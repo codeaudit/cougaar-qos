@@ -43,6 +43,11 @@ public interface FrameSetService extends Service
     public FrameSet loadFrameSet(String xml_filename, 
 				 ServiceBroker sb,
 				 BlackboardService bbs);
+
+    public FrameSet loadFrameSet(String[] xml_filenames, 
+				 ServiceBroker sb,
+				 BlackboardService bbs);
+
     public Set getNames();
 }
 

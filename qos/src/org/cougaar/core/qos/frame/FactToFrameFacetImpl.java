@@ -29,6 +29,7 @@ package org.cougaar.core.qos.frame;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.ca.ConnectionSpec;
@@ -49,7 +50,7 @@ abstract public class FactToFrameFacetImpl
     private LoggingService log;
     private ServiceBroker sb;
     private FrameSet frameSet;
-    private String xml_filename;
+    private String[] xml_filenames;
 
     protected FactToFrameFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -60,8 +61,16 @@ abstract public class FactToFrameFacetImpl
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
 	this.sb = sb;
-	this.xml_filename = spec.ca_parameters.getProperty("frame-set-file");
-	linkPlayer();
+	String files = spec.ca_parameters.getProperty("frame-set-files");
+	if (files != null) {
+	    StringTokenizer tk = new StringTokenizer(files, ",");
+	    xml_filenames = new String[tk.countTokens()];
+	    int i =0;
+	    while (tk.hasMoreTokens()) xml_filenames[i++] = tk.nextToken();
+	    linkPlayer();
+	} else {
+	    throw new RuntimeException("No frame-set-files !");
+	}
     }
 
 
@@ -83,9 +92,11 @@ abstract public class FactToFrameFacetImpl
     private synchronized void ensureFrameSet(BlackboardService bbs)
     {
 	if (frameSet != null) return;
+	if (xml_filenames == null) return;
+
 	FrameSetService	fss = (FrameSetService)
 	    sb.getService(this, FrameSetService.class, null);
-	frameSet = fss.loadFrameSet(xml_filename, sb, bbs);
+	frameSet = fss.loadFrameSet(xml_filenames, sb, bbs);
 	sb.releaseService(this, FrameSetService.class, fss);
     }
 

@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.frame;
 
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
@@ -54,17 +55,24 @@ public class FrameSetTesterPlugin
 
     public void start()
     {
-	String xml_filename = (String) getParameter("frame-set");
-	if (xml_filename != null) {
+
+	String files = (String) getParameter("frame-set-files");
+
+	if (files != null) {
+	    StringTokenizer tk = new StringTokenizer(files, ",");
+	    String[] xml_filenames = new String[tk.countTokens()];
+	    int i =0;
+	    while (tk.hasMoreTokens()) xml_filenames[i++] = tk.nextToken();
+
 	    ServiceBroker sb = getServiceBroker();
 	    BlackboardService bbs = getBlackboardService();
 	    FrameSetService fss = (FrameSetService)
 		sb.getService(this, FrameSetService.class, null);
-	    frameSet = fss.loadFrameSet(xml_filename, sb, bbs);
+	    frameSet = fss.loadFrameSet(xml_filenames, sb, bbs);
 	    sb.releaseService(this, FrameSetService.class, fss);
 	} else {
 	    if (log.isWarnEnabled())
-		log.warn("No FrameSet XML file was specified");
+		log.warn("No FrameSet XML files were specified");
 	}
 	super.start();
     }

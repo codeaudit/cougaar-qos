@@ -111,11 +111,6 @@ public class SingleInheritanceFrameSet
     }
 
 
-    void setPaths(HashMap paths)
-    {
-	this.paths = paths;
-    }
-
     private void addFrame(Frame frame)
     {
 	if (log.isInfoEnabled())

@@ -116,6 +116,24 @@ public class FrameSetServicePlugin
 	return set;
     }
 
+    private FrameSet makeSets(String[] xml_filenames, 
+			     ServiceBroker sb,
+			     BlackboardService bbs)
+					  
+    {
+	FrameSet set = null;
+	synchronized (sets) {
+	    FrameSetParser parser = new FrameSetParser(sb, bbs);
+	    set = parser.parseFrameSetFiles(xml_filenames);
+	    sets.put(set.getName(), set);
+	}
+
+	BlackboardService my_bbs = getBlackboardService();
+	my_bbs.signalClientActivity();
+	
+	return set;
+    }
+
     private void doCallback(FrameSetService.Callback cb,
 			    String name,
 			    FrameSet set)
@@ -178,6 +196,13 @@ public class FrameSetServicePlugin
 				     BlackboardService bbs)
 	{
 	    return makeSet(xml_filename, sb, bbs);
+	}
+
+	public FrameSet loadFrameSet(String[] xml_filenames, 
+				     ServiceBroker sb,
+				     BlackboardService bbs)
+	{
+	    return makeSets(xml_filenames, sb, bbs);
 	}
 
 	public Set getNames()
