@@ -36,11 +36,15 @@ import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.rss.MetricSC;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.service.TopologyEntry;
+import org.cougaar.core.service.TopologyReaderService;
 
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TimerTask;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -76,6 +80,7 @@ public final class SyscondFactory
     private HashMap capacitySysconds = new HashMap();
     private LoggingService loggingService;
     private NameSupport nameSupport;
+    private TopologyReaderService topologyReaderService;
     private MetricsService metricsService;
 
 
@@ -197,52 +202,43 @@ public final class SyscondFactory
 	}
 
 	public void run() {
-	    Attributes match = 
-		new BasicAttributes(NameSupport.STATUS_ATTR, 
-				    NameSupport.REGISTERED_STATUS);
-	    String[] attr =  { NameSupport.AGENT_ATTR, NameSupport.HOST_ATTR };
-	    Iterator itr = nameSupport.lookupInTopology(match, attr);
-	    while (itr.hasNext()) {
-		Attributes pair = (Attributes) itr.next();
-		if (pair != null) {
-		    Attribute new_host_attr = pair.get(NameSupport.HOST_ATTR);
-		    Attribute agent_attr = pair.get(NameSupport.AGENT_ATTR);
-		    if (new_host_attr == null || agent_attr == null) continue;
-		    String new_host = null;
-		    MessageAddress agent = null;
+          if (topologyReaderService == null) return;
+          Set set = 
+            topologyReaderService.getAllEntries(
+                null, null, null, null, null);
+          int n = ((set != null) ? set.size() : 0);
+          if (n < 0) return;
+          Iterator iter = set.iterator();
+          for (int i = 0; i < n; i++) {
+            TopologyEntry te = (TopologyEntry) iter.next();
+            if (te.getStatus() != TopologyEntry.ACTIVE) {
+              continue;
+            }
+            String new_host = te.getHost();
+            String sagent = te.getAgent();
+            MessageAddress agent = new MessageAddress(sagent);
+            String host = (String) hosts.get(agent);
+            if (host != null && host.equals(new_host)) {
+              continue;
+            }
+            hosts.put(agent, new_host);
+            if (Debug.isDebugEnabled(loggingService,RMS))
+              loggingService.debug("===== New host " 
+                  +new_host+
+                  " for agent " 
+                  +agent);
+            ArrayList agentListeners = 
+              (ArrayList) listeners.get(agent);
+            if (agentListeners == null) continue;
 
-		    try {
-			new_host = (String) new_host_attr.get();
-			agent = (MessageAddress) agent_attr.get();
-		    } catch (javax.naming.NamingException name_ex) {
-			loggingService.error(null, name_ex);
-			continue;
-		    }
-
-		    String host = (String) hosts.get(agent);
-
-		    if (host == null || !host.equals(new_host)) {
-			hosts.put(agent, new_host);
-			if (Debug.isDebugEnabled(loggingService,RMS))
-			    loggingService.debug("===== New host " 
-						      +new_host+
-						      " for agent " 
-						      +agent);
-			ArrayList agentListeners = 
-			    (ArrayList) listeners.get(agent);
-			if (agentListeners == null) continue;
-
-			Iterator litr = agentListeners.iterator();
-			while (litr.hasNext()) {
-			    AgentHostUpdaterListener listener =
-				(AgentHostUpdaterListener) litr.next();
-			    listener.newHost(new_host);
-			}
-		    }
-		}
-	    }
-	}
-
+            Iterator litr = agentListeners.iterator();
+            while (litr.hasNext()) {
+              AgentHostUpdaterListener listener =
+                (AgentHostUpdaterListener) litr.next();
+              listener.newHost(new_host);
+            }
+          }
+        }
     }
 
 
@@ -265,6 +261,14 @@ public final class SyscondFactory
 
 	loggingService = (LoggingService) 
 	    sb.getService(this, LoggingService.class, null);
+
+	topologyReaderService = (TopologyReaderService) 
+	    sb.getService(this, TopologyReaderService.class, null);
+        if (topologyReaderService == null) {
+          if (loggingService.isErrorEnabled()) {
+            loggingService.error("Unable to obtain topology service");
+          }
+        }
 
 	factory = this;
     }
