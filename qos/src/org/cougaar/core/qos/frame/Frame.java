@@ -39,7 +39,7 @@ import org.cougaar.core.util.UniqueObject;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
-public class Frame
+abstract public class Frame
     implements UniqueObject
 {
     private final UID uid;

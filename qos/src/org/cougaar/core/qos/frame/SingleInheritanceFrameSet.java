@@ -118,7 +118,7 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    kb.put(object.getUID(), object);
 	}
-	if (object instanceof Frame) checkForPendingParentage(); // yuch
+	if (object instanceof DataFrame) checkForPendingParentage(); // yuch
     }
 
     private void checkForPendingParentage()
@@ -311,8 +311,7 @@ public class SingleInheritanceFrameSet
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
-		if (!(raw instanceof Frame)) continue;
-		if (raw instanceof PrototypeFrame) continue;
+		if (!(raw instanceof DataFrame)) continue;
 		Frame frame = (Frame) raw;
 		// Check only local value [?]
 		if (descendsFrom(frame, proto)) {
@@ -356,9 +355,7 @@ public class SingleInheritanceFrameSet
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
-		if (!(raw instanceof Frame)) continue;
-		// Don't check Prototypes at all
-		if (raw instanceof PrototypeFrame) continue;
+		if (!(raw instanceof DataFrame)) continue;
 
 		Frame relationship = (Frame) raw;
 		
@@ -388,9 +385,7 @@ public class SingleInheritanceFrameSet
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
-		if (!(raw instanceof Frame)) continue;
-		// Don't check Prototypes at all
-		if (raw instanceof PrototypeFrame) continue;
+		if (!(raw instanceof DataFrame)) continue;
 
 		Frame relationship = (Frame) raw;
 
@@ -529,7 +524,7 @@ public class SingleInheritanceFrameSet
 
     public Frame makeFrame(String proto, Properties values, UID uid)
     {
-	Frame frame = new Frame(this, proto, uid, values);
+	Frame frame = new DataFrame(this, proto, uid, values);
 
 	if (isParentageRelation(frame)) establishParentage(frame);
 
