@@ -38,9 +38,10 @@ abstract public class AlarmCoordinationArtifactTemplate
 
     private static final String AlarmCA = "AlarmCA";
 
-    public AlarmCoordinationArtifactTemplate(ServiceBroker sb) 
+    public AlarmCoordinationArtifactTemplate(BlackboardService bbs,
+					     ServiceBroker sb) 
     {
-	super(AlarmCA, sb);
+	super(AlarmCA, bbs, sb);
     }
     
 

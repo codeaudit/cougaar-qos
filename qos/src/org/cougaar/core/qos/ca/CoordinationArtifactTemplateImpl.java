@@ -47,7 +47,7 @@ abstract public class CoordinationArtifactTemplateImpl
 
     private ArrayList artifacts;
     private ServiceBroker sb;
-    private BlackboardService blackboard;
+    private BlackboardService bbs;
     private String kind;
 
     /**
@@ -56,13 +56,14 @@ abstract public class CoordinationArtifactTemplateImpl
      */
     abstract public CoordinationArtifact makeArtifact(ConnectionSpec spec);
 
-    protected CoordinationArtifactTemplateImpl(String kind, ServiceBroker sb)
+    protected CoordinationArtifactTemplateImpl(String kind, 
+					       BlackboardService bbs,
+					       ServiceBroker sb)
     {
 	this.artifacts = new ArrayList();
 	this.sb = sb;
 	this.kind = kind;
-	this.blackboard = (BlackboardService)
-	    sb.getService(this, BlackboardService.class, null);
+	this.bbs = bbs;
 	CoordinationArtifactBroker cab = (CoordinationArtifactBroker) 
 	    sb.getService(this, CoordinationArtifactBroker.class, null);
 	cab.registerCoordinationArtifactTemplate(this);
@@ -90,7 +91,7 @@ abstract public class CoordinationArtifactTemplateImpl
     public void provideFacet(ConnectionSpec spec, RolePlayer player)
     {
 	CoordinationArtifact artifact = findOrMakeArtifact(spec);
-	if (artifact != null) artifact.provideFacet(spec, player, blackboard);
+	if (artifact != null) artifact.provideFacet(spec, player, bbs);
     }
 
     private CoordinationArtifact findOrMakeArtifact(ConnectionSpec spec)
@@ -112,7 +113,7 @@ abstract public class CoordinationArtifactTemplateImpl
 
     public void triggerExecute()
     {
-	blackboard.signalClientActivity();
+	bbs.signalClientActivity();
     }
 
     
@@ -127,15 +128,15 @@ abstract public class CoordinationArtifactTemplateImpl
 	}
 	for (int i=0; i<copy.size(); i++) {
 	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.execute(blackboard);
+	    ca.execute(bbs);
 	}
 	for (int i=0; i<copy.size(); i++) {
 	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.runRuleEngine(blackboard);
+	    ca.runRuleEngine(bbs);
 	}
 	for (int i=0; i<copy.size(); i++) {
 	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.processFactBase(blackboard);
+	    ca.processFactBase(bbs);
 	}
     }
 

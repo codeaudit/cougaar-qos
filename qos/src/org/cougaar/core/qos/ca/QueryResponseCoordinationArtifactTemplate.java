@@ -60,9 +60,10 @@ abstract public class QueryResponseCoordinationArtifactTemplate
     implements QueryCoordArtConstants
 {
     public QueryResponseCoordinationArtifactTemplate(String kind,
+						     BlackboardService bbs,
 						     ServiceBroker sb) 
     {
-	super(kind, sb);
+	super(kind, bbs, sb);
     }
     
 

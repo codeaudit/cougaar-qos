@@ -37,6 +37,7 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
@@ -68,8 +69,9 @@ public class CoordinationArtifactBrokerPlugin
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
 
+	BlackboardService bbs = getBlackboardService();
 	for (int i=0; i<StandardTemplates.length; i++) {
-	    makeTemplate(StandardTemplates[i], sb);
+	    makeTemplate(StandardTemplates[i], bbs, sb);
 	}
 
 	String templates = getParameter(TemplatesParam);
@@ -77,19 +79,21 @@ public class CoordinationArtifactBrokerPlugin
 	    StringTokenizer tk = new StringTokenizer(templates, ",");
 	    while (tk.hasMoreTokens()) {
 		String klass = tk.nextToken();
-		makeTemplate(klass, sb);
+		makeTemplate(klass, bbs, sb);
 	    }
 	}
 
     }
 
 
-    private void makeTemplate(String klass, ServiceBroker sb)
+    private void makeTemplate(String klass, 
+			      BlackboardService bbs,
+			      ServiceBroker sb)
     {
 	try {
 	    Class cl = Class.forName(klass);
-	    Class[] ptypes = { ServiceBroker.class };
-	    Object[] args = { sb };
+	    Class[] ptypes = { BlackboardService.class, ServiceBroker.class };
+	    Object[] args = { bbs, sb };
 	    Constructor cons = cl.getConstructor(ptypes);
 	    CoordinationArtifactTemplate template = 
 		(CoordinationArtifactTemplate) cons.newInstance(args);

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 
 /**
@@ -46,7 +47,7 @@ abstract public class CoordinationArtifactTemplatePlugin
 {
 
     protected abstract CoordinationArtifactTemplateImpl
-	makeTemplate(ServiceBroker sb);
+	makeTemplate(BlackboardService bbs, ServiceBroker sb);
 
     private CoordinationArtifactTemplateImpl impl;
 
@@ -55,7 +56,8 @@ abstract public class CoordinationArtifactTemplatePlugin
 	super.start();
 
 	ServiceBroker sb = getServiceBroker();
-	impl = makeTemplate(sb);
+	BlackboardService bbs = getBlackboardService();
+	impl = makeTemplate(bbs, sb);
     }
 
     protected void setupSubscriptions() 
