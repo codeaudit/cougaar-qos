@@ -171,12 +171,18 @@ public class SingleInheritanceFrameSet
 	    return null;
 	} else {
 	    Frame result = findFrame(proto, slot, value);
-	    if (log.isDebugEnabled()) {
+	    if (result == null && log.isWarnEnabled())
+		if (result == null)
+		    log.warn(" Proto = " +proto+
+			     " Slot = " +slot+
+			     " Value = " +value+
+			     " matches nothing");
+	    if (result != null && log.isInfoEnabled())
 		log.info(" Proto = " +proto+
 			 " Slot = " +slot+
 			 " Value = " +value+
 			 " Result = " +result);
-	    }
+		    
 	    return result;
 	}
     }
@@ -296,6 +302,10 @@ public class SingleInheritanceFrameSet
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
 		Frame relationship = (Frame) itr.next();
+		
+		// Don't check Prototypes at all
+		if (relationship instanceof PrototypeFrame) continue;
+
 		if (descendsFrom(relationship, relation_prototype)) {
 		    Frame p = getRelate(relationship,
 					parent_proto_slot, 
@@ -321,6 +331,10 @@ public class SingleInheritanceFrameSet
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
 		Frame relationship = (Frame) itr.next();
+
+		// Don't check Prototypes at all
+		if (relationship instanceof PrototypeFrame) continue;
+
 		if (descendsFrom(relationship, relation_prototype)) {
 		    Frame c = getRelate(relationship,
 					child_proto_slot, 
