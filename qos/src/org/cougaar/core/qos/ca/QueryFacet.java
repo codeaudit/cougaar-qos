@@ -76,6 +76,11 @@ abstract public class QueryFacet
 	    role_parameters.getProperty(MANAGER_ATTRIBUTE);
 	communityRole = 
 	    role_parameters.getProperty(RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE);
+	if (log.isDebugEnabled()) {
+	    log.debug("Value of " +MANAGER_ATTRIBUTE+ " is " +managerAttr);
+	    log.debug("Value of " +RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE+ " is "
+		      +communityRole);
+	}
 	reclaimer = new RelayReclaimer(sb);
 
 	String filter = 
@@ -231,12 +236,19 @@ abstract public class QueryFacet
 	    Community community = getCommunity();
 	    int count = 0;
 	    Iterator itr = community.getEntities().iterator();
+	    if (log.isDebugEnabled())
+		log.debug("Counting members of " +community.getName()+ 
+			  " with Role " +communityRole);
 	    while (itr.hasNext()) {
 		Entity entity = (Entity) itr.next();
 		Attributes attrs = entity.getAttributes();
 		Attribute attr = attrs.get("Role");
 		if (attr != null && attr.contains(communityRole)) ++count;
 	    }
+	    if (log.isDebugEnabled())
+		log.debug("Counted " +count+ 
+			  " members of " +community.getName()+ 
+			  " with Role " +communityRole);
 	    return count;
 	}
     }

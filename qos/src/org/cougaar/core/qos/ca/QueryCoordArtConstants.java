@@ -40,5 +40,5 @@ public interface QueryCoordArtConstants extends CoordArtConstants
     public static final String SourceAttr = "source";
     public static final String PayloadAttr = "payload";
     public static final String RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE =
-	"RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE ";
+	"RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE";
 }
