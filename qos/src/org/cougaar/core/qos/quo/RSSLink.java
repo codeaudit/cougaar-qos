@@ -225,7 +225,7 @@ public class RSSLink extends ResourceMonitorServiceImpl implements DebugFlags
 
 		    if (host == null || !host.equals(new_host)) {
 			hosts.put(agent, new_host);
-			if (Debug.isDebugEnabled(RMS))
+			if (Debug.isDebugEnabled(loggingService,RMS))
 			    loggingService.debug("===== New host " 
 						      +new_host+
 						      " for agent " 
