@@ -2,7 +2,7 @@
 # (c) Copyright 2001  BBNT Solutions, LLC
 # =====================================================================
 
-.SUFFIXES : .dev .sh
+.SUFFIXES : .dev
 
 nodes=$(wildcard *Node)
 #links=$(foreach file, $(nodes), $(file).dev)
