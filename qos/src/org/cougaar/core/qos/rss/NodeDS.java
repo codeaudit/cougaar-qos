@@ -196,7 +196,7 @@ public class NodeDS
 	    node.kind = "Alarm";
 	    node.parameters = new String[0];
 	    ResourceNode formula = new ResourceNode();
-	    formula.kind = "FifteenSecond";
+	    formula.kind = "FifteenSeconds";
 	    formula.parameters = new String[0];
 	    ResourceNode[] path = { node, formula };
 	    DataFormula alarm = RSS.instance().getPathFormula(path);
