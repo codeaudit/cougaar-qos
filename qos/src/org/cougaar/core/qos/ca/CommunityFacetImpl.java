@@ -50,8 +50,6 @@ abstract public class CommunityFacetImpl
     private AttributeBasedAddress aba;
     private CommunityService commService;
 
-    protected LoggingService log;
-
     /**
      * Hook for domain-specific Facet implementations to construct an
      * ABA given a community.
