@@ -52,16 +52,6 @@ import javax.naming.directory.BasicAttributes;
  * either directly or via a CORBA TypedEventChannel, depending on
  * whether or not JacORB is available.
  *
- * @property org.cougaar.metrics.stec.mesh If true, and if event
- * channels are in use, the channels from each Node in the society
- * will be linked in a ring.  This enabled metrics data collected in
- * one Node to be accessed by another Node.
- *
- * @property org.cougaar.metrics.topology.iorfile If present, and if
- * event channels are in use, the ior of the channel topology manager
- * will be written to the given file.  This allows external
- * applications to communicate with the RSS.
- *
  * @property org.omg.CORBA.ORBClass Set this to org.jacorb.orb.ORB if
  * you want to use the TypedEventChannels to share metrics among
  * Nodes in a society and to get data from third-party collectors.
@@ -70,12 +60,32 @@ import javax.naming.directory.BasicAttributes;
  * org.jacorb.orb.ORBSingleton if you want to use the
  * TypedEventChannels to share metrics among Nodes in a society and to
  * get data from third-party collectors.
+ *
+ * @property org.cougaar.metrics.stec If true, and if JacORB is
+ * enabled, a TypedEventChannel data feed will be created in the RSS.
+ * If false (the default) or if JacORB is not enabled, a simple data
+ * feed will be created instead.
+ *
+ * @property org.cougaar.metrics.stec.mesh If true, and if event
+ * channels are in use, the channels from each Node in the society
+ * will be linked in a ring.  This enables metrics data collected in
+ * one Node to be accessed by another Node.  If
+ * org.cougaar.metrics.stec.mesh is true, org.cougaar.metrics.stec is
+ * ignored.
+ *
+ * @property org.cougaar.metrics.topology.iorfile If present, and if
+ * event channels are in use, the ior of the channel topology manager
+ * will be written to the given file.  This allows external
+ * applications to communicate with the RSS.
+ *
  */
 public class STECMetricsUpdateServiceImpl
     extends QosComponent
     implements MetricsUpdateService
 {
     private static final String RSS_DIR = "RSS";
+    private static final String USE_TEC_PROPERTY = 
+	"org.cougaar.metrics.stec";
     private static final String USE_TOPOLOGY_PROPERTY = 
 	"org.cougaar.metrics.stec.mesh";
     private static final String TOPOLOGY_DUMP_IORFILE_PROPERTY = 
@@ -90,20 +100,21 @@ public class STECMetricsUpdateServiceImpl
     public STECMetricsUpdateServiceImpl() {
     }
 
+    private boolean use_tec() {
+	boolean use_tec = 
+	    Boolean.getBoolean(USE_TOPOLOGY_PROPERTY) ||
+	    Boolean.getBoolean(USE_TEC_PROPERTY);
+	if (!use_tec) return false;
+	String orbclass = System.getProperty("org.omg.CORBA.ORBClass");
+	return orbclass != null && orbclass.equals("org.jacorb.orb.ORB");
+    }
+
     public void load() {
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();
 
-	// make sure jacorb is configured
-	String orbclass = System.getProperty("org.omg.CORBA.ORBClass");
-	if (orbclass == null || !orbclass.equals("org.jacorb.orb.ORB")) {
-	    dataFeed = new TrivialDataFeed(sb);
-	    interpreter = new MetricInterpreter();
-	    DirectSysStatSupplier supplier = 
-		new DirectSysStatSupplier(dataFeed);
-	    supplier.schedule(3000);
-	} else {
+	if (use_tec()) {
 	    namingService = (NamingService)
 		sb.getService(this, NamingService.class, null);
 
@@ -120,6 +131,12 @@ public class STECMetricsUpdateServiceImpl
 
 	    sender = new STECSender(sb, channel, Connector.poa());
 
+	} else {
+	    dataFeed = new TrivialDataFeed(sb);
+	    interpreter = new MetricInterpreter();
+	    DirectSysStatSupplier supplier = 
+		new DirectSysStatSupplier(dataFeed);
+	    supplier.schedule(3000);
 	}
 
     }
