@@ -29,17 +29,19 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This interface describes the equivalent of a closure of a {@link
- * CoordinationArtifact} over a runtime state.  The state includes at
- * least the defining paramaters and a set of {@link Facet}s, and can
- * include whatever else is relevant for any particular Artifact kind.
+ * This interface describes something like a parameterization or
+ * closure of a {@link CoordinationArtifact} over a runtime state.
+ * The state includes at least the defining paramaters and a set of
+ * {@link Facet}s, and can include whatever else is relevant for any
+ * particular Artifact kind.
  */
 public interface FacetProvider
 {
     /**
      * Returns true iff the FacetProvider can provided the requested
      * {@link Facet}.  Ordinarily this depends only on the kind field
-     * of the spec.
+     * of the spec.  The default implementation in {@link
+     * FacetProviderImpl} handles it this way.
     */
     public boolean matches(ConnectionSpec spec);
 
@@ -51,11 +53,17 @@ public interface FacetProvider
 			     RolePlayer player,
 			     BlackboardService blackboard);
 
-
     /**
      * Runs code in a Blackboard transaction.  This will be invoked
      * from within the corresponding {@link CoordinationArtifact}
      * plugin's execute method.
      */
     public void execute(BlackboardService service);
+
+    /**
+     * Signals the provider to run the corresponding method on its
+     * Artifact.  This is handled automatically by the default
+     * implementation in {@link FacetProviderImpl}.
+     */
+    public void triggerExecute();
 }

@@ -6,44 +6,61 @@
 
 <h3>Introduction</h3>
 
-<p><i>Coordination Artifacts</i> are designed to separate out an abstract
-communication pattern, on the one hand, and the domain-specific
-clients of the communication on the other. A generic or abstract
-Artifact is concerned with organizing Communities, Relays and other
-COUGAAR infrastructure in a structured way in order to represent a
-pattern of inter-Agent chatter.  A specific Artifact completes a
-generic artifact by supplying Community names, data types etc.
+<p><i>Coordination Artifacts</i> are designed to separate out an
+  abstract communication pattern, on the one hand, and the
+  domain-specific clients of the communication on the other. The
+  internal parts of the Artifact are concerned with organizing
+  Communities, Relays and other COUGAAR infrastructure in a structured
+  way in order to represent a pattern of inter-Agent chatter.  Each
+  kind of Artifact completes this by supplying Community names, data
+  types etc.
 
-<p> An Artifact includes a set of <i>Roles</i> that define the
-functions performed by each client.  For example in an Artifact that
-implements a multicast request (one request, multiple replies), the
-two Roles are queryer and responder.  Every Role has a corresponding
-interface that specifies the operations that can be performed on the
-Artifact by clients playing that Role.   These interfaces are
-therefore very much like <i>Facets</i> in the CORBA Component Model:
-they present a specific viewport into the Artifact as a whole.  The
-Artifact itself can then be thought of as a provider of Facets.
+<p> An Artifact defines a set of <i>Roles</i> that define the
+  functions performed by each client.  For example in an Artifact that
+  implements a multicast request (one request, multiple replies), the
+  two Roles are queryer and responder.  Every Role has a corresponding
+  interface that specifies the operations that can be performed on the
+  Artifact by clients playing that Role.  These interfaces are
+  therefore very much like <i>Facets</i> in the CORBA Component Model:
+  they present a Role-specific viewport into the Artifact as a whole.
+  An Artifact also defines a set of parameters that, for kind of
+  Artifact, distinguish the individuals of that kind from one another.
+
+<p>An instance of a Coordination Artifact is something like a Java
+  class: it defines a <i>kind</i> of Artifact, in terms of its Facets
+  and parameters, and it has the responsibiliy for creating individual
+  parameterizations of that kind, each of which has its own state.
+  These stateful parameterizations are mainly concerned with creating
+  Facets for each Role and matching them to clients.  In other words,
+  their main job is to be a Facet <i>provider</i>.
+  
+
 
 <p>  This leads to the following Java interfaces:
 
 <ul>
 
  <li><strong>RolePlayer</strong>: From the Artifact's perspective, each
-     client plays one of the Artifacts defined roles.  This interface
+     client plays one of the Artifact's defined roles.  This interface
      specifies that abstracion.</li>
 
- <li><strong>Facet</strong>: The generic viewport that RolePlayers
-     have into the Artifact is specified by this interface.  For
-     particular roles, this interface might be extended.
+ <li><strong>Facet</strong>: The generic viewport that any given
+     RolePlayer has into the Artifact is specified by a Facet, which
+     is effectively a definition of the role.
  </li>
 
- <li><strong>FacetProvider</strong>:  The provision of Facets to
-     RolePlayers is described by this interface.</li>
+ <li><strong>FacetProvider</strong>: The creation of Facets and the
+     linkage between Facets RolePlayers is handled at this layer.
+     This is also the holder of state for parameterizations for any
+     given kind of Artifact</li>
+
+ <li><strong>CoordinationArtifact</strong>: The artifact itself, whose
+   job is to define the logical Roles and parameters, and to create
+   and manage parameterizations (ie FacetProviders) as needed.
+ </li>
 
  <li><strong>FacetBroker</strong>: This interface defines a COUGAAR
-     service that provides the top-level entry point into CAs: the
-     methods that allow FacetProviders and RolePlayer to be linked
-     together.</li>
+     service that provides the top-level entry point into CAs.</li>
 
 </ul>
 
@@ -54,15 +71,17 @@ Jess-like rules defined in terms of facts.  For now
 handled through ordinary method calls between Facets and RolePlayers.
 
 <p>More detailed descriptions of these classes and interfaces follow.
+<i>TO BE DONE</i>
 
-
-<h3> RolePlayer</h3>
+<h3>RolePlayer</h3>
 
 <h3>Facet</h3>
 
-<h3> FacetProvider</h3>
+<h3>FacetProvider</h3>
 
-<h3> FacetBroker</h3>
+<h3>CoordinationArtifact</h3>
+
+<h3>FacetBroker</h3>
 
 <h3>Fact</h3>
 

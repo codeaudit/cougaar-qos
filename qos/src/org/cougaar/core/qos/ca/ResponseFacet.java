@@ -40,6 +40,12 @@ import org.cougaar.multicast.AttributeBasedAddress;
 import org.cougaar.util.UnaryPredicate;
 
 
+/**
+ * An abstraction of the response role in the {@link
+ * QueryResponseCoordinationArtifact}.  The {@link Facet} methods are
+ * implemented here, leaving subclasses only to implement the abstract
+ * methods of this class.
+ */
 abstract public class ResponseFacet
     extends FacetImpl
     implements QueryCoordArtConstants

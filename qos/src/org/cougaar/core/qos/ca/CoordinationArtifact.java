@@ -45,17 +45,25 @@ public interface CoordinationArtifact
      * Returns true iff the Artifact can handle the given spec.  This
      * will only be called with specs whose ca_kind field is already
      * known to match the Artifact's kind.  The default implementation
-     * therefore returns true for all specs.
+     * in {@link AbstractArtifactPlugin} therefore returns true
+     * for all specs.
     */
     public boolean matches(ConnectionSpec spec);
 
     /**
      * Does the linkage between a {@link Facet}, which is generally
-     * created on the fly based on the spec and the player.
-     * .
+     * created on the fly based on the spec and the player. The
+     * default implementation in {@link AbstractArtifactPlugin}
+     * handles this by deferring the creation of {@link
+     * FacetProvider}s to an abstract method.
+     * 
     */
     public void provideFacet(ConnectionSpec spec, RolePlayer player);
 
 
-
+    /**
+     * Signals that the Artifact should execute in a blackboard
+     * transaction.
+    */
+    public void triggerExecute();
 }

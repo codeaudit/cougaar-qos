@@ -26,6 +26,9 @@
 
 package org.cougaar.core.qos.ca;
 
+/**
+ * A set of constants used by the {@link QueryResponseCoordinationArtifact}.
+ */
 public interface QueryCoordArtConstants
 {
     public static final String QueryFact = "Query";

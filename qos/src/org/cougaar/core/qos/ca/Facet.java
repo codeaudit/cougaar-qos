@@ -35,11 +35,35 @@ import org.cougaar.core.service.BlackboardService;
  */
 public interface Facet
 {
+    /**
+     * Used by clients to assert a new fact into the Facet's
+     * fact-base. 
+     */
     public void assertFact(Fact fact);
+
+
+    /**
+     * Used by clients to retract a fact from the Facet's fact-base.
+     */
     public void retractFact(Fact fact);
 
+    /**
+     * Process any queued facts.  This should be run in a blackboard
+     * transacion.  Usually invoked by the {@link FacetProvider}.
+    */
     public void processFactBase(BlackboardService blackboard);
 
-    public void setupSubscriptions(BlackboardService blackboard);
+
+    /**
+     * Handle subscription updates. This should be run in a blackboard
+     * transacion.  Usually invoked by the {@link FacetProvider}.
+     */
     public void execute(BlackboardService blackboard);
+
+
+    /**
+     * Handle blackboard subscriptions.  This should be run in a
+     * blackboard transacion.  Usually invoked by the FacetProvider.
+    */
+    public void setupSubscriptions(BlackboardService blackboard);
 }

@@ -29,31 +29,28 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.component.ServiceBroker;
 
 /**
- * This plugin is the generic implementation of the query side of a
- * multicast query/response rpc Cooordination Artifact.  It handles the
+ * This plugin is the generic implementation of a multicast
+ * query/response rpc {@link CoordinationArtifact}.  It handles the
  * Community and Relay muck, leaving instantiable extensions only a
- * few domain-specific tasks to deal with, as described in the
- * abtract methods. 
+ * few domain-specific tasks to deal with, as described in the abtract
+ * methods.
  * 
  * In the CA scheme, multicast query/response rpc CA has two roles,
- * query and respond.  This entity provides facets for the query
- * role. The corresponding response plugin is {@link ResponseCoordArtPlugin}.
- * The flow of control is as follows: <ol> <li>A RolePlayer for the
- * query role asserts a query as a Fact. </li> <li>The FacetProvider
- * for the query detects the new Fact, constructs a QueryRelay from
- * the Fact and transmits in the usual way through the
- * Blackboard. </li> <li>Each FacetProvider for the response role
- * receives the QueryRelay in the usual way on the Blackboard and
- * asserts a corresponding Fact for the query. </li> <li>The
- * RolePlayers for the response role detect the new query Fact and
- * assert a response Fact. </li><li>The FacetProviders for the
- * response detect the new response Fact, constructs a ResponseRelay
- * from the Fact and transmits in the usual way through the
- * Blackboard. </li><li>The FacetProvider for the query role receives
- * the ResponseRelay in the usual way on the Blackboard and asserts a
- * corresponding Fact for the response. </li><li>The RolePlayer for
- * the query role detects the new response Fact and process it. </li>
- * </ol>
+ * query and respond.  The flow of control is as follows: <ol> <li>A
+ * RolePlayer for the query role asserts a query as a Fact. </li>
+ * <li>The Facet for the query detects the new Fact, constructs a
+ * QueryRelay from the Fact and transmits in the usual way through the
+ * Blackboard. </li> <li>Each Facet for the response role receives the
+ * QueryRelay in the usual way on the Blackboard and asserts a
+ * corresponding Fact for the query. </li> <li>The RolePlayers for the
+ * response role detect the new query Fact and assert a response
+ * Fact. </li><li>The Facets for the response detect the new
+ * response Fact, constructs a ResponseRelay from the Fact and
+ * transmits in the usual way through the Blackboard. </li><li>The
+ * Facet for the query role receives the ResponseRelay in the
+ * usual way on the Blackboard and asserts a corresponding Fact for
+ * the response. </li><li>The RolePlayer for the query role detects
+ * the new response Fact and processes it. </li> </ol>
  *
  */
 abstract public class QueryResponseCoordinationArtifact

@@ -37,8 +37,8 @@ import org.cougaar.core.service.BlackboardService;
 /**
  * This class represents the state of a particular parameterizarion of
  * some {@link CoordinationArtifact}.  It acts an intermediary between
- * a stateful collection of {@link Facet}s and the Artifact they
- * 'implement' (conceptually, not in the Java sense).
+ * {@link Facet}s, which it creates, and the Artifact they 'implement'
+ * (conceptually, not in the Java sense).
  *
  */
 abstract public class FacetProviderImpl
@@ -111,9 +111,9 @@ abstract public class FacetProviderImpl
     }
 
 
-    protected void triggerExecute()
+    public void triggerExecute()
     {
-	((AbstractArtifactPlugin )owner).triggerExecute();
+	owner.triggerExecute();
     }
 
 
