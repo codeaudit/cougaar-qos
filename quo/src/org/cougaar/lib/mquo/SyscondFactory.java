@@ -97,6 +97,7 @@ public final class SyscondFactory
 	    try { 
 		syscond.newPath(path(host));
 	    } catch (java.rmi.RemoteException ex) {
+		ex.printStackTrace();
 	    }
 	}
 
@@ -321,6 +322,7 @@ public final class SyscondFactory
 	try {
 	    syscond.newPath("Host(" +host+ "):EffectiveMJips");
 	} catch (java.rmi.RemoteException ex) {
+	    ex.printStackTrace();
 	}
 	return syscond;
     }
@@ -349,6 +351,7 @@ public final class SyscondFactory
 			    "," +host+
 			    "):CapacityUnused");
 	} catch (java.rmi.RemoteException ex) {
+	    ex.printStackTrace();
 	}
 	return syscond;
     }

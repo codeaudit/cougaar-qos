@@ -119,7 +119,7 @@ public class CompressQosketImpl
 	// parser finds the interface name from the ior.  Whichever
 	// one is missing needs to be filled in manually by the
 	// caller....
-	final String iface = "org/cougaar/core/society/MT";
+	final String iface = "org/cougaar/core/mts/MT";
 	String clientHost = null;
 	String serverHost = null; 
 	Remote remote = (Remote) instrumentedServer;
