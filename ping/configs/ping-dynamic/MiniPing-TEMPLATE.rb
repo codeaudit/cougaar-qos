@@ -34,8 +34,9 @@ Cougaar.new_experiment().run(parameters[:ping_pairs].length) {
   do_action "LoadSocietyFromXML", "#{PING_HOME}/Empty.xml"
 
   # Select your society config here
-  do_action "InfoMessage", "#{parameters[:strategy]}, #{parameters[:ping_pairs][runcount]}, false, #{parameters[:hosts]}"
-  do_action parameters[:strategy], parameters[:ping_pairs][runcount].to_i, "false", "#{parameters[:hosts]}"
+  do_action "InfoMessage", "#{parameters[:strategy]}, #{parameters[:ping_pairs][runcount]}, #{parameters[:security]}, #{parameters[:hosts]}"
+  do_action parameters[:strategy], parameters[:ping_pairs][runcount].to_i, "#{parameters[:security]}", "#{parameters[:hosts]}"
+  
   do_action "MapHosts", HOSTS_FILE
 
   do_action "TransformSociety", false, *parameters[:rules]
