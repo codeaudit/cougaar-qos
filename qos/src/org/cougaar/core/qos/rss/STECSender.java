@@ -22,7 +22,11 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.thread.Schedulable;
+import org.cougaar.util.CircularQueue;
 
 import com.bbn.quo.event.status.HeartBeatUtils;
 import com.bbn.quo.event.status.StatusTEC;
@@ -41,6 +45,7 @@ import org.omg.CosEventComm.PushSupplierPOA;
 
 import org.omg.PortableServer.POA;
 
+
 class STECSender extends PushSupplierPOA
 {
     private int sequenceNum = 0;
@@ -48,8 +53,34 @@ class STECSender extends PushSupplierPOA
     private TypedProxyPushConsumer proxy;
     private StatusPusher consumer;
     private TypedEventChannel channel;
+    private CircularQueue queue;
+    private Schedulable thread;
+    private boolean useThreads = true;
 
-    STECSender(TypedEventChannel channel, POA poa) {
+    private  class Provider implements Runnable {
+
+	Provider() {
+	}
+
+	public void run() {
+	    StatusPayloadStruct payload = null;
+	    synchronized (queue) {
+		if (queue != null)
+		    payload = (StatusPayloadStruct) queue.next();
+	    }
+	    if (payload == null) return;
+	    sendPayload(payload);
+	}
+    }
+
+    STECSender(ServiceBroker sb, TypedEventChannel channel, POA poa) {
+	if (useThreads) {
+	    queue = new CircularQueue();
+	    ThreadService threadService = (ThreadService) 
+		sb.getService(this, ThreadService.class, null);
+	    Provider provider = new Provider();
+	    thread = threadService.getThread(this, provider, "STECSender");
+	}
 	this.channel = channel;
 	try {
 	    poa.activate_object(this);
@@ -59,6 +90,15 @@ class STECSender extends PushSupplierPOA
 	    return;
 	}
 	makeProxy();
+    }
+
+
+    void sendPayload(StatusPayloadStruct payload) {
+	try {
+	    consumer.provideStatus(payload);
+	} catch (Exception e) {
+	    System.err.println("push error: " + e);
+	}
     }
 
     void makeProxy() {
@@ -85,10 +125,10 @@ class STECSender extends PushSupplierPOA
 	consumer = StatusPusherHelper.narrow(raw);
     }
 
-    void send(String key, String type, Metric value) {
+    void send(String key, Metric value) {
 	StatusPayloadStruct payload = new StatusPayloadStruct();
 	payload.key = key;
-	payload.type = type;
+	payload.type = value.getProvenance();
 	payload.value = new payload_value_union();
 	Object raw = value.getRawValue();
 	if (raw instanceof Number) {
@@ -112,11 +152,15 @@ class STECSender extends PushSupplierPOA
 	sendMessage(payload);
     }
 
+
     void sendMessage(StatusPayloadStruct payload) {
-	try {
-	    consumer.provideStatus(payload);
-	} catch (Exception e) {
-	    System.err.println("push error: " + e);
+	if (useThreads) {
+	    synchronized (queue) {
+		queue.add(payload);
+	    }
+	    thread.start();
+	} else {
+	    sendPayload(payload);
 	}
     }
 

@@ -105,8 +105,7 @@ public class AgentDS
 	protected void initialize(DataScope scope) {
 	    super.initialize(scope);
 	    String agentName = (String) scope.getValue(AGENTNAME);
-	    String key = "Agent" +KEY_SEPR+ agentName +KEY_SEPR+ getKey()
-		+KEY_SEPR+ THREAD_SENSOR;
+	    String key = "Agent" +KEY_SEPR+ agentName +KEY_SEPR+ getKey();
 
 	    Object[] parameters = { key };
 	    DataScopeSpec spec = new DataScopeSpec("com.bbn.quo.data.IntegraterDS", 

@@ -32,8 +32,8 @@ import org.cougaar.core.service.ThreadService;
 
 import com.bbn.quo.event.Connector;
 import com.bbn.quo.event.status.StatusTEC;
-import com.bbn.quo.event.sysstat.StatusSupplierSysStat;
 import com.bbn.quo.event.topology.TopologyRing;
+import com.bbn.quo.event.sysstat.StatusSupplierSysStat;
 
 import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
@@ -56,34 +56,35 @@ public class STECMetricsUpdateServiceImpl
     private STECSender sender;
     private NamingService namingService;
     private TypedEventChannel channel;
+    private TrivialDataFeed dataFeed;
 
     public STECMetricsUpdateServiceImpl(ServiceBroker sb, NodeIdentifier id) {
 	this.sb = sb;
 
 	// make sure jacorb is configured
 	String orbclass = System.getProperty("org.omg.CORBA.ORBClass");
-	if (orbclass == null || !orbclass.equals("org.jacorb.orb.ORB")) return;
+	if (orbclass == null || !orbclass.equals("org.jacorb.orb.ORB")) {
+	    dataFeed = new TrivialDataFeed(sb);
+	} else {
+	    namingService = (NamingService)
+		sb.getService(this, NamingService.class, null);
 
-	namingService = (NamingService)
-	    sb.getService(this, NamingService.class, null);
+	    channel = makeChannel(id);
 
-	channel = makeChannel(id);
+	    StatusSupplierSysStat sysstat =
+		new StatusSupplierSysStat(channel, 1000);
+	    Thread sysstatThread = new Thread(sysstat, "SysStat");
+	    sysstatThread.start();
 
-	sender = new STECSender(channel, Connector.poa());
 
-	StatusSupplierSysStat sysstat =
-	    new StatusSupplierSysStat(channel, 1000);
-	Thread sysstatThread = new Thread(sysstat, "SysStat");
-	sysstatThread.start();
+	    sender = new STECSender(sb, channel, Connector.poa());
 
-	// The SysStat thread does it own heartbeat
+	}
 
-//  	Heartbeater beater = new Heartbeater(sender);
-//  	ThreadService threadService = (ThreadService)
-//  	    sb.getService(this, ThreadService.class, null);
-//  	TimerTask task = threadService.getTimerTask(this, beater, "Beater");
-//  	threadService.schedule(task, 0, 1000);
+    }
 
+    TrivialDataFeed getMetricsFeed() {
+	return dataFeed;
     }
 
     TypedEventChannel getChannel() {
@@ -201,11 +202,11 @@ public class STECMetricsUpdateServiceImpl
 	return channel._this();
     }
 
-    public void updateValue(String key, String type, Metric value) {
+    public void updateValue(String key, Metric value) {
 	if (sender != null) 
-	    sender.send(key, type, value);
+	    sender.send(key, value);
 	else
-	    System.err.println("No JacORB!");
+	    dataFeed.newData(key, value);
     }
 
 

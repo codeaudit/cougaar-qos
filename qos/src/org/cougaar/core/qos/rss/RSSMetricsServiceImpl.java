@@ -23,6 +23,7 @@
 package org.cougaar.core.qos.rss;
 
 import com.bbn.quo.data.BoundDataFormula;
+import com.bbn.quo.data.DataFeed;
 import com.bbn.quo.data.DataFormula;
 import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
@@ -30,6 +31,8 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.RSSUtils;
 import com.bbn.quo.event.Connector;
+import com.bbn.quo.event.data.StatusConsumerFeed;
+
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.Metric;
@@ -140,20 +143,33 @@ public final class RSSMetricsServiceImpl
 	    }
 	}
 	properties.put("ServiceBroker", sb);
+	DataFeed feed = null;
+	String feedName = null;
+	TypedEventChannel channel = null;
 	if (mus instanceof STECMetricsUpdateServiceImpl) {
-	    TypedEventChannel channel =
+	    channel =
 		((STECMetricsUpdateServiceImpl) mus).getChannel();
 	    if (channel != null) {
 		String ior = Connector.orb().object_to_string(channel);
-		String feeds = properties.getProperty("rss.DataFeeds", "");
-		feeds += " STEC_Channel";
-		properties.put("rss.DataFeeds", feeds);
-		properties.put("STEC_Channel.class", 
-			       "com.bbn.quo.event.data.StatusConsumerFeed");
-		properties.put("STEC_Channel.args", "-ior " +ior);
+// 		String feeds = properties.getProperty("rss.DataFeeds", "");
+// 		feeds += " STEC_Channel";
+// 		properties.put("rss.DataFeeds", feeds);
+// 		properties.put("STEC_Channel.class", 
+// 			       "com.bbn.quo.event.data.StatusConsumerFeed");
+// 		properties.put("STEC_Channel.args", "-ior " +ior);
+		String[] args = { "-ior", ior };
+		feed = new StatusConsumerFeed(args);
+		feedName = "Local_STEC_Channel";
+	    } else {
+		feed = ((STECMetricsUpdateServiceImpl) mus).getMetricsFeed();
+		feedName = "MetricsDataFeed";
 	    }
-	}
+	} 
 	RSS.makeInstance(properties);
+	if (feed != null) {
+	    feed.setName(feedName);
+	    RSS.instance().registerFeed(feed, feedName);
+	}
     }
 
 
