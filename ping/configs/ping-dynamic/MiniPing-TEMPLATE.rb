@@ -35,7 +35,7 @@ Cougaar.new_experiment().run(parameters[:ping_pairs].length) {
 
   # Select your society config here
   do_action "InfoMessage", "#{parameters[:strategy]}, #{parameters[:ping_pairs][runcount]}, false, #{parameters[:hosts]}"
-  do_action parameters[:strategy], parameters[:ping_pairs][runcount].to_i, "false", parameters[:hosts]
+  do_action parameters[:strategy], parameters[:ping_pairs][runcount].to_i, "false", "#{parameters[:hosts]}"
   do_action "MapHosts", HOSTS_FILE
 
   do_action "TransformSociety", false, *parameters[:rules]
