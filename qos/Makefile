@@ -6,7 +6,8 @@ CLASSPATH=${COUGAARJAR}:${COUGAAR3RDPARTY}/QuoRSS.jar:${COUGAAR3RDPARTY}/QuoKern
 #CLASSPATH=${COUGAAR_INSTALL_PATH}/lib/core.jar:${QUO_ROOT}/lib/quoSumo.jar
 
 export CLASSPATH
-srcdir=src/org/cougaar/core/qos/rss
+pathdir=org/cougaar/core/qos/rss
+srcdir=src/$(pathdir)
 src=$(srcdir)/*.java
 
 jar=newqos.jar
@@ -17,7 +18,7 @@ all: $(jar)
 $(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
 	javac -d . $(src) 
 	rmic -d . -keep org.cougaar.core.qos.rss.MetricSCTie
-	touch $(srcdir)/MetricSCTie_Stub.java
+	mv $(pathdir)/*.java $(srcdir)
 
 
 $(jar):  $(src) 
