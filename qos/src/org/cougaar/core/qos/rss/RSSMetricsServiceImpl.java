@@ -33,7 +33,7 @@ import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.SitesDB;
 import com.bbn.quo.data.RSSUtils;
 
-
+import org.cougaar.util.ConfigFinder;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.DataProvider;
 import org.cougaar.core.qos.metrics.Metric;
@@ -46,13 +46,17 @@ import org.cougaar.core.qos.metrics.VariableEvaluator;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.thread.RunnableQueue;
 import org.cougaar.core.thread.Schedulable;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Timer;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -79,6 +83,8 @@ public class RSSMetricsServiceImpl
     private LoggingService loggingService;
     private ThreadService threadService;
     private RSSMetricsUpdateServiceImpl metricsUpdateService;
+    private RunnableQueue subscriptionQueue;
+    private HashMap bdfCache;
 
     private static class DataValueObserver 
 	implements Observer, DataProvider
@@ -135,6 +141,8 @@ public class RSSMetricsServiceImpl
 	threadService = (ThreadService)
 	    sb.getService(this, ThreadService.class, null);
 
+	subscriptionQueue = new RunnableQueue(threadService, "xxxx");
+
 	MetricsUpdateService mus = (MetricsUpdateService)
 	    sb.getService(this, MetricsUpdateService.class, null);
 	this.metricsUpdateService = (RSSMetricsUpdateServiceImpl) mus;
@@ -143,7 +151,7 @@ public class RSSMetricsServiceImpl
 	String propertiesURL = System.getProperty(RSS_PROPERTIES);
 	if (propertiesURL != null) {
 	    try {
-		java.net.URL url = new java.net.URL(propertiesURL);
+		URL url = new URL(propertiesURL);
 		java.io.InputStream is = url.openStream();
 		properties.load(is);
 		is.close();
@@ -157,8 +165,8 @@ public class RSSMetricsServiceImpl
 	RSSUtils.registerPackage("org.cougaar.core.qos.rss");
 
 	// Make a Timer available to RSS and TEC
-	Timer timer = new CougaarTimer(sb);
-	RSSUtils.setTimer(timer);
+// 	CougaarTimer timer = new CougaarTimer(sb);
+// 	RSSUtils.setTimer(timer);
 
 	DataFeed feed = null;
 	String feedName = null;
@@ -170,6 +178,8 @@ public class RSSMetricsServiceImpl
 	    feed.setName(feedName);
 	    RSS.instance().registerFeed(feed, feedName);
 	}
+
+	bdfCache = new HashMap();
 
 	// Used to start this here.  Now do it via loadable Component.
 	// AgentHostUpdaterComponent comp = new AgentHostUpdaterComponent();
@@ -187,15 +197,27 @@ public class RSSMetricsServiceImpl
     }
 
     public void populateSites(String sitesURLString) {
-	java.net.URL sitesURL =null;
-	try {
-	    sitesURL = new java.net.URL(sitesURLString);
-	} catch (java.net.MalformedURLException ex) {
-	    ex.printStackTrace();
-	}
+	ConfigFinder finder = ConfigFinder.getInstance();
 	SitesDB db = RSS.instance().getSitesDB();
-	if (sitesURL !=null && db != null) {
-	    db.populate(sitesURL);
+	try {
+	    URI uri = null;
+	    try {
+		uri = new URI(sitesURLString);
+	    } catch (java.net.URISyntaxException ex) {
+		return;
+	    }
+	    
+	    String scheme = uri.getScheme();
+	    String path = uri.getSchemeSpecificPart();
+	    if (scheme.equals(ConfigFinderDataFeedComponent.CONFIG_PROTOCOL)) {
+		InputStream stream = finder.open(path);
+		db.populate(stream);
+	    } else {
+		    URL sitesURL = new URL(sitesURLString);
+		    db.populate(sitesURL);
+	    }
+	} catch (Exception ex) {
+	    loggingService.error(null, ex);
 	}
     }
 
@@ -240,13 +262,30 @@ public class RSSMetricsServiceImpl
     }
 
 
+
     // Qos properties not supported yet
     public Metric getValue(String path, 
 			   VariableEvaluator evaluator,
 			   Properties qos_tags) 
     {
+	if (path == null) return null;
+
 	path = evaluateVariables(path, evaluator);
-	Object rawValue = RSSUtils.getPathValue(path);
+	BoundDataFormula bdf = null;
+	synchronized (bdfCache) {
+	    bdf = (BoundDataFormula) bdfCache.get(path);
+	    if (bdf == null) {
+		try { 
+		    bdf = new BoundDataFormula(path);	
+		} 
+		catch (com.bbn.quo.data.NullFormulaException ex) {
+		    return null;
+		}
+		bdfCache.put(path, bdf);
+	    }
+	}
+	Object rawValue = bdf.getCurrentValue();
+	// Object rawValue = RSSUtils.getPathValue(path);
 	
 	if (rawValue == null) {
 	    return null;
@@ -255,8 +294,9 @@ public class RSSMetricsServiceImpl
 	} else if (rawValue instanceof DataValue) {
 	    return  new DataWrapper((DataValue) rawValue);
 	} else {
-	    System.err.println("Unexpected data value " + rawValue +
-			       " for path " + path);
+	    if (loggingService.isErrorEnabled())
+		loggingService.error("Unexpected data value " + rawValue +
+				     " for path " + path);
 	    return null;
 	}
     }
@@ -295,9 +335,7 @@ public class RSSMetricsServiceImpl
 	    // 'dns' lookup.
 	    BoundDataFormula bdf = new BoundDataFormula(path, true, qual);
 	    Runnable binder = bdf.getDelayedFormulaCreator();
-	    Schedulable bdr = threadService.getThread(this, binder, 
-						      "BoundDataFormula");
-	    bdr.start();
+	    subscriptionQueue.add(binder);
 	    return new DataValueObserver(observer, bdf);
 	} catch (com.bbn.quo.data.NullFormulaException ex) {
 	    loggingService.error(path+ " is not valid");

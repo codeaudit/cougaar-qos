@@ -35,7 +35,6 @@ import com.bbn.quo.sysstat.DirectSysStatSupplier;
 
 import java.net.URI;
 import java.util.StringTokenizer;
-import java.util.TimerTask;
 
 /**
  * The implementation of MetricsUpdateService, and a child component
@@ -59,6 +58,7 @@ public class RSSMetricsUpdateServiceImpl
 {
     private static final String SYSSTAT_KINDS_PROPERTY = 
 	"org.cougaar.metrics.probes";
+    private static final int SYSTAT_PERIOD = 15000;
     
     private TrivialDataFeed dataFeed;
     private com.bbn.quo.data.DataInterpreter interpreter;
@@ -100,7 +100,7 @@ public class RSSMetricsUpdateServiceImpl
 	if (kinds == null || kinds.length > 0) {
 	    DirectSysStatSupplier supplier = 
 		new DirectSysStatSupplier(kinds, dataFeed);
-	    supplier.schedule(3000);
+	    supplier.schedule(SYSTAT_PERIOD);
 	}
 
     }

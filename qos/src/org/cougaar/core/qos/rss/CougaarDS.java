@@ -22,33 +22,24 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.ThreadService;
-import org.cougaar.core.thread.Schedulable;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
+import org.cougaar.core.service.LoggingService;
 
-import com.bbn.quo.data.TaskScheduler;
+import com.bbn.quo.data.DataScope;
 
-public class CougaarTimer implements TaskScheduler
+abstract class CougaarDS 
+    extends DataScope 
 {
-    private ThreadService threadService;
 
-    CougaarTimer(ServiceBroker sb) 
+    protected Logger logger;
+
+    CougaarDS(Object[] parameters, DataScope parent) 
+	throws DataScope.ParameterError
     {
-	threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
+	super(parameters, parent);
+	logger = Logging.getLogger(getClass().getName());
     }
-
-    public void schedule(Runnable task, long delay) 
-    {
-	Schedulable sched = threadService.getThread(this, task);
-	sched.schedule(delay);
-    }
-
-    public void schedule(Runnable task, long delay, long period) 
-    {
-	Schedulable sched = threadService.getThread(this, task);
-	sched.schedule(delay, period);
-    }
-
 
 }
+

@@ -26,13 +26,39 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
 import com.bbn.quo.data.SimpleQueueingDataFeed;
+import com.bbn.quo.data.DataValue;
 
 
 public class TrivialDataFeed 
     extends SimpleQueueingDataFeed
 {
+    private static final long HOLD_TIME = 500;
     private Schedulable thread;
 
+    private class Notifier implements Runnable {
+	public void run() { 
+	    long endTime= System.currentTimeMillis() + HOLD_TIME;
+	    // String key = nextKey();
+	    // DataValue value = null;
+	    do {
+		String key = nextKey();
+		if (key == null) break;
+		DataValue value = lookup(key);
+		if (value == null) continue;
+		notifyListeners(key, value); 
+	    } while (System.currentTimeMillis() <= endTime) ;
+// 	    if (key != null) {
+// 		value = lookup(key);
+// 		if (value != null) notifyListeners(key, value); 
+// 	    }
+	    if (!isEmpty()) thread.start();
+	}
+    }
+
+
+    protected Runnable makeNotifier() {
+	return new Notifier();
+    }
 
     TrivialDataFeed(ServiceBroker sb) {
 	super();
@@ -40,6 +66,7 @@ public class TrivialDataFeed
 	    sb.getService(this, ThreadService.class, null);
 	Runnable notifier = getNotifier();
 	thread = threadService.getThread(this, notifier, "TrivialDataFeed");
+	sb.releaseService(this, ThreadService.class, threadService);
     }
 
     protected void dispatch() {

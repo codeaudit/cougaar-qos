@@ -33,7 +33,7 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 
 public class DestinationDS 
-    extends DataScope 
+    extends CougaarDS
 {
     private static final String DESTINATION = "destination".intern();
 
@@ -88,7 +88,6 @@ public class DestinationDS
 	}
 
 	protected DataValue doCalculation(DataFormula.Values values) {
-	    // System.err.println("### Recalculating " +getKey());
 	    DataValue computedValue = values.get("Formula");
 	    DataValue defaultValue = defaultValue();
 	    return DataValue.mostCredible(computedValue, defaultValue);

@@ -66,7 +66,7 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	implements AgentHostUpdaterListener 
     {
 	protected MetricSC syscond;
-	private MessageAddress agentAddress;
+	protected MessageAddress agentAddress;
 
 	MetricSCListener(MetricSC syscond, MessageAddress address)
 	{
@@ -87,32 +87,6 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 
     }
 
-    private class JipsSyscondListener extends MetricSCListener {
-	JipsSyscondListener(MetricSC syscond, 
-			    MessageAddress address) 
-	{
-	    super(syscond, address);
-	}
-
-	public String path (String host) {
-	    return "Host(" +host+ "):Jips";
-	}
-    }
-
-
-    private class EffectiveJipsSyscondListener 
-	extends MetricSCListener 
-    {
-	EffectiveJipsSyscondListener(MetricSC syscond, 
-				     MessageAddress address) 
-	{
-	    super(syscond, address);
-	}
-
-	public String path (String host) {
-	    return "Host(" +host+ "):EffectiveMJips";
-	}
-    }
 
 
     private class BandwidthSyscondListener extends MetricSCListener
@@ -186,8 +160,11 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	if (syscond == null) {
 	    String name = addr+"MaxMJips";
 	    syscond = makeMetricSC(name);
-	    JipsSyscondListener syscondListener = 
-		new JipsSyscondListener(syscond, addr);
+	    try {
+		syscond.newPath("Agent(" +addr+ "):Jips");
+	    } catch (java.rmi.RemoteException ex) {
+		ex.printStackTrace();
+	    }
 	    effectiveJipsSysconds.put(addr, syscond);
 	}
 	return syscond;
@@ -200,8 +177,11 @@ final class SyscondFactoryImpl implements SyscondFactoryService
 	if (syscond == null) {
 	    String name = addr+"EffectiveMJips";
 	    syscond = makeMetricSC(name);
-	    EffectiveJipsSyscondListener syscondListener = 
-		new EffectiveJipsSyscondListener(syscond, addr);
+	    try {
+		syscond.newPath("Agent(" +addr+ "):EffectiveMJips");
+	    } catch (java.rmi.RemoteException ex) {
+		ex.printStackTrace();
+	    }
 	    jipsSysconds.put(addr, syscond);
 	}
 	return syscond;

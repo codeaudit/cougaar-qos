@@ -19,13 +19,8 @@
  * </copyright>
  */
 
-// Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
-import org.cougaar.core.component.ServiceBroker;
-
-import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.node.NodeIdentificationService;
 import org.cougaar.core.qos.metrics.Constants;
 
 import com.bbn.quo.data.DataFormula;
@@ -33,15 +28,17 @@ import com.bbn.quo.data.DataScope;
 import com.bbn.quo.data.DataScopeSpec;
 import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
-import com.bbn.quo.data.RSSUtils;
 
-public class ServiceDS 
-    extends CougaarDS
+
+public class AgentFlowDS 
+    extends CougaarDS 
 {
-    private static final String SERVICENAME = "servicename".intern();
+    private static final String SOURCE_AGENT = "sourceAgent".intern();
+    private static final String DESTINATION_AGENT = "destinationAgent".intern();
+    private static final DataValue NO_VALUE = DataValue.NO_VALUE;
 
 
-    public ServiceDS(Object[] parameters, DataScope parent) 
+    public AgentFlowDS(Object[] parameters, DataScope parent) 
 	throws DataScope.ParameterError
     {
 	super(parameters, parent);
@@ -51,39 +48,35 @@ public class ServiceDS
 	return false;
     }
 
-    // Service DataScopes can be the first element in a path.  They must
-    // find or make the corresponding NodeDS and return that as the
-    // preferred parent.
+    //AgentFlow should really to have an IpFlow as a Parent so that
+    //they can get the path capacity.  Also they need to have the
+    //Source and Destination hosts as perents in order to predict serialization cost
+    // The Flow Layering needs new Modeling primitives TBD later.
+    //JAZ Standalone for now
     protected DataScope preferredParent(RSS root) {
-	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	NodeIdentificationService node_id_svc = (NodeIdentificationService)
-	    sb.getService(this, NodeIdentificationService.class, null);
-	String nodeID = node_id_svc.getMessageAddress().toString();
-
-	Object[] params = { nodeID };
-	DataScopeSpec spec = new DataScopeSpec("Node", params);
-	DataScopeSpec[] path = { spec } ;
-	DataScope parent = root.getDataScope(path);
-	setParent(parent);
-	return parent;
+	return root;
     }
 
-
+    // Two Parameter which are Agent Names
     protected void verifyParameters(Object[] parameters) 
 	throws DataScope.ParameterError
     {
-	if (parameters == null || parameters.length != 1) {
-	    throw new DataScope.ParameterError("ServiceDS: wrong number of parameters");
+	if (parameters == null || parameters.length != 2) {
+	    throw new DataScope.ParameterError("AgentFlowDS: wrong number of parameters");
 	}
 	if (!(parameters[0] instanceof String)) {
-	    throw new DataScope.ParameterError("ServiceDS: wrong parameter type");
+	    throw new DataScope.ParameterError("AgentFlowDS: wrong parameter 1 type");
 	} else {
-	    // could canonicalize here
-	    String servicename = (String) parameters[0];
-	    bindSymbolValue(SERVICENAME, servicename);
+	    String source = (String) parameters[0];
+	    bindSymbolValue(SOURCE_AGENT, source);
+	}
+	if (!(parameters[1] instanceof String)) {
+	    throw new DataScope.ParameterError("AgentFlowDS: wrong parameter 2 type");
+	} else {
+	    String destination = (String) parameters[1];
+	    bindSymbolValue(DESTINATION_AGENT, destination);
 	}
     }
-
 
     abstract static class Formula 
 	extends DataFormula
@@ -92,14 +85,17 @@ public class ServiceDS
 	abstract String getKey();
 	
 	protected DataValue defaultValue() {
-	    return new DataValue(0);
+	    return NO_VALUE;
 	}
-	
 
 	protected void initialize(DataScope scope) {
 	    super.initialize(scope);
-	    String serviceName = (String) scope.getValue(SERVICENAME);
-	    String key = "Service" +KEY_SEPR+ serviceName +KEY_SEPR+ getKey();
+	    String sourceAgent = (String) scope.getValue(SOURCE_AGENT);
+	    String destinationAgent = (String) scope.getValue(DESTINATION_AGENT);
+	    String key = "AgentFlow" +KEY_SEPR+ 
+		sourceAgent  +KEY_SEPR+ 
+		destinationAgent +KEY_SEPR+ 
+		getKey();
 
 	    Object[] parameters = { key };
 	    DataScopeSpec spec = new DataScopeSpec("com.bbn.quo.data.IntegraterDS", 
@@ -117,48 +113,55 @@ public class ServiceDS
     }
 
 
-
-    public static class CPULoadAvg1SecAvg extends Formula {
+    public static class MsgRate1SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_AVG_1_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg10SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_10_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg100SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_100_SEC_AVG;
-	}
-    }	
-    public static class CPULoadAvg1000SecAvg extends Formula {
-	String getKey() {
-	    return Constants.CPU_LOAD_AVG_1000_SEC_AVG;
+	    return Constants.MSG_RATE_1_SEC_AVG;
 	}
     }	
 
-    public static class CPULoadMJips1SecAvg extends Formula {
+    public static class MsgRate10SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_1_SEC_AVG;
+	    return Constants.MSG_RATE_10_SEC_AVG;
 	}
     }	
-    public static class CPULoadMJips10SecAvg extends Formula {
+
+    public static class MsgRate100SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_10_SEC_AVG;
+	    return Constants.MSG_RATE_100_SEC_AVG;
 	}
     }	
-    public static class CPULoadMJips100SecAvg extends Formula {
+
+    public static class MsgRate1000SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_100_SEC_AVG;
+	    return Constants.MSG_RATE_1000_SEC_AVG;
 	}
     }	
-    public static class CPULoadMJips1000SecAvg extends Formula {
+
+
+    public static class ByteRate1SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_MJIPS_1000_SEC_AVG;
+	    return Constants.BYTE_RATE_1_SEC_AVG;
 	}
     }	
+
+    public static class ByteRate10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTE_RATE_10_SEC_AVG;
+	}
+    }	
+
+    public static class ByteRate100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTE_RATE_100_SEC_AVG;
+	}
+    }	
+
+    public static class ByteRate1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTE_RATE_1000_SEC_AVG;
+	}
+    }	
+
 
 }
 

@@ -47,7 +47,7 @@ public class Utils
 	readKernelProperties(kprops);
 	kprops.put("quoKernel.EvaluatorThread", "false");
 	String nodeName = System.getProperty("org.cougaar.node.name");
-  	kprops.put("quoKernel.Title",  "QuO Kernel: " +  nodeName);
+  	kprops.put("quoKernel.Title",  "QuOKernel-" +  nodeName);
 
 	QuoKernel kernel = KernelImpl.getKernelReference(kprops);
 

@@ -36,10 +36,11 @@ import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.RSSUtils;
 
 public class AgentDS 
-    extends DataScope 
+    extends CougaarDS
 {
     private static final String AGENTNAME = "agentname".intern();
     static final String TOPOLOGY = "topology";
+    static final String UNKNOWN_NODE = "FosterNode";
 
 
     public AgentDS(Object[] parameters, DataScope parent) 
@@ -66,19 +67,18 @@ public class AgentDS
 	String agentname = (String) getSymbolValue(AGENTNAME);
         String node = null;
 	try {
-	    AddressEntry entry = svc.get(agentname, TOPOLOGY);
+	    AddressEntry entry = svc.get(agentname, TOPOLOGY, 10);
 	    if (entry == null) {
-		System.err.println("# Can't find node for agent " +agentname);
-		node = "FosterNode";
+		if (logger.isWarnEnabled())
+		    logger.warn("Can't find node for agent " +agentname);
+		node = UNKNOWN_NODE;
 	    } else {
 		node = entry.getURI().getPath().substring(1);
 	    }
 	} catch (Exception ex) {
-	    ex.printStackTrace();
-	    node = "FosterNode";
+	    node = UNKNOWN_NODE;
 	}
 
-	// System.err.println("### Node of " +agentname+ "=" +node);
 
 
 
@@ -102,7 +102,6 @@ public class AgentDS
 	} else {
 	    // could canonicalize here
 	    String agentname = (String) parameters[0];
-	    // System.err.println("#### Created AgentDS for " +agentname);
 	    bindSymbolValue(AGENTNAME, agentname);
 	}
     }
@@ -132,7 +131,6 @@ public class AgentDS
 	}
 
 	protected DataValue doCalculation(DataFormula.Values values) {
-	    // System.err.println("### Recalculating " +getKey());
 	    DataValue computedValue = values.get("Formula");
 	    DataValue defaultValue = defaultValue();
 	    return DataValue.mostCredible(computedValue, defaultValue);
@@ -185,11 +183,6 @@ public class AgentDS
 	    long alarmTime = alarmDV.getLongValue();
 	    long elapsed = 0;
 
-// 	    String agentName = (String) getScope().getValue(AGENTNAME);
-// 	    System.err.println("Agent "+agentName+ 
-// 			       " send="+sendTime+
-// 			       " alarm="+alarmTime+
-// 			       " delta=" + (alarmTime - sendTime));
 
 	    if (alarmTime > sendTime) {
 		elapsed = (long) Math.floor((alarmTime-sendTime)/1000.0);
@@ -268,24 +261,24 @@ public class AgentDS
 	}
     }	
 
-    public static class CPULoadJips1SecAvg extends Formula {
+    public static class CPULoadMJips1SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_JIPS_1_SEC_AVG;
+	    return Constants.CPU_LOAD_MJIPS_1_SEC_AVG;
 	}
     }	
-    public static class CPULoadJips10SecAvg extends Formula {
+    public static class CPULoadMJips10SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_JIPS_10_SEC_AVG;
+	    return Constants.CPU_LOAD_MJIPS_10_SEC_AVG;
 	}
     }	
-    public static class CPULoadJips100SecAvg extends Formula {
+    public static class CPULoadMJips100SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_JIPS_100_SEC_AVG;
+	    return Constants.CPU_LOAD_MJIPS_100_SEC_AVG;
 	}
     }	
-    public static class CPULoadJips1000SecAvg extends Formula {
+    public static class CPULoadMJips1000SecAvg extends Formula {
 	String getKey() {
-	    return Constants.CPU_LOAD_JIPS_1000_SEC_AVG;
+	    return Constants.CPU_LOAD_MJIPS_1000_SEC_AVG;
 	}
     }	
 

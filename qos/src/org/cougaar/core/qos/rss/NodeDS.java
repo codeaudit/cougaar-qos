@@ -34,7 +34,8 @@ import com.bbn.quo.data.RSS;
 import java.util.Iterator;
 import java.util.Set;
 
-public class NodeDS extends DataScope
+public class NodeDS 
+    extends CougaarDS
 {
     static final String NODENAME = "nodename".intern();
     static final String TOPOLOGY = "topology";
@@ -51,6 +52,10 @@ public class NodeDS extends DataScope
 	return false;
     }
 
+    String getNodeName() {
+	return (String) getSymbolValue(NODENAME);
+    }
+
     // Node DataScopes can be the first element in a path.  They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
@@ -61,15 +66,15 @@ public class NodeDS extends DataScope
 	String nodename = (String) getSymbolValue(NODENAME);
 	String host = null;
 	try {
-	    AddressEntry entry = svc.get(nodename, TOPOLOGY);
+	    AddressEntry entry = svc.get(nodename, TOPOLOGY, 10);
 	    if (entry == null) {
-		System.err.println("# Can't find host for node " +nodename);
+		if (logger.isWarnEnabled())
+		    logger.warn("Can't find host for node " +nodename);
 		host = UNKNOWN_HOST_IP;
 	    } else {
 		host = entry.getURI().getHost();
 	    }
 	} catch (Exception ex) {
-	    ex.printStackTrace();
 	    host = UNKNOWN_HOST_IP;
 	}
 
