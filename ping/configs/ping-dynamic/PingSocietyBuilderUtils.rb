@@ -30,17 +30,17 @@ def addPing(source, dest, args=nil)
   destAgent = @run.society.agents[dest]
   puts "srcAgent = #{source}" 
   puts "destAgent = #{dest}"
- 
+  
   if args.nil?
     args =
       {'eventMillis' => '10000',    # delay between cougaar events
-       'delayMillis' => '0',        # delay between pings
-       'sendFillerSize' => '10000',     # extra bytes on send
-       'sendFillerRand' => 'false',  # randomize send bytes
+      'delayMillis' => '0',        # delay between pings
+      'sendFillerSize' => '10000',     # extra bytes on send
+      'sendFillerRand' => 'false',  # randomize send bytes
        'echoFillerSize' => '10000',     # extra bytes on ack
-       'echoFillerRand' => 'false'}  # randomize ack bytes
+      'echoFillerRand' => 'false'}  # randomize ack bytes
   end
- 
+  
   if srcAgent && destAgent
     srcAgent.add_component("org.cougaar.ping.PingAdderPlugin") do |c|
       c.classname = "org.cougaar.ping.PingAdderPlugin"
@@ -84,7 +84,7 @@ def addMgntNode(host, security)
       node.add_facet({'role' => 'AR-Management'})
       puts "Added FWD-MGMT-NODE"
     end
-
+    
     if security=="true"
       # AS Manager
       nsHost.add_node('SEC-MGMT-NODE') do |node|
@@ -120,11 +120,11 @@ end
 ##############################################
 module Cougaar
   module Actions
-
-#######################
-# Map hosts dynamically   
-#######################
-   class MapHosts < ::Cougaar::Action
+    
+    #######################
+    # Map hosts dynamically   
+    #######################
+    class MapHosts < ::Cougaar::Action
       PRIOR_STATES = ["SocietyLoaded"]
       DOCUMENTATION = Cougaar.document {
         @description = "Map hosts file."
@@ -161,23 +161,23 @@ module Cougaar
       end
     end
     
-
-####################################
-# Start configuration building here
-####################################
-
+    
+    ####################################
+    # Start configuration building here
+    ####################################
+    
     # Two hosts/nodes, multiple one-to-one pinging agent pairs
     class CreateOneToOnePing < Cougaar::Action
-      numAgents=0
+      numAgents=0	
       PRIOR_STATE = "SocietyLoaded"
       RESULTANT_STATE = "SocietyLoaded"      
       DOCUMENTATION = Cougaar.document {
         @description = "Create a one-to-one ping society definition."
         @parameters = [
           {:numAgents => "required, The number of agents in this corset-style society configuration"},
-          {:security => "optional, boolean to mark security loaded"},
+          {:security => "optional, boolean to mark security Management Node loaded"}
         ]
-        @example = "do_action 'CreateOneToOnePing', 'numAgents', 'security'
+        @example = "do_action 'CreateOneToOnePing', 'numAgents', 'security'"
       }
       def initialize(run, numAgents, security="false")
         super(run)
@@ -188,7 +188,7 @@ module Cougaar
 	@run.society.add_host('HOST1') do |host|
 	  host.add_node('NodeA') do |node|
 	    i=0
-	    puts("numAgents = ", @numAgents)
+	    puts("numAgents = #{@numAgents}")
 	    while i < @numAgents
 	      node.add_agent("src#{i}")
 	      i+=1
@@ -208,8 +208,8 @@ module Cougaar
 	    end
 	  end
 	end
-       # Add Manager Node / Agent & Nameserver
-       addMgntNode("HOST2", @security)
+	# Add Manager Node / Agent & Nameserver
+	addMgntNode("HOST2", @security)
       end     # perform
     end     # CreateOneToOnePing
     
@@ -338,29 +338,31 @@ module Cougaar
 	else
 	  @run.society.add_host('HOST2') do |host|  
 	    puts "Not Running With Hosts Enabled"
+            puts "Adding SinkNode"
 	    host.add_node("SinkNode") do |node|
 	      node.add_agent("sink")
 	      # Add pings here
 	      i=0
 	      @run.society.add_host('HOST1') do |host2|
 	        while i < @numSrcs               
-	        puts "Adding SrcNode#{i}"
-	        host2.add_node("SrcNode#{i}") do |node|
-		  node.add_agent("src#{i}")
-		  # Add pings here
-		  addPing("src#{i}", "sink")
-		  # wake once every second to check ping timeouts
-		  managePings('1000')
-		  i+=1
+		  puts "Adding SrcNode#{i}"
+	          host2.add_node("SrcNode#{i}") do |node|
+		    node.add_agent("src#{i}")
+		    # Add pings here
+		    addPing("src#{i}", "sink")
+		    # wake once every second to check ping timeouts
+		    managePings('1000')
+		    i+=1
+	          end
 	        end
 	      end
 	    end
 	  end
-	end
+	end  
 	# Add Manager Node / Agent & Nameserver
 	addMgntNode("HOST2", "false")
-      end   # perform
-    end    # CreateMultSrcToSinkPing
+      end   # perform   
+    end  # CreateMultSrcToSinkPing 
     
   end   # Actions
-end   # Cougaar
+end # Cougaar
