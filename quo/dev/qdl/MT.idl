@@ -8,7 +8,7 @@
 module org {
     module cougaar {
         module core {
-            module society {
+            module mts {
                 interface Message;
                 interface MessageAddress;
             };

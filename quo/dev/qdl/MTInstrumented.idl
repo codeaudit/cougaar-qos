@@ -11,7 +11,7 @@ typedef sequence<octet> byteSeq;
 module org {
     module cougaar {
         module core {
-            module society {
+            module mts {
                 interface Message;
                 interface MessageAddress;
             };
