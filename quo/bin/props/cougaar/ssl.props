@@ -1,7 +1,28 @@
-org.cougaar.lib.quo.kernel.gui=false
-org.cougaar.message.transport.aspects=org.cougaar.lib.mquo.RemoteSSLAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect,org.cougaar.core.mts.StepperAspect
+# Corba ORB
+# Enables the STEC
+org.omg.CORBA.ORBClass=org.jacorb.orb.ORB
+org.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton
+
+# SSL for naming
+org.cougaar.core.naming.useSSL=true
+
+#Aspects
+#org.cougaar.core.mts.StepperAspect
+org.cougaar.message.transport.aspects=org.cougaar.lib.mquo.RemoteSSLAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect
+
+#Protocols
 org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
+
+#Debugging
 org.cougaar.message.transport.debug=policy,comm,service
-org.cougaar.lib.quo.UseSSL=true
+
+#QuO Kernel Debugging GUI
+org.cougaar.lib.quo.kernel.gui=true
+
+#Default Trust
+org.cougaar.node.trustStatus=0
+
+#Force SSL on with true
+org.cougaar.lib.quo.UseSSL=false
 
 

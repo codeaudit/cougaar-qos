@@ -1,6 +1,38 @@
-org.cougaar.message.trafficGenerator.requestPeriod=3000
-org.cougaar.lib.quo.UseMasking=true
-org.cougaar.lib.quo.kernel.gui=false
-org.cougaar.message.transport.aspects=org.cougaar.lib.mquo.TrafficMaskAspect,org.cougaar.core.mts.TrafficMaskingGeneratorAspect
+#SSL for Naming
+org.cougaar.core.naming.useSSL=true
+
+# Link Protocols
+org.cougaar.message.protocol.classes=org.cougaar.core.mts.SSLRMILinkProtocol,org.cougaar.core.mts.RMILinkProtocol,org.cougaar.core.mts.LoopbackLinkProtocol
+
+# Corba ORB
+# Enables STEC
+org.omg.CORBA.ORBClass=org.jacorb.orb.ORB
+org.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton
+
+# Aspects
+#org.cougaar.core.mts.ForwardMessageLoggingAspect
+org.cougaar.message.transport.aspects=org.cougaar.core.mts.TrafficMaskingGeneratorAspect,org.cougaar.lib.mquo.RemoteSSLAspect,org.cougaar.lib.mquo.TrafficMaskAspect
+
+# STEC Mesh or Local
+org.cougaar.metrics.stec.mesh=false
+
+# Thread scheduling
+org.cougaar.thread.running.max=9
+
+# RSS/QuO
+org.cougaar.lib.quo.kernel.gui=true
+
+# Debug
 org.cougaar.message.transport.debug=traffic_masking_generator
-# org.cougaar.thread.running.max=1
+#org.cougaar.message.transport.debug=service
+
+#Default Trust
+org.cougaar.node.trustStatus=0
+
+# Force RemoteSSL
+#org.cougaar.lib.quo.UseSSL=true
+
+# Force Traffic Masking
+# org.cougaar.lib.quo.UseMasking=true
+
+
