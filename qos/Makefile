@@ -16,7 +16,7 @@ all: $(jar)
 
 
 $(srcdir)/MetricSCTie_Stub.java: $(srcdir)/MetricSCTie.java
-	javac -d . $(src) 
+	javac -d . $(srcdir)/MetricSCTie.java
 	rmic -d . -keep org.cougaar.core.qos.rss.MetricSCTie
 	mv $(pathdir)/*.java $(srcdir)
 

@@ -8,9 +8,11 @@ thirdparty=dev/3rdparty
 depends=$(thirdparty)/QuoKernel.jar:$(thirdparty)/QuoRSS.jar:$(thirdparty)/QuoInstr.jar:$(thirdparty)/UnixUtils.jar:$(thirdparty)/instrumentation.jar:$(thirdparty)/jacorb.jar
 
 pkg=org.cougaar.lib.quo
-srcdir=org/cougaar/lib/quo
-msrcdir=org/cougaar/lib/mquo
+pathdir=org/cougaar/lib/quo
+srcdir=src/$(pathdir)
 
+stub_file=$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object_Stub.java
+rmic_file=$(srcdir)/MTInstrumentedInstrumentedServerDelegate_object.java
 rmic_class=$(pkg).MTInstrumentedInstrumentedServerDelegate_object
 
 CLASSPATH=$(cougaar):$(qos):$(depends):$(classes)
@@ -36,9 +38,13 @@ gen:
 	mkdir -p $(classes)
 
 
+$(stub_file): $(rmic_file)
+	javac  -d $(classes) $(rmic_file)
+	rmic $(rmic_class) -d $(classes) -keep
+	mv $(classes)/$(pathdir)/*.java $(srcdir)
+
 $(jar): $(src) 
 	javac  -d $(classes) $(src)
-	rmic $(rmic_class) -d $(classes)
 	rmic -d $(classes)  org.cougaar.lib.mquo.ZippyTestServerImpl
 	jar cf $(jar) -C $(classes) .
 
