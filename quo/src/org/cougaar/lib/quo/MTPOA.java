@@ -47,10 +47,10 @@ public abstract class MTPOA
 				_out = handler.createExceptionReply();
 				org.cougaar.lib.quo.CorbaMisdeliveredMessageHelper.write(_out, _ex0);
 			}
-			catch(org.cougaar.lib.quo.CorbaMessageSecurityException _ex1)
+			catch(org.cougaar.lib.quo.CorbaDontRetryException _ex1)
 			{
 				_out = handler.createExceptionReply();
-				org.cougaar.lib.quo.CorbaMessageSecurityExceptionHelper.write(_out, _ex1);
+				org.cougaar.lib.quo.CorbaDontRetryExceptionHelper.write(_out, _ex1);
 			}
 				break;
 			}

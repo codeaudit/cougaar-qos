@@ -16,7 +16,7 @@ public class _MTStub
 	}
 
 	public final static java.lang.Class _opsClass = org.cougaar.lib.quo.MTOperations.class;
-	public byte[] rerouteMessage(byte[] message) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage,org.cougaar.lib.quo.CorbaMessageSecurityException
+	public byte[] rerouteMessage(byte[] message) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage,org.cougaar.lib.quo.CorbaDontRetryException
 	{
 		while(true)
 		{
@@ -39,9 +39,9 @@ public class _MTStub
 				{
 					throw org.cougaar.lib.quo.CorbaMisdeliveredMessageHelper.read(_ax.getInputStream());
 				}
-				else if( _id.equals("IDL:cougaar/CorbaMessageSecurityException:1.0"))
+				else if( _id.equals("IDL:cougaar/CorbaDontRetryException:1.0"))
 				{
-					throw org.cougaar.lib.quo.CorbaMessageSecurityExceptionHelper.read(_ax.getInputStream());
+					throw org.cougaar.lib.quo.CorbaDontRetryExceptionHelper.read(_ax.getInputStream());
 				}
 				else 
 					throw new RuntimeException("Unexpected exception " + _id );

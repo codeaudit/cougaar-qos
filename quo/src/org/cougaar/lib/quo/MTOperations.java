@@ -7,5 +7,5 @@ package org.cougaar.lib.quo;
 
 public interface MTOperations
 {
-	byte[] rerouteMessage(byte[] message) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage,org.cougaar.lib.quo.CorbaMessageSecurityException;
+	byte[] rerouteMessage(byte[] message) throws org.cougaar.lib.quo.CorbaMisdeliveredMessage,org.cougaar.lib.quo.CorbaDontRetryException;
 }

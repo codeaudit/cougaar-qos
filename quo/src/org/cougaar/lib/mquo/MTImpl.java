@@ -23,7 +23,7 @@ import org.cougaar.core.mts.AttributedMessage;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.mts.MessageDeliverer;
-import org.cougaar.core.mts.MessageSecurityException;
+import org.cougaar.core.mts.DontRetryException;
 import org.cougaar.core.mts.MisdeliveredMessageException;
 import org.cougaar.core.mts.SerializationUtils;
 
@@ -41,27 +41,27 @@ public class MTImpl extends MTPOA
     }
 
 
-    private void securityException(MessageSecurityException mex)
-	throws CorbaMessageSecurityException
+    private void dontRetryException(DontRetryException mex)
+	throws CorbaDontRetryException
     {
 	try {
 	    byte[] exception = SerializationUtils.toByteArray(mex);
-	    throw new CorbaMessageSecurityException(exception);
+	    throw new CorbaDontRetryException(exception);
 	} catch  (java.io.IOException iox) {
 	}
 	
-	throw new CorbaMessageSecurityException();
+	throw new CorbaDontRetryException();
     }
 
     public byte[] rerouteMessage(byte[] message_bytes) 
-	throws CorbaMisdeliveredMessage, CorbaMessageSecurityException
+	throws CorbaMisdeliveredMessage, CorbaDontRetryException
     {
 	AttributedMessage message = null;
 	try {
 	    message = (AttributedMessage) 
 		SerializationUtils.fromByteArray(message_bytes);
-	} catch (MessageSecurityException mex) {
-	    securityException(mex);
+	} catch (DontRetryException mex) {
+	    dontRetryException(mex);
 	} catch (java.io.IOException iox) {
 	} catch (ClassNotFoundException cnf) {
 	}
@@ -77,8 +77,8 @@ public class MTImpl extends MTPOA
 	byte[] reply_bytes = null;
 	try {
 	    reply_bytes = SerializationUtils.toByteArray(metadata);
-	} catch (MessageSecurityException mex) {
-	    securityException(mex);
+	} catch (DontRetryException mex) {
+	    dontRetryException(mex);
 	} catch (java.io.IOException iox) {
 	}
 

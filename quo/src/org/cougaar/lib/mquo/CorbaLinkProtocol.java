@@ -31,7 +31,7 @@ import org.cougaar.core.mts.DestinationLink;
 import org.cougaar.core.mts.LinkProtocol;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MessageAttributes;
-import org.cougaar.core.mts.MessageSecurityException;
+import org.cougaar.core.mts.DontRetryException;
 import org.cougaar.core.mts.MessageTransportClient;
 import org.cougaar.core.mts.MisdeliveredMessageException;
 import org.cougaar.core.mts.NameLookupException;
@@ -248,7 +248,7 @@ public class CorbaLinkProtocol
 	    byte[] bytes = null;
 	    try {
 		bytes = SerializationUtils.toByteArray(message);
-	    } catch (MessageSecurityException mex) {
+	    } catch (DontRetryException mex) {
 		throw new CommFailureException(mex);
 	    } catch (java.io.IOException iox) {
 		// What would this mean?
@@ -261,10 +261,10 @@ public class CorbaLinkProtocol
 		// force recache of remote
 		remote = null;
 		throw new MisdeliveredMessageException(message);
-	    } catch (CorbaMessageSecurityException mex) {
-		byte[] ex_bytes = mex.security_exception;
+	    } catch (CorbaDontRetryException mex) {
+		byte[] ex_bytes = mex.cause;
 		try {
-		    MessageSecurityException mse = (MessageSecurityException)
+		    DontRetryException mse = (DontRetryException)
 			SerializationUtils.fromByteArray(ex_bytes);
 		    throw new CommFailureException(mse);
 		} catch (Exception ex) {
@@ -276,7 +276,7 @@ public class CorbaLinkProtocol
 	    try {
 		attrs = (MessageAttributes) 
 		    SerializationUtils.fromByteArray(res);
-	    } catch (MessageSecurityException mex) {
+	    } catch (DontRetryException mex) {
 		throw new CommFailureException(mex);
 	    } catch (java.io.IOException iox) {
 		// What would this mean?
