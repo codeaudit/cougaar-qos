@@ -171,11 +171,11 @@ public class SingleInheritanceFrameSet
 	    return null;
 	} else {
 	    Frame result = findFrame(proto, slot, value);
-	    if (result == null && log.isWarnEnabled()) {
-			log.info(" Proto = " +proto+
-				 " Slot = " +slot+
-				 " Value = " +value+
-				 " not found");
+	    if (log.isDebugEnabled()) {
+		log.info(" Proto = " +proto+
+			 " Slot = " +slot+
+			 " Value = " +value+
+			 " Result = " +result);
 	    }
 	    return result;
 	}
@@ -326,11 +326,17 @@ public class SingleInheritanceFrameSet
 					child_proto_slot, 
 					child_slot_slot,
 					child_value_slot);
+		    if (log.isDebugEnabled())
+			log.debug("Candidate = " +c+
+				  " child = " +child);
+
 		    if ( c != null && c.equals(child)) {
 			Frame parent = getRelate(relationship,
 						parent_proto_slot, 
 						parent_slot_slot,
 						parent_value_slot);
+			if (log.isDebugEnabled())
+			    log.debug("Adding parent " + parent);
 			if (parent != null) results.add(parent);
 		    }		    
 		}
@@ -462,12 +468,16 @@ public class SingleInheritanceFrameSet
     {
 	String proto = frame.getKind();
 	if (proto == null) return false;
-	if (proto.equals(prototype)) return true;
+	if (proto.equals(prototype)) {
+	    return true;
+	}
 	Frame proto_frame = null;
 	synchronized (prototypes) {
 	    proto_frame = (Frame) prototypes.get(proto);
 	}
-	return proto_frame != null &&  descendsFrom(proto_frame, prototype);
+	boolean result =
+	    proto_frame != null &&  descendsFrom(proto_frame, prototype);
+	return result;
     }
 
     // In this case the proto argument refers to what the prototype

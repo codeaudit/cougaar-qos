@@ -313,7 +313,7 @@ public class FrameViewerServlet extends ComponentServlet {
           (parent == null ? "<i>null</i>" :
            parent.getKind()+" ("+linkToUID(parent.getUID())+")")+
           "</td></tr>\n");
-      Properties vp = f.getProperties();
+      Properties vp = f.getLocalSlots();
       int nvp = (vp == null ? 0 : vp.size());
       out.print(
           "<tr><td colspan=4>Properties["+nvp+"]:</td></tr>\n");

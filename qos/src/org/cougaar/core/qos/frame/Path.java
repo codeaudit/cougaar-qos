@@ -29,8 +29,13 @@ package org.cougaar.core.qos.frame;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
+
 class Path
 {
+    private transient Logger log = Logging.getLogger(getClass().getName());
+
     static class Fork {
 	Fork(String role, String relation)
 	{
@@ -65,11 +70,34 @@ class Path
 
     private Object getNextValue(Frame frame, int index)
     {
-	if (index == forks.length) return frame.getValue(slot);
+	if (log.isDebugEnabled())
+	    log.debug("Walking path " +name+
+		      " index=" +index+
+		      " frame=" +frame+
+		      " length=" +forks.length);
+
+	if (index == forks.length) {
+	    Object value = frame.getValue(slot);
+	    if (log.isDebugEnabled())
+		log.debug("End of path at " +frame+
+			  " value of " +slot+ " = "
+			  +value);
+	    return value;
+	}
 
 	Fork entry = forks[index];
 	Set frames = frame.findRelations(entry.role, entry.relation);
-	if (frames == null) return null;
+	if (frames == null) {
+	    if (log.isDebugEnabled())
+		log.debug(frame+ " has no relations of type "
+			  +entry.relation+ " role=" +entry.role);
+	    return null;
+	}
+
+	if (log.isDebugEnabled())
+	    log.debug(frames.size() + " matches for relation "
+		      +entry.relation+ " role=" +entry.role);
+
 	Iterator itr = frames.iterator();
 	while (itr.hasNext()) {
 	    Frame next = (Frame) itr.next();

@@ -70,9 +70,36 @@ public class Frame
     }
 
     // Only here for the Tasks servlet
-    public VisibleProperties getProperties()
+    public VisibleProperties getLocalSlots()
     {
 	return properties;
+    }
+
+
+    public VisibleProperties getDerivedSlots()
+    {
+	VisibleProperties props = new VisibleProperties();
+	try {
+	    Set slot_names = getAllSlotNames();
+	    Iterator itr = slot_names.iterator();
+	    while (itr.hasNext()) {
+		String slot_name = (String) itr.next();
+		if (!properties.containsKey(slot_name)) {
+		    Object value = getValue(slot_name);
+		    if (value != null) {
+			props.put(slot_name, value);
+		    } else {
+			if (log.isInfoEnabled())
+			    log.info("Derived slot " +slot_name+
+				     " has no value");
+		    }
+		}
+	    }
+	} catch (Throwable t) {
+	    log.error("Error computing derived slots", t);
+	}
+
+	return props;
     }
 
     public String getParentKind()
@@ -134,16 +161,21 @@ public class Frame
 
     public Object getValue(String slot)
     {
+	return getValue(this, slot);
+    }
+
+    Object getValue(Frame origin, String slot)
+    {
 	Object result = properties.get(slot);
 	if (result != null) return result;
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) {
-	    result = prototype.getValue(slot);
+	    result = prototype.getValue(origin, slot);
 	    if (result != null) return result;
 	}
 	Frame parent = frameSet.getParent(this);
 	if (parent != null) {
-	    return parent.getValue(slot);
+	    return parent.getValue(origin, slot);
 	}
 	return null;
     }
@@ -165,9 +197,14 @@ public class Frame
 	return null;
     }
 
-    private void addSlotNames(Set set)
+    void addLocalSlotNames(Set set)
     {
 	if (properties != null) set.addAll(properties.keySet());
+    }
+
+    private void addSlotNames(Set set)
+    {
+	addLocalSlotNames(set);
 	Frame prototype = frameSet.getPrototype(this);
 	if (prototype != null) prototype.addSlotNames(set);
 	Frame parent =  frameSet.getParent(this);
@@ -181,6 +218,7 @@ public class Frame
 	return set;
     }
     
+
     public Set findRelations(String role, String relation)
     {
 	return frameSet.findRelations(this, role, relation);
@@ -216,6 +254,11 @@ public class Frame
     // Hack for servlet
     public static class VisibleProperties extends Properties
     {
+	VisibleProperties()
+	{
+	    super();
+	}
+
 	VisibleProperties(Properties properties) 
 	{
 	    super();

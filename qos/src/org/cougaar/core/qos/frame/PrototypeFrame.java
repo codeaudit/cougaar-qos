@@ -29,6 +29,7 @@ package org.cougaar.core.qos.frame;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
 
 import org.cougaar.core.util.UID;
 
@@ -50,17 +51,16 @@ public class PrototypeFrame
 	this.paths = paths;
     }
 
-    public Object getValue(String slot)
+    Object getValue(Frame origin, String slot)
     {
 	if (paths != null) {
-	    Path path = null;
-	    path = (Path) paths.get(slot);
+	    Path path = (Path) paths.get(slot);
 	    if (path != null) {
-		Object result = path.getValue(this);
+		Object result = path.getValue(origin);
 		if (result != null) return result;
 	    }
 	}
-	return super.getValue(slot);
+	return super.getValue(origin, slot);
     }
 
     public String getPrototypeName()
@@ -76,8 +76,14 @@ public class PrototypeFrame
 
     void copyToFrameSet(FrameSet frameSet)
     {
-	frameSet.makePrototype(prototype_name, getKind(), getProperties(), 
+	frameSet.makePrototype(prototype_name, getKind(), getLocalSlots(), 
 			       getUID());
+    }
+
+    void addLocalSlotNames(Set set)
+    {
+	super.addLocalSlotNames(set);
+	if (paths != null) set.addAll(paths.keySet());
     }
 
 }
