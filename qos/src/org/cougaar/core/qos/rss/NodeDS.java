@@ -36,7 +36,7 @@ import java.util.Set;
 
 public class NodeDS extends DataScope
 {
-    private static final String NODENAME = "nodename".intern();
+    static final String NODENAME = "nodename".intern();
 
 
     public NodeDS(Object[] parameters, DataScope parent) 

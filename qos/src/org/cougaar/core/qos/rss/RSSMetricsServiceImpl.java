@@ -86,6 +86,12 @@ public class RSSMetricsServiceImpl
 					org.cougaar.core.qos.rss.ServiceDS.class);
 	DataScopeSpec.defineNameToClass("SERVICE", 
 					org.cougaar.core.qos.rss.ServiceDS.class);
+	DataScopeSpec.defineNameToClass("Destination",
+					org.cougaar.core.qos.rss.DestinationDS.class);
+	DataScopeSpec.defineNameToClass("destination", 
+					org.cougaar.core.qos.rss.DestinationDS.class);
+	DataScopeSpec.defineNameToClass("DESTINATION", 
+					org.cougaar.core.qos.rss.DestinationDS.class);
     }
 
 
