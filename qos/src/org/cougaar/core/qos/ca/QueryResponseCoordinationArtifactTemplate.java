@@ -27,7 +27,6 @@
 package org.cougaar.core.qos.ca;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.BlackboardService;
 
 /**
  * This plugin is the generic implementation of a multicast
@@ -60,10 +59,9 @@ abstract public class QueryResponseCoordinationArtifactTemplate
     implements QueryCoordArtConstants
 {
     public QueryResponseCoordinationArtifactTemplate(String kind,
-						     BlackboardService bbs,
 						     ServiceBroker sb) 
     {
-	super(kind, bbs, sb);
+	super(kind, sb);
     }
     
 

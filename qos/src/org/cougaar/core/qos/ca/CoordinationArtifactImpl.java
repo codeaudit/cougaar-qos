@@ -32,7 +32,6 @@ import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
-import org.cougaar.core.service.BlackboardService;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
@@ -67,8 +66,7 @@ abstract public class CoordinationArtifactImpl
 
     // Extensions of can make specific kinds of facets.  Here we make
     // the generic one.
-    abstract protected Facet makeFacet(ConnectionSpec spec, 
-				       RolePlayer player);
+    abstract protected Facet makeFacet(ConnectionSpec spec, RolePlayer player);
 
 
 
@@ -87,9 +85,7 @@ abstract public class CoordinationArtifactImpl
     }
 
 
-    public void provideFacet(ConnectionSpec spec, 
-			     RolePlayer player,
-			     BlackboardService blackboard)
+    public void provideFacet(ConnectionSpec spec, RolePlayer player)
     {
 	if (logger.isDebugEnabled())
 	    logger.debug("Providing facet for " + spec.logString());
@@ -97,59 +93,7 @@ abstract public class CoordinationArtifactImpl
 	synchronized (facets) {
 	    facets.add(facet);
 	}
-	try {
-	    blackboard.openTransaction();
-	    facet.setupSubscriptions(blackboard);
-	} catch (Exception ex) {
-	    ex.printStackTrace();
-	} finally {
-	    blackboard.closeTransaction();
-	}
     }
 
     
-    // Two circumstances in which this runs:
-    // (1) subscription (ResponsePred)
-    // (2) new fact assertion or retraction in our fact base
-    public void execute(BlackboardService blackboard) 
-    {
-	List copy = null;
-	synchronized (facets) {
-	    copy = new ArrayList(facets);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    Facet facet = (Facet) copy.get(i);
- 	    facet.execute(blackboard);
-	}
-    }
-
-    public void runRuleEngine(BlackboardService blackboard) 
-    {
-	List copy = null;
-	synchronized (facets) {
-	    copy = new ArrayList(facets);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    Facet facet = (Facet) copy.get(i);
-	    facet.runRuleEngine(blackboard);
-	}
-    }
-
-    public void processFactBase(BlackboardService blackboard) 
-    {
-	List copy = null;
-	synchronized (facets) {
-	    copy = new ArrayList(facets);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    Facet facet = (Facet) copy.get(i);
-	    facet.processFactBase(blackboard);
-	}
-    }
-
-
-    public void triggerExecute()
-    {
-	owner.triggerExecute();
-    }
 }

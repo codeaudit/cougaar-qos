@@ -109,13 +109,13 @@ abstract public class QueryFacet
     /*
      * 	subscribe to ResponseRelays from yourself & all DOSNODEs
      */
-    public void setupSubscriptions(BlackboardService blackboard) 
+    protected void setupSubscriptions(BlackboardService blackboard) 
     {
 	responseSub = (IncrementalSubscription)
 	    blackboard.subscribe(ResponsePred);
     }
 
-    public void execute(BlackboardService blackboard)
+    protected void execute(BlackboardService blackboard)
     {
 	if (responseSub == null || !responseSub.hasChanged()) return;
 
@@ -161,7 +161,7 @@ abstract public class QueryFacet
 
 
     // Fact processing
-    public void processFactBase(BlackboardService blackboard)
+    protected void processFactBase(BlackboardService blackboard)
     {
 	if (!factsHaveChanged()) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {
@@ -177,7 +177,7 @@ abstract public class QueryFacet
 	}
     }
 
-    protected void sendQuery(Object query, BlackboardService blackboard)
+    protected void sendQuery(Object fact, BlackboardService blackboard)
     {
 	if (log.isDebugEnabled()) {
 	    log.debug("sendQueries()");
@@ -190,7 +190,7 @@ abstract public class QueryFacet
 	UID uid = nextUID();
 	long timestamp = System.currentTimeMillis();
 	QueryRelay qr = 
-	    new QueryRelayImpl(uid, getAgentID(), aba, query, timestamp);
+	    new QueryRelayImpl(uid, getAgentID(), aba, fact, timestamp);
 	if (log.isInfoEnabled()) {
 	    log.info("Sending QueryRelay from " +getAgentID() +
 		      " to all nodes in community: " + getCommunity());

@@ -37,7 +37,6 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.LoggingService;
-import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 
@@ -78,9 +77,8 @@ public class CoordinationArtifactBrokerPlugin
 	localTemplates = new ArrayList();
 	ServiceBroker sb = getServiceBroker();
 	synchronized (localTemplates) {
-	    BlackboardService bbs = getBlackboardService();
 	    for (int i=0; i<StandardTemplates.length; i++) {
-		makeTemplate(StandardTemplates[i], bbs, sb);
+		makeTemplate(StandardTemplates[i], sb);
 	    }
 
 	    String templates = getParameter(TemplatesParam);
@@ -88,22 +86,20 @@ public class CoordinationArtifactBrokerPlugin
 		StringTokenizer tk = new StringTokenizer(templates, ",");
 		while (tk.hasMoreTokens()) {
 		    String klass = tk.nextToken();
-		    makeTemplate(klass, bbs, sb);
+		    makeTemplate(klass, sb);
 		}
 	    }
 	}
     }
 
 
-    private void makeTemplate(String klass, 
-			      BlackboardService bbs,
-			      ServiceBroker sb)
+    private void makeTemplate(String klass, ServiceBroker sb)
     {
 	Object template = null;
 	try {
 	    Class cl = Class.forName(klass);
-	    Class[] ptypes = { BlackboardService.class, ServiceBroker.class };
-	    Object[] args = { bbs, sb };
+	    Class[] ptypes = { ServiceBroker.class };
+	    Object[] args = { sb };
 	    Constructor cons = cl.getConstructor(ptypes);
 	    template = cons.newInstance(args);
 	    if (template instanceof CoordinationArtifactTemplateImpl) {
@@ -124,16 +120,6 @@ public class CoordinationArtifactBrokerPlugin
     // plugin
     protected void execute()
     {
-	if (localTemplates == null) return;
-
-	synchronized (localTemplates) {
-	    CoordinationArtifactTemplateImpl template;
-	    for (int i=0; i<localTemplates.size(); i++) {
-		template = (CoordinationArtifactTemplateImpl)
-		    localTemplates.get(i);
-		template.execute();
-	    }
-	}
     }
 
     protected void setupSubscriptions() 

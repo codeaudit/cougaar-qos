@@ -27,7 +27,6 @@
 package org.cougaar.core.qos.ca;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.BlackboardService;
 
 /**
  * CA interface to Alarms
@@ -38,10 +37,9 @@ abstract public class AlarmCoordinationArtifactTemplate
 
     private static final String AlarmCA = "AlarmCA";
 
-    public AlarmCoordinationArtifactTemplate(BlackboardService bbs,
-					     ServiceBroker sb) 
+    public AlarmCoordinationArtifactTemplate(ServiceBroker sb) 
     {
-	super(AlarmCA, bbs, sb);
+	super(AlarmCA, sb);
     }
     
 

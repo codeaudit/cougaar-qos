@@ -114,12 +114,12 @@ abstract public class FacetImpl
 
     // Facet.  Other methods of this interface are handled by
     // extensions.
-    public String getArtifactId()
+    protected String getArtifactId()
     {
 	return owner.getArtifactId();
     }
 
-    public String getArtifactKind()
+    protected String getArtifactKind()
     {
 	return owner.getArtifactKind();
     }
@@ -150,11 +150,6 @@ abstract public class FacetImpl
     }
 
 
-    public void runRuleEngine(BlackboardService blackboard)
-    {
-	player.runRuleEngine();
-    }
-
     
     // Fact base
     protected boolean factsHaveChanged()
@@ -179,7 +174,7 @@ abstract public class FacetImpl
 	synchronized (factQueue) {
 	    factQueue.add(entry);
 	}
-	owner.triggerExecute();
+	player.triggerExecute();
     }
 
 
@@ -202,6 +197,18 @@ abstract public class FacetImpl
 	    log.info("Linking " +player+ " to " +this);
 	receptacle = makeReceptacle();
 	player.facetAvailable(spec, receptacle);
+    }
+
+    protected void setupSubscriptions(BlackboardService blackboard)
+    {
+    }
+
+    protected void execute(BlackboardService blackboard)
+    {
+    }
+
+    protected void processFactBase(BlackboardService blackboard)
+    {
     }
 
 
@@ -230,6 +237,20 @@ abstract public class FacetImpl
 	    return FacetImpl.this.getArtifactKind();
 	}
 
+	public void setupSubscriptions(BlackboardService bbs)
+	{
+	    FacetImpl.this.setupSubscriptions(bbs);
+	}
+	
+	public void execute(BlackboardService bbs)
+	{
+	    FacetImpl.this.execute(bbs);
+	}
+
+	public void processFactBase(BlackboardService bbs)
+	{
+	    FacetImpl.this.processFactBase(bbs);
+	}
 
     }
 

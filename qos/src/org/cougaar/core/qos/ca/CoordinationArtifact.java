@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.ca;
 
-import org.cougaar.core.service.BlackboardService;
 
 /**
  * See the package javadoc for more details on CoordinationArtifacts.
@@ -50,36 +49,7 @@ public interface CoordinationArtifact
      * handles this by deferring the creation to an abstract method.
      * 
     */
-    public void provideFacet(ConnectionSpec spec, RolePlayer player,
-			     BlackboardService blackboard);
-
-
-    /**
-     * This method is used to request a Blackboard execution.
-    */
-    public void triggerExecute();
-
-
-    /**
-     * Handle subscriptions in a Blackboard transaction.  This will be
-     * invoked from within the corresponding {@link
-     * CoordinationArtifactTemplate} plugin's execute method.
-     */
-    public void execute(BlackboardService service);
-
-    /**
-     * Run the rule engine in a Blackboard transaction.  This will be
-     * invoked from within the corresponding {@link
-     * CoordinationArtifactTemplate} plugin's execute method.
-     */
-    public void runRuleEngine(BlackboardService service);
-
-    /**
-     * Process fact base in a Blackboard transaction.  This will be
-     * invoked from within the corresponding {@link
-     * CoordinationArtifactTemplate} plugin's execute method.
-     */
-    public void processFactBase(BlackboardService service);
+    public void provideFacet(ConnectionSpec spec, RolePlayer player);
 
 
     /**

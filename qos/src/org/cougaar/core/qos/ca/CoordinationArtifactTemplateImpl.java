@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.BlackboardService;
 
 /**
  * This class represents the base implementation of a {@link
@@ -47,7 +46,6 @@ abstract public class CoordinationArtifactTemplateImpl
 
     private ArrayList artifacts;
     private ServiceBroker sb;
-    private BlackboardService bbs;
     private String kind;
 
     /**
@@ -56,14 +54,11 @@ abstract public class CoordinationArtifactTemplateImpl
      */
     abstract public CoordinationArtifact makeArtifact(ConnectionSpec spec);
 
-    protected CoordinationArtifactTemplateImpl(String kind, 
-					       BlackboardService bbs,
-					       ServiceBroker sb)
+    protected CoordinationArtifactTemplateImpl(String kind, ServiceBroker sb)
     {
 	this.artifacts = new ArrayList();
 	this.sb = sb;
 	this.kind = kind;
-	this.bbs = bbs;
 	CoordinationArtifactBroker cab = (CoordinationArtifactBroker) 
 	    sb.getService(this, CoordinationArtifactBroker.class, null);
 	cab.registerCoordinationArtifactTemplate(this);
@@ -91,7 +86,7 @@ abstract public class CoordinationArtifactTemplateImpl
     public void provideFacet(ConnectionSpec spec, RolePlayer player)
     {
 	CoordinationArtifact artifact = findOrMakeArtifact(spec);
-	if (artifact != null) artifact.provideFacet(spec, player, bbs);
+	if (artifact != null) artifact.provideFacet(spec, player);
     }
 
     private CoordinationArtifact findOrMakeArtifact(ConnectionSpec spec)
@@ -109,37 +104,6 @@ abstract public class CoordinationArtifactTemplateImpl
 	    return ca;
 	}
     }
-
-
-    public void triggerExecute()
-    {
-	bbs.signalClientActivity();
-    }
-
-    
-    // Two circumstances in which this runs:
-    // (1) subscription (ResponsePred)
-    // (2) new fact assertion or retraction in our fact base
-    protected void execute() 
-    {
-	List copy = null;
-	synchronized (artifacts) {
-	    copy = new ArrayList(artifacts);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.execute(bbs);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.runRuleEngine(bbs);
-	}
-	for (int i=0; i<copy.size(); i++) {
-	    CoordinationArtifact ca = (CoordinationArtifact) copy.get(i);
-	    ca.processFactBase(bbs);
-	}
-    }
-
 
 
 }

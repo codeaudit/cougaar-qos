@@ -58,9 +58,4 @@ public interface CoordinationArtifactTemplate
     */
     public void provideFacet(ConnectionSpec spec, RolePlayer player);
 
-    /**
-     * Signals that the Artifact should execute in a blackboard
-     * transaction.
-    */
-    public void triggerExecute();
 }
