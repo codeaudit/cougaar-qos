@@ -26,6 +26,7 @@
 
 package org.cougaar.core.qos.ca;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.cougaar.core.agent.service.alarm.Alarm;
@@ -33,6 +34,7 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.util.ConfigFinder;
 
 /**
  * Simple tester for FrameSets
@@ -104,10 +106,12 @@ public class FrameSetTesterPlugin
 	    newAlarm();
 	} else if (alarm.hasExpired()) {
 	    // change some stuff and restart the alarm
-	    Long now = new Long(System.currentTimeMillis());
-	    if (log.isDebugEnabled())
-		log.debug("Updated host1 \"time\" slot");
-	    frameSet.setFrameValue(host1, "time", now);
+	    if (frameSet != null && host1 != null) {
+		Long now = new Long(System.currentTimeMillis());
+		if (log.isDebugEnabled())
+		    log.debug("Updated host1 \"time\" slot");
+		frameSet.setFrameValue(host1, "time", now);
+	    }
 	    newAlarm();
 	}
     }
@@ -122,77 +126,29 @@ public class FrameSetTesterPlugin
     {
 	BlackboardService bbs = getBlackboardService();
 	ServiceBroker sb = getServiceBroker();
-	frameSet = new SingleInheritanceFrameSet(sb, bbs,
-						 "contains",
-						 "parent-kind",
-						 "parent-slot",
-						 "parent-value",
-						 "child-kind",
-						 "child-slot",
-						 "child-value"
-						 );
-	Properties props = null;
 
-	props = new Properties();
-	frameSet.makePrototype("site", props);
-
-	props = new Properties();
-	frameSet.makePrototype("host", props);
-
-	props = new Properties();	
-	frameSet.makePrototype("process", props);
-
-
-	props = new Properties();
-	props.put("name", "site1");
-	frameSet.makeFrame("site", props);
-	
-	props = new Properties();
-	props.setProperty("name", "site2");
-	frameSet.makeFrame("site", props);
-
-
-	props = new Properties();
-	props.setProperty("name", "host1");
-	props.put("time", new Long(System.currentTimeMillis()));
-	// Use this one as a test case for changing properties
-	host1 = frameSet.makeFrame("host", props);
-
-	props = new Properties();
-	props.setProperty("name", "host2");
-	frameSet.makeFrame("host", props);
-
-	props = new Properties();
-	props.setProperty("name", "host3");
-	frameSet.makeFrame("host", props);
-
-	props = new Properties();
-	props.setProperty("parent-kind", "site");
-	props.setProperty("parent-slot", "name");
-	props.setProperty("parent-value", "site1");	
-	props.setProperty("child-kind", "host");
-	props.setProperty("child-slot", "name");
-	props.setProperty("child-value", "host1");
-	frameSet.makeFrame("contains", props);
-
-	props = new Properties();
-	props.setProperty("parent-kind", "site");
-	props.setProperty("parent-slot", "name");
-	props.setProperty("parent-value", "site1");	
-	props.setProperty("child-kind", "host");
-	props.setProperty("child-slot", "name");
-	props.setProperty("child-value", "host2");
-	frameSet.makeFrame("contains", props);
-
-	props = new Properties();
-	props.setProperty("parent-kind", "site");
-	props.setProperty("parent-slot", "name");
-	props.setProperty("parent-value", "site2");	
-	props.setProperty("child-kind", "host");
-	props.setProperty("child-slot", "name");
-	props.setProperty("child-value", "host3");
-	frameSet.makeFrame("contains", props);
-
+	String xmlfile = (String) getParameter("frame-sets");
+	if (xmlfile != null) {
+	    java.io.File file = 
+		ConfigFinder.getInstance().locateFile(xmlfile);
+	    if (file != null) {
+		SaxParser parser = new SaxParser(sb, bbs);
+		try {
+		    List framesets = parser.parseFramesets(file);
+		    frameSet = (FrameSet) framesets.get(0);
+		    host1 = frameSet.findFrame("host", "name", "host1");
+		} catch (Exception ex) {
+		    ex.printStackTrace();
+		}
+	    } else {
+		if (log.isWarnEnabled())
+		    log.warn("ConfigFinder failed to find " + xmlfile);
+	    }
+	} else {
+		if (log.isWarnEnabled())
+		    log.warn("No FrameSet XML file was specified");
+	    
+	}
 
     }
 
