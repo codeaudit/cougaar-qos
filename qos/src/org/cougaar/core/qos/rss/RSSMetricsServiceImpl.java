@@ -77,38 +77,6 @@ public class RSSMetricsServiceImpl
     private LoggingService loggingService;
     private STECMetricsUpdateServiceImpl metricsUpdateService;
 
-    static class DataWrapper implements Metric {
-	private DataValue data;
-
-	DataWrapper(DataValue data) {
-	    this.data = data;
-	}
-
-	public String toString() {
-	    return data.toString();
-	}
-
-	DataValue getDataValue() {
-	    return data;
-	}
-
-	public String stringValue() { return data.getStringValue(); }
-	public byte byteValue() { return data.getByteValue(); }
-	public short shortValue() { return data.getShortValue(); }
-	public int intValue() { return data.getIntValue(); }
-	public long longValue() { return data.getLongValue(); }
-	public float floatValue() { return data.getFloatValue(); }
-	public double doubleValue() { return data.getDoubleValue(); }
-	public char charValue() { return data.getCharValue(); }
-	public boolean booleanValue() { return data.getBooleanValue(); }
-
-	public Object getRawValue() { return data.getRawValue(); }
-	public double getCredibility() { return data.getCredibility(); }
-	public String getUnits() { return data.getUnits(); }
-	public String getProvenance() { return data.getProvenance(); }
-    }
-
-
     private static class DataValueObserver 
 	implements Observer, DataProvider
     {
