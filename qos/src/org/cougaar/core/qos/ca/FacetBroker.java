@@ -40,8 +40,7 @@ public interface FacetBroker
      * When a FacetProvider plugin is avaliable for use, it should
      * call this.  The kind is the Coordinarion Artifact kind.
     */
-    public void registerCoordinationArtifactProvider(String kind, 
-						     ArtifactProvider plugin);
+    public void registerCoordinationArtifact(CoordinationArtifact artifact);
 
 
     /**

@@ -57,7 +57,7 @@ import org.cougaar.core.component.ServiceBroker;
  *
  */
 abstract public class QueryResponseCoordinationArtifact
-    extends ArtifactProviderPlugin
+    extends AbstractArtifactPlugin
     implements QueryCoordArtConstants
 {
     public QueryResponseCoordinationArtifact() 
@@ -85,7 +85,7 @@ abstract public class QueryResponseCoordinationArtifact
 							RolePlayer player);
 
    
-	protected QueryResponseFacetProvider(ArtifactProviderPlugin owner,
+	protected QueryResponseFacetProvider(CoordinationArtifact owner,
 					     ConnectionSpec spec)
 	{
 	    super(owner, spec);

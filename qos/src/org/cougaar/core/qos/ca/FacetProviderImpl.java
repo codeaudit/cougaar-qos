@@ -49,9 +49,9 @@ abstract public class FacetProviderImpl
 {
     private Properties parameters;
     private List facets = new ArrayList();
-    private ArtifactProviderPlugin owner;
+    private CoordinationArtifact owner;
 
-    protected FacetProviderImpl(ArtifactProviderPlugin owner, 
+    protected FacetProviderImpl(CoordinationArtifact owner, 
 				ConnectionSpec spec)
     {
 	if (spec.ca_parameters != null)
@@ -100,7 +100,7 @@ abstract public class FacetProviderImpl
     // Two circumstances in which this runs:
     // (1) subscription (ResponsePred)
     // (2) new fact assertion or retraction in our fact base
-    protected void execute(BlackboardService blackboard) 
+    public void execute(BlackboardService blackboard) 
     {
 	List copy = null;
 	synchronized (facets) {
@@ -116,7 +116,7 @@ abstract public class FacetProviderImpl
 
     protected void triggerExecute()
     {
-	owner.triggerExecute();
+	((AbstractArtifactPlugin )owner).triggerExecute();
     }
 
 

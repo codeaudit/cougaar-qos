@@ -44,19 +44,17 @@ import org.cougaar.core.service.BlackboardService;
  * state.
  *
  */
-abstract public class ArtifactProviderPlugin
+abstract public class AbstractArtifactPlugin
     extends ParameterizedPlugin
-    implements ArtifactProvider
+    implements CoordinationArtifact
 {
-
-    public abstract String getArtifactKind();
-    public abstract FacetProviderImpl 
-	makeFacetProvider(ArtifactProviderPlugin owner, 
-			  ConnectionSpec spec);
 
     private ArrayList artifacts;
 
-    protected ArtifactProviderPlugin()
+    abstract public FacetProvider makeFacetProvider(CoordinationArtifact owner, 
+						    ConnectionSpec spec);
+
+    protected AbstractArtifactPlugin()
     {
 	this.artifacts = new ArrayList();
     }
@@ -70,23 +68,23 @@ abstract public class ArtifactProviderPlugin
 
     public void provideFacet(ConnectionSpec spec, RolePlayer player)
     {
-	FacetProviderImpl provider = findOrMakeFacetProvider(spec);
+	FacetProvider provider = findOrMakeFacetProvider(spec);
 	if (provider != null) provider.provideFacet(spec, player, blackboard);
     }
 
-    private FacetProviderImpl findOrMakeFacetProvider(ConnectionSpec spec)
+    private FacetProvider findOrMakeFacetProvider(ConnectionSpec spec)
     {
 	synchronized (artifacts) {
 	    for (int i=0; i<artifacts.size(); i++) {
-		FacetProviderImpl impl = (FacetProviderImpl) 
+		FacetProvider fp = (FacetProvider) 
 		    artifacts.get(i);
-		if (impl.matches(spec)) return impl;
+		if (fp.matches(spec)) return fp;
 	    }
 	    
 	    // None around yet; make a new one
-	    FacetProviderImpl impl = makeFacetProvider(this, spec);
-	    artifacts.add(impl);
-	    return impl;
+	    FacetProvider fp = makeFacetProvider(this, spec);
+	    artifacts.add(fp);
+	    return fp;
 	}
     }
 
@@ -98,11 +96,11 @@ abstract public class ArtifactProviderPlugin
 	FacetBroker fb = (FacetBroker) 
 	    sb.getService(this, FacetBroker.class, null);
 	String kind = getArtifactKind();
-	fb.registerCoordinationArtifactProvider(kind, this);
+	fb.registerCoordinationArtifact(this);
 	sb.releaseService(this, FacetBroker.class, fb);
     }
 
-    protected void triggerExecute()
+    public void triggerExecute()
     {
 	BlackboardService bbs = getBlackboardService();
 	if (bbs != null) {
@@ -125,8 +123,8 @@ abstract public class ArtifactProviderPlugin
 	    copy = new ArrayList(artifacts);
 	}
 	for (int i=0; i<copy.size(); i++) {
-	    FacetProviderImpl impl = (FacetProviderImpl) copy.get(i);
-	    impl.execute(blackboard);
+	    FacetProvider fp = (FacetProvider) copy.get(i);
+	    fp.execute(blackboard);
 	}
     }
 

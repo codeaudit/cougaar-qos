@@ -99,7 +99,7 @@ public class FacetBrokerPlugin
     {
 	ThreadService tsvc;
 	HashMap pendingRequests;
-	HashMap artifactProviders;
+	HashMap artifacts;
 	Schedulable requestsThread;
 	ServiceBroker sb;
 
@@ -108,7 +108,7 @@ public class FacetBrokerPlugin
 	    tsvc = (ThreadService)
 		sb.getService(this, ThreadService.class, null);
 	    pendingRequests = new HashMap();
-	    artifactProviders = new HashMap();
+	    artifacts = new HashMap();
 	    Runnable runner = new Runnable() {
 		    public void run() {
 			checkPendingRequests();
@@ -136,16 +136,16 @@ public class FacetBrokerPlugin
 
 
 
-	public void registerCoordinationArtifactProvider(String kind, 
-							 ArtifactProvider provider)
+	public void registerCoordinationArtifact(CoordinationArtifact ca)
 	{
-	    synchronized (artifactProviders) {
-		List providers = (List) artifactProviders.get(kind);
-		if (providers == null) {
-		    providers = new ArrayList();
-		    artifactProviders.put(kind, providers);
+	    String kind = ca.getArtifactKind();
+	    synchronized (artifacts) {
+		List afacts = (List) artifacts.get(kind);
+		if (afacts == null) {
+		    afacts = new ArrayList();
+		    artifacts.put(kind, afacts);
 		}
-		providers.add(provider);
+		afacts.add(ca);
 	    }
 	    if (log.isDebugEnabled())
 		log.debug("Registered provider for " + kind);
@@ -171,21 +171,21 @@ public class FacetBrokerPlugin
 	{
 	    if (log.isDebugEnabled())
 		log.debug("Looking for " +spec.ca_kind+ " " +spec.role);
-	    synchronized (artifactProviders) {
-		List providers = (List) artifactProviders.get(spec.ca_kind);
-		if (providers != null) {
+	    synchronized (artifacts) {
+		List afacts = (List) artifacts.get(spec.ca_kind);
+		if (afacts != null) {
 		    if (log.isDebugEnabled())
-			log.debug(providers.size() + 
-				  " registered providers for " +spec.ca_kind);
-		    for (int i=0; i<providers.size(); i++) {
-			ArtifactProvider prvdr = (ArtifactProvider) 
-			    providers.get(i);
+			log.debug(afacts.size() + 
+				  " registered artifacts for " +spec.ca_kind);
+		    for (int i=0; i<afacts.size(); i++) {
+			CoordinationArtifact ca = (CoordinationArtifact) 
+			    afacts.get(i);
 
-			if (prvdr.matches(spec)) {
+			if (ca.matches(spec)) {
 			    if (log.isDebugEnabled())
 				log.debug("Found " +spec.ca_kind+ " " 
 					  +spec.role);
-			    prvdr.provideFacet(spec, player);
+			    ca.provideFacet(spec, player);
 			    return true;
 
 			}

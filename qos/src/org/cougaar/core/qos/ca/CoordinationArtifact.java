@@ -26,12 +26,10 @@
 
 package org.cougaar.core.qos.ca;
 
-/**
- * This interface describes a simplified form of a
- * CoordinationArtifact client.
- */
-public interface ArtifactProvider
+public interface CoordinationArtifact
 {
+    public String getArtifactKind();
+
     /**
      * Returns true iff the FacetProvider can provided the requested
      * Facet.  Ordinarily this depends only on the kind field of the
@@ -44,4 +42,7 @@ public interface ArtifactProvider
      * specified role.
     */
     public void provideFacet(ConnectionSpec spec, RolePlayer player);
+
+
+
 }

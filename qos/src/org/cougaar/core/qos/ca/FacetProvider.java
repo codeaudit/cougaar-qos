@@ -48,4 +48,7 @@ public interface FacetProvider
     public void provideFacet(ConnectionSpec spec, 
 			     RolePlayer player,
 			     BlackboardService blackboard);
+
+
+    public void execute(BlackboardService service);
 }
