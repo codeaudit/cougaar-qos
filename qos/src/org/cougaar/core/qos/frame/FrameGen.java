@@ -30,7 +30,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -40,6 +42,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class FrameGen
     extends DefaultHandler
 {
+    private static final Object UNDEFINED = new Object();
     private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
     private static final String DRIVER_DEFAULT =
 	"org.apache.crimson.parser.XMLReaderImpl";
@@ -54,12 +57,17 @@ public class FrameGen
     private String dir_name;
     private PrintWriter writer;
     private String path;
-    private ArrayList slots;
+    private HashMap slots;
+    private HashMap proto_parents;
+    private HashMap proto_slots;
     private String current_prototype;
+
 
     public FrameGen(String path)
     {
 	this.path = path;
+	proto_parents = new HashMap();
+	proto_slots = new HashMap();
     }
 
     public void parseProtoFile(File xml_file)
@@ -90,10 +98,6 @@ public class FrameGen
 	    startPrototype(attrs);
 	} else if (name.equals("slot")) {
 	    slot(attrs);
-	} else if (name.equals("fork")) {
-	    fork(attrs);
-	} else if (name.equals("path")) {
-	    startPath(attrs);
 	} 
     }
 
@@ -105,14 +109,23 @@ public class FrameGen
 	    // no-op
 	} else if (name.equals("prototype")) {
 	    endPrototype();
-	} else if (name.equals("path")) {
-	    endPath();
 	} 
     }
 
     // Not using this yet
     public void characters(char buf[], int offset, int length)
     {
+    }
+
+
+
+    private boolean inherits_slot(String proto, String slot)
+    {
+	String parent = (String) proto_parents.get(proto);
+	if (parent == null) return false;
+	HashMap pslots = (HashMap) proto_slots.get(parent);
+	if (pslots != null && pslots.containsKey(slot)) return true;
+	return inherits_slot(parent, slot);
     }
 
 
@@ -178,13 +191,22 @@ public class FrameGen
 	writer.println("{");
     }
 
-    private void writeConstructors(String name)
+    private void writeSlot(String slot, Object value)
     {
+	writer.print("    Object " + fix_name(slot, false));
+	
+	if (value != UNDEFINED)  writer.print(" = \"" +value+ "\"");
+	writer.println(";");
+    }
+
+    private void writeConstructors(String name, HashMap local_overrides)
+    {
+	// Define values for inherited slots!
 	String cname = fix_name(name, true);
 	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
 	writer.println("               UID uid)");
 	writer.println("    {");
-	writer.println("        super(frameSet, \"" +name+ "\", uid);");
+	writer.println("        this(frameSet, \"" +name+ "\", uid);");
 	writer.println("    }");
 
 	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
@@ -192,6 +214,13 @@ public class FrameGen
 	writer.println("               UID uid)");
 	writer.println("    {");
 	writer.println("        super(frameSet, kind, uid);");
+	Iterator itr = local_overrides.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String key = (String) entry.getKey();
+	    String value = (String) entry.getValue();
+	    writer.println("        " +fix_name(key,false)+ " = \"" +value+ "\";");
+	}
 	writer.println("    }");
     }
 
@@ -228,12 +257,33 @@ public class FrameGen
 
     private void endPrototypeClass()
     {
-	writeConstructors(current_prototype);
-	// dump accessors
-	for (int i=0; i<slots.size(); i++) {
-	    String slot = (String) slots.get(i);
-	    writeAccessors(slot);
+	proto_slots.put(current_prototype, slots);
+	
+	HashMap local_defaults = new HashMap();
+
+	Iterator itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Object value = entry.getValue();
+	    if (inherits_slot(current_prototype, slot)) {
+		if (!value.equals(UNDEFINED)) local_defaults.put(slot, value);
+	    } else {
+		writeSlot(slot, value);
+	    }
 	}
+
+	
+
+	writeConstructors(current_prototype, local_defaults);
+
+	// dump accessors
+	itr = slots.keySet().iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    if (!inherits_slot(current_prototype, slot)) writeAccessors(slot);
+	}
+
 	writer.println("}");
 	current_prototype = null;
     }
@@ -243,6 +293,7 @@ public class FrameGen
 	current_prototype = attrs.getValue("name");
 	String name = fix_name(current_prototype, true);
 	String parent = attrs.getValue("prototype");
+	proto_parents.put(name, parent);
 	File out = new File(dir_name, name+".java");
 	try {
 	    FileWriter fw = new FileWriter(out);
@@ -252,7 +303,7 @@ public class FrameGen
 	    System.exit(-1);
 	}
 	beginPrototypeClass(name, parent);
-	slots = new ArrayList();
+	slots = new HashMap();
     }
 
     private void endPrototype()
@@ -261,32 +312,14 @@ public class FrameGen
 	writer.close();
     }
 
-    private void startPath(Attributes attrs)
-    {
-	String name = attrs.getValue("name");
-    }
-
-    private void fork(Attributes attrs)
-    {
-	String role = attrs.getValue("role");
-	String relation = attrs.getValue("relation");
-    }
-
-    private void endPath()
-    {
-    }
-
+    
     
     private void slot(Attributes attrs)
     {
 	String slot = attrs.getValue("name");
-	slots.add(slot);
-	writer.print("    private Object " + fix_name(slot, false));
-
-	String path = attrs.getValue("path");
-	String value = attrs.getValue("value");
-        if (value != null)  writer.print(" = \"" +value+ "\"");
-	writer.println(";");
+	Object value = attrs.getValue("value");
+	if (value == null) value = UNDEFINED;
+	slots.put(slot, value);
     }
 
     private void endFrameset()
