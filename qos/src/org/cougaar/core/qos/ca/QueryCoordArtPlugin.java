@@ -155,6 +155,7 @@ abstract public class QueryCoordArtPlugin
 	private String communityRole;
 	private Community community;
 	private String communityName;
+	private String managerAttr;
 	private AttributeBasedAddress aba;
 
 	protected QueryFacet(ConnectionSpec spec, RolePlayer player)
@@ -163,6 +164,8 @@ abstract public class QueryCoordArtPlugin
 	    Properties role_parameters = spec.role_parameters;
 	    communityType = 
 		role_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
+	    managerAttr = 
+		role_parameters.getProperty(MANAGER_ATTRIBUTE);
 	    communityRole = 
 		role_parameters.getProperty(RESPONDERS_COMMUNITY_ROLE_ATTRIBUTE);
 	    startFinder();
@@ -185,7 +188,7 @@ abstract public class QueryCoordArtPlugin
 		String filter = 
 		    CommunityFinder.makeFilter(COMMUNITY_TYPE_ATTRIBUTE, 
 					       communityType,
-					       MANAGER_ATTRIBUTE, 
+					       managerAttr, 
 					       agentId.getAddress());
 		finder = new CommunityFinder.ForAny(commService, filter);
 		finder.addObserver(this);

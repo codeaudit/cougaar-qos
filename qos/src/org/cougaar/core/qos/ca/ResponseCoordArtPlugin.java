@@ -110,6 +110,7 @@ abstract public class ResponseCoordArtPlugin
 	{
 	    super(ResponseCoordArtPlugin.this, spec, player);
 	    Properties role_parameters = spec.role_parameters;
+	    completedUIDs = new HashSet();
 	    communityType = 
 		role_parameters.getProperty(COMMUNITY_TYPE_ATTRIBUTE);
 	    managerRole = 
