@@ -95,17 +95,4 @@ public class PrototypeFrame
     {
 	return "<Prototype " +prototype_name+ " " +getUID()+ ">";
     }
-
-    void copyToFrameSet(FrameSet frameSet)
-    {
-	frameSet.makePrototype(prototype_name, getKind(), getLocalSlots(), 
-			       getUID());
-    }
-
-//     void addLocalSlotNames(Set set)
-//     {
-// 	super.addLocalSlotNames(set);
-// 	if (paths != null) set.addAll(paths.keySet());
-//     }
-
 }

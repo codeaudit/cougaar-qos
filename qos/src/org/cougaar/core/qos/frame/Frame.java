@@ -40,7 +40,7 @@ import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
 abstract public class Frame
-    implements UniqueObject, Cloneable
+    implements UniqueObject
 {
     private static final Class[] TYPES0 = {};
     private static final Object[] ARGS0 = {};
@@ -78,14 +78,13 @@ abstract public class Frame
 	}
     }
 
-    void copyToFrameSet(FrameSet frameSet)
+    void addToFrameSet(FrameSet frameSet)
     {
-	try {
-	    Frame copy = (Frame) this.clone();
-	    copy.frameSet = frameSet;
-	    frameSet.makeFrame(copy);
-	} catch (CloneNotSupportedException ex) {
-	    // Is this possible?
+	if (this.frameSet != null && this.frameSet != frameSet) {
+	    throw new RuntimeException(this +" is already in FrameSet "+
+				       this.frameSet);
+	} else {
+	    frameSet.makeFrame(this);
 	}
     }
 

@@ -108,7 +108,7 @@ abstract public class FactToFrameFacetImpl
     private void processNewFrame(Object fact)
     {
 	Frame frame = getFrame(fact);
-	frame.copyToFrameSet(frameSet);
+	frame.addToFrameSet(frameSet);
     }
 
     private void handleChange(Frame.Change change)
