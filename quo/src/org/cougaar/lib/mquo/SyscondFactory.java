@@ -29,7 +29,6 @@ import com.bbn.quo.rmi.SysCond;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.mts.NameSupport;
 import org.cougaar.core.mts.Debug;
 import org.cougaar.core.mts.DebugFlags;
 import org.cougaar.core.qos.metrics.MetricsService;
@@ -39,16 +38,13 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.service.TopologyEntry;
 import org.cougaar.core.service.TopologyReaderService;
 
+
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TimerTask;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttributes;
+import java.util.Set;
 
 
 public final class SyscondFactory
@@ -79,8 +75,7 @@ public final class SyscondFactory
     private HashMap bandwidthSysconds = new HashMap();
     private HashMap capacitySysconds = new HashMap();
     private LoggingService loggingService;
-    private NameSupport nameSupport;
-    private TopologyReaderService topologyReaderService;
+    private TopologyReaderService topologyService;
     private MetricsService metricsService;
 
 
@@ -184,10 +179,10 @@ public final class SyscondFactory
 	    ArrayList agentListeners = (ArrayList) listeners.get(agent);
 	    if (agentListeners == null) {
 		agentListeners = new ArrayList();
-		listeners.put(agent, agentListeners);
+		listeners.put(agent.toString(), agentListeners);
 	    }
 	    agentListeners.add(listener);
-	    String host = (String) hosts.get(agent);
+	    String host = (String) hosts.get(agent.toString());
 	    if (host != null) listener.newHost(host);
 	}
 
@@ -202,50 +197,49 @@ public final class SyscondFactory
 	}
 
 	public void run() {
-          if (topologyReaderService == null) return;
-          Set set = 
-            topologyReaderService.getAllEntries(
-                null, null, null, null, null);
-          int n = ((set != null) ? set.size() : 0);
-          if (n < 0) return;
-          Iterator iter = set.iterator();
-          for (int i = 0; i < n; i++) {
-            TopologyEntry te = (TopologyEntry) iter.next();
-            if (te.getStatus() != TopologyEntry.ACTIVE) {
-              continue;
-            }
-            String new_host = te.getHost();
-            String sagent = te.getAgent();
-            MessageAddress agent = new MessageAddress(sagent);
-            String host = (String) hosts.get(agent);
-            if (host != null && host.equals(new_host)) {
-              continue;
-            }
-            hosts.put(agent, new_host);
-            if (Debug.isDebugEnabled(loggingService,RMS))
-              loggingService.debug("===== New host " 
-                  +new_host+
-                  " for agent " 
-                  +agent);
-            ArrayList agentListeners = 
-              (ArrayList) listeners.get(agent);
-            if (agentListeners == null) continue;
+	    // Loop over all Agents, seeing if the Host has changed,
+	    Set matches = topologyService.getAllEntries(null, null, null, null,
+							null);
+	    Iterator itr = matches.iterator();
+	    while (itr.hasNext()) {
+		TopologyEntry entry = (TopologyEntry) itr.next();
+		String agent = entry.getAgent();
+//  		System.out.print("Agent " +agent);
+		// Should we restrict this to ACTIVE Agents?
+		if (entry.getStatus() != TopologyEntry.ACTIVE) continue;
+		String new_host = entry.getHost();
+		String host = (String) hosts.get(agent);
 
-            Iterator litr = agentListeners.iterator();
-            while (litr.hasNext()) {
-              AgentHostUpdaterListener listener =
-                (AgentHostUpdaterListener) litr.next();
-              listener.newHost(new_host);
-            }
-          }
-        }
+//  		System.out.println(" Old host: " +host+
+//  				   " New host: " +new_host);
+
+		if (host == null || !host.equals(new_host)) {
+		    hosts.put(agent, new_host);
+		    if (Debug.isDebugEnabled(loggingService,RMS))
+			loggingService.debug("===== New host " 
+					     +new_host+
+					     " for agent " 
+					     +agent);
+		    ArrayList agentListeners = 
+			(ArrayList) listeners.get(agent);
+		    if (agentListeners == null) continue;
+		    
+		    Iterator litr = agentListeners.iterator();
+		    while (litr.hasNext()) {
+			AgentHostUpdaterListener listener =
+			    (AgentHostUpdaterListener) litr.next();
+			listener.newHost(new_host);
+		    }
+		}
+	    }
+	}
     }
+
 
 
 	    
 
-    public SyscondFactory(NameSupport nameSupport, ServiceBroker sb) {
-	this.nameSupport = nameSupport;
+    public SyscondFactory(ServiceBroker sb) {
 
 	kernel = Utils.getKernel();
 
@@ -262,13 +256,9 @@ public final class SyscondFactory
 	loggingService = (LoggingService) 
 	    sb.getService(this, LoggingService.class, null);
 
-	topologyReaderService = (TopologyReaderService) 
+	topologyService = (TopologyReaderService) 
 	    sb.getService(this, TopologyReaderService.class, null);
-        if (topologyReaderService == null) {
-          if (loggingService.isErrorEnabled()) {
-            loggingService.error("Unable to obtain topology service");
-          }
-        }
+
 
 	factory = this;
     }
