@@ -94,12 +94,6 @@ public class TrafficMaskAspect extends QuoAspect
 	    Bandwidth = 
 		(ExpectedBandwidthSC) 
 		rms.getExpectedBandwidthForAgentSyscond(destination);
-	    //force bandwidth to be low, incase host is not known yet
-	    try {
-		Bandwidth.setLong(1);
-	    } catch (java.rmi.RemoteException ex) {
-		ex.printStackTrace();	
-	    }
 
 	}
 
