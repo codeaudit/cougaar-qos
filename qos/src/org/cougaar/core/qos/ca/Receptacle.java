@@ -29,9 +29,10 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * A Facet represents a {@link RolePlayer}'s viewport into a {@link
- * CoordinationArtifact}.  This is the player's only interface to the
- * artifact.
+ * A Receptacle represents a {@link RolePlayer}'s viewport into some
+ * role of a {@link CoordinationArtifact}.  This is the player's only
+ * interface to the artifact.  The correspdonding entity in the
+ * Artifact is a {@link Facet}.
  */
 public interface Receptacle
 {

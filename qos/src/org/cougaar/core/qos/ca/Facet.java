@@ -29,8 +29,9 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This represents a {@link CoordinationArtifact}'s viewport into a
- * Facet/Receptacle pair.
+ * A Facet represents a role in {@link CoordinationArtifact}.  {@link
+ * RolePlayer}s interact with Facets throuh a {@link Receptacle}
+ * handle.
  */
 public interface Facet
 {
