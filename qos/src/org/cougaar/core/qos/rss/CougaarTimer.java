@@ -38,16 +38,23 @@ public class CougaarTimer implements TaskScheduler
 	    sb.getService(this, ThreadService.class, null);
     }
 
-    public void schedule(Runnable task, long delay) 
+    public Object schedule(Runnable body, long delay) 
     {
-	Schedulable sched = threadService.getThread(this, task);
+	Schedulable sched = threadService.getThread(this, body);
 	sched.schedule(delay);
+	return sched;
     }
 
-    public void schedule(Runnable task, long delay, long period) 
+    public Object schedule(Runnable body, long delay, long period) 
     {
-	Schedulable sched = threadService.getThread(this, task);
+	Schedulable sched = threadService.getThread(this, body);
 	sched.schedule(delay, period);
+	return sched;
+    }
+
+    public void unschedule(Object task)
+    {
+	if (task != null) ((Schedulable) task).cancelTimer();
     }
 
 
