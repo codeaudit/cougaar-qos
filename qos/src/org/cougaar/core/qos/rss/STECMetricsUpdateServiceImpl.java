@@ -36,6 +36,7 @@ import com.bbn.quo.event.Connector;
 import com.bbn.quo.event.status.StatusTEC;
 import com.bbn.quo.event.topology.TopologyRing;
 import com.bbn.quo.event.sysstat.StatusSupplierSysStat;
+import com.bbn.quo.event.sysstat.DirectSysStatSupplier;
 
 import org.omg.CosTypedEventChannelAdmin.TypedEventChannel;
 
@@ -84,6 +85,7 @@ public class STECMetricsUpdateServiceImpl
     private NamingService namingService;
     private TypedEventChannel channel;
     private TrivialDataFeed dataFeed;
+    private com.bbn.quo.data.DataInterpreter interpreter;
 
     public STECMetricsUpdateServiceImpl() {
     }
@@ -97,6 +99,10 @@ public class STECMetricsUpdateServiceImpl
 	String orbclass = System.getProperty("org.omg.CORBA.ORBClass");
 	if (orbclass == null || !orbclass.equals("org.jacorb.orb.ORB")) {
 	    dataFeed = new TrivialDataFeed(sb);
+	    interpreter = new MetricInterpreter();
+	    DirectSysStatSupplier supplier = 
+		new DirectSysStatSupplier(dataFeed);
+	    supplier.schedule(3000);
 	} else {
 	    namingService = (NamingService)
 		sb.getService(this, NamingService.class, null);
@@ -241,7 +247,7 @@ public class STECMetricsUpdateServiceImpl
 	if (sender != null) 
 	    sender.send(key, value);
 	else
-	    dataFeed.newData(key, value);
+	    dataFeed.newData(key, value, interpreter);
     }
 
 

@@ -21,29 +21,26 @@
 
 package org.cougaar.core.qos.rss;
 
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.ThreadService;
-import org.cougaar.core.thread.Schedulable;
+import com.bbn.quo.data.DataInterpreter;
+import com.bbn.quo.data.DataValue;
 
-import com.bbn.quo.data.SimpleQueueingDataFeed;
+import org.cougaar.core.qos.metrics.Metric;
 
 
-public class TrivialDataFeed 
-    extends SimpleQueueingDataFeed
+class MetricInterpreter implements DataInterpreter 
 {
-    private Schedulable thread;
-
-
-    TrivialDataFeed(ServiceBroker sb) {
-	super();
-	ThreadService threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
-	Runnable notifier = getNotifier();
-	thread = threadService.getThread(this, notifier, "TrivialDataFeed");
+    public double getCredibility(Object x) {
+	return ((Metric) x).getCredibility();
     }
-
-    protected void dispatch() {
-	thread.start();
+	
+    public DataValue getDataValue(Object x) {
+	Metric metric = (Metric) x;
+	double credibility = metric.getCredibility();
+	String prov = metric.getProvenance();
+	String units = metric.getUnits();
+	Object val = metric.getRawValue();
+	return new DataValue(val, credibility, units, prov);
     }
-
 }
+
+
