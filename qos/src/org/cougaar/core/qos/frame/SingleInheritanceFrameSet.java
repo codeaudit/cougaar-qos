@@ -314,12 +314,20 @@ public class SingleInheritanceFrameSet
     public Frame makePrototype(String proto, String parent, Properties values,
 			       UID uid)
     {
-	Frame frame = new PrototypeFrame(this, proto, parent, uid, values);
+	Frame frame = null;
 	synchronized (prototypes) { 
-	    if (log.isDebugEnabled())
-		log.debug("Adding prototype " +frame+
-			  " for " +proto);
-	    prototypes.put(proto, frame); 
+	    
+	    if (prototypes.containsKey(proto)) {
+		if (log.isWarnEnabled())
+		    log.warn("Ignoring prototype " +proto);
+		return null;
+	    } else {
+		frame = new PrototypeFrame(this, proto, parent, uid, values);
+		if (log.isDebugEnabled())
+		    log.debug("Adding prototype " +frame+
+			      " for " +proto);
+		prototypes.put(proto, frame); 
+	    }
 	}
 	synchronized (parent_relations) { 
 	    if (descendsFrom(frame, parent_relation))
