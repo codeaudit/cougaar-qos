@@ -63,7 +63,7 @@ abstract public class MetricsReaderFacet
     abstract protected String getPath(Object fact);
     abstract protected MetricNotificationQualifier getQualifier(Object fact);
     abstract protected VariableEvaluator getEvaluator(Object fact);
-    abstract protected void assertDataFact(Metric value);
+    abstract protected void assertDataFact(Metric value, String path);
 
     private class SubscriptionObserver implements Observer
     {
@@ -75,7 +75,7 @@ abstract public class MetricsReaderFacet
 
 	public void update(Observable xxx, Object update) 
 	{
-	    assertDataFact((Metric) update);
+	    assertDataFact((Metric) update, path);
 	}
     }
 
