@@ -509,6 +509,13 @@ public class SingleInheritanceFrameSet
 	return frame;
     }
 
+    public Set getPrototypes()
+    {
+	synchronized (prototypes) {
+	    return new HashSet(prototypes.keySet());
+	}
+    }
+
     public void removeFrame(Frame frame)
     {
 	synchronized (kb) { kb.remove(frame.getUID()); }
