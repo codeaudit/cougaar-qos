@@ -17,9 +17,8 @@ package org.cougaar.lib.quo;
 
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.ValueSC;
-import com.bbn.quo.rmi.Contract;
 import com.bbn.quo.rmi.SysCond;
-import com.bbn.quo.rmi.ExpectedCapacitySC;
+import com.bbn.quo.rmi.ExpectedBandwidthSC;
 
 import org.cougaar.core.society.MessageAddress;
 import org.cougaar.core.society.MulticastMessageAddress;
@@ -49,10 +48,8 @@ public class TrafficMaskAspect extends StandardAspect
     private QuoKernel kernel;
     private HashMap qoskets;
     private ResourceMonitorService rms;
-    private QosMonitorService qms;
     private TrustStatusService tss;
     private TrafficMaskingGeneratorService tmgs;
-    private String local_host;
     private Timer timer = new Timer(true);
     private boolean inited = false;
     private ValueSC USE_MASKING;
@@ -62,42 +59,7 @@ public class TrafficMaskAspect extends StandardAspect
 
     public TrafficMaskAspect() {
 	super();
-	try {
-	    local_host = java.net.InetAddress.getLocalHost().getHostAddress();
-	} catch (java.net.UnknownHostException ex) {
-	    local_host = "127.0.0.1";
-	}
     }
-
-
-    private class ExpectedCapacityUpdater extends TimerTask {
-	private MessageAddress agent;
-	private String host;
-	private ExpectedCapacitySC syscond;
-
-	ExpectedCapacityUpdater(MessageAddress agent,
-				ExpectedCapacitySC syscond)
-	{
-	    this.agent = agent;
-	    this.syscond = syscond;
-	}
-
-	public void run() {
-	    String new_host = rms.getHostForAgent(agent);
-	    if (new_host == null) return;
-	    if (host == null || !host.equals(new_host)) {
-		host = new_host;
-		System.out.println("===== New host " + host +
-				   " for agent " + agent);
-		try {
-		    syscond.setHosts(local_host, host);
-		} catch (java.rmi.RemoteException ex) {
-		    ex.printStackTrace();
-		}
-	    }
-	}
-    }
-
 
     private class NodeUpdater extends TimerTask {
 	public void run() {
@@ -162,16 +124,9 @@ public class TrafficMaskAspect extends StandardAspect
 	{
 	    useMask = Get_USE_MASKING(kernel);
 	    trust = Get_TRUST(kernel);
-	    // Bandwidth = ...
-
-	    SysCond syscond = 
-		kernel.bindSysCond("Bandwidth from " + local_host +
-				   " to " + destination,
-				   "com.bbn.quo.rmi.ExpectedCapacitySC",
-				   "com.bbn.quo.data.ExpectedCapacitySCImpl");
-	    System.out.println("Created Bandwidth syscond");
-
-	    Bandwidth = (ExpectedCapacitySC) syscond;
+	    Bandwidth = 
+		(ExpectedBandwidthSC) 
+		rms.getExpectedBandwidthForAgentSyscond(destination);
 	    //force bandwidth to be low, incase host is not known yet
 	    try {
 		Bandwidth.setLong(1);
@@ -179,9 +134,6 @@ public class TrafficMaskAspect extends StandardAspect
 		ex.printStackTrace();	
 	    }
 
-	    TimerTask task1 = 
-		new ExpectedCapacityUpdater(destination, Bandwidth);
-	    timer.schedule(task1, 0, 5000);
 	}
 
 	public void initCallbacks() {
@@ -274,18 +226,8 @@ public class TrafficMaskAspect extends StandardAspect
 	    }
 	}
 
-	if (qms == null) {
 
-	    Object svc = sb.getService(this, QosMonitorService.class, null);
-	    if (svc == null) {
-		System.err.println("### Can't find QosMonitorService");
-	    } else {
-		qms = (QosMonitorService) svc;
-		System.out.println("%%% Got QosMonitorService!");
-	    }
-	}
-
-	if (rms != null && qms != null && tss != null && tmgs != null) {
+	if (rms != null  && tss != null && tmgs != null) {
 	    inited = true;
 	}
     }

@@ -16,7 +16,6 @@ abstract public class CompressQosketSkel
          org.cougaar.lib.quo.CompressDelegateQosket
 {
   // Sysconds from contract arglist
-  protected com.bbn.quo.rmi.DataSC expectedServerLoadAverage;
   protected com.bbn.quo.rmi.DataSC expectedServerEffectiveMJips;
   protected com.bbn.quo.rmi.DataSC expectedClientEffectiveMJips;
   protected com.bbn.quo.rmi.DataSC expectedNetworkCapacity;
@@ -50,12 +49,11 @@ abstract public class CompressQosketSkel
   {
     com.bbn.quo.rmi.Contract result = null;
     if (name.equals ("Compress")) {
-      com.bbn.quo.rmi.SysCond[] sysconds =  new com.bbn.quo.rmi.SysCond[5]; 
-      sysconds[0] = expectedServerLoadAverage;
-      sysconds[1] = expectedServerEffectiveMJips;
-      sysconds[2] = expectedClientEffectiveMJips;
-      sysconds[3] = expectedNetworkCapacity;
-      sysconds[4] = UseCompression;
+      com.bbn.quo.rmi.SysCond[] sysconds =  new com.bbn.quo.rmi.SysCond[4]; 
+      sysconds[0] = expectedServerEffectiveMJips;
+      sysconds[1] = expectedClientEffectiveMJips;
+      sysconds[2] = expectedNetworkCapacity;
+      sysconds[3] = UseCompression;
 
       com.bbn.quo.rmi.Callback[] callbacks =  new com.bbn.quo.rmi.Callback[0]; 
 
@@ -71,12 +69,11 @@ abstract public class CompressQosketSkel
                                                com.bbn.quo.rmi.QuoKernel kernel)
   throws java.rmi.RemoteException 
   {
-    com.bbn.quo.rmi.SysCond[] sysconds =  new com.bbn.quo.rmi.SysCond[5]; 
-      sysconds[0] = expectedServerLoadAverage;
-      sysconds[1] = expectedServerEffectiveMJips;
-      sysconds[2] = expectedClientEffectiveMJips;
-      sysconds[3] = expectedNetworkCapacity;
-      sysconds[4] = UseCompression;
+    com.bbn.quo.rmi.SysCond[] sysconds =  new com.bbn.quo.rmi.SysCond[4]; 
+      sysconds[0] = expectedServerEffectiveMJips;
+      sysconds[1] = expectedClientEffectiveMJips;
+      sysconds[2] = expectedNetworkCapacity;
+      sysconds[3] = UseCompression;
 
     com.bbn.quo.rmi.Callback[] callbacks =  new com.bbn.quo.rmi.Callback[0]; 
 

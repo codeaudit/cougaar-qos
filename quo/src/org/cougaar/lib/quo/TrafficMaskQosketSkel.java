@@ -15,7 +15,7 @@ abstract public class TrafficMaskQosketSkel
          implements org.cougaar.lib.quo.TrafficMaskQosket
 {
   // Sysconds from contract arglist
-  protected com.bbn.quo.rmi.ExpectedCapacitySC Bandwidth;
+  protected com.bbn.quo.rmi.ExpectedBandwidthSC Bandwidth;
   protected com.bbn.quo.rmi.ValueSC useMask;
   protected com.bbn.quo.rmi.ValueSC trust;
 

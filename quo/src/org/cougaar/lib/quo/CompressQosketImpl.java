@@ -125,13 +125,13 @@ public class CompressQosketImpl
     remoteRef.interfaceName="org/cougaar/core/society/MT";
     System.out.println(remoteRef);
     Scope[] remotePath = remoteRef.toPath();
-    System.out.println("Created Load Average Path" + remotePath);
-    SysCond syscond =  kernel.bindSysCond("ExpectedServerLoadAverage",
-     					  "com.bbn.quo.rmi.DataSC",
-     					  "com.bbn.quo.data.DataSCImpl");
-    expectedServerLoadAverage = (DataSC) syscond;
-    System.out.println("Created Load Average syscond");
-    kernel.bindDataFormula(expectedServerLoadAverage, remotePath, "LoadAverage");
+   //  System.out.println("Created Load Average Path" + remotePath);
+//     SysCond syscond =  kernel.bindSysCond("ExpectedServerLoadAverage",
+//      					  "com.bbn.quo.rmi.DataSC",
+//      					  "com.bbn.quo.data.DataSCImpl");
+//     expectedServerLoadAverage = (DataSC) syscond;
+//     System.out.println( Load Average syscond");
+//     kernel.bindDataFormula(expectedServerLoadAverage, remotePath, "LoadAverage");
     //kernel.bindDataFormula(expectedServerLoadAverage, remotePath, "EffectiveServerLoadAverage");
     
 

@@ -6,7 +6,6 @@
 
 contract Compress 
     (
-     syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedServerLoadAverage,	
      syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedServerEffectiveMJips,
      syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedClientEffectiveMJips,
      syscond quo::DataSC com::bbn::quo::data::DataSCImpl expectedNetworkCapacity,

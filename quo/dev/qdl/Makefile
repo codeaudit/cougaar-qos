@@ -147,7 +147,7 @@ $(diagnose): $(mt_idl) $(mt_inst_idl)  Qosket.idl Diagnose.asl
 	--properties=$(super)/qdl/InstrumentationDerivedRmi.prop \
 	${rmi_qdl_flags}
 
-$(compress): $(mt_idl) $(mt_inst_idl)  Qosket.idl Compress.asl
+$(compress): $(mt_idl) $(mt_inst_idl)  Qosket.idl Compress.asl Compress.cdl
 	$(QUOGEN)  \
         --generate=both \
 	--target=client \
