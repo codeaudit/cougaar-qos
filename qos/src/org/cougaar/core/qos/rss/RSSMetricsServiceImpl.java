@@ -31,7 +31,6 @@ import com.bbn.quo.data.DataValue;
 import com.bbn.quo.data.RSS;
 import com.bbn.quo.data.SitesDB;
 import com.bbn.quo.data.RSSUtils;
-import com.bbn.quo.event.EventUtils;
 
 
 import org.cougaar.core.component.ServiceBroker;
@@ -140,7 +139,6 @@ public class RSSMetricsServiceImpl
 	// Make a Timer available to RSS and TEC
 	Timer timer = new CougaarTimer(sb);
 	RSSUtils.setTimer(timer);
-	EventUtils.setTimer(timer);
 
 	DataFeed feed = null;
 	String feedName = null;

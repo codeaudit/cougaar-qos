@@ -34,7 +34,7 @@ import org.cougaar.core.service.wp.Cert;
 import org.cougaar.core.service.wp.WhitePagesService;
 import org.cougaar.core.service.ThreadService;
 
-import com.bbn.quo.event.sysstat.DirectSysStatSupplier;
+import com.bbn.quo.sysstat.DirectSysStatSupplier;
 
 
 import java.net.URI;
