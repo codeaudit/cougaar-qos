@@ -175,41 +175,69 @@ module Cougaar
         @description = "Create a one-to-one ping society definition."
         @parameters = [
           {:numAgents => "required, The number of agents in this corset-style society configuration"},
-          {:security => "optional, boolean to mark security Management Node loaded"}
+          {:security => "optional, boolean to mark security Management Node loaded"},
+          {:singlenode => "optional, boolean to to indicate whether this should be run on One Node, One Host"}
         ]
-        @example = "do_action 'CreateOneToOnePing', 'numAgents', 'security'"
+        @example = "do_action 'CreateOneToOnePing', 'numAgents', 'security', 'singlenode'"
       }
-      def initialize(run, numAgents, security="false")
+      def initialize(run, numAgents, security="false", singlenode="false")
         super(run)
         @numAgents = numAgents
         @security = security
+	@singlenode = singlenode
       end
       def perform
-	@run.society.add_host('HOST1') do |host|
-	  host.add_node('NodeA') do |node|
-	    i=0
-	    puts("numAgents = #{@numAgents}")
-	    while i < @numAgents
-	      node.add_agent("src#{i}")
-	      i+=1
+	if @singlenode = "true"
+	  @run.society.add_host('HOST1') do |host|
+	    host.add_node('NodeA') do |node|
+	      i=0
+	      puts("numAgents = #{@numAgents}")
+	      while i < @numAgents
+		node.add_agent("src#{i}")
+		i+=1
+	      end
+	    end
+	    host.add_node('NodeB') do |node|
+	      i=0
+	      while i < @numAgents
+		node.add_agent("sink#{i}")
+		# Add pings here
+		addPing("src#{i}", "sink#{i}")
+		# wake once every second to check ping timeouts
+		managePings('1000')
+		i+=1
+	      end
+	    end
+	    # Add Manager Node / Agent & Nameserver
+	    addMgntNode("HOST1", @security)
+	  end
+	else
+	  @run.society.add_host('HOST1') do |host|
+	    host.add_node('NodeA') do |node|
+	      i=0
+	      puts("numAgents = #{@numAgents}")
+	      while i < @numAgents
+		node.add_agent("src#{i}")
+		i+=1
+	    end
 	    end
 	  end
-	end
-	@run.society.add_host('HOST2') do |host|
-	  host.add_node('NodeB') do |node|
-	    i=0
-	    while i < @numAgents
-	      node.add_agent("sink#{i}")
-	      # Add pings here
-	      addPing("src#{i}", "sink#{i}")
-	      # wake once every second to check ping timeouts
-	      managePings('1000')
-	      i+=1
+	  @run.society.add_host('HOST2') do |host|
+	    host.add_node('NodeB') do |node|
+	      i=0
+	      while i < @numAgents
+		node.add_agent("sink#{i}")
+		# Add pings here
+		addPing("src#{i}", "sink#{i}")
+		# wake once every second to check ping timeouts
+		managePings('1000')
+		i+=1
+	      end
 	    end
 	  end
+	  # Add Manager Node / Agent & Nameserver
+	  addMgntNode("HOST2", @security)
 	end
-	# Add Manager Node / Agent & Nameserver
-	addMgntNode("HOST2", @security)
       end     # perform
     end     # CreateOneToOnePing
     
