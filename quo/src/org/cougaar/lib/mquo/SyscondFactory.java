@@ -30,6 +30,11 @@ import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.node.NodeControlService;
 import org.cougaar.core.qos.metrics.QosComponent;
 
+/**
+ * This Component creates the ServiceProvider for
+ * SyscondFactoryService and registers that service with the root
+ * ServiceBroker. 
+ */
 public final class SyscondFactory
     extends QosComponent
 {

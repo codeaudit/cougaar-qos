@@ -34,6 +34,11 @@ import org.cougaar.core.qos.rss.DataWrapper;
 
 import com.bbn.quo.ValueSCImpl;
 
+/**
+ * This class implements a MetricsService syscond.  Its value is
+ * defined by a path in the MetricsService: the syscond subscribes to
+ * the path changes its value as the path's value changes.
+ */
 public class MetricSCImpl
     extends ValueSCImpl
     implements Observer, MetricSCOperations

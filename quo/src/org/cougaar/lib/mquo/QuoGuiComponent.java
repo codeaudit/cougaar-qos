@@ -34,10 +34,12 @@ package org.cougaar.lib.mquo;
 import org.cougaar.core.qos.metrics.QosComponent;
 import com.bbn.quo.rmi.QuoKernel;
 
-/*
- * Enables the QuO GUI for debugging
- * QuO Gui uses raw java windows, not a servlet.
- * For linux you must have X-windows running.
+/**
+ * This Component enables the QuO gui, which is very handy for
+ * debugging the use QuO and RSS by COUGGAR.  The gui uses Swing and
+ * in linux therefore requires an X11 server to be running with an
+ * suitably configured DISPLAY variable.  In OSX, this can only be
+ * used if the Node in which it's loaded is running on the console.
  */
 
 public class QuoGuiComponent extends QosComponent

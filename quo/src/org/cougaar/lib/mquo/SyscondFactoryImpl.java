@@ -37,6 +37,9 @@ import org.cougaar.core.service.LoggingService;
 import com.bbn.quo.rmi.QuoKernel;
 
 
+/**
+ * The implementation of the SyscondFactoryService.
+ */
 final class SyscondFactoryImpl implements SyscondFactoryService
 {
     private static String local_host;

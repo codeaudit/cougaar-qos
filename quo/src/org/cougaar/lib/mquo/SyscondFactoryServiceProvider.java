@@ -28,6 +28,9 @@ package org.cougaar.lib.mquo;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 
+/**
+ * This ServiceProvider provides the {@link SyscondFactoryService}.
+ */
 final class SyscondFactoryServiceProvider implements ServiceProvider
 {
     private SyscondFactoryImpl impl;

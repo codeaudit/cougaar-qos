@@ -32,6 +32,14 @@ import org.cougaar.core.qos.metrics.MetricsService;
 
 import com.bbn.quo.rmi.ReadOnlyValueSCOperations;
 
+/**
+ * This is the abstract API for a QuO syscond whose value is
+ * associated with a oath in the Metrics Service.  For CORBA
+ * compatibility, QuO mecanisms require that the abstract API be
+ * distinct from the corresponding syscond abstraction, in this case
+ * {@link MetricSC}.
+*/
+
 public interface MetricSCOperations extends ReadOnlyValueSCOperations
 {
     public void init(MetricsService svc) throws RemoteException;

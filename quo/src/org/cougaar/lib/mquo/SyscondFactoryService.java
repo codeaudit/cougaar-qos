@@ -28,6 +28,12 @@ package org.cougaar.lib.mquo;
 import org.cougaar.core.component.Service;
 import org.cougaar.core.mts.MessageAddress;
 
+/**
+ * This somewhat hardwird Service can be used to create some specific
+ * kinds of Metric SysConds, for jips and bandwidth metrics.
+ * 
+ * @see MetricSC
+ */
 public interface SyscondFactoryService extends Service
 {
 

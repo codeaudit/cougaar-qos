@@ -10,6 +10,10 @@ import java.rmi.RemoteException;
 
 import org.cougaar.core.qos.metrics.MetricsService;
 
+/**
+ * QuO mechanisms require this class as part of the full
+ * implementation of the Metrics SysCond.
+ */
 public class MetricSCTie 
     extends com.bbn.quo.rmi.ReadOnlyValueSCTie
     implements MetricSC

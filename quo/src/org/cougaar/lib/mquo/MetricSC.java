@@ -28,6 +28,11 @@ package org.cougaar.lib.mquo;
 
 import com.bbn.quo.rmi.SysCond;
 
+/**
+ * This interface joins {@link MetricSCOperations} with QuO's SysCond.
+ * 
+ * @see MetricSCOperations
+ */
 public interface MetricSC extends MetricSCOperations, SysCond
 {
 

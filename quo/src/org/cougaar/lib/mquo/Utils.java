@@ -15,6 +15,10 @@ import java.util.Properties;
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.impl.KernelImpl;
 
+/**
+ * This class defines static utility methods for QuO and RSS
+ */
+
 public class Utils 
 {
     private static final String KERNEL_PROPERTIES = 
@@ -41,6 +45,10 @@ public class Utils
 
     }
 
+    /**
+     * Find or make an RMI QuO Kernel.  This is always a singleton, so
+     * calling this more than once has no effect,
+    */
     public synchronized static QuoKernel getKernel() {
 	Properties kprops = new Properties();
 	readKernelProperties(kprops);
