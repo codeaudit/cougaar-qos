@@ -118,7 +118,7 @@ public class SingleInheritanceFrameSet
 	// **** TBD ****
 	// handle the modification of parent-child relationship frames
 
-	if (bbs != null) bbs.publishRemove(frame);
+	if (bbs != null) bbs.publishChange(frame);
     }
 
     public Frame makeFrame(String kind, Properties values)
