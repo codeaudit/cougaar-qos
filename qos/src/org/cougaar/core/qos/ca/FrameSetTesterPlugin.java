@@ -83,6 +83,7 @@ public class FrameSetTesterPlugin
     private FrameSet frameSet;
     private MyAlarm alarm;
     private Frame host1;
+    private int delayCycles = 10;
 
     public void load()
     {
@@ -100,11 +101,14 @@ public class FrameSetTesterPlugin
     protected void execute()
     {
 	if (alarm == null) {
-	    initializeBlackboard();
 	    newAlarm();
 	} else if (alarm.hasExpired()) {
-	    // change some stuff and restart the alarm
-	    if (frameSet != null && host1 != null) {
+	    if (delayCycles > 0) {
+		--delayCycles;
+	    } else if (delayCycles == 0) {
+		initializeBlackboard();
+		--delayCycles;
+	    } else {
 		Long now = new Long(System.currentTimeMillis());
 		if (log.isDebugEnabled())
 		    log.debug("Updated host1 \"time\" slot");
