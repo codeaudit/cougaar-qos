@@ -54,7 +54,6 @@ public class FrameSetTesterPlugin
 
     public void start()
     {
-	super.start();
 	String xml_filename = (String) getParameter("frame-set");
 	if (xml_filename != null) {
 	    ServiceBroker sb = getServiceBroker();
@@ -67,7 +66,7 @@ public class FrameSetTesterPlugin
 	    if (log.isWarnEnabled())
 		log.warn("No FrameSet XML file was specified");
 	}
-
+	super.start();
     }
 
     // plugin
