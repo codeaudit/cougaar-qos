@@ -369,7 +369,10 @@ public class RSSLink extends ResourceMonitorServiceImpl
     {
 	try {
 	    SysCond syscond = 
-		kernel.bindSysCond(address + "Effective Bandwidth",
+		kernel.bindSysCond("Bandwidth " + 
+				   local_host + 
+				   " to " +
+				   address ,
 				   "com.bbn.quo.rmi.ExpectedBandwidthSC",
 				   "com.bbn.quo.data.ExpectedBandwidthSCImpl");
 	    ((ExpectedBandwidthSC) syscond).doubleValue(1.0);
@@ -428,7 +431,10 @@ public class RSSLink extends ResourceMonitorServiceImpl
     {
 	try {
 	    SysCond syscond = 
-		kernel.bindSysCond(address + " Max Bandwidth",
+		kernel.bindSysCond("Max Bandwidth " + 
+				   local_host + 
+				   " to " +
+				   address ,
 				   "com.bbn.quo.rmi.ExpectedCapacitySC",
 				   "com.bbn.quo.data.ExpectedCapacitySCImpl");
 	    ((ExpectedCapacitySC) syscond).doubleValue(1.0);
