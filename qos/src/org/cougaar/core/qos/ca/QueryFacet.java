@@ -70,7 +70,7 @@ abstract public class QueryFacet
     private String communityRole;
     private IncrementalSubscription responseSub;
 
-    protected QueryFacet(FacetProviderPlugin owner,
+    protected QueryFacet(FacetProviderImpl owner,
 			 ServiceBroker sb,
 			 ConnectionSpec spec, 
 			 RolePlayer player)
@@ -192,8 +192,8 @@ abstract public class QueryFacet
 	long timestamp = System.currentTimeMillis();
 	QueryRelay qr = 
 	    new QueryRelayImpl(uid, getAgentID(), aba, query, timestamp);
-	if (log.isShoutEnabled()) {
-	    log.shout("Sending QueryRelay from " +getAgentID() +
+	if (log.isInfoEnabled()) {
+	    log.info("Sending QueryRelay from " +getAgentID() +
 		      " to all nodes in community: " + getCommunity());
 	}
 	publishQuery(qr, blackboard);

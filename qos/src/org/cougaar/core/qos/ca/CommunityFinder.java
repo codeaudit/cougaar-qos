@@ -68,48 +68,45 @@ abstract public class CommunityFinder
 	svc.addListener(this);
     }
 
-    public void communityChanged(CommunityChangeEvent e) 
+    public synchronized void communityChanged(CommunityChangeEvent e) 
     {
 	if (logger.isDebugEnabled())
 	    logger.debug("CommunityChangeEvent " + e);
 	boolean repost; // only notify observers once
-	synchronized (this) {
-	    repost = this.community_name == null;
-	}
+	repost = this.community_name == null;
 	if (repost) postQuery();
     }
 
-    private void foundCommunity(String community_found,
+    private synchronized void foundCommunity(String community_found,
 				Community community) 
     {
 	if (logger.isDebugEnabled())
 	    logger.debug("Community = " + community_found);
 	boolean notify; // only notify observers once
-	synchronized (this) {
-	    notify = this.community_name == null;
-	    if (notify) {
-		this.community_name = community_found;
-		if (community != null) {
-		    this.community = community;
-		} else {
-		    // find the actual community
-		    CommunityResponseListener crl = 
-			new CommunityResponseListener () {
-			    public void getResponse(CommunityResponse response)
-			    {
-				Object xxx = response.getContent();
-				if (xxx instanceof Community) {
-				    CommunityFinder.this.community = (Community)
-					xxx;
-				} else {
-				    ; // ???
-				}
+	notify = this.community_name == null;
+	if (notify) {
+	    this.community_name = community_found;
+	    if (community != null) {
+		this.community = community;
+	    } else {
+		// find the actual community
+		CommunityResponseListener crl = 
+		    new CommunityResponseListener () {
+			public void getResponse(CommunityResponse response)
+			{
+			    Object xxx = response.getContent();
+			    if (xxx instanceof Community) {
+				CommunityFinder.this.community = (Community)
+				    xxx;
+			    } else {
+				; // ???
 			    }
-			};
-		    this.community = svc.getCommunity(community_name, crl);
-		}
+			}
+		    };
+		this.community = svc.getCommunity(community_name, crl);
 	    }
 	}
+
 	if (notify) {
 	    setChanged();
 	    notifyObservers(community_name);
@@ -167,7 +164,7 @@ abstract public class CommunityFinder
     public void getResponse(CommunityResponse response) 
     {
 	if (logger.isDebugEnabled())
-	     logger.debug("CommunityResponse " +response.getStatus());
+	     logger.debug("CommunityResponse callback " +response.getStatus());
 	if (response.getStatus() == CommunityResponse.SUCCESS) {
 	    Collection result = (Collection) response.getContent();
 	    handleCollectionResponse(result);
@@ -227,8 +224,7 @@ abstract public class CommunityFinder
 				 filter);
 	    Collection results = 
 		svc.listParentCommunities(agentID.getAddress(), 
-					  filter, 
-					  this);
+					  filter);
 	    if (results != null) {
 		handleCollectionResponse(results);
 	    }

@@ -71,7 +71,7 @@ abstract public class ResponseFacet
     private ResponseRelay lastResponse; // for cleaning up
     private IncrementalSubscription querySub;
 
-    protected ResponseFacet(FacetProviderPlugin owner,
+    protected ResponseFacet(FacetProviderImpl owner,
 			    ServiceBroker sb,
 			    ConnectionSpec spec,
 			    RolePlayer player)

@@ -57,39 +57,50 @@ import org.cougaar.core.component.ServiceBroker;
  *
  */
 abstract public class QueryResponseCoordinationArtifact
-    extends FacetProviderPlugin
+    extends ArtifactProviderPlugin
     implements QueryCoordArtConstants
 {
     public QueryResponseCoordinationArtifact() 
     {
     }
     
-    /**
-     * Make a CA-specific QueryFacet.
-     */
-    public abstract QueryFacet makeQueryFacet(ServiceBroker sb,
-					      ConnectionSpec spec, 
-					      RolePlayer player);
 
 
-    /**
-     * Make a CA-specific ResponseFacet.
-     */
-    public abstract ResponseFacet makeResponseFacet(ServiceBroker sb,
-						    ConnectionSpec spec, 
-						    RolePlayer player);
+    abstract protected class QueryResponseFacetProvider 
+	extends FacetProviderImpl
+    {
+	/**
+	 * Make a CA-specific QueryFacet.
+	 */
+	public abstract QueryFacet makeQueryFacet(ServiceBroker sb,
+						  ConnectionSpec spec, 
+						  RolePlayer player);
+
+
+	/**
+	 * Make a CA-specific ResponseFacet.
+	 */
+	public abstract ResponseFacet makeResponseFacet(ServiceBroker sb,
+							ConnectionSpec spec, 
+							RolePlayer player);
 
    
-    protected Facet makeClientFacet(ConnectionSpec spec, RolePlayer player)
-    {
-	ServiceBroker sb = getServiceBroker();
-	if (spec.role.equals(RequestorRole))
-	    return makeQueryFacet(sb, spec, player);
-	else if (spec.role.equals(ReceiverRole))
-	    return makeResponseFacet(sb, spec, player);
-	else
-	    throw new RuntimeException("Bogus role in spec: " + spec);
-    }
+	protected QueryResponseFacetProvider(ArtifactProviderPlugin owner,
+					     ConnectionSpec spec)
+	{
+	    super(owner, spec);
+	}
 
+	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
+	{
+	    ServiceBroker sb = getServiceBroker();
+	    if (spec.role.equals(RequestorRole))
+		return makeQueryFacet(sb, spec, player);
+	    else if (spec.role.equals(ReceiverRole))
+		return makeResponseFacet(sb, spec, player);
+	    else
+		throw new RuntimeException("Bogus role in spec: " + spec);
+	}
+    }
 
 }

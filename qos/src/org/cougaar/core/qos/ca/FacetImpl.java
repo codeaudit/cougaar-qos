@@ -34,7 +34,6 @@ import java.util.Observer;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.service.AgentIdentificationService;
-import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
 import org.cougaar.core.service.community.CommunityService;
@@ -51,14 +50,13 @@ abstract public class FacetImpl // should be abstract
 {
     private RolePlayer player;
     private ConnectionSpec spec;
-    private FacetProviderPlugin owner;
+    private FacetProviderImpl owner;
     private SimpleQueue factQueue;
     private Community community;
     private String communityName;
     private CommunityFinder finder;
     private AttributeBasedAddress aba;
     private ServiceBroker sb;
-    private BlackboardService blackboard;
     private CommunityService commService;
     private UIDService uids;
     private MessageAddress agentId;
@@ -72,7 +70,7 @@ abstract public class FacetImpl // should be abstract
 	}
     }
 
-    protected FacetImpl(FacetProviderPlugin owner, 
+    protected FacetImpl(FacetProviderImpl owner, 
 			ServiceBroker sb,
 			ConnectionSpec spec, 
 			RolePlayer player)
@@ -84,9 +82,6 @@ abstract public class FacetImpl // should be abstract
 	this.factQueue = new SimpleQueue();
 
 	this.sb = sb;
-	this.blackboard = (BlackboardService)
-	    sb.getService(owner, BlackboardService.class, null);
-
 	log = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
 
@@ -134,7 +129,7 @@ abstract public class FacetImpl // should be abstract
 	return player;
     }
 
-    FacetProviderPlugin getOwner()
+    FacetProviderImpl getOwner()
     {
 	return owner;
     }

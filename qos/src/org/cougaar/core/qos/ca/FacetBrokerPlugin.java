@@ -99,7 +99,7 @@ public class FacetBrokerPlugin
     {
 	ThreadService tsvc;
 	HashMap pendingRequests;
-	HashMap facetProviders;
+	HashMap artifactProviders;
 	Schedulable requestsThread;
 	ServiceBroker sb;
 
@@ -108,7 +108,7 @@ public class FacetBrokerPlugin
 	    tsvc = (ThreadService)
 		sb.getService(this, ThreadService.class, null);
 	    pendingRequests = new HashMap();
-	    facetProviders = new HashMap();
+	    artifactProviders = new HashMap();
 	    Runnable runner = new Runnable() {
 		    public void run() {
 			checkPendingRequests();
@@ -136,14 +136,14 @@ public class FacetBrokerPlugin
 
 
 
-	public void registerFacetProvider(String kind, 
-					  FacetProvider provider)
+	public void registerCoordinationArtifactProvider(String kind, 
+							 ArtifactProvider provider)
 	{
-	    synchronized (facetProviders) {
-		List providers = (List) facetProviders.get(kind);
+	    synchronized (artifactProviders) {
+		List providers = (List) artifactProviders.get(kind);
 		if (providers == null) {
 		    providers = new ArrayList();
-		    facetProviders.put(kind, providers);
+		    artifactProviders.put(kind, providers);
 		}
 		providers.add(provider);
 	    }
@@ -171,19 +171,23 @@ public class FacetBrokerPlugin
 	{
 	    if (log.isDebugEnabled())
 		log.debug("Looking for " +spec.ca_kind+ " " +spec.role);
-	    synchronized (facetProviders) {
-		List providers = (List) facetProviders.get(spec.ca_kind);
+	    synchronized (artifactProviders) {
+		List providers = (List) artifactProviders.get(spec.ca_kind);
 		if (providers != null) {
 		    if (log.isDebugEnabled())
 			log.debug(providers.size() + 
 				  " registered providers for " +spec.ca_kind);
 		    for (int i=0; i<providers.size(); i++) {
-			FacetProvider prvdr = (FacetProvider) providers.get(i);
+			ArtifactProvider prvdr = (ArtifactProvider) 
+			    providers.get(i);
+
 			if (prvdr.matches(spec)) {
 			    if (log.isDebugEnabled())
-				log.debug("Found " +spec.ca_kind+ " " +spec.role);
+				log.debug("Found " +spec.ca_kind+ " " 
+					  +spec.role);
 			    prvdr.provideFacet(spec, player);
 			    return true;
+
 			}
 		    }
 		} else {

@@ -56,7 +56,7 @@ class RelayReclaimer
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    Object relay = (Object) entry.getKey();
 	    long expiration_time = ((Long) entry.getValue()).longValue();
-	    if (expiration_time <= now) {
+	    if (true) {
 		blackboard.publishRemove(relay);
 		itr.remove();
 		if (log.isDebugEnabled())

@@ -44,24 +44,51 @@ import org.cougaar.core.service.BlackboardService;
  * state.
  *
  */
-abstract public class FacetProviderPlugin
+abstract public class ArtifactProviderPlugin
     extends ParameterizedPlugin
-    implements FacetProvider
+    implements ArtifactProvider
 {
-    private Properties parameters;
-    private List facets = new ArrayList();
 
-    protected FacetProviderPlugin()
+    public abstract String getArtifactKind();
+    public abstract FacetProviderImpl 
+	makeFacetProvider(ArtifactProviderPlugin owner, 
+			  ConnectionSpec spec);
+
+    private ArrayList artifacts;
+
+    protected ArtifactProviderPlugin()
     {
-	this.parameters = new Properties();
+	this.artifacts = new ArrayList();
     }
 
-    /**
-     * The implementation of this method in instantiable extensions
-     * would return the name of the specific Coordination Artifact.
-     */
-    public abstract String getArtifactKind();
+    // By default an ArtifactProvider can handle any spec
+    public boolean matches(ConnectionSpec spec)
+    {
+	return true;
+    }
 
+
+    public void provideFacet(ConnectionSpec spec, RolePlayer player)
+    {
+	FacetProviderImpl provider = findOrMakeFacetProvider(spec);
+	if (provider != null) provider.provideFacet(spec, player, blackboard);
+    }
+
+    private FacetProviderImpl findOrMakeFacetProvider(ConnectionSpec spec)
+    {
+	synchronized (artifacts) {
+	    for (int i=0; i<artifacts.size(); i++) {
+		FacetProviderImpl impl = (FacetProviderImpl) 
+		    artifacts.get(i);
+		if (impl.matches(spec)) return impl;
+	    }
+	    
+	    // None around yet; make a new one
+	    FacetProviderImpl impl = makeFacetProvider(this, spec);
+	    artifacts.add(impl);
+	    return impl;
+	}
+    }
 
     public void start()
     {
@@ -71,41 +98,8 @@ abstract public class FacetProviderPlugin
 	FacetBroker fb = (FacetBroker) 
 	    sb.getService(this, FacetBroker.class, null);
 	String kind = getArtifactKind();
-	fb.registerFacetProvider(kind, this);
+	fb.registerCoordinationArtifactProvider(kind, this);
 	sb.releaseService(this, FacetBroker.class, fb);
-    }
-
-
-    // Extensions of can make specific kinds of facets.  Here we make
-    // the generic one.
-    abstract protected Facet makeClientFacet(ConnectionSpec spec, 
-					     RolePlayer player);
-
-
-
-    // FacetProvider
-    public boolean matches(ConnectionSpec spec)
-    {
-	if (spec.ca_parameters == null && parameters == null) return true;
-	if (spec.ca_parameters == null || parameters == null) return false;
-	return spec.ca_parameters.equals(parameters);
-    }
-
-
-    public void provideFacet(ConnectionSpec spec, RolePlayer player)
-    {
-	Facet facet = makeClientFacet(spec, player);
-	synchronized (facets) {
-	    facets.add(facet);
-	}
-	try {
-	    blackboard.openTransaction();
-	    facet.setupSubscriptions(blackboard);
-	} catch (Exception ex) {
-	    ex.printStackTrace();
-	} finally {
-	    blackboard.closeTransaction();
-	}
     }
 
     protected void triggerExecute()
@@ -127,13 +121,12 @@ abstract public class FacetProviderPlugin
     protected void execute() 
     {
 	List copy = null;
-	synchronized (facets) {
-	    copy = new ArrayList(facets);
+	synchronized (artifacts) {
+	    copy = new ArrayList(artifacts);
 	}
 	for (int i=0; i<copy.size(); i++) {
-	    Facet facet = (Facet) copy.get(i);
-	    facet.processFactBase(blackboard);
-	    facet.execute(blackboard);
+	    FacetProviderImpl impl = (FacetProviderImpl) copy.get(i);
+	    impl.execute(blackboard);
 	}
     }
 

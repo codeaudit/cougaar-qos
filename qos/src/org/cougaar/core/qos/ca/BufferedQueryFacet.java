@@ -65,7 +65,7 @@ abstract public class BufferedQueryFacet
     private String responderRole;
     private LoggingService log;
 
-    protected BufferedQueryFacet(FacetProviderPlugin owner,
+    protected BufferedQueryFacet(FacetProviderImpl owner,
 				 ServiceBroker sb,
 				 ConnectionSpec spec, 
 				 RolePlayer player)

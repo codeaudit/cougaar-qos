@@ -26,13 +26,11 @@
 
 package org.cougaar.core.qos.ca;
 
-import org.cougaar.core.service.BlackboardService;
-
 /**
  * This interface describes a simplified form of a
  * CoordinationArtifact client.
  */
-public interface FacetProvider
+public interface ArtifactProvider
 {
     /**
      * Returns true iff the FacetProvider can provided the requested
@@ -45,7 +43,5 @@ public interface FacetProvider
      * Does the linkage between the Facet and the RolePlayer for the
      * specified role.
     */
-    public void provideFacet(ConnectionSpec spec, 
-			     RolePlayer player,
-			     BlackboardService blackboard);
+    public void provideFacet(ConnectionSpec spec, RolePlayer player);
 }
