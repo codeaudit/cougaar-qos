@@ -26,6 +26,7 @@ import com.bbn.quo.rmi.ExpectedCapacitySC;
 import com.bbn.quo.rmi.ExpectedAvailableJipsSC;
 import com.bbn.quo.rmi.QuoKernel;
 import com.bbn.quo.rmi.SysCond;
+import com.bbn.quo.data.RSS;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
@@ -222,6 +223,13 @@ public final class SyscondFactory
 //  				   " New host: " +new_host);
 
 		if (host == null || !host.equals(new_host)) {
+		    if (host != null) {
+			// Agent has moved to a new host.  Delete the
+			// old DataScope.
+			Object[] params = { agent };
+			Class cls = org.cougaar.core.qos.rss.AgentDS.class;
+			RSS.instance().deleteScope(cls, params);
+		    }
 		    hosts.put(agent, new_host);
 		    if (Debug.isDebugEnabled(loggingService,RMS))
 			loggingService.debug("===== New host " 
