@@ -71,11 +71,14 @@ abstract public class Frame
 	if (frameSet != null) frameSet.valueUpdated(this, slot, value);
     }
 
+    // In theory this is distinct from slotModified, though that might
+    // not be obvious from the code
     protected void slotInitialized(String slot, Object value)
     {
 	synchronized (localSlots) {
 	    localSlots.add(slot);
 	}
+	if (frameSet != null) frameSet.valueUpdated(this, slot, value);
     }
 
     void copyToFrameSet(FrameSet frameSet)
