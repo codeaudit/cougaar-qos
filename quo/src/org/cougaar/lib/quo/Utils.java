@@ -22,10 +22,21 @@ import unix.UnixUtils;
 class Utils 
 {
     static private PrintWriter LogFile = null;
+    static private char SEPR;
+    static private String TAG;
     static Rusage lastUsage = new Rusage();
     static long lastThreadTime = System.currentTimeMillis();;
 
     static {
+	TAG = System.getProperty("org.cougaar.lib.quo.TAG", "COUGAAR");
+	String sepr = System.getProperty("org.cougaar.lib.quo.separator", "");
+	if (sepr.equals("") || sepr.equalsIgnoreCase("space") )
+	    SEPR = ' ';
+	else if (sepr.equalsIgnoreCase("tab"))
+	    SEPR = '\t';
+	else 
+	    SEPR = sepr.charAt(0);
+
 	String logfilename = System.getProperty("org.cougaar.lib.quo.logfile");
 	if (logfilename != null && !logfilename.equals("")) {
 	    try {
@@ -61,56 +72,77 @@ class Utils
 						  int inLength,
 						  int outLength) 
     {
-      if (LogFile == null) return;
-	beginLogMessage(startTime, "COUGAAR compressed_message", m);
-	LogFile.print(' ');
+	if (LogFile == null) return;
+	beginLogMessage(startTime, "compressed_message", m);
+	LogFile.print(SEPR);
 	LogFile.print(inLength);
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	LogFile.print(outLength);
 	endLogMessage(m);
     }
 	
 
     static synchronized void logMessage(long startTime, Message m) {
-      if (LogFile == null) return;
-	beginLogMessage(startTime, "COUGAAR message", m);
+	if (LogFile == null) return;
+	beginLogMessage(startTime, "message", m);
+	endLogMessage(m);
+    }
+
+    static synchronized void logMessage(long startTime, 
+					long endTime,
+					Message m) 
+    {
+	if (LogFile == null) return;
+	beginLogMessage(startTime, endTime, "message", m);
 	endLogMessage(m);
     }
 
     static void beginLogMessage(long startTime, String type, Message m) {
-      if (LogFile == null) return;
-
 	long now = System.currentTimeMillis();
-	long nowSecs = now/1000;
-	long nowUsecs = now-(nowSecs*1000);
+	beginLogMessage(startTime, now, type, m);
+    }
+
+    static void beginLogMessage(long startTime, 
+				long endTime,
+				String type, 
+				Message m) 
+    {
+	if (LogFile == null) return;
+
+	long endSecs = endTime/1000;
+	long endUsecs = endTime-(endSecs*1000);
 	long startSecs = startTime/1000;
 	long startUsecs = startTime-(startSecs*1000);
 	LogFile.print(startSecs);
 	LogFile.print('.');
 	LogFile.print(startUsecs);
-	LogFile.print(' ');
-	LogFile.print(nowSecs);
+	LogFile.print(SEPR);
+	LogFile.print(endSecs);
 	LogFile.print('.');
-	LogFile.print(nowUsecs);
-	LogFile.print(' ');
+	LogFile.print(endUsecs);
+	LogFile.print(SEPR);
+	LogFile.print(TAG);
+	LogFile.print(SEPR);
 	LogFile.print(type);
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	LogFile.print(m.getOriginator());
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	LogFile.print(m.getTarget());
     }
 
     static void endLogMessage(Message m) {
-      if (LogFile == null) return;
+	if (LogFile == null) return;
 
 	if (m instanceof DirectiveMessage) {
-	    LogFile.print(" DirectiveMessage ");
+	    LogFile.print(SEPR);
+	    LogFile.print("DirectiveMessage");
+	    LogFile.print(SEPR);
 	    DirectiveMessage dm = (DirectiveMessage) m;
 	    Directive[] directives = dm.getDirectives();
 	    int count = directives.length;
 	    LogFile.print(count);
 	    for (int i=0; i<count; i++) {
-		LogFile.print(' ');
+		LogFile.print(SEPR);
 		LogFile.print(directives[i].getClass().getName());
 	    }
 	}
@@ -121,7 +153,7 @@ class Utils
 
     static synchronized void logEvent(long startTime, Message m, String name) 
     {
-      if (LogFile == null) return;
+	if (LogFile == null) return;
 
 	long now = System.currentTimeMillis();
 	long nowSecs = now/1000;
@@ -131,19 +163,21 @@ class Utils
 	LogFile.print(startSecs);
 	LogFile.print('.');
 	LogFile.print(startUsecs);
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	LogFile.print(nowSecs);
 	LogFile.print('.');
 	LogFile.print(nowUsecs);
 
-	LogFile.print(" EVENT ");
+	LogFile.print(SEPR);
+	LogFile.print("EVENT");
+	LogFile.print(SEPR);
 
 	LogFile.print(m.getOriginator());
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	LogFile.print(m.getTarget());
 
-	LogFile.print(' ');
-	LogFile.print(name.replace(' ', '_'));
+	LogFile.print(SEPR);
+	LogFile.print(name.replace(SEPR, '_'));
 
 	LogFile.println("");
 	LogFile.flush();
@@ -152,7 +186,7 @@ class Utils
    
     static synchronized void logProcessorUsage() 
     {
-      if (LogFile == null) return;
+	if (LogFile == null) return;
 
 	Rusage currentUsage = new Rusage();
 	currentUsage.update();
@@ -164,13 +198,15 @@ class Utils
 	LogFile.print(startSecs);
 	LogFile.print('.');
 	LogFile.print(startUsecs);
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	LogFile.print(nowSecs);
 	LogFile.print('.');
 	LogFile.print(nowUsecs);
-	LogFile.print(" Process ");
+	LogFile.print(SEPR);
+	LogFile.print("Process");
+	LogFile.print(SEPR);
 	LogFile.print( Process.getProcessID());
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	double deltaUserMsecs = 
 	    ((currentUsage.user_secs - lastUsage.user_secs) * 1000
 	     + (currentUsage.user_usecs - lastUsage.user_usecs) /  1000);
@@ -216,7 +252,7 @@ class Utils
 
     static synchronized void logThreadCount() 
     {
-      if (LogFile == null) return;
+	if (LogFile == null) return;
 
 	long now = System.currentTimeMillis();
 	long nowSecs = now/1000;
@@ -228,11 +264,13 @@ class Utils
 	LogFile.print(lastSecs);
 	LogFile.print('.');
 	LogFile.print(lastUsecs);
-	LogFile.print(' ');
+	LogFile.print(SEPR);
 	LogFile.print(nowSecs);
 	LogFile.print('.');
 	LogFile.print(nowUsecs);
-	LogFile.print(" Threads ");
+	LogFile.print(SEPR);
+	LogFile.print("Threads");
+	LogFile.print(SEPR);
 	LogFile.print(count);
 	LogFile.println("");
 	LogFile.flush();

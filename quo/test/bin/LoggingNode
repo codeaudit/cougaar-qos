@@ -1,0 +1,18 @@
+#!/bin/sh
+
+module=quo
+
+COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.lib.quo.LoggingAspect -Dorg.cougaar.lib.quo.logfile=$LOGFILE"
+export COUGAAR_JAVA_ARGS
+
+# The field-separator can be set in org.cougaar.lib.quo.separator
+# (default=space)
+
+# The application tag can be set in org.cougaar.lib.quo.tag
+# (default=COUGAAR).
+# Use ALP for spyglass import.
+
+
+
+#exec ${COUGAAR_INSTALL_PATH}/core/bin/Node $*
+exec ${COUGAAR_SRC_PATH}/${module}/test/bin/Node $*

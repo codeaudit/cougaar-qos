@@ -9,6 +9,7 @@ LINKS += AdaptDemoNode
 LINKS += CorbaNode
 LINKS += ComboNode
 LINKS += FutileNode
+LINKS += LoggingNode
 LINKS += MulticastNode
 LINKS += NoisyNode
 LINKS += PreSerializeNode
@@ -46,6 +47,9 @@ ComboNode:
 
 FutileNode:
 	ln -s wrapper FutileNode
+
+LoggingNode:
+	ln -s wrapper LoggingNode
 
 MulticastNode:
 	ln -s wrapper MulticastNode
