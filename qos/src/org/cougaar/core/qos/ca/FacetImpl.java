@@ -164,7 +164,7 @@ abstract public class FacetImpl // should be abstract
 	return uids.nextUID();
     }
 
-    Community getCommunity()
+    protected Community getCommunity()
     {
 	return community;
     }
