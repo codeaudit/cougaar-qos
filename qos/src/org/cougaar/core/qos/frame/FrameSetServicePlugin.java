@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
@@ -67,7 +68,7 @@ public class FrameSetServicePlugin
     }
 
     // plugin
-    protected synchronized void execute()
+    protected void execute()
     {
 	handleCallbacks();
     }
@@ -97,15 +98,17 @@ public class FrameSetServicePlugin
     }
 
 	
-    private synchronized FrameSet makeSet(String xml_filename, 
-					  ServiceBroker sb,
-					  BlackboardService bbs)
+    private FrameSet makeSet(String xml_filename, 
+			     ServiceBroker sb,
+			     BlackboardService bbs)
 					  
     {
-	FrameSetParser parser = new FrameSetParser(sb, bbs);
-	FrameSet set = parser.parseFrameSetFile(xml_filename);
-	sets.put(set.getName(), set);
-
+	FrameSet set = null;
+	synchronized (sets) {
+	    FrameSetParser parser = new FrameSetParser(sb, bbs);
+	    set = parser.parseFrameSetFile(xml_filename);
+	    sets.put(set.getName(), set);
+	}
 	BlackboardService my_bbs = getBlackboardService();
 	my_bbs.signalClientActivity();
 
@@ -119,40 +122,49 @@ public class FrameSetServicePlugin
 	cb.frameSetAvailable(name, set);
     }
 
-    private synchronized void handleCallbacks()
+    private void handleCallbacks()
     {
-	Iterator itr = pending.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    String name = (String) entry.getKey();
-	    HashSet callbacks = (HashSet) entry.getValue();
-	    FrameSet set = (FrameSet) sets.get(name);
-	    if (set == null || callbacks == null) continue;
+	synchronized (pending) {
+	    Iterator itr = pending.entrySet().iterator();
+	    while (itr.hasNext()) {
+		Map.Entry entry = (Map.Entry) itr.next();
+		String name = (String) entry.getKey();
+		HashSet callbacks = (HashSet) entry.getValue();
+		FrameSet set = null;
+		synchronized (sets) {
+		    set = (FrameSet) sets.get(name);
+		}
+		if (set == null || callbacks == null) continue;
 
-	    Iterator sub_itr = callbacks.iterator();
-	    while (sub_itr.hasNext()) {
-		FrameSetService.Callback cb = (FrameSetService.Callback)
-		    sub_itr.next();
-		doCallback(cb, name, set);
+		Iterator sub_itr = callbacks.iterator();
+		while (sub_itr.hasNext()) {
+		    FrameSetService.Callback cb = (FrameSetService.Callback)
+			sub_itr.next();
+		    doCallback(cb, name, set);
+		}
+		itr.remove();
 	    }
-	    itr.remove();
 	}
     }
 
 
-    private synchronized FrameSet doRequest(String name, 
-					    FrameSetService.Callback cb)
+    private FrameSet doRequest(String name, FrameSetService.Callback cb)
     {
-	FrameSet set = (FrameSet) sets.get(name);
+	FrameSet set = null;
+	synchronized (sets) {
+	    set = (FrameSet) sets.get(name);
+	}
 	if (set != null) {
 	    return set;
 	} else if (cb != null) {
-	    HashSet callbacks = (HashSet) pending.get(name);
-	    if (callbacks == null) {
-		callbacks = new HashSet();
-		pending.put(name, callbacks);
+	    synchronized (pending) {
+		HashSet callbacks = (HashSet) pending.get(name);
+		if (callbacks == null) {
+		    callbacks = new HashSet();
+		    pending.put(name, callbacks);
+		}
+		callbacks.add(cb);
 	    }
-	    callbacks.add(cb);
 	    return null;
  	} else {
 	    return null;
@@ -171,6 +183,15 @@ public class FrameSetServicePlugin
 				     BlackboardService bbs)
 	{
 	    return makeSet(xml_filename, sb, bbs);
+	}
+
+	public Set getNames()
+	{
+	    Set result = null;
+	    synchronized (sets) {
+		result = new HashSet(sets.keySet());
+	    }
+	    return result;
 	}
     }
 

@@ -26,6 +26,8 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.util.Set;
+
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.Service;
 import org.cougaar.core.service.BlackboardService;
@@ -41,5 +43,6 @@ public interface FrameSetService extends Service
     public FrameSet loadFrameSet(String xml_filename, 
 				 ServiceBroker sb,
 				 BlackboardService bbs);
+    public Set getNames();
 }
 
