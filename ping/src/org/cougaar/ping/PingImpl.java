@@ -56,6 +56,7 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
   public static final String PROP_SEND_FILLER_RAND = "sendFillerRand";
   public static final String PROP_ECHO_FILLER_SIZE = "echoFillerSize";
   public static final String PROP_ECHO_FILLER_RAND = "echoFillerRand";
+  public static final String PROP_SEND_COUNT = "sendCount";
 
   public static final long DEFAULT_START_MILLIS = 0;
   public static final long DEFAULT_DELAY_MILLIS = 2000;
@@ -68,6 +69,7 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
   public static final boolean DEFAULT_SEND_FILLER_RAND = true;
   public static final int DEFAULT_ECHO_FILLER_SIZE = -1;
   public static final boolean DEFAULT_ECHO_FILLER_RAND = true;
+  public static final int DEFAULT_SEND_COUNT = 0;
 
   private static final Random rand = new Random();
 
@@ -84,10 +86,10 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
   private final boolean sendFillerRand;
   private final int echoFillerSize;
   private final boolean echoFillerRand;
+  private int sendCount;
 
   private long sendTime;
   private long replyTime;
-  private int sendCount;
   private int echoCount;
   private int replyCount;
   private String error;
@@ -173,10 +175,13 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
       (s == null ? DEFAULT_ECHO_FILLER_RAND :
        "true".equalsIgnoreCase(s));
 
+    s = (String) props.get(PROP_SEND_COUNT);
+    sendCount = 
+      (s == null ? DEFAULT_SEND_COUNT : Integer.parseInt(s));
+
     // initialize
     sendTime = System.currentTimeMillis();
     replyTime = -1;
-    sendCount = 0;
     echoCount = 0;
     replyCount = 0;
     error = null;
@@ -202,7 +207,8 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
       int sendFillerSize,
       boolean sendFillerRand,
       int echoFillerSize,
-      boolean echoFillerRand) {
+      boolean echoFillerRand,
+      int sendCount) {
     this.uid = uid;
     this.source = source;
     this.target = target;
@@ -216,6 +222,7 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
     this.sendFillerRand = sendFillerRand;
     this.echoFillerSize = echoFillerSize;
     this.echoFillerRand = echoFillerRand;
+    this.sendCount = sendCount;
     if ((uid == null) ||
         (source == null) ||
         (target == null)) {
@@ -229,7 +236,6 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
     }
     sendTime = System.currentTimeMillis();
     replyTime = -1;
-    sendCount = 0;
     echoCount = 0;
     replyCount = 0;
     error = null;
@@ -597,7 +603,7 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
         PingData pingData = (PingData) content;
         int sendCount = pingData.getCount();
         if ((sendCount != 0) &&
-            pingData.isIgnoreRollback()) {
+            (!pingData.isIgnoreRollback())) {
           // detected restart of sender
           throw new IllegalArgumentException(
               "Unable to create ping object on target "+
@@ -611,7 +617,8 @@ implements Ping, Relay.Source, Relay.Target, Serializable {
             pingData.isIgnoreRollback(),
             -1, -1, false,
             pingData.getEchoFillerSize(),
-            pingData.isEchoFillerRandomized());
+            pingData.isEchoFillerRandomized(),
+            sendCount);
       }
     }
 }
