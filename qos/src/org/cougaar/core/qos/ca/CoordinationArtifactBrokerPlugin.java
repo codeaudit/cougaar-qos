@@ -50,7 +50,7 @@ public class CoordinationArtifactBrokerPlugin
 {
     private static final String[] StandardProviders = 
     {
-	"org.cougaar.robustness.dos.ca.JessAlarmArtifactProvider",
+	"org.cougaar.ca.artifacts.JessAlarmArtifactProvider",
     };
 
     private static final String ProvidersParam = "providers";
