@@ -30,14 +30,17 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.qos.metrics.Constants;
 import org.cougaar.core.service.wp.WhitePagesService;
 
 import com.bbn.rss.AbstractContextInstantiater;
 import com.bbn.rss.ContextInstantiater;
 import com.bbn.rss.DataFormula;
+import com.bbn.rss.DataValue;
 import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
 import com.bbn.ResourceStatus.ResourceNode;
+
 
 /**
  * This RSS ResourceContext represents a COUGGAR Node.  Its parent in
@@ -72,6 +75,9 @@ public class NodeDS
     static final String NODENAME = "nodename".intern();
     static final String TOPOLOGY = "topology";
     static final String UNKNOWN_HOST_IP = "169.0.0.1";//DHCP No Address from server
+
+    private DataFormula vm_size;
+
     static boolean isUnknownHost(String addr)
     {
 	return addr.equals(UNKNOWN_HOST_IP);
@@ -147,14 +153,64 @@ public class NodeDS
 	    // could canonicalize here
 	    String nodename = (String) parameters[0];
 	    bindSymbolValue(NODENAME, nodename);
+	    historyPrefix = "Node" +KEY_SEPR+ nodename;
 	}
     }
 
 
     protected DataFormula instantiateFormula(String kind)
     {
-	// No local formulas
-	return null;
+	if (kind.equals(Constants.CPU_LOAD_AVG) ||
+	    kind.equals(Constants.CPU_LOAD_MJIPS) ||
+	    kind.equals(Constants.MSG_IN) ||
+	    kind.equals(Constants.BYTES_IN) ||
+	    kind.equals(Constants.MSG_OUT) ||
+	    kind.equals(Constants.BYTES_OUT)) {
+	    return new DecayingHistoryFormula(historyPrefix, kind);
+	} else if (kind.equals("VMSize")) {
+	    // singleton
+	    return findOrMakeVMSizeFormula();
+	} else {
+	    // No local formulas
+	    return null;
+	}
+    }
+
+
+    private synchronized DataFormula  findOrMakeVMSizeFormula()
+    {
+	if (vm_size == null) vm_size = new VMSize();
+	return vm_size;
+    }
+
+    private class VMSize extends DataFormula {
+	protected DataValue defaultValue() {
+	    return DataValue.NO_VALUE;
+	}
+	
+
+	protected void initialize(ResourceContext context) {
+	    super.initialize(context);
+
+	    ResourceNode node = new ResourceNode();
+	    node.kind = "Alarm";
+	    node.parameters = new String[0];
+	    ResourceNode formula = new ResourceNode();
+	    formula.kind = "FifteenSecond";
+	    formula.parameters = new String[0];
+	    ResourceNode[] path = { node, formula };
+	    DataFormula alarm = RSS.instance().getPathFormula(path);
+	    registerDependency(alarm, "Alarm");
+	}
+
+	protected DataValue doCalculation(DataFormula.Values vals)
+	{
+	    long size = Runtime.getRuntime().totalMemory();
+	    return new DataValue(size, Constants.SECOND_MEAS_CREDIBILITY,
+				 "bytes", 
+				 "Runtime.getRuntime().totalMemory()");
+	}
+
+	
     }
 }
-
