@@ -206,12 +206,69 @@ public class AgentDS
 	}
     }
 
+    // Both HeardTime and SpokeTime need to be Monotonic, and they
+    // need to be hooked into LastHeard and LastSpoke
 
-    public static class OneSecondLoadAvg extends Formula {
+    //The raw integrater values can not be used because there is no
+    //ordering between threads, so an old thread could publish a
+    //HeardTime that is actually before the current HeardTime
+    public static class HeardTime extends MonotonicLongFormula {
 	String getKey() {
-	    return Constants.ONE_SEC_LOAD_AVG;
+	    return "HeardTime";
 	}
     }	
+
+    public static class SpokeTime extends MonotonicLongFormula {
+	String getKey() {
+	    return "SpokeTime";
+	}
+    }	
+
+
+
+
+    public static class CPULoadAvg1SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_AVG_1_SEC_AVG;
+	}
+    }	
+    public static class CPULoadAvg10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_AVG_10_SEC_AVG;
+	}
+    }	
+    public static class CPULoadAvg100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_AVG_100_SEC_AVG;
+	}
+    }	
+    public static class CPULoadAvg1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_AVG_1000_SEC_AVG;
+	}
+    }	
+
+    public static class CPULoadJips1SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_1_SEC_AVG;
+	}
+    }	
+    public static class CPULoadJips10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_10_SEC_AVG;
+	}
+    }	
+    public static class CPULoadJips100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_100_SEC_AVG;
+	}
+    }	
+    public static class CPULoadJips1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_1000_SEC_AVG;
+	}
+    }	
+
 
     public static class MsgIn1SecAvg extends Formula {
 	String getKey() {
@@ -237,24 +294,87 @@ public class AgentDS
 	}
     }	
 
-    // JAZ both HeardTime and SpokeTime need to be Monotonic, and they
-    // need to be hooked into LastHeard and LastSpoke
 
-    //The raw integrater values can not be used because there is no
-    //ordering between threads, so an old thread could publish a
-    //HeardTime that is actually before the current HeardTime
-    public static class HeardTime extends MonotonicLongFormula {
+    public static class MsgOut1SecAvg extends Formula {
 	String getKey() {
-	    return "HeardTime";
+	    return Constants.MSG_OUT_1_SEC_AVG;
 	}
     }	
 
-    public static class SpokeTime extends MonotonicLongFormula {
+    public static class MsgOut10SecAvg extends Formula {
 	String getKey() {
-	    return "SpokeTime";
+	    return Constants.MSG_OUT_10_SEC_AVG;
 	}
     }	
 
+    public static class MsgOut100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.MSG_OUT_100_SEC_AVG;
+	}
+    }	
+
+    public static class MsgOut1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.MSG_OUT_1000_SEC_AVG;
+	}
+    }	
+
+
+    public static class BytesIn1SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_IN_1_SEC_AVG;
+	}
+    }	
+
+    public static class BytesIn10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_IN_10_SEC_AVG;
+	}
+    }	
+
+    public static class BytesIn100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_IN_100_SEC_AVG;
+	}
+    }	
+
+    public static class BytesIn1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_IN_1000_SEC_AVG;
+	}
+    }	
+
+
+    public static class BytesOut1SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_OUT_1_SEC_AVG;
+	}
+    }	
+
+    public static class BytesOut10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_OUT_10_SEC_AVG;
+	}
+    }	
+
+    public static class BytesOut100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_OUT_100_SEC_AVG;
+	}
+    }	
+
+    public static class BytesOut1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.BYTES_OUT_1000_SEC_AVG;
+	}
+    }	
+
+
+    public static class PersistSizeLast extends Formula {
+	String getKey() {
+	    return Constants.PERSIST_SIZE_LAST;
+	}
+    }	
 
 
 }

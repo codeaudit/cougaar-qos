@@ -126,12 +126,47 @@ public class ServiceDS
 
 
 
-    public static class OneSecondLoadAvg extends Formula {
+    public static class CPULoadAvg1SecAvg extends Formula {
 	String getKey() {
-	    return Constants.ONE_SEC_LOAD_AVG;
+	    return Constants.CPU_LOAD_AVG_1_SEC_AVG;
+	}
+    }	
+    public static class CPULoadAvg10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_AVG_10_SEC_AVG;
+	}
+    }	
+    public static class CPULoadAvg100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_AVG_100_SEC_AVG;
+	}
+    }	
+    public static class CPULoadAvg1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_AVG_1000_SEC_AVG;
 	}
     }	
 
+    public static class CPULoadJips1SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_1_SEC_AVG;
+	}
+    }	
+    public static class CPULoadJips10SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_10_SEC_AVG;
+	}
+    }	
+    public static class CPULoadJips100SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_100_SEC_AVG;
+	}
+    }	
+    public static class CPULoadJips1000SecAvg extends Formula {
+	String getKey() {
+	    return Constants.CPU_LOAD_JIPS_1000_SEC_AVG;
+	}
+    }	
 
 }
 
