@@ -1,7 +1,11 @@
 #!/bin/sh
 
 
-COUGAAR_JAVA_ARGS="-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.StatisticsAspect -Dorg.cougaar.message.transport.debug=statistics"
+logging=-Dorg.cougaar.core.logging.config.filename=$COUGAAR_INSTALL_PATH/quo/bin/props/cougaar/logging.props
+debug=-Dorg.cougaar.message.transport.debug=statistics
+aspects=-Dorg.cougaar.message.transport.aspects=org.cougaar.core.mts.StatisticsAspect
+
+COUGAAR_JAVA_ARGS="$logging $debug $aspects"
 export COUGAAR_JAVA_ARGS
 
 
