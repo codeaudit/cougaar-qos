@@ -5,7 +5,7 @@
 src=$(COUGAAR_SRC_PATH)/quo/src
 root=$(COUGAAR_SRC_PATH)/quo/dev
 qosketroot=$(QUO_ROOT)/qosket
-newcore=$(COUGAAR_SRC_PATH)/core/src/org/cougaar/core/newcore.jar
+newcore=$(COUGAAR_SRC_PATH)/core/newcore.jar
 
 # COUGAAR_INSTALL_PATH and $COUGAAR_SRC_PATH should be set in the
 # $USER's environment
