@@ -107,6 +107,12 @@
         insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
       </component>
       <component
+        name='org.cougaar.mts.std.SerializationAspect'
+        class='org.cougaar.mts.std.SerializationAspect'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+      </component>
+      <component
         name='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
         class='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
         priority='COMPONENT'

@@ -1,6 +1,10 @@
 ##############
-# Single Ping society generator
-# Agent1 -> Agent2
+# Five Ping society generator
+# Src1 -> Sink1
+# Src2 -> Sink2
+# Src3 -> Sink3
+# Src4 -> Sink4
+# Src4 -> Sink5
 # All on a single Node1 and Host1
 
 def addPing(source, dest, args)
@@ -34,20 +38,29 @@ def managePings(wake_time)
   end
 end
 
+def addDefaultPing(number)
+    # send ping from Agent1 to Agent2
+    # eventMillis is interval beteen statistics events being logged
+  addPing("Source#{number}", "Sink#{number}", 
+	  {'eventMillis' => '100000',
+	    'delayMillis' => '5000',
+	    'ignoreRollback' => 'true',
+	    # Define Ping Size in bytes, 
+	    #'sendFillerSize' => '50000',
+	    # false means extra bytes will be compressable 
+	    #'sendFillerRand' => 'false',
+	    #'echoFillerSize' => '50000',
+	    #'echoFillerRand' => 'false',
+	  })
+end
+
 society.add_host('HOST1') do |host|
   host.add_node('NODE1') do |node|
-    # send ping from Source1 to Sink2
-    # eventMillis is interval beteen statistics events being logged
-    addPing('Source1', 'Sink1', 
-            {'eventMillis' => '10000',
-	      'delayMillis' => '0',
-	      #'sendFillerSize' => '50000',
-	      #'sendFillerRand' => 'false',
-	      #'echoFillerSize' => '50000',
-	      #'echoFillerRand' => 'false',
-	    })
-
-    # add more "addPing" calls here
+    addDefaultPing(1)
+    addDefaultPing(2)
+    addDefaultPing(3)
+    addDefaultPing(4)
+    addDefaultPing(5)
   end
 
   # add ping managers to all agents that send pings

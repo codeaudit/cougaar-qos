@@ -36,11 +36,11 @@ end
 
 society.add_host('HOST1') do |host|
   host.add_node('NODE1') do |node|
-    # send ping from Source1 to Sink2
+    # send ping from Source1 to Sink1
     # eventMillis is interval beteen statistics events being logged
     addPing('Source1', 'Sink1', 
             {'eventMillis' => '10000',
-	      'delayMillis' => '0',
+	      'delayMillis' => '9000',
 	      #'sendFillerSize' => '50000',
 	      #'sendFillerRand' => 'false',
 	      #'echoFillerSize' => '50000',

@@ -30,14 +30,18 @@ COUGAAR_JAVA_ARGS="
 -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.ping=DEBUG
 -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.core.agent=DEBUG
 -Dorg.cougaar.society.xsl.param.communities=false
+-Dorg.cougaar.name.server=NodeA@date.bbn.com:8888
+-Dorg.cougaar.class.path=/home/jzinky/cougaar/HEAD/core/newcore.jar:/home/jzinky/cougaar/HEAD/util/newutil.jar:/home/jzinky/cougaar/HEAD/mtsstd/newmts.jar:/home/jzinky/cougaar/robustness/bbn/robustness.jar:
 "
 
+#### Name Service
+#
 
 #### now Minimal Options 
 #-Dorg.cougaar.society.xsl.param.communities=false
-#-Dorg.cougaar.society.xsl.param.metrics=trivial
 #-Dorg.cougaar.society.xsl.param.servlets=false
 #-Dorg.cougaar.society.xsl.param.mts=singlenode
+#-Dorg.cougaar.society.xsl.param.metrics=trivial
 #-Dorg.cougaar.thread.service.type=single
 
 ### Persistance enable
@@ -63,5 +67,5 @@ export COUGAAR_JAVA_ARGS
 echo "ARGS => ${COUGAAR_JAVA_ARGS}"
 
 
-#exec ${COUGAAR_INSTALL_PATH}/bin/Node -v $*
-exec ${COUGAAR_SRC_PATH}/base/bin/Node -v $*
+exec ${COUGAAR_INSTALL_PATH}/bin/Node -v $*
+#exec ${COUGAAR_SRC_PATH}/base/bin/Node -v $*

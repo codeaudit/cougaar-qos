@@ -13,8 +13,14 @@ society.add_host('HOST2')
 # HOST1 already contains NODE1
 society.hosts['HOST2'].add_node('NODE2')
 
-# NODE1 already contains Agent1
-society.agents['Agent2'].move_to('NODE2')
+# NODE1 already contains Source* agents
+# NODE2 should have Sink agents
+society.each_agent do |agent|
+  if agent.name =~ /Sink.*/
+    society.agents[agent.name].move_to('NODE2')
+  end
+end
+
 
 
 # Make Enclaves with Manager

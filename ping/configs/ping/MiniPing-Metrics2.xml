@@ -2,7 +2,7 @@
 <society name='MiniPing'
   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
   xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2003/society.xsd'>
-  <host name='holodeck'>
+  <host name='localhost'>
     <node name='NodeA'>
       <class>
         org.cougaar.bootstrap.Bootstrapper
@@ -14,10 +14,10 @@
         -Dorg.cougaar.node.name=NodeA
       </vm_parameter>
       <vm_parameter>
-        -Dorg.cougaar.society.file=MiniPing-Metrics.xml
+        -Dorg.cougaar.society.file=MiniPing2-Metrics.xml
       </vm_parameter>
       <vm_parameter>
-        -Dorg.cougaar.name.server=localhost:8888
+        -Dorg.cougaar.name.server=NodeA@date.bbn.com:8888
       </vm_parameter>
       <vm_parameter>
         -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.core.mobility.ping=DEBUG
@@ -250,7 +250,7 @@
           args=-url http://stout.bbn.com/~statusquo/QuoTestbed-Hosts.conf
         </argument>
       </component>
-        <component
+       <component
           name='org.cougaar.core.wp.server.Server()'
           class='org.cougaar.core.wp.server.Server'
           priority='COMPONENT'
@@ -327,6 +327,254 @@
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
         </component>
       </agent>
+    </node>
+    <node name='NodeB'>
+      <class>
+        org.cougaar.bootstrap.Bootstrapper
+      </class>
+      <prog_parameter>
+        org.cougaar.core.node.Node
+      </prog_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.node.name=NodeA
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.society.file=MiniPing2-Metrics.xml
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.name.server=NodeA@date.bbn.com:8888
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.core.logging.log4j.category.EVENT.org.cougaar.core.mobility.ping=DEBUG
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.core.logging.log4j.category.org.cougaar.core.mobility.ping=INFO
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.core.agent.showTraffic=false
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.core.load.planning=false
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.core.load.community=false
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.config.path=$COUGAAR_INSTALL_PATH/ping/configs/ping
+      </vm_parameter>
+      <vm_parameter>
+        -XX:ThreadStackSize=256
+      </vm_parameter>
+      <vm_parameter>
+        -Xms16m
+      </vm_parameter>
+      <vm_parameter>
+        -Xmx128m
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.core.node.InitializationComponent=XML
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.install.path=$COUGAAR_INSTALL_PATH
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.workspace=$COUGAAR_INSTALL_PATH/workspace
+      </vm_parameter>
+      <vm_parameter>
+        -Dorg.cougaar.system.path=$COUGAAR_INSTALL_PATH/sys
+      </vm_parameter>
+      <vm_parameter>
+        -Djava.class.path=$COUGAAR_INSTALL_PATH/lib/bootstrap.jar
+      </vm_parameter>
+      <vm_parameter>
+        -Xbootclasspath/p:$COUGAAR_INSTALL_PATH/lib/javaiopatch.jar
+      </vm_parameter>
+      <component
+        name='mobility'
+        class='org.cougaar.core.mobility.ldm.MobilityDomain'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
+        <argument>
+          mobility
+        </argument>
+      </component>
+      <component
+        name='org.cougaar.core.mobility.service.RootMobilityPlugin()'
+        class='org.cougaar.core.mobility.service.RootMobilityPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.core.wp.WhitePagesServlet(/wp)'
+        class='org.cougaar.core.wp.WhitePagesServlet'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+        <argument>
+          /wp
+        </argument>
+      </component>
+      <component
+        name='org.cougaar.core.thread.AgentLoadRatePlugin'
+        class='org.cougaar.core.thread.AgentLoadRatePlugin'
+        priority='LOW'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
+        class='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.core.qos.metrics.MetricsServletPlugin'
+        class='org.cougaar.core.qos.metrics.MetricsServletPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
+        class='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+      </component>
+      <component
+        name='org.cougaar.core.thread.AgentLoadSensorPlugin'
+        class='org.cougaar.core.thread.AgentLoadSensorPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
+        class='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.mts.std.StatisticsPlugin'
+        class='org.cougaar.mts.std.StatisticsPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.core.thread.TopPlugin'
+        class='org.cougaar.core.thread.TopPlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.core.qos.metrics.AgentFlowRatePlugin'
+        class='org.cougaar.core.qos.metrics.AgentFlowRatePlugin'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+      </component>
+      <component
+        name='org.cougaar.mts.std.StatisticsAspect()'
+        class='org.cougaar.mts.std.StatisticsAspect'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+        <order>
+          140
+        </order>
+      </component>
+      <component
+        name='org.cougaar.mts.std.AgentFlowAspect()'
+        class='org.cougaar.mts.std.AgentFlowAspect'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+        <order>
+          210
+        </order>
+      </component>
+      <component
+        name='org.cougaar.mts.std.DeliveryVerificationAspect(info-time=9,warn-time=99)'
+        class='org.cougaar.mts.std.DeliveryVerificationAspect'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+        <order>
+          220
+        </order>
+        <argument>
+          info-time=9
+        </argument>
+        <argument>
+          warn-time=99
+        </argument>
+      </component>
+      <component
+        name='org.cougaar.core.qos.gossip.GossipAspect()'
+        class='org.cougaar.core.qos.gossip.GossipAspect'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+        <order>
+          230
+        </order>
+      </component>
+      <component
+        name='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect()'
+        class='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+        <order>
+          240
+        </order>
+      </component>
+      <component
+        name='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent()'
+        class='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+        <order>
+          250
+        </order>
+      </component>
+      <component
+        name='org.cougaar.core.qos.rss.AgentHostUpdaterComponent()'
+        class='org.cougaar.core.qos.rss.AgentHostUpdaterComponent'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+      </component>
+      <component
+        name='org.cougaar.lib.mquo.SyscondFactory()'
+        class='org.cougaar.lib.mquo.SyscondFactory'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+      </component>
+      <component
+        name='org.cougaar.core.qos.gossip.GossipFeedComponent()'
+        class='org.cougaar.core.qos.gossip.GossipFeedComponent'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+      </component>
+      <component
+        name='org.cougaar.core.qos.metrics.FeedLoader(name=sites,class=com.bbn.quo.data.PropertiesDataFeed,args=-url http://stout.bbn.com/~statusquo/QuoTestbed-Sites.conf)'
+        class='org.cougaar.core.qos.metrics.FeedLoader'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+        <argument>
+          name=sites
+        </argument>
+        <argument>
+          class=com.bbn.quo.data.PropertiesDataFeed
+        </argument>
+        <argument>
+          args=-url http://stout.bbn.com/~statusquo/QuoTestbed-Sites.conf
+        </argument>
+      </component>
+      <component
+        name='org.cougaar.core.qos.metrics.FeedLoader(name=hosts,class=com.bbn.quo.data.PropertiesDataFeed,args=-url http://stout.bbn.com/~statusquo/QuoTestbed-Hosts.conf)'
+        class='org.cougaar.core.qos.metrics.FeedLoader'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+        <argument>
+          name=hosts
+        </argument>
+        <argument>
+          class=com.bbn.quo.data.PropertiesDataFeed
+        </argument>
+        <argument>
+          args=-url http://stout.bbn.com/~statusquo/QuoTestbed-Hosts.conf
+        </argument>
+      </component>
       <agent name='AgentB'>
         <component
           name='mobility'
