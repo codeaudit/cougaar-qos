@@ -32,13 +32,13 @@ package org.cougaar.core.qos.ca;
  */
 public abstract class FactRevision  
 {
-    private Fact fact;
+    private Object fact;
 
-    FactRevision(Fact fact) {
+    FactRevision(Object fact) {
 	this.fact = fact;
     }
     
-    public Fact getFact()
+    public Object getFact()
     {
 	return fact;
     }

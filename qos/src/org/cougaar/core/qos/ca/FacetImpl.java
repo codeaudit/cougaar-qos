@@ -257,14 +257,14 @@ abstract public class FacetImpl
 
 
     protected class ReceptacleImpl implements Receptacle {
-	public void assertFact(Fact fact)
+	public void assertFact(Object fact)
 	{
 	    FactRevision entry = new FactAssertion(fact);
 	    addRevision(entry);
 	}
 
 
-	public void retractFact(Fact fact)
+	public void retractFact(Object fact)
 	{
 	    FactRevision entry = new FactRetraction(fact);
 	    addRevision(entry);

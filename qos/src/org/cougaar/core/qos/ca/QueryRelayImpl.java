@@ -42,181 +42,178 @@ import org.cougaar.core.persist.NotPersistable;
  */
 public final class QueryRelayImpl
     implements QueryRelay, Relay.Source, Relay.Target, 
-	       Serializable, NotPersistable {
+	       Serializable, NotPersistable 
+{
     
     private final UID uid;
-  private final MessageAddress source;
-  // the target is transient to avoid resend on rehydration
-  private final transient MessageAddress target;
+    private final MessageAddress source;
+    // the target is transient to avoid resend on rehydration
+    private final transient MessageAddress target;
 
-  private Object query;
-  private Object reply;
+    private Object query;
 
-    private String artifactId;
-
-  private transient Set _targets;
-  private transient Relay.TargetFactory _factory;
+    private transient Set _targets;
+    private transient Relay.TargetFactory _factory;
 
     private long timestamp;
     
-  /**
-   * Create an instance.
-   *
-   * @param uid unique object id from the UIDService 
-   * @param source the local agent's address 
-   * @param target the remote agent's address 
-   * @param query optional initial value, which can be null
-   * @param timestamp necessary for rate calculation
-   */
-    public QueryRelayImpl(
-			    UID uid,
-			    MessageAddress source,
-			    MessageAddress target,
-			    Object query, 
-			    String artifactId,
-			    long timestamp) {
+    /**
+     * Create an instance.
+     *
+     * @param uid unique object id from the UIDService 
+     * @param source the local agent's address 
+     * @param target the remote agent's address 
+     * @param query optional initial value, which can be null
+     * @param timestamp necessary for rate calculation
+     */
+    public QueryRelayImpl(UID uid,
+			  MessageAddress source,
+			  MessageAddress target,
+			  Object query, 
+			  long timestamp) 
+    {
 	this.uid = uid;
 	this.source = source;
 	this.target = target;
 	this.query = query;
 	this.timestamp = timestamp;
-	this.artifactId = artifactId;
 	cacheTargets();
     }
     
-    public UID getUID() {
+    public UID getUID() 
+    {
 	return uid;
     }
-  public void setUID(UID uid) {
-    throw new UnsupportedOperationException();
-  }
 
-  public MessageAddress getSource() {
-    return source;
-  }
-
-  public MessageAddress getTarget() {
-    return target;
-  }
-
-  public Object getQuery() {
-    return query;
-  }
-
-  public void setQuery(Object query) {
-    this.query = query;
-  }
-
-  public Object getReply() {
-    return reply;
-  }
-
-  public void setReply(Object reply) {
-    this.reply = reply;
-  }
-
-  // Relay.Source:
-
-  private void cacheTargets() {
-    _targets = Collections.singleton(target);
-    _factory = new QueryRelayImplFactory(target, timestamp, artifactId);
-  }
-  public Set getTargets() {
-    return _targets;
-  }
-  public Object getContent() {
-    return query;
-  }
-  public Relay.TargetFactory getTargetFactory() {
-    return _factory;
-  }
-  public int updateResponse(
-      MessageAddress target, Object response) {
-      if (response == null ? reply == null : response.equals(reply)) {
-	  return Relay.NO_CHANGE;
-      }
-    this.reply = response;
-    return Relay.RESPONSE_CHANGE;
-  }
-
-  // Relay.Target:
-
-  public Object getResponse() {
-    return reply;
-  }
-  public int updateContent(Object content, Token token) {
-    // assert content != null
-      if (content == null ? query == null : content.equals(query)) {
-	  return Relay.NO_CHANGE;
-      }
-
-    this.query = content;
-    return Relay.CONTENT_CHANGE;
-  }
-
-  // Object:
-
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    } else if (o instanceof QueryRelayImpl) { 
-      UID u = ((QueryRelayImpl) o).uid;
-      return uid.equals(u);
-    } else {
-      return false;
+    public void setUID(UID uid)
+    {
+	throw new UnsupportedOperationException();
     }
-  }
-  public int hashCode() {
-    return uid.hashCode();
-  }
-  private void readObject(java.io.ObjectInputStream os) 
-    throws ClassNotFoundException, java.io.IOException {
-      os.defaultReadObject();
-      cacheTargets();
+
+    public MessageAddress getSource() 
+    {
+	return source;
     }
-  public String toString() {
-    return 
-      "(QueryRelayImpl"+
-      " uid="+uid+
-      " source="+source+
-      " target="+target+
-      " query="+query+
-      " reply="+reply+
-	"timestamp="+timestamp+
-	"artifactId="+artifactId+
-	")";
-  }
+
+    public MessageAddress getTarget() 
+    {
+	return target;
+    }
+
+    public Object getQuery() 
+    {
+	return query;
+    }
+
+    public void setQuery(Object query) 
+    {
+	this.query = query;
+    }
+
+    private void cacheTargets() 
+    {
+	_targets = Collections.singleton(target);
+	_factory = new QueryRelayImplFactory(target, timestamp);
+    }
+
+    public Set getTargets() 
+    {
+	return _targets;
+    }
+
+    public Object getContent() 
+    {
+	return query;
+    }
+
+    public Relay.TargetFactory getTargetFactory() 
+    {
+	return _factory;
+    }
+
+    public int updateResponse(MessageAddress source, Object response)
+    {
+	// illegal?
+	return  Relay.NO_CHANGE;
+    }
+
+    public Object getResponse()
+    {
+	return null;
+    }
+
+    public int updateContent(Object content, Token token) 
+    {
+	// assert content != null
+	if (content == null ? query == null : content.equals(query)) {
+	    return Relay.NO_CHANGE;
+	}
+
+	this.query = content;
+	return Relay.CONTENT_CHANGE;
+    }
+
+    // Object:
+
+    public boolean equals(Object o) 
+    {
+	if (o == this) {
+	    return true;
+	} else if (o instanceof QueryRelayImpl) { 
+	    UID u = ((QueryRelayImpl) o).uid;
+	    return uid.equals(u);
+	} else {
+	    return false;
+	}
+    }
+    public int hashCode() 
+    {
+	return uid.hashCode();
+    }
+    private void readObject(java.io.ObjectInputStream os) 
+	throws ClassNotFoundException, java.io.IOException 
+    {
+	os.defaultReadObject();
+	cacheTargets();
+    }
+
+    public String toString() {
+	return 
+	    "(QueryRelayImpl"+
+	    " uid="+uid+
+	    " source="+source+
+	    " target="+target+
+	    " query="+query+
+	    "timestamp="+timestamp+
+	    ")";
+    }
     
-    public long getTimestamp() {
+    public long getTimestamp() 
+    {
 	return timestamp;
     }
     
-    public String getArtifactId() {
-	return artifactId;
-    }
 
-  // factory method:
+    // factory method:
 
-  private static class QueryRelayImplFactory 
-    implements Relay.TargetFactory, Serializable {
-      private final MessageAddress target;
-      private long timestamp;
-      private String artifactId;
-      public QueryRelayImplFactory(MessageAddress target,
-				   long timestamp,
-				   String artifactId)
-      {
-        this.target = target;
-	this.timestamp = timestamp;
-	this.artifactId = artifactId;
-      }
-      public Relay.Target create(
-          UID uid, MessageAddress source, Object content,
-          Relay.Token token) {
-        Object query = content;
-	// long timestamp = System.currentTimeMillis();
-        // bug 3824, pass null aba-target to avoid n^2 peer copies
-        return new QueryRelayImpl(uid, source, null, query, artifactId, timestamp);
-      }
+    private static class QueryRelayImplFactory 
+	implements Relay.TargetFactory, Serializable {
+	private final MessageAddress target;
+	private long timestamp;
+	private String artifactId;
+	public QueryRelayImplFactory(MessageAddress target,
+				     long timestamp)
+	{
+	    this.target = target;
+	    this.timestamp = timestamp;
+	}
+	public Relay.Target create(
+				   UID uid, MessageAddress source, Object content,
+				   Relay.Token token) {
+	    Object query = content;
+	    // long timestamp = System.currentTimeMillis();
+	    // bug 3824, pass null aba-target to avoid n^2 peer copies
+	    return new QueryRelayImpl(uid, source, null, query, timestamp);
+	}
     }
 }

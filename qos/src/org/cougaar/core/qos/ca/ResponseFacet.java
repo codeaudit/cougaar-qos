@@ -46,33 +46,10 @@ import org.cougaar.util.UnaryPredicate;
  * implemented here, leaving subclasses only to implement the abstract
  * methods of this class.
  */
-abstract public class ResponseFacet
+public class ResponseFacet
     extends FacetImpl
     implements QueryCoordArtConstants
 {
-    /**
-     * The implementation of this method in instantiable extensions
-     * would return true or false depending on whether or not the
-     * given relay was of interest.
-     */
-    public abstract boolean acceptQuery(QueryRelay relay);
-
-    /**
-     * The implementation of this method in instantiable extensions
-     * would transform the given response, as received via relay from
-     * a QueryResponseCoordinationArtifact, into a Fact that will be
-     * propagated out to the responding RolePlayer.
-     */
-    public abstract Fact transformQuery(QueryRelay relay);
-
-    /**
-     * The implementation of this method in instantiable extensions
-     * would transform the given fact, as received from a responding
-     * RolePlayer, into an Object suitable for transmission as the
-     * content of ResponseRelay.
-     */
-    public abstract Object transformResponse(Fact fact);
-
     private String managerRole;
     private HashSet completedUIDs;
     private ResponseRelay lastResponse; // for cleaning up
@@ -159,7 +136,7 @@ abstract public class ResponseFacet
 	    if (log.isDebugEnabled()) 
 		log.debug("Processing fact " + frev.getFact());
 	    if (frev.isAssertion()) {
-		Fact fact = frev.getFact();
+		Object fact = frev.getFact();
 		sendReply(fact, blackboard);
 	    } else {
 		// no retractions yet
@@ -167,10 +144,8 @@ abstract public class ResponseFacet
 	}
     }
 
-    private void sendReply(Fact fact, BlackboardService blackboard)
+    private void sendReply(Object reply, BlackboardService blackboard)
     {
-	UID queryUID = (UID) fact.getAttribute(UidAttr);
-	String artifactID = (String) fact.getAttribute(ArtifactIdAttr);
 	// Pass back response relay
 	UID uid = nextUID();
 	//String s = "Response Matrix";
@@ -181,17 +156,14 @@ abstract public class ResponseFacet
 	    blackboard.publishRemove(lastResponse);
 	}
 
-	Object payload = transformResponse(fact);
-	    
 	ResponseRelay response = 
 	    new ResponseRelayImpl(uid, getAgentID(), getABA(), 
-				  payload, queryUID, 
-				  artifactID,
+				  reply,
 				  timestamp);
 	    
 	    
 	if (log.isDebugEnabled()) {
-	    log.debug("Responding to query: " + queryUID
+	    log.debug("Responding to query: " // + queryUID
 		      + " with new reply: " + response);
 	}
 	//blackboard.publishChange(tr);
@@ -226,14 +198,10 @@ abstract public class ResponseFacet
 	    log.debug("Observed added relay"+query);
 	}
 
-	Fact fact = transformQuery(query);
-	HashMap updates = new HashMap();
-	updates.put(UidAttr, query.getUID());
-	updates.put(ArtifactIdAttr, query.getArtifactId());
-	Fact updated_fact = new Fact(fact, updates);
+	Object fact = query.getQuery();
 	if (log.isDebugEnabled())
-	    log.debug("Updated Fact" +updated_fact.debugString());
-	getPlayer().factAsserted(updated_fact, getReceptacle());
+	    log.debug("Updated Fact" +fact);
+	getPlayer().factAsserted(fact, getReceptacle());
     }
 
 
@@ -246,10 +214,7 @@ abstract public class ResponseFacet
     private UnaryPredicate QueryPred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
 		if (o instanceof QueryRelay) {
-		    QueryRelay relay = (QueryRelay) o;
-		    String id = relay.getArtifactId();
-		    return id.equals(getArtifactId()) &&
-			acceptQuery(relay);
+		    return true;
 		} else {
 		    return false;
 		}

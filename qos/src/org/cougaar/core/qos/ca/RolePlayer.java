@@ -32,9 +32,9 @@ package org.cougaar.core.qos.ca;
  */
 public interface RolePlayer
 {
-    public void factAsserted(Fact fact, Receptacle receptacle);
+    public void factAsserted(Object fact, Receptacle receptacle);
 
-    public void factRetracted(Fact fact, Receptacle receptacle);
+    public void factRetracted(Object fact, Receptacle receptacle);
 
     public void facetAvailable(ConnectionSpec spec, Receptacle receptacle);
 

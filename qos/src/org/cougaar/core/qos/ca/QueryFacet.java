@@ -43,34 +43,10 @@ import org.cougaar.util.UnaryPredicate;
  * implemented here, leaving subclasses only to implement the abstract
  * methods of this class.
  */
-abstract public class QueryFacet 
+public class QueryFacet 
     extends FacetImpl
     implements QueryCoordArtConstants
 {
-    /**
-     * The implementation of this method in instantiable extensions
-     * would return true or false depending on whether or not the
-     * given relay was of interest to the Artifact instance.
-     */
-    public abstract boolean acceptResponse(ResponseRelay response);
-
-
-    /**
-     * The implementation of this method in instantiable extensions
-     * would transform the given fact, as received from a querying
-     * RolePlayer, into an Object suitable for transmission as the
-     * content of QueryRelay.
-     */
-    public abstract Object transformQuery(Fact fact);
-
-    /**
-     * The implementation of this method in instantiable extensions
-     * would transform the given response, as received from a
-     * QueryResponseCoordinationArtifact via relay, into a Fact that
-     * will be propagated out to the querying RolePlayer.
-     */
-    public abstract Fact transformResponse(ResponseRelay response);
-
     private String managerAttr;
     private RelayReclaimer reclaimer = null;
     private String communityRole;
@@ -175,7 +151,7 @@ abstract public class QueryFacet
 	    if (log.isDebugEnabled()) 
 		log.debug("Processing fact " + frev.getFact());
 	    if (frev.isAssertion()) {
-		Fact fact = frev.getFact();
+		Object fact = frev.getFact();
 		// Should only be one and should be a RequestFact
 		sendQuery(fact, blackboard);
 	    } else {
@@ -184,7 +160,7 @@ abstract public class QueryFacet
 	}
     }
 
-    protected void sendQuery(Fact fact, BlackboardService blackboard)
+    protected void sendQuery(Object query, BlackboardService blackboard)
     {
 	if (log.isDebugEnabled()) {
 	    log.debug("sendQueries()");
@@ -195,12 +171,9 @@ abstract public class QueryFacet
 	// too early, but this shouldn't happen
 
 	UID uid = nextUID();
-	Object query = transformQuery(fact);
 	long timestamp = System.currentTimeMillis();
 	QueryRelay qr = 
-	    new QueryRelayImpl(uid, getAgentID(), aba, query, 
-			       getArtifactId(),
-			       timestamp);
+	    new QueryRelayImpl(uid, getAgentID(), aba, query, timestamp);
 	if (log.isInfoEnabled()) {
 	    log.info("Sending QueryRelay from " +getAgentID() +
 		      " to all nodes in community: " + getCommunity());
@@ -223,7 +196,7 @@ abstract public class QueryFacet
      */
     protected void processResponse(ResponseRelay response)
     {
-	Fact responseFact = transformResponse(response);
+	Object responseFact = response.getReply();
 	if (log.isDebugEnabled())
 	    log.debug("Tranformed " +response+ " into " +responseFact);
 	if (responseFact != null) 
@@ -241,12 +214,7 @@ abstract public class QueryFacet
     private UnaryPredicate ResponsePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
 		if (o instanceof ResponseRelay) {
-		    ResponseRelay relay = (ResponseRelay) o;
-		    if (log.isDebugEnabled())
-			log.debug("testing response relay" +relay);
-		    String id = relay.getArtifactId();
-		    return id.equals(getArtifactId()) &&
-			acceptResponse(relay);
+		    return true;
 		} else {
 		    return false;
 		}

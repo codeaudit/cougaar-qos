@@ -38,15 +38,16 @@ public interface Receptacle
 {
     /**
      * Used by clients to assert a new fact into the Facet's
-     * fact-base. 
+     * fact-base. The fact itself is a blackbox.
      */
-    public void assertFact(Fact fact);
+    public void assertFact(Object fact);
 
 
     /**
-     * Used by clients to retract a fact from the Facet's fact-base.
+     * Used by clients to retract a fact from the Facet's
+     * fact-base. The fact itself is a blackbox.
      */
-    public void retractFact(Fact fact);
+    public void retractFact(Object fact);
 
 
     /**

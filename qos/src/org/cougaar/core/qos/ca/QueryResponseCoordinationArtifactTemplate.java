@@ -70,22 +70,6 @@ abstract public class QueryResponseCoordinationArtifactTemplate
 	private String artifactId;
 
 
-	/**
-	 * Make a CA-specific QueryFacet.
-	 */
-	public abstract QueryFacet makeQueryFacet(ServiceBroker sb,
-						  ConnectionSpec spec, 
-						  RolePlayer player);
-
-
-	/**
-	 * Make a CA-specific ResponseFacet.
-	 */
-	public abstract ResponseFacet makeResponseFacet(ServiceBroker sb,
-							ConnectionSpec spec, 
-							RolePlayer player);
-
-   
 	protected QueryResponseCA(CoordinationArtifactTemplate owner,
 				  ConnectionSpec spec)
 	{
@@ -101,6 +85,25 @@ abstract public class QueryResponseCoordinationArtifactTemplate
 	}
 
 
+	protected QueryFacet makeQueryFacet(ServiceBroker sb,
+					    ConnectionSpec spec, 
+					    RolePlayer player)
+	{
+	    return new QueryFacet(this, sb, spec, player);
+	}
+
+
+	/**
+	 * Make a CA-specific ResponseFacet.
+	 */
+	protected ResponseFacet makeResponseFacet(ServiceBroker sb,
+						  ConnectionSpec spec, 
+						  RolePlayer player)
+	{
+	    return new ResponseFacet(this, sb, spec, player);
+	}
+
+   
 	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
 	{
 	    ServiceBroker sb = getServiceBroker();

@@ -31,7 +31,7 @@ package org.cougaar.core.qos.ca;
  */
 public class FactRetraction extends FactRevision 
 {
-    FactRetraction(Fact fact) {
+    FactRetraction(Object fact) {
 	super(fact);
     }
  

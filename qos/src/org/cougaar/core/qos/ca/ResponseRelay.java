@@ -36,60 +36,42 @@ import org.cougaar.core.util.UniqueObject;
  *
  * @see ResponseRelayImpl relay-based implementation 
  */
-public interface ResponseRelay extends UniqueObject {
+public interface ResponseRelay extends UniqueObject 
+{
 
-  // from UniqueObject 
-  UID getUID();
-  void setUID(UID uid);
-    UID getOrigUID();
+    // from UniqueObject 
+    UID getUID();
+    void setUID(UID uid);
 
-  /** The agent that created the query */
-  MessageAddress getSource();
+    /** The agent that created the query */
+    MessageAddress getSource();
 
-  /** The agent that will set the reply */
-  MessageAddress getTarget();
+    /** The agent that will set the reply */
+    MessageAddress getTarget();
 
-  /** Get the query contents */
-  Object getQuery();
+    /**
+     * Get the remote reply to the query, if any.
+     * <p>
+     * Blackboard interactions are asynchronous, so the plugin should
+     * use a subscription to wake when the ResponseRelay has changed.
+     */
+    Object getReply();
 
-  /** 
-   * Change the query, which is optional.
-   * <p> 
-   * Only the agent who's address matches "getSource()" may call
-   * this method, which must be followed by a blackboard
-   * "publishChange" to resend the query to the target.
-   * <p>
-   * Note that the relay implementation may batch changes and
-   * only send the latest change.
-   *
-   * @param query the immutable query object 
-   */ 
-  void setQuery(Object query);
-
-  /**
-   * Get the remote reply to the query, if any.
-   * <p>
-   * Blackboard interactions are asynchronous, so the plugin should
-   * use a subscription to wake when the ResponseRelay has changed.
-   */
-  Object getReply();
-
-  /** 
-   * Change the reply, which is optional.
-   * <p>
-   * Only the agent who's address matches "getTarget()" should call
-   * this method, which must be followed by a blackboard
-   * "publishChange" to resend the reply to the target.
-   * <p>
-   * Note that the relay implementation may batch changes and
-   * only send the latest change.
-   *
-   * @param reply the immutable reply object 
-   */ 
-  void setReply(Object reply);
+    /** 
+     * Change the reply, which is optional.
+     * <p>
+     * Only the agent who's address matches "getTarget()" should call
+     * this method, which must be followed by a blackboard
+     * "publishChange" to resend the reply to the target.
+     * <p>
+     * Note that the relay implementation may batch changes and
+     * only send the latest change.
+     *
+     * @param reply the immutable reply object 
+     */ 
+    void setReply(Object reply);
 
 
     long getTimestamp();
 
-    String getArtifactId();
 }

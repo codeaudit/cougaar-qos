@@ -43,202 +43,192 @@ import org.cougaar.core.persist.NotPersistable;
  */
 public final class ResponseRelayImpl
 implements ResponseRelay, Relay.Source, Relay.Target, 
-	   Serializable, NotPersistable {
+	   Serializable, NotPersistable 
+{
 
-  private final UID uid;
-  private final MessageAddress source;
-  // the target is transient to avoid resend on rehydration
-  private transient final MessageAddress target;
+    private final UID uid;
+    private final MessageAddress source;
+    // the target is transient to avoid resend on rehydration
+    private transient final MessageAddress target;
 
-  private Object query;
-  private Object reply;
-    private UID origUID;
-    private String artifactId;
+    private Object reply;
 
-  private transient Set _targets;
-  private transient Relay.TargetFactory _factory;
+    private transient Set _targets;
+    private transient Relay.TargetFactory _factory;
 
     private long timestamp;
 
-  /**
-   * Create an instance.
-   *
-   * @param uid unique object id from the UIDService 
-   * @param source the local agent's address 
-   * @param target the remote agent's address 
-   * @param query optional initial value, which can be null
-   */
-    public ResponseRelayImpl(
-				    UID uid,
-				    MessageAddress source,
-				    MessageAddress target,
-				    Object query, 
-				    UID origUID,
-				    String artifactId,
-				    long timestamp) {
+    /**
+     * Create an instance.
+     *
+     * @param uid unique object id from the UIDService 
+     * @param source the local agent's address 
+     * @param target the remote agent's address 
+     * @param query optional initial value, which can be null
+     */
+    public ResponseRelayImpl(UID uid,
+			     MessageAddress source,
+			     MessageAddress target,
+			     Object reply,
+			     long timestamp) 
+    {
 	this.uid = uid;
 	this.source = source;
 	this.target = target;
-	this.query = query;
-	this.origUID = origUID;
-	this.artifactId = artifactId;
+	this.reply = reply;
 	this.timestamp = timestamp;
 	cacheTargets();
     }
     
 
-  public UID getUID() {
-    return uid;
-  }
-  public void setUID(UID uid) {
-    throw new UnsupportedOperationException();
-  }
-    
-    public UID getOrigUID() {
-	return origUID;
+    public UID getUID() 
+    {
+	return uid;
+    }
+
+    public void setUID(UID uid) 
+    {
+	throw new UnsupportedOperationException();
     }
     
-  public MessageAddress getSource() {
-    return source;
-  }
+    public MessageAddress getSource() 
+    {
+	return source;
+    }
 
-  public MessageAddress getTarget() {
-    return target;
-  }
+    public MessageAddress getTarget() 
+    {
+	return target;
+    }
 
-  public Object getQuery() {
-    return query;
-  }
+    public Object getReply() 
+    {
+	return reply;
+    }
 
-  public void setQuery(Object query) {
-    this.query = query;
-  }
+    public void setReply(Object reply) 
+    {
+	this.reply = reply;
+    }
 
-  public Object getReply() {
-    return reply;
-  }
+    // Relay.Source:
 
-  public void setReply(Object reply) {
-    this.reply = reply;
-  }
+    private void cacheTargets() 
+    {
+	_targets = Collections.singleton(target);
+	_factory = new ResponseRelayImplFactory(target, timestamp);
+    }
 
-  // Relay.Source:
+    public Set getTargets() 
+    {
+	return _targets;
+    }
 
-  private void cacheTargets() {
-    _targets = Collections.singleton(target);
-    _factory = new ResponseRelayImplFactory(target, timestamp, origUID, 
-					    artifactId);
-  }
-  public Set getTargets() {
-    return _targets;
-  }
-  public Object getContent() {
-    return query;
-  }
-  public Relay.TargetFactory getTargetFactory() {
-    return _factory;
-  }
+    public Object getContent() 
+    {
+	return reply;
+    }
+
+    public Relay.TargetFactory getTargetFactory()
+    {
+	return _factory;
+    }
     
-     public int updateResponse(
-      MessageAddress target, Object response) {
-      if (response == null ? reply == null : response.equals(reply)) {
-	  return Relay.NO_CHANGE;
-      }
-    this.reply = response;
-    return Relay.RESPONSE_CHANGE;
-  }
+    public int updateResponse(MessageAddress target, Object response) 
+    {
+	if (response == null ? reply == null : response.equals(reply)) {
+	    return Relay.NO_CHANGE;
+	}
+	this.reply = response;
+	return Relay.RESPONSE_CHANGE;
+    }
 
-  // Relay.Target:
+    // Relay.Target:
 
-  public Object getResponse() {
-    return reply;
-  }
+    public Object getResponse() 
+    {
+	return reply;
+    }
     /* public int updateContent(Object content, Token token) {
     // assert content != null
     this.query = content;
     return Relay.CONTENT_CHANGE;
-  }
+    }
     */
-    public int updateContent(Object content, Token token) {
-    // assert content != null
-      if (content == null ? query == null : content.equals(query)) {
-	  return Relay.NO_CHANGE;
-      }
+    public int updateContent(Object content, Token token) 
+    {
+	// assert content != null
+	if (content == null ? reply == null : content.equals(reply)) {
+	    return Relay.NO_CHANGE;
+	}
 
-    this.query = content;
-    return Relay.CONTENT_CHANGE;
-  }
-
-
-  // Object:
-
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    } else if (o instanceof ResponseRelayImpl) { 
-      UID u = ((ResponseRelayImpl) o).uid;
-      return uid.equals(u);
-    } else {
-      return false;
+	this.reply = content;
+	return Relay.CONTENT_CHANGE;
     }
-  }
-  public int hashCode() {
-    return uid.hashCode();
-  }
-  private void readObject(java.io.ObjectInputStream os) 
-    throws ClassNotFoundException, java.io.IOException {
-      os.defaultReadObject();
-      cacheTargets();
-    }
-  public String toString() {
-    return 
-      "(ResponseRelayImpl"+
-      " uid="+uid+
-      " source="+source+
-      " target="+target+
-      " query="+query+
-      " reply="+reply+
-	"origUID="+origUID+
-	"timestamp="+timestamp+
-	"artifactId="+artifactId+
-	")";
-  }
 
-    public long getTimestamp() {
+
+    // Object:
+
+    public boolean equals(Object o) 
+    {
+	if (o == this) {
+	    return true;
+	} else if (o instanceof ResponseRelayImpl) { 
+	    UID u = ((ResponseRelayImpl) o).uid;
+	    return uid.equals(u);
+	} else {
+	    return false;
+	}
+    }
+
+    public int hashCode() 
+    {
+	return uid.hashCode();
+    }
+
+    private void readObject(java.io.ObjectInputStream os) 
+	throws ClassNotFoundException, java.io.IOException 
+    {
+	os.defaultReadObject();
+	cacheTargets();
+    }
+
+    public String toString() 
+    {
+	return 
+	    "(ResponseRelayImpl"+
+	    " uid="+uid+
+	    " source="+source+
+	    " target="+target+
+	    " reply="+reply+
+	    " timestamp="+timestamp+
+	    ")";
+    }
+
+    public long getTimestamp() 
+    {
 	return timestamp;
     }
 
-    public String getArtifactId() {
-	return artifactId;
-    }
-    
-  // factory method:
+    // factory method:
 
-  private static class ResponseRelayImplFactory 
-    implements Relay.TargetFactory, Serializable {
-      private final MessageAddress target;
-      private final long timestamp;
-      private final UID origUID;
-      private String artifactId;
-      public ResponseRelayImplFactory(MessageAddress target,
-				      long timestamp,
-				      UID origUID,
-				      String artifactId) 
-      {
-        this.target = target;
-	this.timestamp = timestamp;
-	this.origUID = origUID;
-	this.artifactId = artifactId;
-      }
-      public Relay.Target create(
-          UID uid, MessageAddress source, Object content,
-          Relay.Token token) {
-        Object query = content;
-// 	long timestamp = System.currentTimeMillis();
-// 	UID origUID = null;
-        // bug 3824, pass null aba-target to avoid n^2 peer copies
-        return new ResponseRelayImpl(uid, source, null, query, origUID, 
-				     artifactId, timestamp);
-      }
-  }
+    private static class ResponseRelayImplFactory 
+	implements Relay.TargetFactory, Serializable {
+	private final MessageAddress target;
+	private final long timestamp;
+	public ResponseRelayImplFactory(MessageAddress target,
+					long timestamp) 
+	{
+	    this.target = target;
+	    this.timestamp = timestamp;
+	}
+	public Relay.Target create(
+				   UID uid, MessageAddress source, Object content,
+				   Relay.Token token) {
+	    // 	long timestamp = System.currentTimeMillis();
+	    // 	UID origUID = null;
+	    // bug 3824, pass null aba-target to avoid n^2 peer copies
+	    return new ResponseRelayImpl(uid, source, null, content, timestamp);
+	}
+    }
 }
