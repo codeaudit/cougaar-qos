@@ -108,9 +108,8 @@ public class STECMetricsUpdateServiceImpl
 	    channel = makeChannel(id);
 
 	    StatusSupplierSysStat sysstat =
-		new StatusSupplierSysStat(channel, 3000);
-	    Thread sysstatThread = new Thread(sysstat, "SysStat");
-	    sysstatThread.start();
+		new StatusSupplierSysStat(channel);
+	    sysstat.schedule(3000);
 
 
 	    sender = new STECSender(sb, channel, Connector.poa());
