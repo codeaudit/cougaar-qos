@@ -130,8 +130,8 @@ public final class Frame
 
 
     public static class Change implements ChangeReport {
-	public String attribute;
-	public Object value;
+	public final String attribute;
+	public final Object value;
 	public Change(String attr, Object val)
 	{
 	    this.attribute = attr;
@@ -141,6 +141,20 @@ public final class Frame
 	public String getAttribute() { return attribute; }
 
 	public Object getValue() { return value; }
+
+	// Object
+	public boolean equals(Object o) 
+	{
+	    return
+		((o == this) ||
+		 ((o instanceof Change) &&
+		  attribute.equals(((Change) o).attribute)));
+	}
+
+	public int hashCode() 
+	{
+	    return attribute.hashCode();
+	}
     }
 
 
