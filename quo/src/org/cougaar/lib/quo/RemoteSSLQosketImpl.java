@@ -38,7 +38,6 @@ public class RemoteSSLQosketImpl
 
     private DestinationLink link;
     private ResourceMonitorService rms;
-    private QosMonitorService qms;
 
 
     public void setDestinationLink(DestinationLink link) {
@@ -46,10 +45,10 @@ public class RemoteSSLQosketImpl
     }
 
     public void setServices(ResourceMonitorService rms,
-			    QosMonitorService qms) 
+			    ValueSC trust) 
     {
 	this.rms = rms;
-	this.qms = qms;
+	this.trust = trust; // 'trust' defined in RemoteSSL.cdl
     }
 
     public int computeCost(Message message) 

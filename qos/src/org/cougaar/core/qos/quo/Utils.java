@@ -29,11 +29,16 @@ public class Utils
 	}
 	props.put("EvaluatorThread", "false");
 	QuoKernel kernel = KernelImpl.getKernelReference(props);
-//  	try { 
-//  	    kernel.newFrame(); 
-//  	    kernel.setDebug(QuoKernel.DEBUG_ALL);
-//  	}
-//  	catch (java.rmi.RemoteException ex) {}
+
+
+	if (Boolean.getBoolean("org.cougaar.lib.quo.kernel.gui")) {
+	    try {
+		kernel.newFrame();
+	    } catch (java.rmi.RemoteException ex) {
+		ex.printStackTrace();
+	    }
+	}
+
 	return kernel;
     }
 

@@ -16,6 +16,8 @@
 package org.cougaar.lib.quo;
 
 import com.bbn.quo.rmi.QuoKernel;
+import com.bbn.quo.rmi.ValueSC;
+import com.bbn.quo.rmi.SysCond;
 
 import org.cougaar.core.qos.quo.Utils;
 
@@ -24,9 +26,13 @@ import org.cougaar.core.mts.SSLRMILinkProtocol;
 import org.cougaar.core.mts.StandardAspect;
 import org.cougaar.core.society.Message;
 import org.cougaar.core.society.TrustStatusService;
+import org.cougaar.core.society.TrustStatusServiceImpl;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.monitor.ResourceMonitorService;
 import org.cougaar.core.qos.monitor.QosMonitorService;
+
+import java.util.Observer;
+import java.util.Observable;
 
 
 public class RemoteSSLAspect extends StandardAspect
@@ -34,9 +40,10 @@ public class RemoteSSLAspect extends StandardAspect
     private ResourceMonitorService rms;
     private QosMonitorService qms;
     private TrustStatusService tss;
+    private QuoKernel kernel;
+    private TrustObserver trustObserver;
 
-    public Object getDelegate(Object delegate, Class type) 
-    {
+    public Object getDelegate(Object delegate, Class type) {
 	if (type == DestinationLink.class) {
 	    DestinationLink link = (DestinationLink) delegate;
 	    if (link.getProtocolClass() == SSLRMILinkProtocol.class)
@@ -50,20 +57,12 @@ public class RemoteSSLAspect extends StandardAspect
 
 
     private void ensureServices() {
+	if (kernel == null) kernel = Utils.getKernel();
+
 	ServiceBroker sb = getServiceBroker();
 
-	if (rms == null) {
-	    Object svc = 
-		sb.getService(this, ResourceMonitorService.class, null);
-	    if (svc == null) {
-		System.err.println("### Can't find ResourceMonitorService");
-	    } else {
-		rms = (ResourceMonitorService) svc;
-		System.out.println("%%% Got ResourceMonitorService!");
-	    }
-	}
-
 	if (tss == null) {
+	    System.out.println("%%% Looking for TSS");
 	    Object svc = 
 		sb.getService(this, TrustStatusService.class, null);
 	    if (svc == null) {
@@ -71,6 +70,19 @@ public class RemoteSSLAspect extends StandardAspect
 	    } else {
 		tss = (TrustStatusService) svc;
 		System.out.println("%%% Got TrustStatusService!");
+		trustObserver = new TrustObserver();
+	    }
+	}
+
+	if (rms == null) {
+	    System.out.println("%%% Looking for RMS");
+	    Object svc = 
+		sb.getService(this, ResourceMonitorService.class, null);
+	    if (svc == null) {
+		System.err.println("### Can't find ResourceMonitorService");
+	    } else {
+		rms = (ResourceMonitorService) svc;
+		System.out.println("%%% Got ResourceMonitorService!");
 	    }
 	}
 
@@ -87,21 +99,49 @@ public class RemoteSSLAspect extends StandardAspect
     }
 
 
+    private class TrustObserver implements Observer {
+	private ValueSC syscond;
+
+	TrustObserver() {
+	    try {
+		SysCond sc = kernel.bindSysCond("TrustObserver",
+						"com.bbn.quo.rmi.ValueSC",
+						"com.bbn.quo.ValueSCImpl");
+		syscond = (ValueSC) sc;
+		syscond.longValue(10);
+	    } catch (java.rmi.RemoteException remote_ex) {
+		remote_ex.printStackTrace();
+	    }
+
+	    if (tss != null) tss.registerSocietyTrustObserver(this);
+	}
+
+	ValueSC getSysCond() {
+	    return syscond;
+	}
+
+	public void update(Observable obs, Object value) {
+	    if (syscond != null) {
+		if (obs instanceof TrustStatusServiceImpl) {
+		    int trust = 
+			((TrustStatusServiceImpl) obs).getSocietyTrust();
+		    try {
+			syscond.longValue(trust);
+		    } catch (java.rmi.RemoteException remote_ex) {
+			remote_ex.printStackTrace();
+		    }
+		}
+	    }
+	}
+    }
+
     private class SSLDestinationLink extends DestinationLinkRemoteSSLAdapter {
 
 	SSLDestinationLink(DestinationLink link) {
-	    QuoKernel kernel = Utils.getKernel();
-	    if (Boolean.getBoolean("org.cougaar.lib.quo.kernel.gui")) {
-		try {
-		    kernel.newFrame();
-		} catch (java.rmi.RemoteException ex) {
-		    ex.printStackTrace();
-		}
-	    }
 
 	    ensureServices();
 	    setDestinationLink(link);
-	    setServices(rms,qms);
+	    setServices(rms, trustObserver.getSysCond());
 
 	    try {
 		initSysconds(kernel);

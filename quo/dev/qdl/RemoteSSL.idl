@@ -1,6 +1,7 @@
 #if !defined(REMOTESSL_IDL)
 #define REMOTESSL_IDL
 
+#include "quo.idl"
 #include "MT.idl"
 #include "DestinationLink.idl"
 
@@ -21,7 +22,7 @@ module org {
 		interface RemoteSSLQosket {
 		    void setDestinationLink(in org::cougaar::core::mts::DestinationLink link);
 		    void setServices(in org::cougaar::core::qos::monitor::ResourceMonitorService rms,
-				     in org::cougaar::core::qos::monitor::QosMonitorService qms);
+				     in quo::ValueSC trust);
 		};
 
 		interface RemoteSSLDelegateQosket {
