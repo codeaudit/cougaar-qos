@@ -50,6 +50,7 @@ abstract public class Frame
 
     private final UID uid;
     private final String kind;
+    private Properties props;
     private transient FrameSet frameSet;
     private transient Set localSlots;
     private static Logger log = 
@@ -60,7 +61,18 @@ abstract public class Frame
 	this.frameSet = frameSet;
 	this.uid = uid;
 	this.kind = kind;
+	this.props = new Properties();
 	this.localSlots = new HashSet();
+    }
+
+    protected Object getProperty(String slot)
+    {
+	return props.get(slot);
+    }
+
+    protected void setProperty(String slot, Object value)
+    {
+	props.put(slot, value);
     }
 
     protected void slotModified(String slot, Object value)
@@ -189,7 +201,7 @@ abstract public class Frame
     {
 	// reflection
 	Class klass = getClass();
-	String mname = "get" + FrameGen.fix_name(slot, true);
+	String mname = "get" + FrameGen.fixName(slot, true);
 	try {
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
 	    Object result = meth.invoke(this, ARGS0);
@@ -211,7 +223,7 @@ abstract public class Frame
     {
 	// reflection
 	Class klass = getClass();
-	String mname = "set" + FrameGen.fix_name(slot, true);
+	String mname = "set" + FrameGen.fixName(slot, true);
 	try {
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
 	    Object[] args1 = { value };
@@ -228,7 +240,7 @@ abstract public class Frame
     {
 	// reflection
 	Class klass = getClass();
-	String mname = "initialize" + FrameGen.fix_name(slot, true);
+	String mname = "initialize" + FrameGen.fixName(slot, true);
 	try {
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
 	    Object[] args1 = { value };

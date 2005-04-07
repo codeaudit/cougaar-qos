@@ -68,7 +68,7 @@ public class DataFrame
 	DataFrame frame = null;
 	try {
 	    Object[] args = { frameSet, proto, uid };
-	    String fixed_proto = FrameGen.fix_name(proto, true);
+	    String fixed_proto = FrameGen.fixName(proto, true);
 	    String classname = pkg +"."+ fixed_proto;
 	    Class klass = Class.forName(classname);
 	    java.lang.reflect.Constructor cons = klass.getConstructor(CTYPES);
