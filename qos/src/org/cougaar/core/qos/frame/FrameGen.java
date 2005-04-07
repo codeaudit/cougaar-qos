@@ -178,11 +178,6 @@ public class FrameGen
 	}
     }
 
-    private String staticName(String name)
-    {
-	return "__" +name+ "_DEFAULT_VALUE";
-    }
-    
 
     private boolean getBooleanAttribute(Attributes attrs,
 					String attr,
@@ -305,9 +300,9 @@ public class FrameGen
 
 	writeDecl(writer, prototype, parent);
 	writer.println("{");
-	writeSlots(writer, local_slots, override_slots);
+	writeSlots(writer, local_slots);
 	writeConstructors(writer, prototype);
-	writeAccessors(writer, local_slots);
+	writeAccessors(writer, local_slots, override_slots);
 	writeContainerReaders(writer, prototype, container);
 	writer.println("}");
 
@@ -335,33 +330,9 @@ public class FrameGen
 
 
     private void writeSlots(PrintWriter writer,
-			    HashMap local_slots,
-			    HashMap override_slots)
+			    HashMap local_slots)
     {
-	Iterator itr = override_slots.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    String slot = (String) entry.getKey();
-	    Attributes attrs = (Attributes) entry.getValue();
-	    writeSlot(writer, slot, attrs);
-	}
-
-// 	writer.println("\n    static {");
-// 	while (itr.hasNext()) {
-// 	    Map.Entry entry = (Map.Entry) itr.next();
-// 	    String key = (String) entry.getKey();
-// 	    Attributes attrs = (Attributes)  entry.getValue();
-// 	    String value = attrs.getValue("value");
-// 	    boolean staticp = isStatic(attrs);
-// 	    if (value != null && staticp) {
-// 		String static_name = staticName(fixName(key, false));
-// 		writer.println("        " +static_name+ 
-// 			       " = \"" +value+ "\";");
-// 	    }
-// 	}
-// 	writer.println("    }");
-
-	itr = local_slots.entrySet().iterator();
+	Iterator itr = local_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
@@ -379,13 +350,7 @@ public class FrameGen
 	boolean staticp = isStatic(attrs);
 	String fixed_name = fixName(slot, false);
 	if (memberp) {
-	    writer.println("    private Object " +fixed_name+ ";");
-	}
-	if (staticp) {
-	    writer.print("    private static Object "
-			 +staticName(fixed_name)); 
-	    if (value != null) writer.print(" = \"" +value+ "\"");
-	    writer.println(";");
+	    writer.println("    protected Object " +fixed_name+ ";");
 	}
     }
 
@@ -408,9 +373,11 @@ public class FrameGen
 	writer.println("    }");
     }
 
-    private void writeAccessors(PrintWriter writer, HashMap slots)
+    private void writeAccessors(PrintWriter writer, 
+				HashMap local_slots,
+				HashMap override_slots)
     {
-	Iterator itr = slots.entrySet().iterator();
+	Iterator itr = local_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
@@ -418,6 +385,13 @@ public class FrameGen
 	    writeGetter(writer, slot, attrs);
 	    writeSetter(writer, slot, attrs);
 	    writeInitializer(writer, slot, attrs);
+	}
+	itr = override_slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    writeGetter(writer, slot, attrs);
 	}
     }
 
@@ -427,7 +401,8 @@ public class FrameGen
 			     Attributes attrs)
     {
 	String accessor_name = fixName(slot, true);
-	    String fixed_name = fixName(slot, false);
+	String fixed_name = fixName(slot, false);
+	String default_value = attrs.getValue("value");
 	boolean memberp = isMember(attrs);
 	boolean staticp = isStatic(attrs);
 	writer.println("\n\n    public Object get" +accessor_name+ "()");
@@ -442,13 +417,12 @@ public class FrameGen
 	    writer.println("        if (" +result_var+ " != null) return "
 			   +result_var+ ";");
 	}
-	if (staticp) {
-	    String static_name = staticName(fixed_name);
-	    writer.println("        if (" +static_name+ " != null) return "
-			   +static_name+ ";");
+	if (staticp && default_value != null) {
+	    writer.println("        return \"" +default_value+ "\";");
+	} else {
+	    writer.println("        return getInheritedValue(this, \"" 
+			   +slot+ "\");");
 	}
-
-	writer.println("        return getInheritedValue(this, \"" +slot+ "\");");
 
 	writer.println("    }");
     }
