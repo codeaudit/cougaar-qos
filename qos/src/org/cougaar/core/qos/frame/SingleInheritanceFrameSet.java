@@ -624,7 +624,7 @@ public class SingleInheritanceFrameSet
 		    log.warn("Ignoring prototype " +proto);
 		return null;
 	    } else {
-		frame = new PrototypeFrame(this, proto, parent, uid);
+		frame = new PrototypeFrame(this, proto, parent, uid, values);
 		if (log.isDebugEnabled())
 		    log.debug("Adding prototype " +frame+
 			      " for " +proto);

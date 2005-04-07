@@ -29,6 +29,7 @@ package org.cougaar.core.qos.frame;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -46,13 +47,25 @@ public class PrototypeFrame
     private transient HashMap paths;
     private transient HashSet required_slots;
 
-    PrototypeFrame(FrameSet frameSet, String prototype_name,
-		   String parent, UID uid)
+    PrototypeFrame(FrameSet frameSet, 
+		   String prototype_name,
+		   String parent, 
+		   UID uid, 
+		   Properties values)
     {
 	super(frameSet, parent, uid);
 	this.prototype_name = prototype_name;
 	this.required_slots = new HashSet();
 	this.paths = new HashMap();
+	if (values != null) {
+	    Iterator itr = values.entrySet().iterator();
+	    while (itr.hasNext()) {
+		Map.Entry entry = (Map.Entry) itr.next();
+		String key = (String) entry.getKey();
+		Object value = entry.getValue();
+		setProperty(key, value);
+	    }
+	}
     }
 
     void addPaths(HashMap paths)
