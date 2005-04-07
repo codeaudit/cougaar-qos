@@ -37,13 +37,13 @@ import java.util.Map;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 public class FrameGen
     extends DefaultHandler
 {
-    private static final Object UNDEFINED = new Object();
     private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
     private static final String DRIVER_DEFAULT =
 	"org.apache.crimson.parser.XMLReaderImpl";
@@ -88,6 +88,7 @@ public class FrameGen
     }
 
 
+    // SAX
     public void startElement(String uri, String local, String name, 
 			     Attributes attrs)
     {
@@ -117,6 +118,10 @@ public class FrameGen
     public void characters(char buf[], int offset, int length)
     {
     }
+
+
+
+
 
 
     // Utilities
@@ -211,9 +216,7 @@ public class FrameGen
     private void slot(Attributes attrs)
     {
 	String slot = attrs.getValue("name");
-	Object value = attrs.getValue("value");
-	if (value == null) value = UNDEFINED;
-	slots.put(slot, value);
+	slots.put(slot, new AttributesImpl(attrs));
     }
 
     private void endFrameset()
@@ -234,14 +237,33 @@ public class FrameGen
 	    String parent = (String) entry.getValue();
 	    String container = (String) proto_containers.get(prototype);
 	    HashMap slots = (HashMap) proto_slots.get(prototype);
-	    generateCode(prototype, parent, container, slots);
+
+	    HashMap override_slots = new HashMap();
+	    HashMap local_slots = new HashMap();
+
+	    Iterator itr2 = slots.entrySet().iterator();
+	    while (itr2.hasNext()) {
+		Map.Entry entry2 = (Map.Entry) itr2.next();
+		String slot = (String) entry2.getKey();
+		Attributes attrs = (Attributes) entry2.getValue();
+		if (inherits_slot(prototype, slot)) {
+		    override_slots.put(slot, attrs);
+		} else {
+		    local_slots.put(slot, attrs);
+		}
+	    }
+
+
+	    generateCode(prototype, parent, container, 
+			 local_slots, override_slots);
 	}
     }
 
     private void generateCode(String prototype, 
 			      String parent, 
 			      String container,
-			      HashMap slots)
+			      HashMap local_slots,
+			      HashMap override_slots)
     {
 	String name = fix_name(prototype, true);
 	File out = new File(dir_name, name+".java");
@@ -253,13 +275,19 @@ public class FrameGen
 	    iox.printStackTrace();
 	    System.exit(-1);
 	}
-	beginPrototypeClass(writer, prototype, parent);
-	endPrototypeClass(writer, prototype, container, slots);
+
+	writeDecl(writer, prototype, parent);
+	writer.println("{");
+	writeSlots(writer, local_slots, override_slots);
+	writeConstructors(writer, prototype, override_slots);
+	writeAccessors(writer, local_slots);
+	writeContainerReaders(writer, prototype, container);
+	writer.println("}");
+
 	writer.close();
-
     }
-
-    private void beginPrototypeClass(PrintWriter writer,
+    
+    private void writeDecl(PrintWriter writer,
 				     String prototype, 
 				     String parent)
     {
@@ -275,55 +303,28 @@ public class FrameGen
 	} else {
 	    writer.println("    extends DataFrame");
 	}
-	writer.println("{");
     }
 
-    private void endPrototypeClass(PrintWriter writer,
-				   String prototype, 
-				   String container,
-				   HashMap slots)
-    {
-	HashMap local_defaults = new HashMap();
 
-	Iterator itr = slots.entrySet().iterator();
+    private void writeSlots(PrintWriter writer,
+			    HashMap local_slots,
+			    HashMap override_slots)
+    {
+	Iterator itr = local_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
-	    Object value = entry.getValue();
-	    if (inherits_slot(prototype, slot)) {
-		if (!value.equals(UNDEFINED)) local_defaults.put(slot, value);
-	    } else {
-		writeSlot(writer, slot, value);
-	    }
+	    Attributes attrs = (Attributes) entry.getValue();
+	    Object value = attrs.getValue("value");
+	    writeSlot(writer, slot, value);
 	}
-
-	if (container != null) {
-	    HashSet container_accessors = collectSlots(container);
-	    itr = container_accessors.iterator();
-	    while (itr.hasNext()) {
-		String slot = (String) itr.next();
-		if (!inherits_slot(prototype, slot))
-		    writeContainerReader(writer, container, slot);
-	    }
-	}
-
-	writeConstructors(writer, prototype, local_defaults);
-
-	// dump accessors
-	itr = slots.keySet().iterator();
-	while (itr.hasNext()) {
-	    String slot = (String) itr.next();
-	    if (!inherits_slot(prototype, slot)) writeAccessors(writer, slot);
-	}
-
-	writer.println("}");
     }
 
     private void writeSlot(PrintWriter writer, String slot, Object value)
     {
 	writer.print("    private Object " + fix_name(slot, false));
 	
-	if (value != UNDEFINED)  writer.print(" = \"" +value+ "\"");
+	if (value != null)  writer.print(" = \"" +value+ "\"");
 	writer.println(";");
     }
 
@@ -348,11 +349,23 @@ public class FrameGen
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String key = (String) entry.getKey();
-	    String value = (String) entry.getValue();
-	    writer.println("        initialize" +fix_name(key,true)+ 
-			   "(\"" +value+ "\");");
+	    Attributes attrs = (Attributes)  entry.getValue();
+	    String value = (String) attrs.getValue("value");
+	    if (value != null) {
+		writer.println("        initialize" +fix_name(key,true)+ 
+			       "(\"" +value+ "\");");
+	    }
 	}
 	writer.println("    }");
+    }
+
+    private void writeAccessors(PrintWriter writer, HashMap slots)
+    {
+	Iterator itr = slots.keySet().iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    writeAccessors(writer, slot);
+	}
     }
 
     private void writeAccessors(PrintWriter writer, String slot)
@@ -385,6 +398,20 @@ public class FrameGen
 	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
 	writer.println("    }");
     }
+
+    private void writeContainerReaders(PrintWriter writer, 
+				       String prototype,
+				       String container)
+    {
+	if (container == null) return;
+	HashSet container_accessors = collectSlots(container);
+	Iterator itr = container_accessors.iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    if (!inherits_slot(prototype, slot))
+		writeContainerReader(writer, container, slot);
+	}
+    }	
 
     private void writeContainerReader(PrintWriter writer, 
 				      String container,
