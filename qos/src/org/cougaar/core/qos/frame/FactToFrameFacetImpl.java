@@ -45,6 +45,7 @@ import org.cougaar.core.util.UID;
 
 abstract public class FactToFrameFacetImpl
     extends FacetImpl
+    implements FrameSetService.Callback
 {
 
     private LoggingService log;
@@ -62,17 +63,30 @@ abstract public class FactToFrameFacetImpl
            sb.getService(this, LoggingService.class, null);
 	this.sb = sb;
 	String files = spec.ca_parameters.getProperty("frame-set-files");
+	String set_name = spec.ca_parameters.getProperty("frame-set");
 	if (files != null) {
 	    StringTokenizer tk = new StringTokenizer(files, ",");
 	    xml_filenames = new String[tk.countTokens()];
 	    int i =0;
 	    while (tk.hasMoreTokens()) xml_filenames[i++] = tk.nextToken();
 	    linkPlayer();
+	} else if (set_name != null) {
+	    FrameSetService fss = (FrameSetService)
+		sb.getService(this, FrameSetService.class, null);
+	    frameSet = fss.findFrameSet(set_name, this);
+	    sb.releaseService(this, FrameSetService.class, fss);
+	    if (frameSet != null) linkPlayer();
 	} else {
-	    throw new RuntimeException("No frame-set-files !");
+	    throw new RuntimeException("No frame-sets and no frame-set-files!");
 	}
     }
 
+    // FrameSet service callback
+    public void frameSetAvailable(String name, FrameSet frameSet)
+    {
+	this.frameSet = frameSet;
+	linkPlayer();
+    }
 
     abstract protected boolean isNewFrame(Object fact);
     abstract protected boolean isModifiedFrame(Object fact);
