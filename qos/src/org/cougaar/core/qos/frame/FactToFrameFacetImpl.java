@@ -52,6 +52,10 @@ abstract public class FactToFrameFacetImpl
     private ServiceBroker sb;
     private FrameSet frameSet;
     private String[] xml_filenames;
+    private String set_name;
+    private FrameSetService fss;
+    private boolean files_loaded;
+    private FrameSetParser fsp;
 
     protected FactToFrameFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -62,30 +66,38 @@ abstract public class FactToFrameFacetImpl
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
 	this.sb = sb;
+	fss = (FrameSetService)
+	    sb.getService(this, FrameSetService.class, null);
 	String files = spec.ca_parameters.getProperty("frame-set-files");
-	String set_name = spec.ca_parameters.getProperty("frame-set");
+	set_name = spec.ca_parameters.getProperty("frame-set");
 	if (files != null) {
 	    StringTokenizer tk = new StringTokenizer(files, ",");
 	    xml_filenames = new String[tk.countTokens()];
 	    int i =0;
 	    while (tk.hasMoreTokens()) xml_filenames[i++] = tk.nextToken();
-	    linkPlayer();
-	} else if (set_name != null) {
-	    FrameSetService fss = (FrameSetService)
-		sb.getService(this, FrameSetService.class, null);
-	    frameSet = fss.findFrameSet(set_name, this);
-	    sb.releaseService(this, FrameSetService.class, fss);
-	    if (frameSet != null) linkPlayer();
-	} else {
+	} else if (set_name == null) {
 	    throw new RuntimeException("No frame-sets and no frame-set-files!");
 	}
+	files_loaded = false;
+	linkPlayer();
     }
+
 
     // FrameSet service callback
     public void frameSetAvailable(String name, FrameSet frameSet)
     {
 	this.frameSet = frameSet;
-	linkPlayer();
+	ready();
+    }
+
+    private synchronized void ready()
+    {
+	if (files_loaded) return;
+	if (xml_filenames != null) {
+	    for (int i=0; i<xml_filenames.length; i++)
+		fsp.parseFrameSetFile(xml_filenames[i], frameSet);
+	}
+	files_loaded = true;
     }
 
     abstract protected boolean isNewFrame(Object fact);
@@ -111,12 +123,14 @@ abstract public class FactToFrameFacetImpl
     private synchronized void ensureFrameSet(BlackboardService bbs)
     {
 	if (frameSet != null) return;
-	if (xml_filenames == null) return;
 
-	FrameSetService	fss = (FrameSetService)
-	    sb.getService(this, FrameSetService.class, null);
-	frameSet = fss.loadFrameSet(xml_filenames, sb, bbs);
-	sb.releaseService(this, FrameSetService.class, fss);
+	if (set_name != null) {
+	    if (xml_filenames != null) fsp = new FrameSetParser(sb, bbs);
+	    frameSet = fss.findFrameSet(set_name, this);
+	    if (frameSet != null) ready();
+	} else if (xml_filenames != null) {
+	    frameSet = fss.loadFrameSet(xml_filenames, sb, bbs);
+	}
     }
 
     private void processNewFrame(Object fact)
