@@ -67,13 +67,13 @@ public class FrameGen
     public FrameGen(String path)
     {
 	this.path = path;
-	proto_parents = new HashMap();
-	proto_slots = new HashMap();
-	proto_containers = new HashMap();
     }
 
     public void parseProtoFile(File xml_file)
     {
+	proto_parents = new HashMap();
+	proto_slots = new HashMap();
+	proto_containers = new HashMap();
 	try {
 	    XMLReader producer = XMLReaderFactory.createXMLReader();
 	    DefaultHandler consumer = this; 
