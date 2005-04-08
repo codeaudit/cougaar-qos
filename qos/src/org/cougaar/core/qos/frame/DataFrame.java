@@ -33,8 +33,8 @@ import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
 /**
- * This extension to @{link Frame} is the basic representation of a
- * frame representing data (cf @{link PrototypeFrame}).  Classes
+ * This extension to {@link Frame} is the basic representation of a
+ * frame representing data (cf {@link PrototypeFrame}).  Classes
  * generated from prototype xml extend this one, either directly or
  * indirectly.
  */

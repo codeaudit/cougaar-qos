@@ -38,8 +38,7 @@ import org.cougaar.core.service.BlackboardService;
 public interface FrameSetService extends Service
 {
     /**
-     * The implementation of findFrameSet uses this as its callbacj
-     * interface. 
+     * This interface describes the callback object used by findFrameSet.
      */
     public interface Callback {
 	public void frameSetAvailable(String name, FrameSet set);

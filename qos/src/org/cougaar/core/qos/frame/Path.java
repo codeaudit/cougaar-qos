@@ -35,7 +35,7 @@ import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
 /**
- * A Path represents a kind of visitor pattern that can be used to
+ * This class represents a kind of visitor pattern that can be used to
  * find the value of a slot at runtime.  It consists of an ordered
  * series of Forks and a slot.  Each Fork refers to a relation and a
  * role.  This allows any given frame to traverse a Path to a related

@@ -349,7 +349,11 @@ abstract public class Frame
 	return uid.hashCode();
     }
 
-
+    /**
+     * This trivial extension of Properties has a bean-ish
+     * reader method listing the contents as a string (handy for the
+     * {@link FrameViewerServlet}).
+     */
     public static class VisibleProperties extends Properties
     {
 	VisibleProperties()
@@ -371,6 +375,11 @@ abstract public class Frame
 
 
 
+    /**
+     * This extension of ChangeReport is used to describe a change to
+     * a Frame.  Collections of these are included with frame changes
+     * published to the Blackboard.
+     */
     public static class Change implements ChangeReport {
 	private final String slot;
 	private final Object value;

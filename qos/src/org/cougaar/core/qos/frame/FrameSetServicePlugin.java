@@ -39,8 +39,8 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.BlackboardService;
 
 /**
- * This plugin provides the {@link FrameSetService}
- * service, which is implemented by an inner class.
+ * This plugin provides the {@link FrameSetService}, which is
+ *  implemented by an inner class.
  */
 public class FrameSetServicePlugin
     extends ParameterizedPlugin

@@ -35,7 +35,7 @@ import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 
 /**
- * Simple tester for FrameSets
+ * This class is a simple tester for FrameSets
  */
 public class FrameSetTesterPlugin
     extends ParameterizedPlugin

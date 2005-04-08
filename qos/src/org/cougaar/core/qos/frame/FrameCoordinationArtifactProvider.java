@@ -36,10 +36,11 @@ import org.cougaar.core.qos.ca.Facet;
 import org.cougaar.core.qos.ca.RolePlayer;
 
 /**
- * Coordination Artifact for {@link Frame}s.  The two roles are
- * Producer (generates new Frames and modifications to Frames,
- * typically derived from facts), and Consumer (takes action when
- * Frames are created or modified, typically by asserting facts).
+ * This class is implements a Coordination Artifact for reading and
+ * writing {@link Frame}s.  The two roles are Producer (generates new
+ * Frames and modifications to Frames, typically derived from facts),
+ * and Consumer (takes action when Frames are created or modified,
+ * typically by asserting facts).
  *
  * @see FactToFrameFacetImpl
  * @see FrameToFactFacetImpl
