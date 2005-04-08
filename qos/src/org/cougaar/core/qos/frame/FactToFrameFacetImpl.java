@@ -52,6 +52,7 @@ abstract public class FactToFrameFacetImpl
     private FrameSet frameSet;
     private String[] xml_filenames;
     private String set_name;
+    private boolean use_existing_frameset;
 
     protected FactToFrameFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -64,6 +65,9 @@ abstract public class FactToFrameFacetImpl
 	this.sb = sb;
 	String files = spec.ca_parameters.getProperty("files");
 	set_name = spec.ca_parameters.getProperty("frame-set");
+	String use_existing = 
+	    spec.ca_parameters.getProperty("use-existing", "false");
+	use_existing_frameset = use_existing.equalsIgnoreCase("true");
 	if (files == null || set_name == null) {
 	    throw new RuntimeException("No frame-sets and no frame-set-files!");
 	}
@@ -108,8 +112,16 @@ abstract public class FactToFrameFacetImpl
 
 	FrameSetService fss = (FrameSetService)
 	    sb.getService(this, FrameSetService.class, null);
-
-	frameSet = fss.loadFrameSet(set_name, xml_filenames, sb, bbs);
+	if (use_existing_frameset) {
+	    frameSet = fss.findFrameSet(set_name, null);
+	    if (frameSet != null) {
+		FrameSetParser fsp = new FrameSetParser(sb, bbs);
+		for (int i=0; i<xml_filenames.length; i++)
+		    fsp.parseFrameSetFile(set_name, xml_filenames[i] ,frameSet);
+	    }
+	} else {
+	    frameSet = fss.loadFrameSet(set_name, xml_filenames, sb, bbs);
+	}
     }
 
     private void processNewFrame(Object fact)
@@ -164,6 +176,7 @@ abstract public class FactToFrameFacetImpl
     {
 	if (!factsHaveChanged()) return;
 	ensureFrameSet(bbs);
+	if (frameSet == null) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {
 	    if (log.isDebugEnabled()) 
 		log.debug("Processing fact " + frev.getFact());
