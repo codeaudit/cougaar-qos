@@ -39,53 +39,151 @@ import org.cougaar.core.util.UID;
 
 public interface FrameSet
 {
+    /**
+     * Returns the name of the FrameSet.
+     */
     public String getName();
 
+    /**
+     * Returns the package used by the {@link FrameGen} code generator
+     * when it writes Java classes for prototypes.
+     */
     public String getPackageName();
 
+    /**
+     * Returns true iff the given frame matches the given prototype,
+     * directly or indirectly.
+     */
     public boolean descendsFrom(Frame frame, String prototype);
 
+    /**
+     * Returns the frame that matches the given triple, ie, whose
+     * prototype matches the given kind and whose value for the given
+     * slot matches the given value.  If more than one frame matches,
+     * the first match is returned.
+     */
     public Frame findFrame(String kind, String slot, Object value);
 
+    /**
+     * Returns the frame with the given UID. There can be at most one.
+     */
     public Frame findFrame(UID uid);
 
+    /**
+     * Returns the path with the given name.  There can be at most one.
+     */
     public Path findPath(String name);
 
+    /**
+     * Returns the path with the given UID.  There can be at most one.
+     */
     public Path findPath(UID uid);
 
+    /**
+     * Returns a collection of all frames that match all the
+     * slot/value pairs.  {@link PrototypeFrame}s are ignored if
+     * includePrototypes is false.
+     */
     public Set findFrames(String kind, 
 			  Properties slot_value_pairs,
 			  boolean includePrototypes);
 
+    /**
+     * Returns a collection of {@link DataFrame}s representing
+     * relationships of the given prototype in which the given frame
+     * plays the given role ("parent" or "child").
+     */
     public Set findRelations(Frame root, String role, String relation);
 
+    /**
+     * Adds a previously constucted DataFrame to this FrameSet.  The
+     * Frame's current frameSet should be null.  As a result of this
+     * operation the Frame will be published to the Blackboard.
+     */
     public Frame makeFrame(Frame frame);
 
+    /**
+     * Creates a DataFrame of the given kind and with the given intial
+     * values, and adds it to this FrameSet.  A UID for the frame will
+     * be generated automatically.  As a result of this operation the
+     * Frame will be published to the Blackboard.
+     */
     public Frame makeFrame(String kind, Properties slots);
 
+    /**
+     * Creates a DataFrame of the given kind and with the given intial
+     * values, and adds it to this FrameSet.  The UID for the frame as
+     * specified.  As a result of this operation the Frame will be
+     * published to the Blackboard.
+     */
     public Frame makeFrame(String kind, Properties slots, UID uid);
 
+    /**
+     * Creates a PrototypeFrame with the given name, parent prototype
+     * and intial values, and adds it to this FrameSet.  A UID for the
+     * frame will be generated automatically.  As a result of this
+     * operation the Frame will be published to the Blackboard.
+     */
     public PrototypeFrame makePrototype(String kind, String parent, 
 					Properties properties);
 
+    /**
+     * Creates a PrototypeFrame with the given name, parent prototype,
+     * UID, and intial values, and adds it to this FrameSet.  As a
+     * result of this operation the Frame will be published to the
+     * Blackboard.
+     */
     public PrototypeFrame makePrototype(String kind, String parent, 
 					Properties properties, UID uid);
 
+    /**
+     * Creates a Path and adds it to the FrameSet As a result of this
+     * operation the Path will be published to the Blackboard.
+     */
     public Path  makePath(String name, Path.Fork[] forks, String slot);
 
+    /**
+     * Removes the given Frame from the FrameSet.  As a result of this
+     * operation the Frame will also be removed from the Blackboard.
+     */
     public void removeFrame(Frame frame);
 
+    /**
+     * Returns the containing Frame of the given Frame, if any.  The
+     * exact meaning of 'containment' is specific to the FrameSet
+     * instance. 
+     */
     public Frame getParent(Frame frame);
 
+    /**
+     * Returns the given DataFrame's PrototypeFrame.
+     */
     public Frame getPrototype(Frame frame);
 
+    /**
+     * Returns the matching 'parent' Frame in the given relationship.
+     */
     public Frame getRelationshipParent(Frame relationship);
 
+    /**
+     * Returns the matching 'child' Frame in the given relationship.
+     */
     public Frame getRelationshipChild(Frame relationship);
-
+    
+    /**
+     * Inform the FrameSet that the given frame was changed in the
+     * given way.  As a result of this operation, a change will be
+     * published to the Blackboard.
+     */
     public void valueUpdated(Frame frame, String slot, Object value);
 
+    /**
+     * Forcs the FrameSet to process any queued Blackboard operations.
+     */
     public void processQueue();
 
+    /**
+     * Returns a collection of all PrototypeFrames in the FrameSet,
+     */
     public Set getPrototypes();
 }
