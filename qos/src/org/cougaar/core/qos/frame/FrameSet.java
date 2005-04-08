@@ -31,6 +31,12 @@ import java.util.Set;
 
 import org.cougaar.core.util.UID;
 
+/**
+ * Abstract specification of an organized collection of {@link
+ * Frame}s.  The main job of a FrameSet is to handle inter-Frame
+ * relationships.
+ */
+
 public interface FrameSet
 {
     public String getName();

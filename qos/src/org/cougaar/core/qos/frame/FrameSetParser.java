@@ -44,6 +44,11 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.ConfigFinder;
 
 
+/**
+ * This class parses frame and protocol xml files and creates the
+ * corresponding {@link PrototypeFrame}s and {@link DataFrame}s .  The
+ * parsing is SAX.
+ */
 public class FrameSetParser
     extends DefaultHandler
 {

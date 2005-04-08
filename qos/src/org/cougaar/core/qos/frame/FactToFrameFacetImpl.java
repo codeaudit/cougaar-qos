@@ -43,6 +43,13 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.util.UID;
 
 
+/**
+ * This class is the abstract implementation of the "Producer" facet
+ * of the Frame CoordinationArtifact.  That is, it creates or modifies
+ * {@link Frame}s, given facts.
+ * 
+ * @see FrameCoordinationArtifactProvider
+ */
 abstract public class FactToFrameFacetImpl
     extends FacetImpl
 {

@@ -39,6 +39,10 @@ import org.cougaar.core.util.UniqueObject;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
+/**
+ * This class is the most abstract representation of a frame and
+ * includes almost all of the generic implementation.
+ */
 abstract public class Frame
     implements UniqueObject, Cloneable
 {

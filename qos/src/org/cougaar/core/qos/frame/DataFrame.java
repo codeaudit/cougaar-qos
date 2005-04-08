@@ -32,6 +32,12 @@ import org.cougaar.core.util.UID;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
+/**
+ * This extension to @{link Frame} is the basic representation of a
+ * frame representing data (cf @{link PrototypeFrame}).  Classes
+ * generated from prototype xml extend this one, either directly or
+ * indirectly.
+ */
 public class DataFrame 
     extends Frame
 {
@@ -48,10 +54,10 @@ public class DataFrame
     public static DataFrame newFrame(FrameSet frameSet,
 				     String proto, 
 				     UID uid,
-				     Properties values)
+				     Properties initial_values)
     {
 	String pkg = frameSet.getPackageName();
-	return newFrame(pkg, frameSet, proto, uid, values);
+	return newFrame(pkg, frameSet, proto, uid, initial_values);
     }
 
     private static final Class[] CTYPES = { FrameSet.class, 

@@ -41,6 +41,11 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+/**
+ * This class parses frame protocol xml files and generates classes
+ * for each prototype.  It has a main method and is intended to be run
+ * standalone.  The parsing is SAX.
+ */
 public class FrameGen
     extends DefaultHandler
 {

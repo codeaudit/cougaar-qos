@@ -41,6 +41,13 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
 
 
+/**
+ * This class is the abstract implementation of the "Consumer" facet
+ * of the Frame CoordinationArtifact.  That is, it creates facts
+ * representing the creation of modification of {@link Frame}s.
+ * 
+ * @see FrameCoordinationArtifactProvider
+ */
 abstract public class FrameToFactFacetImpl
     extends FacetImpl
 {
