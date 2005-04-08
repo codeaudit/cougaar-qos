@@ -138,7 +138,7 @@ public class FrameSetParser
     }
 
 
-
+    private String frame_set_name;
     private FrameSet frame_set;
     private FrameSpec frame_spec;
     private FrameSpec proto_spec;
@@ -159,25 +159,30 @@ public class FrameSetParser
 	path_specs = new HashMap();
     }
 
-    public FrameSet parseFrameSetFiles(String[] xml_filenames)
+    public FrameSet parseFrameSetFiles(String name, String[] xml_filenames)
     {
 	if (xml_filenames == null || xml_filenames.length == 0)  return null;
 
-	FrameSet fset = parseFrameSetFile(xml_filenames[0], null);
+	FrameSet fset = parseFrameSetFile(name, xml_filenames[0], null);
 	for (int i=1; i<xml_filenames.length; i++)
-	    parseFrameSetFile(xml_filenames[i], fset);
+	    parseFrameSetFile(name, xml_filenames[i], fset);
 	return fset;
     }
 
-    public FrameSet parseFrameSetFile(String xml_filename)
+    public FrameSet parseFrameSetFile(String name, String xml_filename)
     {
-	return parseFrameSetFile(xml_filename, null);
+	return parseFrameSetFile(name, xml_filename, null);
     }
 
-    public FrameSet parseFrameSetFile(String xml_filename,
+    public FrameSet parseFrameSetFile(String name,
+				      String xml_filename,
 				      FrameSet frameSet)
     {
+	if (log.isInfoEnabled())
+	    log.info("FrameSet " +name+ " file " +xml_filename);
+		
 	this.frame_set = frameSet;
+	this.frame_set_name = name;
 	File xml_file = ConfigFinder.getInstance().locateFile(xml_filename);
 	if (xml_file == null) {
 	    if (log.isWarnEnabled())
@@ -259,18 +264,10 @@ public class FrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("startFrameset");
 	
-	String name = attrs.getValue("name");
+
+	if (frame_set != null) return;
+
 	String pkg_prefix = attrs.getValue("package");
-
-	if (frame_set != null) {
-	    // add to existing set, as long as the name is the same
-	    if (!name.equals(frame_set.getName())) {
-		log.warn("Loading into FrameSet " +frame_set.getName()+
-			 " not FrameSet " +name+ "!");
-	    }
-	    return;
-	}
-
 	String inheritance = attrs.getValue("frame-inheritance");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
@@ -286,7 +283,7 @@ public class FrameSetParser
 
 	frame_set = new SingleInheritanceFrameSet(pkg_prefix,
 						  sb, bbs,
-						  name,
+						  frame_set_name,
 						  relation_name,
 						  parent_proto,
 						  parent_slot,

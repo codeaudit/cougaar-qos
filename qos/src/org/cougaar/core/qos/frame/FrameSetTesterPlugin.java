@@ -57,6 +57,7 @@ public class FrameSetTesterPlugin
     {
 
 	String files = (String) getParameter("frame-set-files");
+	String name = (String) getParameter("frame-set");
 
 	if (files != null) {
 	    StringTokenizer tk = new StringTokenizer(files, ",");
@@ -68,7 +69,7 @@ public class FrameSetTesterPlugin
 	    BlackboardService bbs = getBlackboardService();
 	    FrameSetService fss = (FrameSetService)
 		sb.getService(this, FrameSetService.class, null);
-	    frameSet = fss.loadFrameSet(xml_filenames, sb, bbs);
+	    frameSet = fss.loadFrameSet(name, xml_filenames, sb, bbs);
 	    sb.releaseService(this, FrameSetService.class, fss);
 	} else {
 	    if (log.isWarnEnabled())

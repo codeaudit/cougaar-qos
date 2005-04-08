@@ -45,7 +45,6 @@ import org.cougaar.core.util.UID;
 
 abstract public class FactToFrameFacetImpl
     extends FacetImpl
-    implements FrameSetService.Callback
 {
 
     private LoggingService log;
@@ -53,9 +52,6 @@ abstract public class FactToFrameFacetImpl
     private FrameSet frameSet;
     private String[] xml_filenames;
     private String set_name;
-    private FrameSetService fss;
-    private boolean files_loaded;
-    private FrameSetParser fsp;
 
     protected FactToFrameFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -66,39 +62,25 @@ abstract public class FactToFrameFacetImpl
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
 	this.sb = sb;
-	fss = (FrameSetService)
-	    sb.getService(this, FrameSetService.class, null);
-	String files = spec.ca_parameters.getProperty("frame-set-files");
+	String files = spec.ca_parameters.getProperty("files");
 	set_name = spec.ca_parameters.getProperty("frame-set");
-	if (files != null) {
-	    StringTokenizer tk = new StringTokenizer(files, ",");
-	    xml_filenames = new String[tk.countTokens()];
-	    int i =0;
-	    while (tk.hasMoreTokens()) xml_filenames[i++] = tk.nextToken();
-	} else if (set_name == null) {
+	if (files == null || set_name == null) {
 	    throw new RuntimeException("No frame-sets and no frame-set-files!");
 	}
-	files_loaded = false;
+
+	StringTokenizer tk = new StringTokenizer(files, ",");
+	xml_filenames = new String[tk.countTokens()];
+	int i =0;
+	while (tk.hasMoreTokens()) {
+	    String fname = tk.nextToken();
+	    if (log.isInfoEnabled())
+		log.info("FrameSet " +set_name+ " file " +fname);
+	    xml_filenames[i++] = fname;
+	}
+
 	linkPlayer();
     }
 
-
-    // FrameSet service callback
-    public void frameSetAvailable(String name, FrameSet frameSet)
-    {
-	this.frameSet = frameSet;
-	ready();
-    }
-
-    private synchronized void ready()
-    {
-	if (files_loaded) return;
-	if (xml_filenames != null) {
-	    for (int i=0; i<xml_filenames.length; i++)
-		fsp.parseFrameSetFile(xml_filenames[i], frameSet);
-	}
-	files_loaded = true;
-    }
 
     abstract protected boolean isNewFrame(Object fact);
     abstract protected boolean isModifiedFrame(Object fact);
@@ -124,13 +106,10 @@ abstract public class FactToFrameFacetImpl
     {
 	if (frameSet != null) return;
 
-	if (set_name != null) {
-	    if (xml_filenames != null) fsp = new FrameSetParser(sb, bbs);
-	    frameSet = fss.findFrameSet(set_name, this);
-	    if (frameSet != null) ready();
-	} else if (xml_filenames != null) {
-	    frameSet = fss.loadFrameSet(xml_filenames, sb, bbs);
-	}
+	FrameSetService fss = (FrameSetService)
+	    sb.getService(this, FrameSetService.class, null);
+
+	frameSet = fss.loadFrameSet(set_name, xml_filenames, sb, bbs);
     }
 
     private void processNewFrame(Object fact)

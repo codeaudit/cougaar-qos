@@ -40,11 +40,13 @@ public interface FrameSetService extends Service
 
     public FrameSet findFrameSet(String name, Callback callback);
 
-    public FrameSet loadFrameSet(String xml_filename, 
+    public FrameSet loadFrameSet(String name,
+				 String xml_filename, 
 				 ServiceBroker sb,
 				 BlackboardService bbs);
 
-    public FrameSet loadFrameSet(String[] xml_filenames, 
+    public FrameSet loadFrameSet(String name,
+				 String[] xml_filenames, 
 				 ServiceBroker sb,
 				 BlackboardService bbs);
 

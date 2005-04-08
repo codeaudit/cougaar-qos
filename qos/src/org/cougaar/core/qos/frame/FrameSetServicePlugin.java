@@ -98,7 +98,8 @@ public class FrameSetServicePlugin
     }
 
 	
-    private FrameSet makeSet(String xml_filename, 
+    private FrameSet makeSet(String name,
+			     String xml_filename, 
 			     ServiceBroker sb,
 			     BlackboardService bbs)
 					  
@@ -106,8 +107,8 @@ public class FrameSetServicePlugin
 	FrameSet set = null;
 	synchronized (sets) {
 	    FrameSetParser parser = new FrameSetParser(sb, bbs);
-	    set = parser.parseFrameSetFile(xml_filename);
-	    sets.put(set.getName(), set);
+	    set = parser.parseFrameSetFile(name, xml_filename);
+	    sets.put(name, set);
 	}
 
 	BlackboardService my_bbs = getBlackboardService();
@@ -116,7 +117,8 @@ public class FrameSetServicePlugin
 	return set;
     }
 
-    private FrameSet makeSets(String[] xml_filenames, 
+    private FrameSet makeSet(String name,
+			     String[] xml_filenames, 
 			     ServiceBroker sb,
 			     BlackboardService bbs)
 					  
@@ -124,8 +126,8 @@ public class FrameSetServicePlugin
 	FrameSet set = null;
 	synchronized (sets) {
 	    FrameSetParser parser = new FrameSetParser(sb, bbs);
-	    set = parser.parseFrameSetFiles(xml_filenames);
-	    sets.put(set.getName(), set);
+	    set = parser.parseFrameSetFiles(name, xml_filenames);
+	    sets.put(name, set);
 	}
 
 	BlackboardService my_bbs = getBlackboardService();
@@ -191,18 +193,20 @@ public class FrameSetServicePlugin
 	    return doRequest(name, cb);
 	}
 
-	public FrameSet loadFrameSet(String xml_filename, 
+	public FrameSet loadFrameSet(String name,
+				     String xml_filename, 
 				     ServiceBroker sb,
 				     BlackboardService bbs)
 	{
-	    return makeSet(xml_filename, sb, bbs);
+	    return makeSet(name, xml_filename, sb, bbs);
 	}
 
-	public FrameSet loadFrameSet(String[] xml_filenames, 
+	public FrameSet loadFrameSet(String name,
+				     String[] xml_filenames, 
 				     ServiceBroker sb,
 				     BlackboardService bbs)
 	{
-	    return makeSets(xml_filenames, sb, bbs);
+	    return makeSet(name, xml_filenames, sb, bbs);
 	}
 
 	public Set getNames()

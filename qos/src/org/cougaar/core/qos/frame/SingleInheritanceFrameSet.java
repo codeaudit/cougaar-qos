@@ -67,7 +67,7 @@ public class SingleInheritanceFrameSet
 	child_value_slot;
     
 
-    public SingleInheritanceFrameSet(String pkg_prefix,
+    public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
 				     BlackboardService bbs,
 				     String name,
@@ -80,7 +80,7 @@ public class SingleInheritanceFrameSet
 				     String child_value_slot)
     {
 	this.name = name;
-	this.pkg = pkg_prefix +"."+ name;
+	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
 	this.change_queue_lock = new Object();

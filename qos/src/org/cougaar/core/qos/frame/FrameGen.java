@@ -205,16 +205,13 @@ public class FrameGen
 
     private void startFrameset(Attributes attrs)
     {
-	
-	String name = attrs.getValue("name");
-	String pkg_prefix = attrs.getValue("package");
+	package_name = attrs.getValue("package");
 
 	String inheritance = attrs.getValue("frame-inheritance");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	package_name = pkg_prefix +"."+ name;
 	dir_name = path + File.separator+ 
 	    package_name.replaceAll("\\.", File.separator);
     }
