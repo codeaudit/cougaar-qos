@@ -37,6 +37,12 @@ import org.cougaar.core.util.UID;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
+/**
+ * This extension to @{link Frame} is the runtime representation of a
+ * prototype.  It's main job at runtime is to hold non-static default
+ * values (static defaults are code-generated into constants) and to
+ * process {@link Path} slot values.
+ */
 public class PrototypeFrame
     extends Frame
 {

@@ -43,6 +43,11 @@ import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
 
 
+/**
+ * Currently the only implementation of FrameSet, this class enforces
+ * single inheritance in both the prototype hierarchy and the
+ * containment hierarchy.
+ */
 public class SingleInheritanceFrameSet
     implements FrameSet
 {

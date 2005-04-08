@@ -32,24 +32,52 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.Service;
 import org.cougaar.core.service.BlackboardService;
 
+/**
+ * This service finds and makes FrameSets.
+ */
 public interface FrameSetService extends Service
 {
+    /**
+     * The implementation of findFrameSet uses this as its callbacj
+     * interface. 
+     */
     public interface Callback {
 	public void frameSetAvailable(String name, FrameSet set);
     }
 
+    /**
+     * Finds the given FrameSet, returning it immediately if available
+     * or invoking the callback when it becomes availale if if isn't
+     * at the the time of the call.  The callback can be null if the
+     * caller doesn't want a callback.
+     */
     public FrameSet findFrameSet(String name, Callback callback);
 
+    /**
+     * Creates a FrameSet with the given name, populating it from the
+     * given xml file.  The given BlackboardService will be used by
+     * the FrameSet to publish Frames and modifications.
+     */
     public FrameSet loadFrameSet(String name,
 				 String xml_filename, 
 				 ServiceBroker sb,
 				 BlackboardService bbs);
 
+    /**
+     * Creates a FrameSet with the given name, populating it from the
+     * given xml files, loaded in order.  The given BlackboardService
+     * will be used by the FrameSet to publish Frames and
+     * modifications.
+     */
     public FrameSet loadFrameSet(String name,
 				 String[] xml_filenames, 
 				 ServiceBroker sb,
 				 BlackboardService bbs);
 
+    /**
+     * Returns a collection of the names of the all the FrameSets
+     * known to the service.
+    */
     public Set getNames();
 }
 
