@@ -141,8 +141,10 @@ public class FrameSetParser
 
     private FrameSet frame_set;
     private FrameSpec frame_spec;
+    private FrameSpec proto_spec;
     private PathSpec path_spec;
-    HashMap path_specs;
+    private String current_slot;
+    private HashMap path_specs;
 
     private ServiceBroker sb;
     private BlackboardService bbs;
@@ -199,7 +201,10 @@ public class FrameSetParser
     public void startElement(String uri, String local, String name, 
 			     Attributes attrs)
     {
-	if (name.equals("frameset")) {
+	if (frame_spec != null) {
+	    // inner structures are always slot values
+	    current_slot = name;
+	} else	if (name.equals("frameset")) {
 	    startFrameset(attrs);
 	} else if (name.equals("prototypes")) {
 	    // no-op
@@ -238,6 +243,12 @@ public class FrameSetParser
     // Not using this yet
     public void characters(char buf[], int offset, int length)
     {
+	if (current_slot != null) {
+	    String value = new String(buf, offset, length);
+// 	    log.shout("Setting " +current_slot+ " to " +value);
+	    frame_spec.put(current_slot, value);
+	    current_slot = null;
+	}
     }
 
 
@@ -293,7 +304,7 @@ public class FrameSetParser
 
 	String name = attrs.getValue("name");
 	String parent = attrs.getValue("prototype");
-	frame_spec = new FrameSpec(name, parent);
+	proto_spec = new FrameSpec(name, parent);
     }
 
     private void endPrototype()
@@ -301,8 +312,8 @@ public class FrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("endPrototype");
 
-	frame_spec.makePrototype(frame_set);
-	frame_spec = null;
+	proto_spec.makePrototype(frame_set);
+	proto_spec = null;
     }
 
     private void startFrame(Attributes attrs)
@@ -361,17 +372,17 @@ public class FrameSetParser
 	String slot = attrs.getValue("name");
 	if (path_spec != null) {
 	    path_spec.setSlot(slot);
-	} else if (frame_spec != null) {
+	} else if (proto_spec != null) {
 	    String path = attrs.getValue("path");
 	    if (path != null) {
 		Path vp = (Path) path_specs.get(path);
-		frame_spec.putPath(slot, vp);
+		proto_spec.putPath(slot, vp);
 	    } else {
 		String value = attrs.getValue("value");
 		if (value == null) {
-		    frame_spec.addRequiredSlot(slot);
+		    proto_spec.addRequiredSlot(slot);
 		} else {
-		    frame_spec.put(slot, value);
+		    proto_spec.put(slot, value);
 		}
 	    }
 	} else {
