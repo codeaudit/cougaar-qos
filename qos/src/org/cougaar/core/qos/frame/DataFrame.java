@@ -44,6 +44,11 @@ public class DataFrame
     private static transient Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
 
+    protected static Logger getLogger()
+    {
+	return log;
+    }
+
     protected DataFrame(FrameSet frameSet, 
 			String kind, 
 			UID uid)

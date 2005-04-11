@@ -90,6 +90,9 @@ public class FrameGen
 	    ex.printStackTrace();
 	    return;
 	}
+
+	generateCode();
+
     }
 
 
@@ -139,6 +142,26 @@ public class FrameGen
 	return inheritsSlot(parent, slot);
     }
 
+    private String ancestorForSlot(String proto, String slot)
+    {
+// 	System.out.println("Looking for ancestor of " +proto+
+// 			   " defining slot " +slot);
+	String parent = (String) proto_parents.get(proto);
+	if (parent == null) {
+// 	    System.out.println("No ancestor of " +proto+
+// 			       " for slot " +slot);
+	    return null;
+	}
+	HashMap pslots = (HashMap) proto_slots.get(parent);
+	if (pslots != null && pslots.containsKey(slot)) {
+// 	    System.out.println("Ancestor of " +proto+
+// 			       " for slot " +slot+
+// 			       " is " +parent);
+	    return parent;
+	}
+	return ancestorForSlot(parent, slot);
+    }
+
     private HashSet collectSlots(String proto)
     {
 	// **** TBD ****
@@ -184,26 +207,37 @@ public class FrameGen
     }
 
 
-    private boolean getBooleanAttribute(Attributes attrs,
+    private boolean getBooleanAttribute(String prototype,
+					String slot,
+					Attributes attrs,
 					String attr,
 					boolean default_value)
     {
 	String attrstr = attrs.getValue(attr);
-	if (attrstr == null)
-	    return default_value;
-	else 
+	if (attrstr == null) {
+	    String ancestor = ancestorForSlot(prototype, slot);
+	    if (ancestor != null) {
+		HashMap slots = (HashMap) proto_slots.get(ancestor);
+		Attributes inherited = (Attributes) slots.get(slot);
+		return getBooleanAttribute(ancestor, slot, inherited, attr, 
+					   default_value);
+	    } else {
+		return default_value;
+	    }
+	} else {
 	    return attrstr.equalsIgnoreCase("true");
+	}
     }
 
-    private boolean isStatic(Attributes attrs)
+    private boolean isStatic(String prototype, String slot, Attributes attrs)
     {
-	return getBooleanAttribute(attrs, "static", true);
+	return getBooleanAttribute(prototype, slot, attrs, "static", true);
     }
 
 
-    private boolean isMember(Attributes attrs)
+    private boolean isMember(String prototype, String slot, Attributes attrs)
     {
-	return getBooleanAttribute(attrs, "member", true);
+	return getBooleanAttribute(prototype, slot, attrs, "member", true);
     }
 
     // Parsing 
@@ -245,7 +279,6 @@ public class FrameGen
 
     private void endFrameset()
     {
-	generateCode();
     }
 
 
@@ -302,9 +335,9 @@ public class FrameGen
 
 	writeDecl(writer, prototype, parent);
 	writer.println("{");
-	writeSlots(writer, local_slots);
+	writeSlots(writer, prototype, local_slots);
 	writeConstructors(writer, prototype);
-	writeAccessors(writer, local_slots, override_slots);
+	writeAccessors(writer, prototype, local_slots, override_slots);
 	writeContainerReaders(writer, prototype, container);
 	writer.println("}");
 
@@ -332,6 +365,7 @@ public class FrameGen
 
 
     private void writeSlots(PrintWriter writer,
+			    String prototype, 
 			    HashMap local_slots)
     {
 	Iterator itr = local_slots.entrySet().iterator();
@@ -339,17 +373,18 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeSlot(writer, slot, attrs);
+	    writeSlot(writer, prototype, slot, attrs);
 	}
     }
 
     private void writeSlot(PrintWriter writer, 
+			   String prototype,
 			   String  slot, 
 			   Attributes attrs)
     {
 	String value = attrs.getValue("value");
-	boolean memberp = isMember(attrs);
-	boolean staticp = isStatic(attrs);
+	boolean memberp = isMember(prototype, slot, attrs);
+	boolean staticp = isStatic(prototype, slot, attrs);
 	String fixed_name = fixName(slot, false);
 	if (memberp) {
 	    writer.println("    protected Object " +fixed_name+ ";");
@@ -375,7 +410,8 @@ public class FrameGen
 	writer.println("    }");
     }
 
-    private void writeAccessors(PrintWriter writer, 
+    private void writeAccessors(PrintWriter writer,
+				String prototype,
 				HashMap local_slots,
 				HashMap override_slots)
     {
@@ -384,29 +420,31 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeGetter(writer, slot, attrs);
-	    writeSetter(writer, slot, attrs);
-	    writeInitializer(writer, slot, attrs);
+	    writeGetter(writer, prototype, slot, attrs);
+	    writeSetter(writer, prototype, slot, attrs);
+	    writeInitializer(writer, prototype, slot, attrs);
 	}
 	itr = override_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeGetter(writer, slot, attrs);
+	    writeGetter(writer, prototype, slot, attrs);
 	}
     }
 
 
     private void writeGetter(PrintWriter writer, 
+			     String prototype,
 			     String slot,
 			     Attributes attrs)
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	String default_value = attrs.getValue("value");
-	boolean memberp = isMember(attrs);
-	boolean staticp = isStatic(attrs);
+	String path = attrs.getValue("path");
+	boolean memberp = isMember(prototype, slot, attrs);
+	boolean staticp = path == null && isStatic(prototype, slot, attrs);
 	writer.println("\n\n    public Object get" +accessor_name+ "()");
 	writer.println("    {");
 	if (memberp) {
@@ -419,8 +457,15 @@ public class FrameGen
 	    writer.println("        if (" +result_var+ " != null) return "
 			   +result_var+ ";");
 	}
-	if (staticp && default_value != null) {
-	    writer.println("        return \"" +default_value+ "\";");
+	if (staticp) {
+	    if (default_value != null) {
+		writer.println("        return \"" +default_value+ "\";");
+	    } else {
+		writer.println("        getLogger().warn(this + \" has no value for " 
+			       +accessor_name+
+			       "\");");
+		writer.println("        return null;");
+	    }
 	} else {
 	    writer.println("        return getInheritedValue(this, \"" 
 			   +slot+ "\");");
@@ -429,13 +474,14 @@ public class FrameGen
 	writer.println("    }");
     }
 
-    private void writeSetter(PrintWriter writer, 
+    private void writeSetter(PrintWriter writer,
+			     String prototype,
 			     String slot,
 			     Attributes attrs)
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	boolean memberp = isMember(attrs);
+	boolean memberp = isMember(prototype, slot, attrs);
 
 	writer.println("\n\n    public void set" +accessor_name+
 		       "(Object new_value)");
@@ -449,12 +495,13 @@ public class FrameGen
     }
 
     private void writeInitializer(PrintWriter writer, 
+				  String prototype,
 				  String slot,
 				  Attributes attrs)
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	boolean memberp = isMember(attrs);
+	boolean memberp = isMember(prototype, slot, attrs);
 
 	writer.println("\n\n    public void initialize" +accessor_name+
 		       "(Object new_value)");

@@ -281,7 +281,7 @@ abstract public class Frame
 	}
 	Frame parent = frameSet.getParent(this);
 	if (parent != null) {
-	    return parent.getValue(origin, slot);
+	    return parent.getValue(slot);
 	}
 	return null;
     }
