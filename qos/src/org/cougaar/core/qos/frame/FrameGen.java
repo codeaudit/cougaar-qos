@@ -338,7 +338,7 @@ public class FrameGen
 	writeSlots(writer, prototype, local_slots);
 	writeConstructors(writer, prototype);
 	writeAccessors(writer, prototype, local_slots, override_slots);
-	writeContainerReaders(writer, prototype, container);
+	writeContainerReaders(writer, prototype, local_slots, container);
 	writer.println("}");
 
 	writer.close();
@@ -516,6 +516,7 @@ public class FrameGen
 
     private void writeContainerReaders(PrintWriter writer, 
 				       String prototype,
+				       HashMap local_slots,
 				       String container)
     {
 	if (container == null) return;
@@ -523,10 +524,10 @@ public class FrameGen
 	Iterator itr = container_accessors.iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    if (!inheritsSlot(prototype, slot))
+	    if(!local_slots.containsKey(slot) && !inheritsSlot(prototype, slot))
 		writeContainerReader(writer, container, slot);
 	}
-    }	
+    }
 
     private void writeContainerReader(PrintWriter writer, 
 				      String container,
