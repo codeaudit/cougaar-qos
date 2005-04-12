@@ -540,6 +540,7 @@ public class FrameGen
 	writer.println("\n\n    public Object " +reader_name+ "()");
 	writer.println("    {");
 	writer.println("       Object " +raw_parent_var+ " = parentFrame();");
+	writer.println("       if ( " + raw_parent_var + " == null) return null;");
 	writer.println("       if (!("  +raw_parent_var+ " instanceof "
 		       +container_class+ ")) {");
 	writer.println("            getLogger().warn(\"Parent of \" +this+ \" is not a " +container_class+ ": \" + " +raw_parent_var+ ");");
@@ -547,7 +548,6 @@ public class FrameGen
 	writer.println("       }");
 	writer.println("       " +container_class+  " " +parent_var+ " = ("
 		       +container_class+ ") " +raw_parent_var+ ";");
-	writer.println("       if ( " + parent_var + " == null) return null;");
 	writer.println("       return " +parent_var+ "." +reader_name+ "();");
 	writer.println("    }");
     }
