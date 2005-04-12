@@ -534,11 +534,18 @@ public class FrameGen
     {
 	String reader_name = "get"+fixName(slot, true);
 	String container_class = fixName(container, true);
+	String raw_parent_var = "__raw_parent";
 	String parent_var = "__parent";
 	writer.println("\n\n    public Object " +reader_name+ "()");
 	writer.println("    {");
+	writer.println("       Object " +raw_parent_var+ " = parentFrame();");
+	writer.println("       if (!("  +raw_parent_var+ " instanceof "
+		       +container_class+ ")) {");
+	writer.println("            getLogger().warn(\"Parent of \" +this+ \" is not a " +container_class+ ": \" + " +raw_parent_var+ ");");
+	writer.println("            return null;");
+	writer.println("       }");
 	writer.println("       " +container_class+  " " +parent_var+ " = ("
-		       +container_class+ ") parentFrame();");
+		       +container_class+ ") " +raw_parent_var+ ";");
 	writer.println("       if ( " + parent_var + " == null) return null;");
 	writer.println("       return " +parent_var+ "." +reader_name+ "();");
 	writer.println("    }");
