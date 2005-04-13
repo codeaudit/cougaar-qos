@@ -192,7 +192,7 @@ abstract public class Frame
 	return result;
     }
 
-    FrameSet getFrameSet()
+    public FrameSet getFrameSet()
     {
 	return frameSet;
     }
