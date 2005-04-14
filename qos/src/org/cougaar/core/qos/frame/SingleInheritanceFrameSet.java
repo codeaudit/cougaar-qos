@@ -681,10 +681,10 @@ public class SingleInheritanceFrameSet
 	return frame;
     }
 
-    public Set getPrototypes()
+    public Collection getPrototypes()
     {
 	synchronized (prototypes) {
-	    return new HashSet(prototypes.keySet());
+	    return new ArrayList(prototypes.values());
 	}
     }
 

@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -54,9 +53,7 @@ abstract public class Frame
 
     private final UID uid;
     private final String kind;
-    private Properties props;
     private transient FrameSet frameSet;
-    private transient Set localSlots;
     private static Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.Frame.class);
 
@@ -65,34 +62,9 @@ abstract public class Frame
 	this.frameSet = frameSet;
 	this.uid = uid;
 	this.kind = kind;
-	this.props = new Properties();
-	this.localSlots = new HashSet();
     }
 
-    protected Object getProperty(String slot)
-    {
-	return props.get(slot);
-    }
-
-    protected void setProperty(String slot, Object value)
-    {
-	props.put(slot, value);
-    }
-
-    protected void slotModified(String slot, Object value)
-    {
-	synchronized (localSlots) {
-	    localSlots.add(slot);
-	}
-	if (frameSet != null) frameSet.valueUpdated(this, slot, value);
-    }
-
-    protected void slotInitialized(String slot, Object value)
-    {
-	synchronized (localSlots) {
-	    localSlots.add(slot);
-	}
-    }
+    abstract Properties getLocalSlots();
 
     void addToFrameSet(FrameSet frameSet)
     {
@@ -150,20 +122,6 @@ abstract public class Frame
 	return kind;
     }
 
-    // Only here for the Tasks servlet
-    Properties getLocalSlots()
-    {
-	Properties props = new VisibleProperties();
-	synchronized (localSlots) {
-	    Iterator itr = localSlots.iterator();
-	    while (itr.hasNext()) {
-		String slot =  (String) itr.next();
-		Object value = getLocalValue(slot);
-		if (value != null) props.put(slot, value);
-	    }
-	}
-	return props;
-    }
 
     public String getParentKind()
     {
@@ -214,7 +172,7 @@ abstract public class Frame
     // frame. 
 
 
-    private Object getLocalValue(String slot)
+    Object getLocalValue(String slot)
     {
 	// reflection
 	Class klass = getClass();
@@ -236,7 +194,7 @@ abstract public class Frame
 	}
     }
 
-    private void setLocalValue(String slot, Object value)
+    void setLocalValue(String slot, Object value)
     {
 	// reflection
 	Class klass = getClass();

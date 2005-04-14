@@ -35,6 +35,7 @@ import java.util.Properties;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -68,23 +69,17 @@ public class FrameSetParser
 	String kind;
 	String parent;
 	Properties props;
-	HashMap paths;
-	HashSet requiredSlots;
 
 	FrameSpec(String kind, String parent)
 	{
 	    this.kind = kind;
 	    this.parent = parent;
 	    props = new Properties();
-	    paths = new HashMap();
-	    requiredSlots = new HashSet();
 	}
 
 	Frame makePrototype(FrameSet frameSet)
 	{
 	    PrototypeFrame frame = frameSet.makePrototype(kind, parent, props);
-	    if (!paths.isEmpty()) frame.addPaths(paths);
-	    if (!requiredSlots.isEmpty()) frame.addRequiredSlots(requiredSlots);
 	    return frame;
 	}
 
@@ -94,20 +89,11 @@ public class FrameSetParser
 	}
 
 
-	void put(String attr, String value)
+	void put(String attr, Object value)
 	{
-	    props.setProperty(attr, value);
+	    props.put(attr, value);
 	}
 
-	void putPath(String attr, Path path)
-	{
-	    paths.put(attr, path);
-	}
-
-	void addRequiredSlot(String name)
-	{
-	    requiredSlots.add(name);
-	}
     }
 
     private class PathSpec
@@ -375,18 +361,7 @@ public class FrameSetParser
 	if (path_spec != null) {
 	    path_spec.setSlot(slot);
 	} else if (proto_spec != null) {
-	    String path = attrs.getValue("path");
-	    if (path != null) {
-		Path vp = (Path) path_specs.get(path);
-		proto_spec.putPath(slot, vp);
-	    } else {
-		String value = attrs.getValue("value");
-		if (value == null) {
-		    proto_spec.addRequiredSlot(slot);
-		} else {
-		    proto_spec.put(slot, value);
-		}
-	    }
+	    proto_spec.put(slot, new AttributesImpl(attrs));
 	} else {
 	    // log
 	}

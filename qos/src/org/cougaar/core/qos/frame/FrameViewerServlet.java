@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.net.URLDecoder;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -78,6 +79,25 @@ public class FrameViewerServlet extends ComponentServlet {
     }
   }
 
+    static class PrototypeComparator 
+	implements java.util.Comparator
+    {
+	public int compare(Object x, Object y)
+	{
+	    String x_name = ((PrototypeFrame) x).getName();
+	    String y_name = ((PrototypeFrame) y).getName();
+	    return x_name.compareTo(y_name);
+	}
+
+	public boolean equals(Object thing)
+	{
+	    return thing == this;
+	}
+    }
+
+    private static final java.util.Comparator cmp = new PrototypeComparator();
+
+
   public void doGet(
       HttpServletRequest request,
       HttpServletResponse response) throws IOException {
@@ -117,6 +137,7 @@ public class FrameViewerServlet extends ComponentServlet {
     private String newSlot;
     private static final String NEW_VALUE_PARAM = "newValue";
     private String newValue;
+
 
     public Worker(
         HttpServletRequest request,
@@ -208,14 +229,16 @@ public class FrameViewerServlet extends ComponentServlet {
           if (fs == null) continue;
           out.print(
               "names["+i+"] = '"+ni+"';\n"+
-              "kinds["+i+"] = [ '*'");
-          Set kinds = fs.getPrototypes();
+              "kinds["+i+"] = [ '*'" +
+	      ", '--Prototypes--'");
+	  
+          Collection kinds = fs.getPrototypes();
           if (kinds != null) {
             allKinds.addAll(kinds);
-            for (Iterator i2 = Sortings.sort(kinds).iterator();
+            for (Iterator i2 = Sortings.sort(kinds, cmp).iterator();
                 i2.hasNext();
                 ) {
-              out.print(", '"+((String) i2.next())+"'");
+		out.print(", '"+((PrototypeFrame) i2.next()).getName()+"'");
             }
           }
           out.print(" ];\n");
@@ -223,10 +246,10 @@ public class FrameViewerServlet extends ComponentServlet {
         out.print(
             "names["+i+"] = '*';\n"+
             "kinds["+i+"] = [ '*'");
-        for (Iterator i2 = Sortings.sort(allKinds).iterator();
+        for (Iterator i2 = Sortings.sort(allKinds, cmp).iterator();
             i2.hasNext();
             ) {
-          out.print(", '"+((String) i2.next())+"'");
+	    out.print(", '"+((PrototypeFrame) i2.next()).getName()+"'");
         }
         out.print(" ];\n");
       }
@@ -354,17 +377,20 @@ public class FrameViewerServlet extends ComponentServlet {
       Set frames;
       if (kind.equals("*")) {
         frames = new HashSet();
-        Set kinds = fs.getPrototypes();
+        Collection kinds = fs.getPrototypes();
         if (kinds != null && !kinds.isEmpty()) {
-          for (Iterator i2 = Sortings.sort(kinds).iterator();
+	    for (Iterator i2 = Sortings.sort(kinds, cmp).iterator();
               i2.hasNext();
               ) {
-            String k = (String) i2.next();
+	      String k = ((PrototypeFrame) i2.next()).getName();
             Set set = fs.findFrames(k, slot_value_pairs, false);
             if (set == null) continue;
             frames.addAll(set);
           }
         }
+      } else if (kind.equals("--Prototypes--")) {
+	  frames = new HashSet();
+	  frames.addAll(fs.getPrototypes());
       } else {
         frames = fs.findFrames(kind, slot_value_pairs, false);
       }

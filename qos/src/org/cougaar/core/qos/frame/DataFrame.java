@@ -27,9 +27,11 @@
 package org.cougaar.core.qos.frame;
 
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.cougaar.core.util.UID;
 import org.cougaar.util.log.Logger;
@@ -51,37 +53,6 @@ public class DataFrame
     {
 	return log;
     }
-
-    protected DataFrame(FrameSet frameSet, 
-			String kind, 
-			UID uid)
-    {
-	super(frameSet, kind, uid);
-    }
-
-    void dumpLocalSlots(PrintWriter writer, int indentation, int offset)
-    {
-	Map slots = getLocalSlots();
-	Iterator itr = slots.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    String slot_name = (String) entry.getKey();
-	    Object slot_value = entry.getValue();
-	    for (int i=0; i<indentation; i++) writer.print(' ');
-	    writer.println("<" +slot_name+ ">" +slot_value+ "</"
-			   +slot_name+ ">");
-	}
-    }
-
-    void dump(PrintWriter writer, int indentation, int offset)
-    {
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frame prototype=\"" +getKind()+ "\">");
-	dumpLocalSlots(writer, indentation+offset, offset);
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("</frame>");
-    }
-
 
 
     public static DataFrame newFrame(FrameSet frameSet,
@@ -121,5 +92,88 @@ public class DataFrame
 	frame.initializeValues(values);
 	return frame;
     }
+
+
+
+
+    private Properties props;
+    private transient Set localSlots;
+
+    protected DataFrame(FrameSet frameSet, 
+			String kind, 
+			UID uid)
+    {
+	super(frameSet, kind, uid);
+	this.props = new Properties();
+	this.localSlots = new HashSet();
+    }
+
+    protected void slotModified(String slot, Object value)
+    {
+	synchronized (localSlots) {
+	    localSlots.add(slot);
+	}
+	FrameSet frameSet = getFrameSet();
+	if (frameSet != null) frameSet.valueUpdated(this, slot, value);
+    }
+
+    protected void slotInitialized(String slot, Object value)
+    {
+	synchronized (localSlots) {
+	    localSlots.add(slot);
+	}
+    }
+
+    // Only here for the Tasks servlet
+    Properties getLocalSlots()
+    {
+	Properties props = new VisibleProperties();
+	synchronized (localSlots) {
+	    Iterator itr = localSlots.iterator();
+	    while (itr.hasNext()) {
+		String slot =  (String) itr.next();
+		Object value = getLocalValue(slot);
+		if (value != null) props.put(slot, value);
+	    }
+	}
+	return props;
+    }
+
+    protected Object getProperty(String slot)
+    {
+	return props.get(slot);
+    }
+
+    protected void setProperty(String slot, Object value)
+    {
+	props.put(slot, value);
+    }
+
+
+    void dumpLocalSlots(PrintWriter writer, int indentation, int offset)
+    {
+	Map slots = getLocalSlots();
+	Iterator itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot_name = (String) entry.getKey();
+	    Object slot_value = entry.getValue();
+	    for (int i=0; i<indentation; i++) writer.print(' ');
+	    writer.println("<" +slot_name+ ">" +slot_value+ "</"
+			   +slot_name+ ">");
+	}
+    }
+
+    void dump(PrintWriter writer, int indentation, int offset)
+    {
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<frame prototype=\"" +getKind()+ "\">");
+	dumpLocalSlots(writer, indentation+offset, offset);
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("</frame>");
+    }
+
+
+
 
 }

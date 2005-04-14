@@ -26,12 +26,12 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.AttributesImpl;
 
 import org.cougaar.core.util.UID;
 import org.cougaar.util.log.Logger;
@@ -48,52 +48,68 @@ public class PrototypeFrame
 {
     private final String prototype_name;
     private transient Logger log = Logging.getLogger(getClass().getName());
-
-    // Are these really transient?
-    private transient HashMap paths;
-    private transient HashSet required_slots;
+    private transient Properties dynamic_values;
+    private Properties slots;
 
     PrototypeFrame(FrameSet frameSet, 
 		   String prototype_name,
 		   String parent, 
 		   UID uid, 
-		   Properties values)
+		   Properties slots)
     {
 	super(frameSet, parent, uid);
 	this.prototype_name = prototype_name;
-	this.required_slots = new HashSet();
-	this.paths = new HashMap();
-	if (values != null) {
-	    Iterator itr = values.entrySet().iterator();
-	    while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry) itr.next();
-		String key = (String) entry.getKey();
-		Object value = entry.getValue();
-		setProperty(key, value);
+	this.slots = slots;
+	this.dynamic_values = new Properties();
+    }
+
+    Properties getLocalSlots()
+    {
+	Properties result = new Properties();
+	Iterator itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot_name = (String) entry.getKey();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    Object slot_value = dynamic_values.get(slot_name);
+	    if (slot_value != null) {
+		result.put(slot_name, slot_value);
+	    } else {
+		slot_value = attrs.getValue("value");
+		if (slot_value != null) result.put(slot_name, slot_value);
 	    }
 	}
+	return result;
     }
 
-    void addPaths(HashMap paths)
+    public void setValue(String slot, Object value)
     {
-	this.paths.putAll(paths);
+	dynamic_values.put(slot, value);
     }
 
-    void addRequiredSlots(HashSet required_slots)
+    public Object getValue(String slot)
     {
-	this.required_slots.addAll(required_slots);
+	return getValue(this, slot);
     }
 
-    Object getValue(Frame origin, String slot)
+    Object getValue(Frame origin, String slot_name)
     {
-	Path path = (Path) paths.get(slot);
-	if (path != null) {
+	Object slot_value = dynamic_values.get(slot_name);
+	if (slot_value != null) return slot_value;
+
+	Attributes attrs = (Attributes) slots.get(slot_name);
+	String value = attrs.getValue("value");
+	String path_name = attrs.getValue("path");
+	if (value != null) {
+	    return value;
+	} else if (path_name != null) {
+	    Path path = getFrameSet().findPath(path_name);
 	    return path.getValue(origin);
 	} else {
-	    if (required_slots.contains(slot) &&
-		log.isWarnEnabled())
-		log.warn("Slot " +slot+ " is required by prototype "
-			 +prototype_name+ " but was never provided in frame "
+	    if (log.isWarnEnabled())
+		log.warn("Slot " +slot_name+ " is required by prototype "
+			 +prototype_name+ 
+			 " but was never provided in frame "
 			 +origin);
 	    return null;
 	}

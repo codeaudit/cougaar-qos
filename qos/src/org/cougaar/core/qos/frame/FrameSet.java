@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.frame;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.Set;
 
@@ -186,7 +187,7 @@ public interface FrameSet
     /**
      * Returns a collection of all PrototypeFrames in the FrameSet,
      */
-    public Set getPrototypes();
+    public Collection getPrototypes();
 
     /**
      * Dump the DataFrames as XML.
