@@ -26,6 +26,9 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -278,6 +281,39 @@ public class SingleInheritanceFrameSet
 	return name;
     }
 
+
+    void dumpDataFrames(PrintWriter writer, int indentation, int offset)
+    {
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<frameset>");
+	indentation += offset;
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<frames>");
+	indentation += offset;
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Object raw = itr.next();
+		if (raw instanceof DataFrame) {
+		    DataFrame frame = (DataFrame) raw;
+		    frame.dump(writer, indentation, offset);
+		}
+	    }
+	}
+	indentation -= offset;
+	writer.println("</frames>");
+	indentation -= offset;
+	writer.println("</frameset>");
+    }
+
+    public void dumpDataFrames(File file)
+	throws java.io.IOException
+    {
+	FileWriter fwriter = new FileWriter(file);
+	PrintWriter writer = new PrintWriter(fwriter);
+	dumpDataFrames(writer, 0, 2);
+	writer.close();
+    }
 
     public Path findPath(UID uid)
     {

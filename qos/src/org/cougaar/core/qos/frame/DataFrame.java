@@ -26,6 +26,9 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import org.cougaar.core.util.UID;
@@ -55,6 +58,31 @@ public class DataFrame
     {
 	super(frameSet, kind, uid);
     }
+
+    void dumpLocalSlots(PrintWriter writer, int indentation, int offset)
+    {
+	Map slots = getLocalSlots();
+	Iterator itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot_name = (String) entry.getKey();
+	    Object slot_value = entry.getValue();
+	    for (int i=0; i<indentation; i++) writer.print(' ');
+	    writer.println("<" +slot_name+ ">" +slot_value+ "</"
+			   +slot_name+ ">");
+	}
+    }
+
+    void dump(PrintWriter writer, int indentation, int offset)
+    {
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<frame prototype=\"" +getKind()+ "\">");
+	dumpLocalSlots(writer, indentation+offset, offset);
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("</frame>");
+    }
+
+
 
     public static DataFrame newFrame(FrameSet frameSet,
 				     String proto, 
