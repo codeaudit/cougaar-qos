@@ -26,6 +26,7 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -49,14 +50,22 @@ public class Path
     private transient Logger log = Logging.getLogger(getClass().getName());
 
     static class Fork implements java.io.Serializable {
+	private String role;
+	private String relation;
+
 	Fork(String role, String relation)
 	{
 	    this.role = role;
 	    this.relation = relation;
 	}
 
-	private String role;
-	private String relation;
+	void dump(PrintWriter writer, int indentation, int offset)
+	{
+	    for (int i=0; i<indentation; i++) writer.print(' ');
+	    writer.println("<fork relation=\"" +relation+
+			   " role=\"" +role+
+			   "\"/>");
+	}
     }
 
     private final UID uid;
@@ -133,4 +142,18 @@ public class Path
 	    throw new RuntimeException("UID already set");
     }
 
+    void dump(PrintWriter writer, int indentation, int offset)
+    {
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<path name=\"" +name+ "\">");
+	indentation += offset;
+	for (int i=0; i<forks.length; i++) {
+	    Fork fork = forks[i];
+	    fork.dump(writer, indentation, offset);
+	}
+	writer.println("<slot name=\"" +slot+ "\"/>");
+	indentation -= offset;
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("</path>");
+    }
 }

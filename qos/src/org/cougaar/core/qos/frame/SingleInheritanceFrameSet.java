@@ -282,14 +282,10 @@ public class SingleInheritanceFrameSet
     }
 
 
+
+    // XML dumping
     void dumpDataFrames(PrintWriter writer, int indentation, int offset)
     {
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frameset>");
-	indentation += offset;
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frames>");
-	indentation += offset;
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
@@ -300,20 +296,114 @@ public class SingleInheritanceFrameSet
 		}
 	    }
 	}
-	indentation -= offset;
-	writer.println("</frames>");
-	indentation -= offset;
-	writer.println("</frameset>");
     }
 
-    public void dumpDataFrames(File file)
+    void dumpData(File file, int indentation, int offset)
 	throws java.io.IOException
     {
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
-	dumpDataFrames(writer, 0, 2);
+
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<frameset>");
+	indentation += offset;
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<frames>");
+	indentation += offset;
+
+	dumpDataFrames(writer, indentation, offset);
+
+	indentation -= offset;
+	writer.println("</frames>");
+	indentation -= offset;
+	writer.println("</frameset>");
+
+
 	writer.close();
     }
+
+
+
+    void dumpProtoFrames(PrintWriter writer, int indentation, int offset)
+    {
+	synchronized (prototypes) {
+	    Iterator itr = prototypes.values().iterator();
+	    while (itr.hasNext()) {
+		Object raw = itr.next();
+		if (raw instanceof PrototypeFrame) {
+		    PrototypeFrame frame = (PrototypeFrame) raw;
+		    frame.dump(writer, indentation, offset);
+		}
+	    }
+	}
+    }
+
+    void dumpPaths(PrintWriter writer, int indentation, int offset)
+    {
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Object raw = itr.next();
+		if (raw instanceof Path) {
+		    Path path = (Path) raw;
+		    path.dump(writer, indentation, offset);
+		}
+	    }
+	}
+    }
+
+    void dumpPrototypes(File file, int indentation, int offset)
+	throws java.io.IOException
+    {
+	FileWriter fwriter = new FileWriter(file);
+	PrintWriter writer = new PrintWriter(fwriter);
+
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<frameset"); 
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  frame-inheritance=\"single\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  package=\"" +pkg+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  frame-inheritance-relation=\"" +parent_relation+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  parent-prototype=\"" +parent_proto_slot+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  parent-slot=\"" +parent_slot_slot+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  parent-value=\"" +parent_value_slot+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  child-prototype=\"" +child_proto_slot+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  child-slot=\"" +child_slot_slot+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  child-value=\"" +child_value_slot+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println(">");
+
+
+	indentation += offset;
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("<prototypes>");
+	indentation += offset;
+	dumpPaths(writer, indentation, offset);
+	dumpProtoFrames(writer, indentation, offset);
+	indentation -= offset;
+	writer.println("</prototypes>");
+	indentation -= offset;
+	writer.println("</frameset>");
+
+	writer.close();
+    }
+
+
+    public  void dump(File proto_file, File data_file)
+	throws java.io.IOException
+    {
+	dumpPrototypes(proto_file, 0, 2);
+	dumpData(data_file, 0, 2);
+    }
+
 
     public Path findPath(UID uid)
     {
