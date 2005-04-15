@@ -732,6 +732,17 @@ public class SingleInheritanceFrameSet
 	return result;
     }
 
+    public boolean descendsFromReflective(Frame frame, String prototype)
+    {
+	String classname =  FrameGen.fixName(prototype, true);
+	try {
+	    Class klass = Class.forName(classname);
+	    return klass.isInstance(frame);
+	} catch (Exception ex) {
+	    return false;
+	}
+    }
+
     // In this case the proto argument refers to what the prototype
     // should be a prototype of.  
     public PrototypeFrame makePrototype(String proto, 
