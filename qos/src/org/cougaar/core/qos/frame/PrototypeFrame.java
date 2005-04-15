@@ -88,31 +88,35 @@ public class PrototypeFrame
 	dynamic_values.put(slot, value);
     }
 
-    public Object getValue(String slot)
-    {
-	return getValue(this, slot);
-    }
-
     Object getValue(Frame origin, String slot_name)
     {
+	// Look for a dynamically set default first.
 	Object slot_value = dynamic_values.get(slot_name);
 	if (slot_value != null) return slot_value;
 
 	Attributes attrs = (Attributes) slots.get(slot_name);
-	String value = attrs.getValue("value");
-	String path_name = attrs.getValue("path");
-	if (value != null) {
-	    return value;
-	} else if (path_name != null) {
-	    Path path = getFrameSet().findPath(path_name);
-	    return path.getValue(origin);
+	if (attrs != null) {
+	    // Declared at this level -- either get a real value or
+	    // complain and return null.
+	    Object result = null;
+	    String value = attrs.getValue("value");
+	    String path_name = attrs.getValue("path");
+	    if (value != null) {
+		result = value;
+	    } else if (path_name != null) {
+		Path path = getFrameSet().findPath(path_name);
+		result = path.getValue(origin);
+	    } else {
+		if (log.isWarnEnabled())
+		    log.warn("Slot " +slot_name+ " is required by prototype "
+			     +prototype_name+ 
+			     " but was never provided in frame "
+			     +origin);
+	    }
+	    return result;
 	} else {
-	    if (log.isWarnEnabled())
-		log.warn("Slot " +slot_name+ " is required by prototype "
-			 +prototype_name+ 
-			 " but was never provided in frame "
-			 +origin);
-	    return null;
+	    // Not owned by us, check super
+	    return getInheritedValue(origin, slot_name);
 	}
     }
 
