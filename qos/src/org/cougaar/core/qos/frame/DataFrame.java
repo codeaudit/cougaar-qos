@@ -26,6 +26,8 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -98,6 +100,7 @@ public class DataFrame
 
     private Properties props;
     private transient Set localSlots;
+    private transient PropertyChangeSupport pcs;
 
     protected DataFrame(FrameSet frameSet, 
 			String kind, 
@@ -106,6 +109,18 @@ public class DataFrame
 	super(frameSet, kind, uid);
 	this.props = new Properties();
 	this.localSlots = new HashSet();
+	this.pcs = new PropertyChangeSupport(this);
+    }
+
+
+    public void addPropertyChangeListener(PropertyChangeListener pcl)
+    {
+	pcs.addPropertyChangeListener(pcl);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener pcl)
+    {
+	pcs.removePropertyChangeListener(pcl);
     }
 
     protected void slotModified(String slot, Object value)
