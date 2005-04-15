@@ -73,6 +73,7 @@ public class SingleInheritanceFrameSet
 	child_proto_slot,
 	child_slot_slot,
 	child_value_slot;
+    private HashMap cached_classes;
     
 
     public SingleInheritanceFrameSet(String pkg,
@@ -88,6 +89,7 @@ public class SingleInheritanceFrameSet
 				     String child_value_slot)
     {
 	this.name = name;
+	this.cached_classes = new HashMap();
 	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
@@ -716,7 +718,8 @@ public class SingleInheritanceFrameSet
 	return path;
     }
 
-    public boolean descendsFrom(Frame frame, String prototype)
+    // Old version.  Keep around just in case.
+    public boolean descendsFromWalk(Frame frame, String prototype)
     {
 	String proto = frame.getKind();
 	if (proto == null) return false;
@@ -732,13 +735,42 @@ public class SingleInheritanceFrameSet
 	return result;
     }
 
-    public boolean descendsFromReflective(Frame frame, String prototype)
+    private static final Object CNF = new Object();
+    public Class classForPrototype(String prototype)
     {
-	String classname =  FrameGen.fixName(prototype, true);
-	try {
-	    Class klass = Class.forName(classname);
-	    return klass.isInstance(frame);
-	} catch (Exception ex) {
+	// cache these!
+	synchronized (cached_classes) {
+	    Object klass = cached_classes.get(prototype);
+	    if (klass == CNF) return null;
+	    if (klass != null) return (Class) klass;
+
+	    
+	    String classname = pkg +"."+ FrameGen.fixName(prototype, true);
+	    try {
+		Class klass2 =  Class.forName(classname);
+		cached_classes.put(prototype, klass2);
+		return klass2;
+	    } catch (Exception ex) {
+		if (log.isWarnEnabled())
+		    log.warn("Couldn't find class for prototype " +prototype);
+		cached_classes.put(prototype, CNF);
+		return null;
+	    }
+	}
+    }
+
+
+    public boolean descendsFrom(Frame frame, String prototype)
+    {
+	Class klass = classForPrototype(prototype);
+	if (klass != null) {
+	    boolean result = klass.isInstance(frame);
+	    if (log.isDebugEnabled())
+		log.debug(frame+ 
+			  (result ? " descends from " : " does not descend from ") 
+			  +prototype);
+	    return result;
+	} else {
 	    return false;
 	}
     }

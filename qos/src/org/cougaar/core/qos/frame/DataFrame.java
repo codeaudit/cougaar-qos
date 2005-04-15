@@ -75,12 +75,12 @@ public class DataFrame
 				     Properties values)
     {
 	// use reflection here!
+	Class klass = frameSet.classForPrototype(proto);
+	if (klass == null) return null;
+
 	DataFrame frame = null;
+	Object[] args = { frameSet, proto, uid };
 	try {
-	    Object[] args = { frameSet, proto, uid };
-	    String fixed_proto = FrameGen.fixName(proto, true);
-	    String classname = pkg +"."+ fixed_proto;
-	    Class klass = Class.forName(classname);
 	    java.lang.reflect.Constructor cons = klass.getConstructor(CTYPES);
 	    frame = (DataFrame) cons.newInstance(args);
 	    if (log.isInfoEnabled())

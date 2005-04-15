@@ -190,6 +190,11 @@ public interface FrameSet
     public Collection getPrototypes();
 
     /**
+     * Return the generated class for the given prototype
+     */
+    public Class classForPrototype(String prototype);
+
+    /**
      * Dump the DataFrames as XML.
      */
     public void dump(File proto_file, File data_file)
