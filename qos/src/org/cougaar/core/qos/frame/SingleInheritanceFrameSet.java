@@ -719,7 +719,7 @@ public class SingleInheritanceFrameSet
     }
 
     // Old version.  Keep around just in case.
-    public boolean descendsFromWalk(Frame frame, String prototype)
+    public boolean descendsFrom(Frame frame, String prototype)
     {
 	String proto = frame.getKind();
 	if (proto == null) return false;
@@ -760,7 +760,7 @@ public class SingleInheritanceFrameSet
     }
 
 
-    public boolean descendsFrom(Frame frame, String prototype)
+    public boolean descendsFromReflective(Frame frame, String prototype)
     {
 	Class klass = classForPrototype(prototype);
 	if (klass != null) {
