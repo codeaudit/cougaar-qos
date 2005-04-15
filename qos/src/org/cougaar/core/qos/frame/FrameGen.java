@@ -490,13 +490,16 @@ public class FrameGen
 	boolean memberp = isMember(prototype, slot, attrs);
 
 	writer.println("\n\n    public void set" +accessor_name+
-		       "(Object new_value)");
+		       "(Object __new_value)");
 	writer.println("    {");
-	if (memberp)
-	    writer.println("        this." +fixed_name+ " = new_value;");
-	else
-	    writer.println("        setProperty(\"" +slot+ "\", new_value);");
-	writer.println("        slotModified(\"" +slot+ "\", new_value);");
+	if (memberp) {
+	    writer.println("        Object __old_value = " +fixed_name+ ";");
+	    writer.println("        this." +fixed_name+ " = __new_value;");
+	} else {
+	    writer.println("        Object __old_value = getProperty(\"" +slot+ "\");");
+	    writer.println("        setProperty(\"" +slot+ "\", __new_value);");
+	}
+	writer.println("        slotModified(\"" +slot+ "\", __old_value, __new_value);");
 	writer.println("    }");
     }
 

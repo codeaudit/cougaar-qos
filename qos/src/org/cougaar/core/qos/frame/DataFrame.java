@@ -123,13 +123,15 @@ public class DataFrame
 	pcs.removePropertyChangeListener(pcl);
     }
 
-    protected void slotModified(String slot, Object value)
+    protected void slotModified(String slot, Object old_value, Object new_value)
     {
 	synchronized (localSlots) {
 	    localSlots.add(slot);
 	}
 	FrameSet frameSet = getFrameSet();
-	if (frameSet != null) frameSet.valueUpdated(this, slot, value);
+	if (frameSet != null) frameSet.valueUpdated(this, slot, new_value);
+	String fixed_name = FrameGen.fixName(slot, false);
+	pcs.firePropertyChange(fixed_name, old_value, new_value);
     }
 
     protected void slotInitialized(String slot, Object value)
