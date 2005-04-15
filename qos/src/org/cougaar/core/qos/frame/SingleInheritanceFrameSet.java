@@ -718,7 +718,7 @@ public class SingleInheritanceFrameSet
 	return path;
     }
 
-    // Old version.  Keep around just in case.
+    // Will eventually be replaced by descendsFromReflective
     public boolean descendsFrom(Frame frame, String prototype)
     {
 	String proto = frame.getKind();
@@ -760,11 +760,23 @@ public class SingleInheritanceFrameSet
     }
 
 
+    // Not using this yet, but soon...
     public boolean descendsFromReflective(Frame frame, String prototype)
     {
 	Class klass = classForPrototype(prototype);
 	if (klass != null) {
-	    boolean result = klass.isInstance(frame);
+	    boolean result = false;
+	    if (frame instanceof PrototypeFrame) {
+		PrototypeFrame pframe = (PrototypeFrame) frame;
+		Class klass2 = classForPrototype(pframe.getName());
+		if (klass2 == null) 
+		    result = false;
+		else
+		    result = klass.isAssignableFrom(klass2);
+	    } else {
+		result = klass.isInstance(frame);
+	    }
+
 	    if (log.isDebugEnabled())
 		log.debug(frame+ 
 			  (result ? " descends from " : " does not descend from ") 

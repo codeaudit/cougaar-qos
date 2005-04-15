@@ -64,7 +64,7 @@ abstract public class Frame
 	this.kind = kind;
     }
 
-    abstract Properties getLocalSlots();
+    abstract public Properties getLocalSlots();
 
     void addToFrameSet(FrameSet frameSet)
     {

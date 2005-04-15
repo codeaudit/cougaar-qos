@@ -64,7 +64,7 @@ public class PrototypeFrame
 	this.dynamic_values = new Properties();
     }
 
-    Properties getLocalSlots()
+    public Properties getLocalSlots()
     {
 	Properties result = new Properties();
 	Iterator itr = slots.entrySet().iterator();

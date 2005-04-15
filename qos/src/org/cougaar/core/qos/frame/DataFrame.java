@@ -125,7 +125,7 @@ public class DataFrame
     }
 
     // Only here for the Tasks servlet
-    Properties getLocalSlots()
+    public Properties getLocalSlots()
     {
 	Properties props = new VisibleProperties();
 	synchronized (localSlots) {
