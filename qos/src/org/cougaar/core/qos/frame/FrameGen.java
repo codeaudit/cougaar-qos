@@ -459,7 +459,12 @@ public class FrameGen
 	}
 	if (staticp) {
 	    if (default_value != null) {
-		writer.println("        return \"" +default_value+ "\";");
+		// Zinky suggestion: NIL -> null
+		if (default_value.equals("NIL")) {
+		    writer.println("        return null;");
+		} else {
+		    writer.println("        return \"" +default_value+ "\";");
+		}
 	    } else {
 		writer.println("        getLogger().warn(this + \" has no value for " 
 			       +accessor_name+
