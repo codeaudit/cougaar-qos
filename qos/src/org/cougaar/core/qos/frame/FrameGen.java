@@ -164,7 +164,6 @@ public class FrameGen
 
     private HashSet collectSlots(String proto)
     {
-	// **** TBD ****
 	HashSet slots = new HashSet();
 	collectSlots(proto, slots);
 	return slots;
@@ -269,12 +268,15 @@ public class FrameGen
     {
 	proto_slots.put(current_prototype, slots);
 	current_prototype = null;
+	slots = null;
     }
 
     private void slot(Attributes attrs)
     {
-	String slot = attrs.getValue("name");
-	slots.put(slot, new AttributesImpl(attrs));
+	if (slots != null) {
+	    String slot = attrs.getValue("name");
+	    slots.put(slot, new AttributesImpl(attrs));
+	}
     }
 
     private void endFrameset()
@@ -294,7 +296,6 @@ public class FrameGen
 	    String parent = (String) proto_parents.get(prototype);
 	    String container = (String) proto_containers.get(prototype);
 	    HashMap slots = (HashMap) entry.getValue();
-
 	    HashMap override_slots = new HashMap();
 	    HashMap local_slots = new HashMap();
 
