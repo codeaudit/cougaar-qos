@@ -381,6 +381,26 @@ public class FrameGen
 	    Attributes attrs = (Attributes) entry.getValue();
 	    writeSlot(writer, prototype, slot, attrs);
 	}
+	
+	itr = local_slots.entrySet().iterator();
+	if (!itr.hasNext()) return; // no local slots
+
+	String props = "__props";
+	String val = "__value";
+	writer.println("\n\n    protected void collectSlotValues(java.util.Properties "
+		       +props+ ")");
+	writer.println("    {");
+	writer.println("        super.collectSlotValues(__props);");
+	writer.println("        Object " +val+ ";");
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    String getter = "get" + fixName(slot, true);
+	    writer.println("        " +val+ " = " +getter+ "();");
+	    writer.print("        if (" +val+ " != null)");
+	    writer.println(props+ ".put(\"" +slot+ "\", " +val+ ");");
+	}
+	writer.println("    }");
     }
 
     private void writeSlot(PrintWriter writer, 

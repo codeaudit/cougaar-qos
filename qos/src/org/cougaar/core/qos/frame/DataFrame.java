@@ -46,7 +46,7 @@ import org.cougaar.util.log.Logging;
  * generated from prototype xml extend this one, either directly or
  * indirectly.
  */
-public class DataFrame 
+abstract public class DataFrame 
     extends Frame
     implements PropertyChangeListener
 {
@@ -101,7 +101,7 @@ public class DataFrame
 
 
     private Properties props;
-    private Set localSlots;
+//     private Set localSlots;
     private transient PropertyChangeSupport pcs;
 
     protected DataFrame(FrameSet frameSet, 
@@ -110,10 +110,11 @@ public class DataFrame
     {
 	super(frameSet, kind, uid);
 	this.props = new Properties();
-	this.localSlots = new HashSet();
+// 	this.localSlots = new HashSet();
 	this.pcs = new PropertyChangeSupport(this);
     }
 
+    // Serialization
     private void readObject(java.io.ObjectInputStream in)
 	throws java.io.IOException, ClassNotFoundException
     {
@@ -147,19 +148,20 @@ public class DataFrame
     }
 
 
-
+    
     // Public accesssors
     public Properties getLocalSlots()
     {
 	Properties props = new VisibleProperties();
-	synchronized (localSlots) {
-	    Iterator itr = localSlots.iterator();
-	    while (itr.hasNext()) {
-		String slot =  (String) itr.next();
-		Object value = getLocalValue(slot);
-		if (value != null) props.put(slot, value);
-	    }
-	}
+	collectSlotValues(props);
+// 	synchronized (localSlots) {
+// 	    Iterator itr = localSlots.iterator();
+// 	    while (itr.hasNext()) {
+// 		String slot =  (String) itr.next();
+// 		Object value = getLocalValue(slot);
+// 		if (value != null) props.put(slot, value);
+// 	    }
+// 	}
 	return props;
     }
 
@@ -205,9 +207,9 @@ public class DataFrame
 
     protected void slotModified(String slot, Object old_value, Object new_value)
     {
-	synchronized (localSlots) {
-	    localSlots.add(slot);
-	}
+// 	synchronized (localSlots) {
+// 	    localSlots.add(slot);
+// 	}
 	if (frameSet != null) frameSet.valueUpdated(this, slot, new_value);
 	String fixed_name = FrameGen.fixName(slot, true, true);
 	fireChange(fixed_name, old_value, new_value);
@@ -234,11 +236,16 @@ public class DataFrame
 	// no-op at this level
     }
 
+    protected void collectSlotValues(Properties props)
+    {
+	// no-op at this level
+    }
+
     protected void slotInitialized(String slot, Object value)
     {
-	synchronized (localSlots) {
-	    localSlots.add(slot);
-	}
+// 	synchronized (localSlots) {
+// 	    localSlots.add(slot);
+// 	}
     }
 
     protected Object getProperty(String slot)
