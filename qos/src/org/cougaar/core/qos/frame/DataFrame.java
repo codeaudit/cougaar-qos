@@ -101,7 +101,7 @@ public class DataFrame
 
 
     private Properties props;
-    private transient Set localSlots;
+    private Set localSlots;
     private transient PropertyChangeSupport pcs;
 
     protected DataFrame(FrameSet frameSet, 
@@ -114,6 +114,12 @@ public class DataFrame
 	this.pcs = new PropertyChangeSupport(this);
     }
 
+    private void readObject(java.io.ObjectInputStream in)
+	throws java.io.IOException, ClassNotFoundException
+    {
+	in.defaultReadObject();
+	pcs = new PropertyChangeSupport(this);
+    }
 
     // PropertyChangeListener
 
@@ -249,6 +255,8 @@ public class DataFrame
     {
 	Object result = super.getInheritedValue(origin, slot);
 	if (result != null) return result;
+
+	if (frameSet == null) return null;
 
 	Frame parent = frameSet.getParent(this);
 	if (parent != null) {
