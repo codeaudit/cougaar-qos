@@ -345,6 +345,7 @@ public class FrameGen
 	writeConstructors(writer, prototype);
 	writeAccessors(writer, prototype, local_slots, override_slots);
 	writeContainerReaders(writer, prototype, local_slots, container);
+	writeUpdaters(writer, prototype, local_slots, container);
 	writer.println("}");
 
 	writer.close();
@@ -359,8 +360,7 @@ public class FrameGen
 	writer.println("package " +package_name+ ";\n");
 	writer.println("import org.cougaar.core.util.UID;");
 	writer.println("import org.cougaar.core.qos.frame.FrameSet;");
-	if (parent == null)
-	    writer.println("import org.cougaar.core.qos.frame.DataFrame;");
+	writer.println("import org.cougaar.core.qos.frame.DataFrame;");
 	writer.println("\npublic class " +name);
 	if (parent != null) {
 	    writer.println("    extends " +fixName(parent, true));
@@ -566,7 +566,73 @@ public class FrameGen
 	writer.println("    }");
     }
 
+    private void writeUpdaters(PrintWriter writer, 
+			       String prototype,
+			       HashMap local_slots,
+			       String container)
+    {
+	if (container == null) return;
+	HashSet container_accessors = collectSlots(container);
+	Iterator itr = container_accessors.iterator();
 
+	String old_arg = "__old_frame";
+	String new_arg = "__new_frame";
+	String old_var = "__old";
+	String new_var = "__new";
+	String classname = fixName(container, true);
+
+	writer.println("\n\n    protected void fireParentChanges(" +
+		       "DataFrame __raw_old, DataFrame __raw_new)");
+	writer.println("    {");
+	writer.println("        " +classname+ " " +old_arg+ " = ("
+		       +classname+ ") __raw_old;");
+	writer.println("        " +classname+ " " +new_arg+ " = ("
+		       +classname+ ") __raw_new;");
+	writer.println("        Object " +old_var+ ";");
+	writer.println("        Object " +new_var+ ";");
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    if(local_slots.containsKey(slot) || inheritsSlot(prototype, slot))
+		continue;
+
+	    String fixed_name = fixName(slot, true);
+	    String bean_name = fixName(slot, true, true);
+	    String reader = "get" +fixed_name+ "();";
+	    writer.println("        " +old_var+ " = " +old_arg+ "." + reader);
+	    writer.println("        " +new_var+ " = " +new_arg+ "." + reader);
+	    writer.println("        if (" +new_var+ " != null) {");
+	    writer.println("            if (" +old_var+ " == null || !"
+			   +old_var+ ".equals(" +new_var+ ")) {");
+	    writer.println("                fireChange(\"" +bean_name+ "\", "
+			   +old_var+ ", " +new_var+ ");");
+	    writer.println("            }");
+	    writer.println("        }");
+	}
+	writer.println("    }");
+
+	itr = container_accessors.iterator();
+	writer.println("\n\n    protected void fireParentChanges(DataFrame __raw)");
+	writer.println("    {");
+	writer.println("        " +classname+ " " +new_arg+ " = ("
+		       +classname+ ") __raw;");
+	writer.println("        Object " +new_var+ ";");
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    if(local_slots.containsKey(slot) || inheritsSlot(prototype, slot))
+		continue;
+
+	    String fixed_name = fixName(slot, true);
+	    String bean_name = fixName(slot, true, true);
+	    String reader = "get" +fixed_name+ "();";
+	    writer.println("        " +new_var+ " = " +new_arg+ "." + reader);
+	    writer.println("        if (" +new_var+ " != null) {");
+	    writer.println("            fireChange(\"" +bean_name+ "\", "
+			   +"null"+ ", " +new_var+ ");");
+	    writer.println("        }");
+	}
+	writer.println("    }");
+
+   }
 
     // Driver
 

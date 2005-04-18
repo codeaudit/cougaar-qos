@@ -121,8 +121,8 @@ public class DataFrame
     {
 	// Some frame I depend on has changed (parent only, for now).
 	// Resignal to my listeners.
-	if (log.isDebugEnabled())
-	    log.debug("Propagate PropertyChange " +event.getPropertyName()+
+	if (log.isInfoEnabled())
+	    log.info("Propagate PropertyChange " +event.getPropertyName()+
 		      " old value = " +event.getOldValue()+
 		      " new value = " +event.getNewValue());
 	pcs.firePropertyChange(event);
@@ -204,11 +204,28 @@ public class DataFrame
 	}
 	if (frameSet != null) frameSet.valueUpdated(this, slot, new_value);
 	String fixed_name = FrameGen.fixName(slot, true, true);
-	if (log.isDebugEnabled())
-	    log.shout("Fire PropertyChange " +fixed_name+
+	fireChange(fixed_name, old_value, new_value);
+    }
+
+    protected void fireChange(String property, 
+			      Object old_value, 
+			      Object new_value)
+    {
+	if (log.isInfoEnabled())
+	    log.info("Fire PropertyChange " +property+
 		      " old value = " +old_value+
 		      " new value = " +new_value);
-	pcs.firePropertyChange(fixed_name, old_value, new_value);
+	pcs.firePropertyChange(property, old_value, new_value);
+    }
+
+    protected void fireParentChanges(DataFrame old_frame, DataFrame new_frame)
+    {
+	// no-op at this level
+    }
+
+    protected void fireParentChanges(DataFrame new_frame)
+    {
+	// no-op at this level
     }
 
     protected void slotInitialized(String slot, Object value)
@@ -291,17 +308,21 @@ public class DataFrame
 
     void parentChange(DataFrame old_parent, DataFrame new_parent)
     {
-	if (log.isDebugEnabled())
-	    log.shout(" Old parent = " +old_parent+
+	if (log.isInfoEnabled())
+	    log.info(" Old parent = " +old_parent+
 		      " New parent = " +new_parent);
 	if (old_parent != null) {
 	    // No longer subscribe to changes on old parent
 	    old_parent.removePropertyChangeListener(this);
 	}
 	if (new_parent != null) {
-	    // Subscribe to changes on old parent.  Must also do
+	    // Subscribe to changes on new parent.  Must also do
 	    // immediate property changes for all parent accessors!
 	    new_parent.addPropertyChangeListener(this);
+	    if (old_parent != null)
+		fireParentChanges(old_parent, new_parent);
+	    else
+		fireParentChanges(new_parent);
 	}
     }
 
