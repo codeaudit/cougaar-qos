@@ -55,7 +55,7 @@ abstract public class FrameToFactFacetImpl
     // This should check the frameset_name!!!
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
-	       return (o instanceof Frame) &&
+	       return (o instanceof DataFrame) &&
 		    ((Frame) o).getFrameSet().getName().equals(frameset_name);
 	    }
 	};
@@ -75,8 +75,9 @@ abstract public class FrameToFactFacetImpl
 	linkPlayer();
     }
 
-    abstract protected Object frameToFact(Frame frame);
-    abstract protected Object changesToFact(Frame frame, Collection changes);
+    abstract protected Object frameToFact(DataFrame frame);
+    abstract protected Object changesToFact(DataFrame frame, 
+					    Collection changes);
 
     private void do_execute(BlackboardService bbs)
     {
@@ -93,7 +94,7 @@ abstract public class FrameToFactFacetImpl
 	// New Frames
 	en = sub.getAddedList();
 	while (en.hasMoreElements()) {
-	    Frame frame = (Frame) en.nextElement();
+	    DataFrame frame = (DataFrame) en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed added "+frame);
 	    }
@@ -110,7 +111,7 @@ abstract public class FrameToFactFacetImpl
 	// Changed Frames
 	en = sub.getChangedList();
 	while (en.hasMoreElements()) {
-	    Frame frame = (Frame) en.nextElement();
+	    DataFrame frame = (DataFrame) en.nextElement();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed changed "+frame);
 	    }

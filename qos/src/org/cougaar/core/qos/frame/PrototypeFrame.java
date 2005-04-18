@@ -105,7 +105,7 @@ public class PrototypeFrame
 		result = value;
 	    } else if (path_name != null) {
 		Path path = getFrameSet().findPath(path_name);
-		result = path.getValue(origin);
+		result = path.getValue((DataFrame) origin);
 	    } else {
 		if (log.isWarnEnabled())
 		    log.warn("Slot " +slot_name+ " is required by prototype "
@@ -116,7 +116,7 @@ public class PrototypeFrame
 	    return result;
 	} else {
 	    // Not owned by us, check super
-	    return getInheritedValue(origin, slot_name);
+	    return getInheritedValue((DataFrame) origin, slot_name);
 	}
     }
 

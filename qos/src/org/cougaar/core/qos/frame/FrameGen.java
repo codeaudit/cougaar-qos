@@ -181,11 +181,16 @@ public class FrameGen
 
     static String fixName(String name, boolean is_class)
     {
+	return fixName(name, is_class, false);
+    }
+
+    static String fixName(String name, boolean is_class, boolean is_bean)
+    {
 	if (is_class) {
-	    // camelize, or at least initial cap
+	    // camelize
 	    StringBuffer buf = new StringBuffer();
 	    char[] name_chars = name.toCharArray();
-	    boolean capitalize_next = true;
+	    boolean capitalize_next = !is_bean;
 	    for (int i=0; i<name_chars.length; i++) {
 		char next = name_chars[i];
 		if (next == '-') {
@@ -386,8 +391,8 @@ public class FrameGen
 	String value = attrs.getValue("value");
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = isStatic(prototype, slot, attrs);
-	String fixed_name = fixName(slot, false);
 	if (memberp) {
+	    String fixed_name = fixName(slot, false);
 	    writer.println("    protected Object " +fixed_name+ ";");
 	}
     }

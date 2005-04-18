@@ -86,12 +86,12 @@ public class Path
 	return name;
     }
 
-    Object getValue(Frame root)
+    Object getValue(DataFrame root)
     {
 	return getNextValue(root, 0);
     }
 
-    private Object getNextValue(Frame frame, int index)
+    private Object getNextValue(DataFrame frame, int index)
     {
 	if (log.isDebugEnabled())
 	    log.debug("Walking path " +name+
@@ -123,7 +123,7 @@ public class Path
 
 	Iterator itr = frames.iterator();
 	while (itr.hasNext()) {
-	    Frame next = (Frame) itr.next();
+	    DataFrame next = (DataFrame) itr.next();
 	    Object result = getNextValue(next, ++index);
 	    if (result != null) return result;
 	}

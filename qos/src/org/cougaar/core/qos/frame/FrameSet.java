@@ -64,7 +64,7 @@ public interface FrameSet
      * slot matches the given value.  If more than one frame matches,
      * the first match is returned.
      */
-    public Frame findFrame(String kind, String slot, Object value);
+    public DataFrame findFrame(String kind, String slot, Object value);
 
     /**
      * Returns the frame with the given UID. There can be at most one.
@@ -102,7 +102,7 @@ public interface FrameSet
      * Frame's current frameSet should be null.  As a result of this
      * operation the Frame will be published to the Blackboard.
      */
-    public Frame makeFrame(Frame frame);
+    public DataFrame makeFrame(DataFrame frame);
 
     /**
      * Creates a DataFrame of the given kind and with the given intial
@@ -110,7 +110,7 @@ public interface FrameSet
      * be generated automatically.  As a result of this operation the
      * Frame will be published to the Blackboard.
      */
-    public Frame makeFrame(String kind, Properties slots);
+    public DataFrame makeFrame(String kind, Properties slots);
 
     /**
      * Creates a DataFrame of the given kind and with the given intial
@@ -118,7 +118,7 @@ public interface FrameSet
      * specified.  As a result of this operation the Frame will be
      * published to the Blackboard.
      */
-    public Frame makeFrame(String kind, Properties slots, UID uid);
+    public DataFrame makeFrame(String kind, Properties slots, UID uid);
 
     /**
      * Creates a PrototypeFrame with the given name, parent prototype
@@ -142,7 +142,7 @@ public interface FrameSet
      * Creates a Path and adds it to the FrameSet As a result of this
      * operation the Path will be published to the Blackboard.
      */
-    public Path  makePath(String name, Path.Fork[] forks, String slot);
+    public Path makePath(String name, Path.Fork[] forks, String slot);
 
     /**
      * Removes the given Frame from the FrameSet.  As a result of this
@@ -155,22 +155,22 @@ public interface FrameSet
      * exact meaning of 'containment' is specific to the FrameSet
      * instance. 
      */
-    public Frame getParent(Frame frame);
+    public DataFrame getParent(DataFrame frame);
 
     /**
      * Returns the given DataFrame's PrototypeFrame.
      */
-    public Frame getPrototype(Frame frame);
+    public PrototypeFrame getPrototype(Frame frame);
 
     /**
      * Returns the matching 'parent' Frame in the given relationship.
      */
-    public Frame getRelationshipParent(Frame relationship);
+    public DataFrame getRelationshipParent(DataFrame relationship);
 
     /**
      * Returns the matching 'child' Frame in the given relationship.
      */
-    public Frame getRelationshipChild(Frame relationship);
+    public DataFrame getRelationshipChild(DataFrame relationship);
     
     /**
      * Inform the FrameSet that the given frame was changed in the

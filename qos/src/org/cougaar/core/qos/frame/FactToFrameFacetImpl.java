@@ -95,7 +95,7 @@ abstract public class FactToFrameFacetImpl
 
     abstract protected boolean isNewFrame(Object fact);
     abstract protected boolean isModifiedFrame(Object fact);
-    abstract protected Frame getFrame(Object fact);
+    abstract protected DataFrame getFrame(Object fact);
     abstract protected Object getModifications(Object fact);
     
     public void setupSubscriptions(BlackboardService bbs) 
@@ -133,7 +133,7 @@ abstract public class FactToFrameFacetImpl
 
     private void processNewFrame(Object fact)
     {
-	Frame frame = getFrame(fact);
+	DataFrame frame = getFrame(fact);
 	frame.addToFrameSet(frameSet);
     }
 

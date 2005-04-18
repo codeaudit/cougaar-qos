@@ -149,10 +149,10 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private Frame getRelate(Frame relationship,
-			    String proto_slot,
-			    String slot_slot,
-			    String value_slot)
+    private DataFrame getRelate(Frame relationship,
+				String proto_slot,
+				String slot_slot,
+				String value_slot)
     {
 	String proto = (String)
 	    relationship.getValue(proto_slot);
@@ -178,7 +178,7 @@ public class SingleInheritanceFrameSet
 	    
 	    return null;
 	} else {
-	    Frame result = findFrame(proto, slot, value);
+	    DataFrame result = (DataFrame) findFrame(proto, slot, value);
 	    if (result == null && log.isWarnEnabled())
 		if (result == null)
 		    log.warn(" Proto = " +proto+
@@ -201,7 +201,7 @@ public class SingleInheritanceFrameSet
 	return pkg;
     }
 
-    public Frame getRelationshipParent(Frame relationship)
+    public DataFrame getRelationshipParent(DataFrame relationship)
     {
 	return getRelate(relationship, 
 			 parent_proto_slot,
@@ -209,7 +209,7 @@ public class SingleInheritanceFrameSet
 			 parent_value_slot);
     }
 
-    public Frame getRelationshipChild(Frame relationship)
+    public DataFrame getRelationshipChild(DataFrame relationship)
     {
 	return getRelate(relationship,
 			 child_proto_slot,
@@ -225,15 +225,15 @@ public class SingleInheritanceFrameSet
 	synchronized (parents) {
 	    // cache a parent-child relationship
 		    
-	    Frame parent = getRelate(relationship,
-				     parent_proto_slot, 
-				     parent_slot_slot,
-				     parent_value_slot);
+	    DataFrame parent = getRelate(relationship,
+					 parent_proto_slot, 
+					 parent_slot_slot,
+					 parent_value_slot);
 
-	    Frame child = getRelate(relationship,
-				    child_proto_slot, 
-				    child_slot_slot,
-				    child_value_slot);
+	    DataFrame child = getRelate(relationship,
+					child_proto_slot, 
+					child_slot_slot,
+					child_value_slot);
 
 	    
 	    if (parent == null || child == null) {
@@ -243,6 +243,8 @@ public class SingleInheritanceFrameSet
 		}
 		return false;
 	    } else {
+		DataFrame old = (DataFrame) parents.get(child);
+		child.parentChange(old, parent);
 		parents.put(child, parent);
 		if (log.isInfoEnabled())
 		    log.info("Parent of " +child+ " is " +parent);
@@ -445,14 +447,14 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    public Frame findFrame(String proto, String slot, Object value)
+    public DataFrame findFrame(String proto, String slot, Object value)
     {
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
 		if (!(raw instanceof DataFrame)) continue;
-		Frame frame = (Frame) raw;
+		DataFrame frame = (DataFrame) raw;
 		// Check only local value [?]
 		if (descendsFrom(frame, proto)) {
 		    Object candidate = frame.getValue(slot);
@@ -682,15 +684,15 @@ public class SingleInheritanceFrameSet
 	publishChange(frame, changes);
     }
 
-    public Frame makeFrame(String proto, Properties values)
+    public DataFrame makeFrame(String proto, Properties values)
     {
 	UID uid = uids.nextUID();
 	return makeFrame(proto, values, uid);
     }
 
-    public Frame makeFrame(String proto, Properties values, UID uid)
+    public DataFrame makeFrame(String proto, Properties values, UID uid)
     {
-	Frame frame = DataFrame.newFrame(this, proto, uid, values);
+	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
 
 	if (isParentageRelation(frame)) establishParentage(frame);
 
@@ -699,7 +701,7 @@ public class SingleInheritanceFrameSet
 	return frame;
     }
 
-    public Frame makeFrame(Frame frame)
+    public DataFrame makeFrame(DataFrame frame)
     {
 	if (isParentageRelation(frame)) establishParentage(frame);
 
@@ -848,19 +850,19 @@ public class SingleInheritanceFrameSet
 	publishRemove(frame);
     }
 
-    public Frame getParent(Frame frame)
+    public DataFrame getParent(DataFrame frame)
     {
 	synchronized (parents) {
-	    return (Frame) parents.get(frame);
+	    return (DataFrame) parents.get(frame);
 	}
     }
 
-    public Frame getPrototype(Frame frame)
+    public PrototypeFrame getPrototype(Frame frame)
     {
 	String proto = frame.getKind();
 	if (proto == null) return null;
 	synchronized (prototypes) {
-	    return (Frame) prototypes.get(proto);
+	    return (PrototypeFrame) prototypes.get(proto);
 	}
     }
 

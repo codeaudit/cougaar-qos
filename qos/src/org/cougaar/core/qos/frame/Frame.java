@@ -53,7 +53,7 @@ abstract public class Frame
 
     private final UID uid;
     private final String kind;
-    private transient FrameSet frameSet;
+    protected transient FrameSet frameSet;
     private static Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.Frame.class);
 
@@ -65,19 +65,7 @@ abstract public class Frame
     }
 
     abstract public Properties getLocalSlots();
-
-    void addToFrameSet(FrameSet frameSet)
-    {
-	if (this.frameSet != null && this.frameSet != frameSet) {
-	    throw new RuntimeException(this +" is already in FrameSet "
-				       +this.frameSet+
-				       ".  It can't be added to FrameSet "
-				       +frameSet);
-	} else {
-	    this.frameSet = frameSet;
-	    frameSet.makeFrame(this);
-	}
-    }
+    abstract Object getValue(Frame origin, String slot);
 
 
     public Frame copy()
@@ -105,29 +93,11 @@ abstract public class Frame
 	return frameSet.descendsFrom(this, kind);
     }
 
-    public Frame relationshipParent()
-    {
-	if (frameSet == null) return null;
-	return frameSet.getRelationshipParent(this);
-    }
-
-    public Frame relationshipChild()
-    {
-	if (frameSet == null) return null;
-	return frameSet.getRelationshipChild(this);
-    }
-
     public String getKind()
     {
 	return kind;
     }
 
-
-    public String getParentKind()
-    {
-	Frame parent = parentFrame();
-	return parent == null ? null : parent.getKind();
-    }
 
     Frame getPrototype()
     {
@@ -135,17 +105,6 @@ abstract public class Frame
 	Frame result = frameSet.getPrototype(this);
 	if (result == null) {
 	    if (log.isWarnEnabled()) log.warn(this + " has no prototype!");
-	}
-	return result;
-    }
-
-    // Don't use a beany name here...
-    public Frame parentFrame()
-    {
-	if (frameSet == null) return null;
-	Frame result = frameSet.getParent(this);
-	if (result == null) {
-	    if (log.isDebugEnabled()) log.debug(this + " has no parent!");
 	}
 	return result;
     }
@@ -171,6 +130,13 @@ abstract public class Frame
     // These should only be called from the FrameSet owning the
     // frame. 
 
+    protected Object getInheritedValue(Frame origin, String slot)
+    {
+	if (frameSet == null) return null;
+	Frame prototype = frameSet.getPrototype(this);
+	if (prototype == null)  return null;
+	return prototype.getValue(origin, slot);
+    }
 
     Object getLocalValue(String slot)
     {
@@ -229,21 +195,6 @@ abstract public class Frame
 	}
     }
 
-    protected Object getInheritedValue(Frame origin, String slot)
-    {
-	if (frameSet == null) return null;
-	Frame prototype = frameSet.getPrototype(this);
-	if (prototype != null) {
-	    Object result = prototype.getValue(origin, slot);
-	    if (result != null) return result;
-	}
-	Frame parent = frameSet.getParent(this);
-	if (parent != null) {
-	    return parent.getValue(slot);
-	}
-	return null;
-    }
-
 
     public void setValue(String slot, Object value)
     {
@@ -264,21 +215,7 @@ abstract public class Frame
 	return getValue(this, slot);
     }
 
-    Object getValue(Frame origin, String slot)
-    {
-	Object result = getLocalValue(slot);
-	if (result != null) 
-	    return result;
-	else
-	    return getInheritedValue(origin, slot);
-    }
 
-
-    public Set findRelations(String role, String relation)
-    {
-	if (frameSet == null) return null;
-	return frameSet.findRelations(this, role, relation);
-    }
 
 
     // UniqueObject

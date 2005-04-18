@@ -26,6 +26,7 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.PrintWriter;
@@ -47,6 +48,7 @@ import org.cougaar.util.log.Logging;
  */
 public class DataFrame 
     extends Frame
+    implements PropertyChangeListener
 {
     private static transient Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
@@ -113,6 +115,21 @@ public class DataFrame
     }
 
 
+    // PropertyChangeListener
+
+    public void propertyChange(PropertyChangeEvent event)
+    {
+	// Some frame I depend on has changed (parent only, for now).
+	// Resignal to my listeners.
+	if (log.isDebugEnabled())
+	    log.debug("Propagate PropertyChange " +event.getPropertyName()+
+		      " old value = " +event.getOldValue()+
+		      " new value = " +event.getNewValue());
+	pcs.firePropertyChange(event);
+    }
+
+
+    // Jess ShadowFact
     public void addPropertyChangeListener(PropertyChangeListener pcl)
     {
 	pcs.addPropertyChangeListener(pcl);
@@ -123,25 +140,9 @@ public class DataFrame
 	pcs.removePropertyChangeListener(pcl);
     }
 
-    protected void slotModified(String slot, Object old_value, Object new_value)
-    {
-	synchronized (localSlots) {
-	    localSlots.add(slot);
-	}
-	FrameSet frameSet = getFrameSet();
-	if (frameSet != null) frameSet.valueUpdated(this, slot, new_value);
-	String fixed_name = FrameGen.fixName(slot, false);
-	pcs.firePropertyChange(fixed_name, old_value, new_value);
-    }
 
-    protected void slotInitialized(String slot, Object value)
-    {
-	synchronized (localSlots) {
-	    localSlots.add(slot);
-	}
-    }
 
-    // Only here for the Tasks servlet
+    // Public accesssors
     public Properties getLocalSlots()
     {
 	Properties props = new VisibleProperties();
@@ -156,6 +157,67 @@ public class DataFrame
 	return props;
     }
 
+    public DataFrame relationshipParent()
+    {
+	if (frameSet == null) return null;
+	return frameSet.getRelationshipParent(this);
+    }
+
+    public DataFrame relationshipChild()
+    {
+	if (frameSet == null) return null;
+	return frameSet.getRelationshipChild(this);
+    }
+
+    public String getParentKind()
+    {
+	Frame parent = parentFrame();
+	return parent == null ? null : parent.getKind();
+    }
+
+    // Don't use a beany name here...
+    public DataFrame parentFrame()
+    {
+	if (frameSet == null) return null;
+	DataFrame result = frameSet.getParent(this);
+	if (result == null) {
+	    if (log.isDebugEnabled()) log.debug(this + " has no parent!");
+	}
+	return result;
+    }
+
+    public Set findRelations(String role, String relation)
+    {
+	if (frameSet == null) return null;
+	return frameSet.findRelations(this, role, relation);
+    }
+
+
+
+
+    // Support
+
+    protected void slotModified(String slot, Object old_value, Object new_value)
+    {
+	synchronized (localSlots) {
+	    localSlots.add(slot);
+	}
+	if (frameSet != null) frameSet.valueUpdated(this, slot, new_value);
+	String fixed_name = FrameGen.fixName(slot, true, true);
+	if (log.isDebugEnabled())
+	    log.shout("Fire PropertyChange " +fixed_name+
+		      " old value = " +old_value+
+		      " new value = " +new_value);
+	pcs.firePropertyChange(fixed_name, old_value, new_value);
+    }
+
+    protected void slotInitialized(String slot, Object value)
+    {
+	synchronized (localSlots) {
+	    localSlots.add(slot);
+	}
+    }
+
     protected Object getProperty(String slot)
     {
 	return props.get(slot);
@@ -165,6 +227,42 @@ public class DataFrame
     {
 	props.put(slot, value);
     }
+
+    protected Object getInheritedValue(Frame origin, String slot)
+    {
+	Object result = super.getInheritedValue(origin, slot);
+	if (result != null) return result;
+
+	Frame parent = frameSet.getParent(this);
+	if (parent != null) {
+	    return parent.getValue(slot);
+	} else {
+	    return null;
+	}
+    }
+
+    Object getValue(Frame origin, String slot)
+    {
+	Object result = getLocalValue(slot);
+	if (result != null) 
+	    return result;
+	else
+	    return getInheritedValue(origin, slot);
+    }
+
+    void addToFrameSet(FrameSet frameSet)
+    {
+	if (this.frameSet != null && this.frameSet != frameSet) {
+	    throw new RuntimeException(this +" is already in FrameSet "
+				       +this.frameSet+
+				       ".  It can't be added to FrameSet "
+				       +frameSet);
+	} else {
+	    this.frameSet = frameSet;
+	    frameSet.makeFrame(this);
+	}
+    }
+
 
 
     void dumpLocalSlots(PrintWriter writer, int indentation, int offset)
@@ -191,6 +289,21 @@ public class DataFrame
     }
 
 
+    void parentChange(DataFrame old_parent, DataFrame new_parent)
+    {
+	if (log.isDebugEnabled())
+	    log.shout(" Old parent = " +old_parent+
+		      " New parent = " +new_parent);
+	if (old_parent != null) {
+	    // No longer subscribe to changes on old parent
+	    old_parent.removePropertyChangeListener(this);
+	}
+	if (new_parent != null) {
+	    // Subscribe to changes on old parent.  Must also do
+	    // immediate property changes for all parent accessors!
+	    new_parent.addPropertyChangeListener(this);
+	}
+    }
 
 
 }
