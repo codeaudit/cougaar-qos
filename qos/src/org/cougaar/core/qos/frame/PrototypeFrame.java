@@ -66,7 +66,7 @@ public class PrototypeFrame
 
     public Properties getLocalSlots()
     {
-	Properties result = new Properties();
+	Properties result = new VisibleProperties();
 	Iterator itr = slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();

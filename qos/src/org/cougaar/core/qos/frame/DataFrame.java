@@ -217,7 +217,7 @@ abstract public class DataFrame
 
     public Properties getAllSlots()
     {
-	Properties props = new Properties();
+	Properties props = new VisibleProperties();
 	Class klass = getClass();
 	java.lang.reflect.Method[] methods = klass.getMethods();
 	for (int i=0; i<methods.length; i++) {
