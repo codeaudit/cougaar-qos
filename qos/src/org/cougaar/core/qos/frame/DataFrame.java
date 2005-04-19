@@ -223,7 +223,14 @@ abstract public class DataFrame
 	    log.info("Fire PropertyChange " +property+
 		      " old value = " +old_value+
 		      " new value = " +new_value);
-	pcs.firePropertyChange(property, old_value, new_value);
+	// Both null: no change
+	if (old_value == null && new_value == null) return;
+
+	// One null, not: fire
+	if (old_value == null || new_value == null // One null, not
+	    || !old_value.equals(new_value) // Different non-nulls
+	    )
+	    pcs.firePropertyChange(property, old_value, new_value);
     }
 
     protected void fireParentChanges(DataFrame old_frame, DataFrame new_frame)
@@ -256,6 +263,11 @@ abstract public class DataFrame
     protected void setProperty(String slot, Object value)
     {
 	props.put(slot, value);
+    }
+
+    protected void removeProperty(String slot)
+    {
+	props.remove(slot);
     }
 
     protected Object getInheritedValue(Frame origin, String slot)

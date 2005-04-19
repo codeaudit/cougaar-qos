@@ -177,6 +177,28 @@ abstract public class Frame
 	}
     }
 
+    Object removeLocalValue(String slot)
+    {
+	// reflection
+	Class klass = getClass();
+	String mname = "remove" + FrameGen.fixName(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
+	    Object result = meth.invoke(this, ARGS0);
+	    if (log.isInfoEnabled())
+		log.info("Slot " +slot+ " of " +this+ " = " +result);
+	    return result;
+	} catch (Exception ex) {
+	    // This is not necessarily an error.  It could mean one of
+	    // our children was supposed to have this value and
+	    // didn't, so it asked us.
+	    if (log.isInfoEnabled())
+		log.info("Couldn't get slot " +slot+ " of " +this+
+			  " via " +mname);
+	    return null;
+	}
+    }
+
     private void initializeLocalValue(String slot, Object value)
     {
 	// reflection
