@@ -66,7 +66,7 @@ abstract public class Frame
 
     abstract public Properties getLocalSlots();
     abstract Object getValue(Frame origin, String slot);
-    abstract boolean isa(String kind);
+    abstract public boolean isa(String kind);
 
     public Frame copy()
     {
