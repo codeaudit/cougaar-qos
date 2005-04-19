@@ -10,9 +10,13 @@
 <p> <b>Frames</b> are a simple, lightweight form of knowledge
 representation.  A <b>DataFrame</b> is a unit of knowledge, consisting
 of a type specification (what kind of frame it is) and a set of
-name-value pairs representing its current state.  The pairs, also know
-as <b>slots</b>, can change dynamically at runtime.  The type of any
-given DataFrame is fixed for the lifetime of the Frame.</p>
+name-value pairs representing its current state.  The pairs, also
+known as <b>slots</b>, can change dynamically at runtime.  The type of
+any given DataFrame is fixed for the lifetime of the Frame.
+DataFrames can be treated as beans, more or less, with the standard
+form of accessor methods.  This allows DataFrames to be shadowed in
+Jess, which in turn means that rules can use slot values of
+DataFrames</p>
 
 <p> A DataFrame can represent either an entity or a binary
 relationship between other DataFrames.  In the latter case, each of
@@ -29,36 +33,44 @@ with optional default values.  </p>
 
 <p>Prototype meta-data is used for several purposes.  First, it's used
 to generate Java classes for the types.  DataFrame instances at run
-time will usually be instances of one of these generated classes.  In
+time will be instances of one of these generated classes.  In
 addition, the prototypes are also accessible at runtime as frames
 themselves, in particular as <b>PrototypeFrames</b>. </p>
 
-<p> In addition to the prototype hierarchy, the Cougaar frame system a
-second, independent hierarchy known as <b>containment</b>.  See <a
-href="#containment" >below</a>. Containment is a special relationship
-used to augment slot value lookup at runtime.  As one might expect,
-DataFrames can include a frame-specific value for any given slot.  If
-it does, no further work is required.  If it doesn't, the prototype
-hierarchy is searched for a default value or for a path specification
-(see <a href="#paths" >below</a> for more on paths).  If this fails as
-well, the containment hierarchy can then be searched.  This allows a
-DataFrame to have virtual access to slots defined by its logical
-container.</p>
 
 <p>Frames are organized into <b>FrameSets</b>, which is simply an
 organized collection of DataFrames and PrototypeFrames.  The latter
 can come and go dynamically; the former are associated with the
 FrameSet when it's made and are fixed for the life of the FrameSet
 (the structure is fixed -- specific slot values in PrototypeFrames are
-not).  <a name="containment"></a>Also fixed at FrameSet creation time
-is the containment relationship -- the particular relationship
-prototype use for the containment hierarchy.  </p>
+not).  The main job of a FrameSet is to provide a well-defined
+subspace of Frames.  It's also used to cache interesting
+relationships, including the relationship between a DataFrame and its
+Prototype, as well as the <a href="#containment">containment</a>
+relationshops.</p>
 
 <p>FrameSets can be created and populated via xml using the
-FrameSetService. Existing FrameSets can be found with that service.
-[...]  </p>
+<b>FrameSetService</b>, and existing FrameSets can be found with that
+service.  [more]  </p>
 
-<a name="paths"></a> <p>One of the novel features of the cougaar frame
+<p> <a name="containment"></a> One of the novel features of the
+Cougaar frame system is that it supports two independent
+hierarchies. In addition to the prototype hierarchy, the Cougaar frame
+system a second single-inheritance hierarchy known as
+<b>containment</b>. Containment is a special relationship used to
+augment slot value lookup at runtime.  As one might expect, DataFrames
+can include a frame-specific value for any given slot.  If it does, no
+further work is required.  If it doesn't, the prototype hierarchy is
+searched for a default value or for a path specification (see <a
+href="#paths">below</a> for more on paths).  If this fails as well,
+the containment hierarchy can then be searched.  This allows a
+DataFrame to have virtual access to slots defined by its logical
+container.  The containment relation is defined as part of FrameSet
+and fixed when the FrameSet is created.  This relation is another
+example of caching handled by the FrameSet. </p>
+
+
+<a name="paths"></a> <p>Another novel features of the Cougaar frame
 system is the <b>Path</b> specification.  The description of any given
 slot in a prototype can indicate that the value of that slot for some
 frame F is determined by following a particular path from F a runtime.
