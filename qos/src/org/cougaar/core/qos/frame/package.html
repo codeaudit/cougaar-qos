@@ -5,17 +5,17 @@
 </head>
 
 <body>
-<h1>Frames and FrameSets</h1>
 
 <p> <b>Frames</b> are a simple, lightweight form of knowledge
-representation.  A <b>DataFrame</b> is a unit of knowledge, consisting
-of a type specification (what kind of frame it is) and a set of
-name-value pairs representing its current state.  The pairs, also
-known as <b>slots</b>, can change dynamically at runtime.  The type of
-any given DataFrame is fixed for the lifetime of the Frame.
-DataFrames can be treated as beans, more or less, with the standard
-form of accessor methods.  This allows DataFrames to be shadowed in
-Jess, which in turn means that rules can use slot values of
+representation.  A <b>{@link org.cougaar.core.qos.frame.DataFrame}</b>
+is a unit of knowledge, consisting of a type specification (what kind
+of frame it is) and a set of name-value pairs representing its current
+state.  The pairs, also known as <b>slots</b>, can change dynamically
+at runtime.  The type of any given DataFrame is fixed for the lifetime
+of the Frame.  DataFrames can be treated as beans, more or less, with
+the standard form of accessor methods and with support for
+property-change notifications.  This allows DataFrames to be shadowed
+in Jess, which in turn means that rules can use slot values of
 DataFrames</p>
 
 <p> A DataFrame can represent either an entity or a binary
@@ -35,10 +35,11 @@ with optional default values.  </p>
 to generate Java classes for the types.  DataFrame instances at run
 time will be instances of one of these generated classes.  In
 addition, the prototypes are also accessible at runtime as frames
-themselves, in particular as <b>PrototypeFrames</b>. </p>
+themselves, in particular as <b>{@link
+org.cougaar.core.qos.frame.PrototypeFrame}</b> instances. </p>
 
 
-<p>Frames are organized into <b>FrameSets</b>, which is simply an
+<p>A <b>{@link org.cougaar.core.qos.frame.FrameSet}</b> is simply an
 organized collection of DataFrames and PrototypeFrames.  The latter
 can come and go dynamically; the former are associated with the
 FrameSet when it's made and are fixed for the life of the FrameSet
@@ -49,9 +50,9 @@ relationships, including the relationship between a DataFrame and its
 Prototype, as well as the <a href="#containment">containment</a>
 relationshops.</p>
 
-<p>FrameSets can be created and populated via xml using the
-<b>FrameSetService</b>, and existing FrameSets can be found with that
-service.  [more]  </p>
+<p>FrameSets can be created and populated via xml using the <b>{@link
+org.cougaar.core.qos.frame.FrameSetService}</b>, and existing
+FrameSets can be found with that service.  [more] </p>
 
 <p> <a name="containment"></a> One of the novel features of the
 Cougaar frame system is that it supports two independent
@@ -71,15 +72,20 @@ example of caching handled by the FrameSet. </p>
 
 
 <a name="paths"></a> <p>Another novel features of the Cougaar frame
-system is the <b>Path</b> specification.  The description of any given
-slot in a prototype can indicate that the value of that slot for some
-frame F is determined by following a particular path from F a runtime.
-A Path represents a kind of encapsulated visitor pattern.  It consists
-of an ordered series of <b>Forks</b> and a slot.  Each Fork refers to
-a relation and a role.  This allows any given frame to follow a path,
-one relationship at a time, to any related frame, arbitrarily far
-away.  When the final frame in the path is reached, the given slot
-value is returned as the value of the original slot referene.  <p>
+system is the <b>{@link org.cougaar.core.qos.frame.Path}</b>
+specification.  The description of any given slot in a prototype can
+indicate that the value of that slot for some frame F is determined by
+following a particular path from F a runtime.  A Path represents a
+kind of encapsulated visitor pattern.  It consists of an ordered
+series of <b>Forks</b> and a slot.  Each Fork refers to a relation and
+a role.  This allows any given frame to follow a path, one
+relationship at a time, to any related frame, arbitrarily far away.
+When the final frame in the path is reached, the given slot value is
+returned as the value of the original slot reference. NB: Although
+DataFrames generally act like beans, including property-change
+support, Path-valued slots are an exception at the moment: if the
+value of Path-valued slot changes, listeners will not be notified. We
+hope to deal with this in a future release. <p>
 
 
 
