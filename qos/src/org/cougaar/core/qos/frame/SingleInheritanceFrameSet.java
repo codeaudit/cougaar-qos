@@ -716,7 +716,7 @@ public class SingleInheritanceFrameSet
 	return path;
     }
 
-    // Will eventually be replaced by descendsFromReflective
+    // Replaced by reflection
     public boolean descendsFromOld(Frame frame, String prototype)
     {
 	String proto = frame.getKind();
@@ -758,7 +758,6 @@ public class SingleInheritanceFrameSet
     }
 
 
-    // Not using this yet, but soon...
     public boolean descendsFrom(DataFrame frame, String prototype)
     {
 	boolean result;
