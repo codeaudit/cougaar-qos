@@ -468,19 +468,15 @@ public class SingleInheritanceFrameSet
 
 
 
-    public Set findFrames(String proto, 
-			  Properties slot_value_pairs,
-			  boolean includePrototypes)
+    public Set findFrames(String proto, Properties slot_value_pairs)
     {
 	HashSet results = new HashSet();
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
-		if (!(raw instanceof Frame)) continue;
-		if (!includePrototypes && raw instanceof PrototypeFrame)
-		    continue;
-		Frame frame = (Frame) raw;
+		if (!(raw instanceof DataFrame)) continue;
+		DataFrame frame = (DataFrame) raw;
 		// Check only local value [?]
 		if (descendsFrom(frame, proto) &&
 		    frame.matchesSlots(slot_value_pairs))
@@ -499,7 +495,7 @@ public class SingleInheritanceFrameSet
 		Object raw = itr.next();
 		if (!(raw instanceof DataFrame)) continue;
 
-		Frame relationship = (Frame) raw;
+		DataFrame relationship = (DataFrame) raw;
 		
 
 		if (descendsFrom(relationship, relation_prototype)) {
@@ -529,7 +525,7 @@ public class SingleInheritanceFrameSet
 		Object raw = itr.next();
 		if (!(raw instanceof DataFrame)) continue;
 
-		Frame relationship = (Frame) raw;
+		DataFrame relationship = (DataFrame) raw;
 
 
 		if (descendsFrom(relationship, relation_prototype)) {
@@ -721,7 +717,7 @@ public class SingleInheritanceFrameSet
     }
 
     // Will eventually be replaced by descendsFromReflective
-    public boolean descendsFrom(Frame frame, String prototype)
+    public boolean descendsFromOld(Frame frame, String prototype)
     {
 	String proto = frame.getKind();
 	if (proto == null) return false;
@@ -733,7 +729,7 @@ public class SingleInheritanceFrameSet
 	    proto_frame = (Frame) prototypes.get(proto);
 	}
 	boolean result =
-	    proto_frame != null &&  descendsFrom(proto_frame, prototype);
+	    proto_frame != null &&  descendsFromOld(proto_frame, prototype);
 	return result;
     }
 
@@ -763,30 +759,37 @@ public class SingleInheritanceFrameSet
 
 
     // Not using this yet, but soon...
-    public boolean descendsFromReflective(Frame frame, String prototype)
+    public boolean descendsFrom(DataFrame frame, String prototype)
     {
+	boolean result;
 	Class klass = classForPrototype(prototype);
 	if (klass != null) {
-	    boolean result = false;
-	    if (frame instanceof PrototypeFrame) {
-		PrototypeFrame pframe = (PrototypeFrame) frame;
-		Class klass2 = classForPrototype(pframe.getName());
-		if (klass2 == null) 
-		    result = false;
-		else
-		    result = klass.isAssignableFrom(klass2);
-	    } else {
-		result = klass.isInstance(frame);
-	    }
-
-	    if (log.isDebugEnabled())
-		log.debug(frame+ 
-			  (result ? " descends from " : " does not descend from ") 
-			  +prototype);
-	    return result;
+	    result = klass.isInstance(frame);
 	} else {
-	    return false;
+	    result = false;
 	}
+	if (log.isDebugEnabled())
+	    log.debug(frame+ 
+		      (result ? " descends from " : " does not descend from ") 
+		      +prototype);
+	return result;
+    }
+
+    public boolean descendsFrom(PrototypeFrame frame, String prototype)
+    {
+	boolean result;
+	Class klass1 = classForPrototype(prototype);
+	Class klass2 = classForPrototype(frame.getName());
+	if (klass1 != null && klass2 != null)
+	    result = klass1.isAssignableFrom(klass2);
+	else
+	    result = false;
+
+	if (log.isDebugEnabled())
+	    log.debug(frame+ 
+		      (result ? " descends from " : " does not descend from ") 
+		      +prototype);
+	return result;
     }
 
     // In this case the proto argument refers to what the prototype

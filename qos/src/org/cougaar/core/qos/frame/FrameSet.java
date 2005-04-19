@@ -56,10 +56,16 @@ public interface FrameSet
      * Returns true iff the given frame matches the given prototype,
      * directly or indirectly.
      */
-    public boolean descendsFrom(Frame frame, String prototype);
+    public boolean descendsFrom(DataFrame frame, String prototype);
 
     /**
-     * Returns the frame that matches the given triple, ie, whose
+     * Returns true iff the given frame is an extension the given
+     * prototype, directly or indirectly.
+     */
+    public boolean descendsFrom(PrototypeFrame frame, String prototype);
+
+    /**
+     * Returns the DataFrame that matches the given triple, ie, whose
      * prototype matches the given kind and whose value for the given
      * slot matches the given value.  If more than one frame matches,
      * the first match is returned.
@@ -82,13 +88,10 @@ public interface FrameSet
     public Path findPath(UID uid);
 
     /**
-     * Returns a collection of all frames that match all the
-     * slot/value pairs.  {@link PrototypeFrame}s are ignored if
-     * includePrototypes is false.
+     * Returns a collection of DataFrames that match all the
+     * slot/value pairs.
      */
-    public Set findFrames(String kind, 
-			  Properties slot_value_pairs,
-			  boolean includePrototypes);
+    public Set findFrames(String kind, Properties slot_value_pairs);
 
     /**
      * Returns a collection of {@link DataFrame}s representing

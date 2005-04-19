@@ -136,6 +136,12 @@ public class PrototypeFrame
 	return "<Prototype " +prototype_name+ " " +getUID()+ ">";
     }
 
+    public boolean isa(String kind)
+    {
+	if (frameSet == null) return kind.equals(prototype_name);
+	return frameSet.descendsFrom(this, kind);
+    }
+
 
     void dumpLocalSlots(PrintWriter writer, int indentation, int offset)
     {

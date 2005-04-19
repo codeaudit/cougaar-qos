@@ -383,7 +383,7 @@ public class FrameViewerServlet extends ComponentServlet {
               i2.hasNext();
               ) {
 	      String k = ((PrototypeFrame) i2.next()).getName();
-            Set set = fs.findFrames(k, slot_value_pairs, false);
+            Set set = fs.findFrames(k, slot_value_pairs);
             if (set == null) continue;
             frames.addAll(set);
           }
@@ -392,7 +392,7 @@ public class FrameViewerServlet extends ComponentServlet {
 	  frames = new HashSet();
 	  frames.addAll(fs.getPrototypes());
       } else {
-        frames = fs.findFrames(kind, slot_value_pairs, false);
+        frames = fs.findFrames(kind, slot_value_pairs);
       }
 
       int nframes = (frames == null ? 0 : frames.size());

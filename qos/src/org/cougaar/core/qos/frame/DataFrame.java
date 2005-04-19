@@ -200,6 +200,12 @@ abstract public class DataFrame
 	return frameSet.findRelations(this, role, relation);
     }
 
+    public boolean isa(String kind)
+    {
+	if (frameSet == null) return kind.equals(getKind());
+	return frameSet.descendsFrom(this, kind);
+    }
+
 
 
 

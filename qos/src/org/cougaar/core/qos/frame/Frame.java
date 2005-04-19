@@ -66,7 +66,7 @@ abstract public class Frame
 
     abstract public Properties getLocalSlots();
     abstract Object getValue(Frame origin, String slot);
-
+    abstract boolean isa(String kind);
 
     public Frame copy()
     {
@@ -86,12 +86,6 @@ abstract public class Frame
     }
 
     // Basic accessors
-
-    public boolean isa(String kind)
-    {
-	if (frameSet == null) return kind.equals(this.kind);
-	return frameSet.descendsFrom(this, kind);
-    }
 
     public String getKind()
     {
