@@ -131,7 +131,7 @@ abstract public class DataFrame
 
     public void propertyChange(PropertyChangeEvent event)
     {
-	// Some frame I depend on has changed (parent only, for now).
+	// Some frame I depend on has changed (container only, for now).
 	// Resignal to my listeners.
 	if (log.isInfoEnabled())
 	    log.info("Propagate PropertyChange " +event.getPropertyName()+
@@ -196,19 +196,19 @@ abstract public class DataFrame
 	return frameSet.getRelationshipChild(this);
     }
 
-    public String getParentKind()
+    public String getContainerKind()
     {
-	Frame parent = parentFrame();
-	return parent == null ? null : parent.getKind();
+	Frame container = containerFrame();
+	return container == null ? null : container.getKind();
     }
 
     // Don't use a beany name here...
-    public DataFrame parentFrame()
+    public DataFrame containerFrame()
     {
 	if (frameSet == null) return null;
-	DataFrame result = frameSet.getParent(this);
+	DataFrame result = frameSet.getContainer(this);
 	if (result == null) {
-	    if (log.isDebugEnabled()) log.debug(this + " has no parent!");
+	    if (log.isDebugEnabled()) log.debug(this + " has no container!");
 	}
 	return result;
     }
@@ -285,12 +285,13 @@ abstract public class DataFrame
 	    pcs.firePropertyChange(property, old_value, new_value);
     }
 
-    protected void fireParentChanges(DataFrame old_frame, DataFrame new_frame)
+    protected void fireContainerChanges(DataFrame old_frame, 
+					DataFrame new_frame)
     {
 	// no-op at this level
     }
 
-    protected void fireParentChanges(DataFrame new_frame)
+    protected void fireContainerChanges(DataFrame new_frame)
     {
 	// no-op at this level
     }
@@ -329,9 +330,9 @@ abstract public class DataFrame
 
 	if (frameSet == null) return null;
 
-	Frame parent = frameSet.getParent(this);
-	if (parent != null) {
-	    return parent.getValue(slot);
+	Frame container = frameSet.getContainer(this);
+	if (container != null) {
+	    return container.getValue(slot);
 	} else {
 	    return null;
 	}
@@ -385,23 +386,23 @@ abstract public class DataFrame
     }
 
 
-    void parentChange(DataFrame old_parent, DataFrame new_parent)
+    void containerChange(DataFrame old_container, DataFrame new_container)
     {
 	if (log.isInfoEnabled())
-	    log.info(" Old parent = " +old_parent+
-		      " New parent = " +new_parent);
-	if (old_parent != null) {
-	    // No longer subscribe to changes on old parent
-	    old_parent.removePropertyChangeListener(this);
+	    log.info(" Old container = " +old_container+
+		      " New container = " +new_container);
+	if (old_container != null) {
+	    // No longer subscribe to changes on old container
+	    old_container.removePropertyChangeListener(this);
 	}
-	if (new_parent != null) {
-	    // Subscribe to changes on new parent.  Must also do
-	    // immediate property changes for all parent accessors!
-	    new_parent.addPropertyChangeListener(this);
-	    if (old_parent != null)
-		fireParentChanges(old_parent, new_parent);
+	if (new_container != null) {
+	    // Subscribe to changes on new container.  Must also do
+	    // immediate property changes for all container accessors!
+	    new_container.addPropertyChangeListener(this);
+	    if (old_container != null)
+		fireContainerChanges(old_container, new_container);
 	    else
-		fireParentChanges(new_parent);
+		fireContainerChanges(new_container);
 	}
     }
 

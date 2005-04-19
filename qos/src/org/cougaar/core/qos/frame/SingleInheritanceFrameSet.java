@@ -60,13 +60,13 @@ public class SingleInheritanceFrameSet
     private ArrayList change_queue;
     private Object change_queue_lock;
     private final String name;
-    private HashSet pending_parentage;
+    private HashSet pending_containment;
     private HashMap kb;
-    private HashMap prototypes, parents;
-    private HashSet parent_relations;
+    private HashMap prototypes, containers;
+    private HashSet container_relations;
     private String pkg;
     private String 
-	parent_relation,
+	container_relation,
 	parent_proto_slot,
 	parent_slot_slot,
 	parent_value_slot,
@@ -80,7 +80,7 @@ public class SingleInheritanceFrameSet
 				     ServiceBroker sb,
 				     BlackboardService bbs,
 				     String name,
-				     String parent_relation,
+				     String container_relation,
 				     String parent_proto_slot,
 				     String parent_slot_slot,
 				     String parent_value_slot,
@@ -99,15 +99,15 @@ public class SingleInheritanceFrameSet
 	uids = (UIDService)
 	    sb.getService(this, UIDService.class, null);
 
-	this.pending_parentage = new HashSet();
+	this.pending_containment = new HashSet();
  	this.kb = new HashMap();
 	this.prototypes = new HashMap();
-	this.parents = new HashMap();
+	this.containers = new HashMap();
 
 	// The kind tag of Frames representing a parent-child relationship
-	this.parent_relation = parent_relation;
-	this.parent_relations = new HashSet();
-	this.parent_relations.add(parent_relation);
+	this.container_relation = container_relation;
+	this.container_relations = new HashSet();
+	this.container_relations.add(container_relation);
 
 	// Any given Frame of this kind will have three slots each,
 	// for the parent and child respectively: a proto, a slot, and
@@ -131,16 +131,16 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    kb.put(object.getUID(), object);
 	}
-	if (object instanceof DataFrame) checkForPendingParentage(); // yuch
+	if (object instanceof DataFrame) checkForPendingContainment(); // yuch
     }
 
-    private void checkForPendingParentage()
+    private void checkForPendingContainment()
     {
-	synchronized (pending_parentage) {
-	    Iterator itr = pending_parentage.iterator();
+	synchronized (pending_containment) {
+	    Iterator itr = pending_containment.iterator();
 	    while (itr.hasNext()) {
 		Frame frame = (Frame) itr.next();
-		boolean success = establishParentage(frame);
+		boolean success = establishContainment(frame);
 		if (success) {
 		    itr.remove();
 		    return;
@@ -220,10 +220,10 @@ public class SingleInheritanceFrameSet
 
 
 
-    private boolean establishParentage(Frame relationship)
+    private boolean establishContainment(Frame relationship)
     {
-	synchronized (parents) {
-	    // cache a parent-child relationship
+	synchronized (containers) {
+	    // cache a containment relationship
 		    
 	    DataFrame parent = getRelate(relationship,
 					 parent_proto_slot, 
@@ -238,14 +238,14 @@ public class SingleInheritanceFrameSet
 	    
 	    if (parent == null || child == null) {
 		// Queue for later
-		synchronized (pending_parentage) {
-		    pending_parentage.add(relationship);
+		synchronized (pending_containment) {
+		    pending_containment.add(relationship);
 		}
 		return false;
 	    } else {
-		DataFrame old = (DataFrame) parents.get(child);
-		child.parentChange(old, parent);
-		parents.put(child, parent);
+		DataFrame old = (DataFrame) containers.get(child);
+		child.containerChange(old, parent);
+		containers.put(child, parent);
 		if (log.isInfoEnabled())
 		    log.info("Parent of " +child+ " is " +parent);
 		return true;
@@ -253,28 +253,28 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private void disestablishParentage(Frame relationship)
+    private void disestablishContainment(Frame relationship)
     {
-	synchronized (parents) {
-	    // decache a parent-child relationship
+	synchronized (containers) {
+	    // decache a containment relationship
 	    String child_proto = (String)
 		relationship.getValue(child_proto_slot);
 	    String child_slot = (String)
 		relationship.getValue(child_slot_slot);
 	    Object child_value = relationship.getValue(child_value_slot);
 	    Frame child = findFrame(child_proto, child_slot, child_value);
-	    if (child != null) parents.remove(child);
+	    if (child != null) containers.remove(child);
 	}
-	synchronized (pending_parentage) {
-	    pending_parentage.remove(relationship);
+	synchronized (pending_containment) {
+	    pending_containment.remove(relationship);
 	}
     }
 
-    private boolean isParentageRelation(Frame frame)
+    private boolean isContainmentRelation(Frame frame)
     {
 	String proto = frame.getKind();
-	synchronized (parent_relations) {
-	    return parent_relations.contains(proto);
+	synchronized (container_relations) {
+	    return container_relations.contains(proto);
 	}
     }
 
@@ -369,7 +369,7 @@ public class SingleInheritanceFrameSet
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("  package=\"" +pkg+ "\"");
 	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  frame-inheritance-relation=\"" +parent_relation+ "\"");
+	writer.println("  frame-inheritance-relation=\"" +container_relation+ "\"");
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("  parent-prototype=\"" +parent_proto_slot+ "\"");
 	for (int i=0; i<indentation; i++) writer.print(' ');
@@ -669,8 +669,8 @@ public class SingleInheritanceFrameSet
 
     public void valueUpdated(Frame frame, String slot, Object value)
     {
-	// handle the modification of parent-child relationship frames
-	if (isParentageRelation(frame))  establishParentage(frame);
+	// handle the modification of container relationship frames
+	if (isContainmentRelation(frame))  establishContainment(frame);
 
 	// Publish the frame itself as the change, or just a change
 	// record for the specific slot?
@@ -690,7 +690,7 @@ public class SingleInheritanceFrameSet
     {
 	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
 
-	if (isParentageRelation(frame)) establishParentage(frame);
+	if (isContainmentRelation(frame)) establishContainment(frame);
 
 	addObject(frame);
 	publishAdd(frame);
@@ -699,7 +699,7 @@ public class SingleInheritanceFrameSet
 
     public DataFrame makeFrame(DataFrame frame)
     {
-	if (isParentageRelation(frame)) establishParentage(frame);
+	if (isContainmentRelation(frame)) establishContainment(frame);
 
 	addObject(frame);
 	publishAdd(frame);
@@ -821,9 +821,9 @@ public class SingleInheritanceFrameSet
 		prototypes.put(proto, frame); 
 	    }
 	}
-	synchronized (parent_relations) { 
-	    if (descendsFrom(frame, parent_relation))
-		parent_relations.add(proto);
+	synchronized (container_relations) { 
+	    if (descendsFrom(frame, container_relation))
+		container_relations.add(proto);
 	}
 	addObject(frame);
 	publishAdd(frame);
@@ -846,16 +846,16 @@ public class SingleInheritanceFrameSet
 	    prototypes.remove(name); 
 	}
 
-	// Handle the removal of parent-child relationship frames
-	if (isParentageRelation(frame)) disestablishParentage(frame);
+	// Handle the removal of containment relationship frames
+	if (isContainmentRelation(frame)) disestablishContainment(frame);
 
 	publishRemove(frame);
     }
 
-    public DataFrame getParent(DataFrame frame)
+    public DataFrame getContainer(DataFrame frame)
     {
-	synchronized (parents) {
-	    return (DataFrame) parents.get(frame);
+	synchronized (containers) {
+	    return (DataFrame) containers.get(frame);
 	}
     }
 

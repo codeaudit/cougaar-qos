@@ -599,20 +599,20 @@ public class FrameGen
     {
 	String reader_name = "get"+fixName(slot, true);
 	String container_class = fixName(container, true);
-	String raw_parent_var = "__raw_parent";
-	String parent_var = "__parent";
+	String raw_container_var = "__raw_container";
+	String container_var = "__container";
 	writer.println("\n\n    public Object " +reader_name+ "()");
 	writer.println("    {");
-	writer.println("       Object " +raw_parent_var+ " = parentFrame();");
-	writer.println("       if ( " + raw_parent_var + " == null) return null;");
-	writer.println("       if (!("  +raw_parent_var+ " instanceof "
+	writer.println("       Object " +raw_container_var+ " = containerFrame();");
+	writer.println("       if ( " + raw_container_var + " == null) return null;");
+	writer.println("       if (!("  +raw_container_var+ " instanceof "
 		       +container_class+ ")) {");
-	writer.println("            getLogger().warn(\"Parent of \" +this+ \" is not a " +container_class+ ": \" + " +raw_parent_var+ ");");
+	writer.println("            getLogger().warn(\"Container of \" +this+ \" is not a " +container_class+ ": \" + " +raw_container_var+ ");");
 	writer.println("            return null;");
 	writer.println("       }");
-	writer.println("       " +container_class+  " " +parent_var+ " = ("
-		       +container_class+ ") " +raw_parent_var+ ";");
-	writer.println("       return " +parent_var+ "." +reader_name+ "();");
+	writer.println("       " +container_class+  " " +container_var+ " = ("
+		       +container_class+ ") " +raw_container_var+ ";");
+	writer.println("       return " +container_var+ "." +reader_name+ "();");
 	writer.println("    }");
     }
 
@@ -631,7 +631,7 @@ public class FrameGen
 	String new_var = "__new";
 	String classname = fixName(container, true);
 
-	writer.println("\n\n    protected void fireParentChanges(" +
+	writer.println("\n\n    protected void fireContainerChanges(" +
 		       "DataFrame __raw_old, DataFrame __raw_new)");
 	writer.println("    {");
 	writer.println("        " +classname+ " " +old_arg+ " = ("
@@ -661,7 +661,7 @@ public class FrameGen
 	writer.println("    }");
 
 	itr = container_accessors.iterator();
-	writer.println("\n\n    protected void fireParentChanges(DataFrame __raw)");
+	writer.println("\n\n    protected void fireContainerChanges(DataFrame __raw)");
 	writer.println("    {");
 	writer.println("        " +classname+ " " +new_arg+ " = ("
 		       +classname+ ") __raw;");

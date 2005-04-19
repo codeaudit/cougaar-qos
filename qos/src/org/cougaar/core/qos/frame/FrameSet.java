@@ -158,7 +158,7 @@ public interface FrameSet
      * exact meaning of 'containment' is specific to the FrameSet
      * instance. 
      */
-    public DataFrame getParent(DataFrame frame);
+    public DataFrame getContainer(DataFrame frame);
 
     /**
      * Returns the given DataFrame's PrototypeFrame.

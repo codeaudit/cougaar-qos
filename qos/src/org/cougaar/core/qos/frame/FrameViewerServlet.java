@@ -460,11 +460,11 @@ public class FrameViewerServlet extends ComponentServlet {
            proto.getKind()+" ("+linkToUID(proto.getUID())+")")+
           "</td></tr>\n");
       if (f instanceof DataFrame) {
-	  DataFrame parent = ((DataFrame) f).parentFrame();
+	  DataFrame container = ((DataFrame) f).containerFrame();
 	  out.print(
-		    "<tr><td>Parent: &nbsp;</td><td colspan=3>"+
-		    (parent == null ? "<i>null</i>" :
-		     parent.getKind()+" ("+linkToUID(parent.getUID())+")")+
+		    "<tr><td>Container: &nbsp;</td><td colspan=3>"+
+		    (container == null ? "<i>null</i>" :
+		     container.getKind()+" ("+linkToUID(container.getUID())+")")+
 		    "</td></tr>\n");
       }
       Properties vp = f.getLocalSlots();
