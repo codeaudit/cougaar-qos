@@ -29,7 +29,6 @@ package org.cougaar.core.qos.frame;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 
 import org.cougaar.core.blackboard.ChangeReport;
@@ -45,12 +44,6 @@ import org.cougaar.util.log.Logging;
 abstract public class Frame
     implements UniqueObject, Cloneable
 {
-    private static final Class[] TYPES0 = {};
-    private static final Object[] ARGS0 = {};
-
-    private static final Class[] TYPES1 = { Object.class };
-
-
     private final UID uid;
     private final String kind;
     protected transient FrameSet frameSet;
@@ -65,8 +58,9 @@ abstract public class Frame
     }
 
     abstract public Properties getLocalSlots();
-    abstract Object getValue(Frame origin, String slot);
+    abstract public void setValue(String slot, Object value);
     abstract public boolean isa(String kind);
+    abstract Object getValue(Frame origin, String slot);
 
     public Frame copy()
     {
@@ -132,99 +126,7 @@ abstract public class Frame
 	return prototype.getValue(origin, slot);
     }
 
-    Object getLocalValue(String slot)
-    {
-	// reflection
-	Class klass = getClass();
-	String mname = "get" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
-	    Object result = meth.invoke(this, ARGS0);
-	    if (log.isInfoEnabled())
-		log.info("Slot " +slot+ " of " +this+ " = " +result);
-	    return result;
-	} catch (Exception ex) {
-	    // This is not necessarily an error.  It could mean one of
-	    // our children was supposed to have this value and
-	    // didn't, so it asked us.
-	    if (log.isInfoEnabled())
-		log.info("Couldn't get slot " +slot+ " of " +this+
-			  " via " +mname);
-	    return null;
-	}
-    }
 
-    void setLocalValue(String slot, Object value)
-    {
-	// reflection
-	Class klass = getClass();
-	String mname = "set" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
-	    Object[] args1 = { value };
-	    meth.invoke(this, args1);
-	    if (log.isInfoEnabled())
-		log.info("Set slot " +slot+ " of " +this+ " to " + value);
-	} catch (Exception ex) {
-	    log.error("Error setting slot " +slot+ " of " +this+
-		      " via " +mname);
-	}
-    }
-
-    Object removeLocalValue(String slot)
-    {
-	// reflection
-	Class klass = getClass();
-	String mname = "remove" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
-	    Object result = meth.invoke(this, ARGS0);
-	    if (log.isInfoEnabled())
-		log.info("Slot " +slot+ " of " +this+ " = " +result);
-	    return result;
-	} catch (Exception ex) {
-	    // This is not necessarily an error.  It could mean one of
-	    // our children was supposed to have this value and
-	    // didn't, so it asked us.
-	    if (log.isInfoEnabled())
-		log.info("Couldn't get slot " +slot+ " of " +this+
-			  " via " +mname);
-	    return null;
-	}
-    }
-
-    private void initializeLocalValue(String slot, Object value)
-    {
-	// reflection
-	Class klass = getClass();
-	String mname = "initialize" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
-	    Object[] args1 = { value };
-	    meth.invoke(this, args1);
-	    if (log.isInfoEnabled())
-		log.info("Initializing slot " +slot+ " of " +this+ 
-			 " to " + value);
-	} catch (Exception ex) {
-	    log.error("Error initializing slot " +slot+ " of " +this+
-		      " via " +mname);
-	}
-    }
-
-
-    public void setValue(String slot, Object value)
-    {
-	setLocalValue(slot, value);
-    }
-
-    public void initializeValues(Properties values)
-    {
-	Iterator itr = values.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    initializeLocalValue((String) entry.getKey(), entry.getValue());
-	}
-    }
 
     public Object getValue(String slot)
     {

@@ -50,6 +50,11 @@ abstract public class DataFrame
     extends Frame
     implements PropertyChangeListener
 {
+    private static final Object[] ARGS0 = {};
+    private static final Class[] TYPES0 = {};
+    private static final Class[] TYPES1 = { Object.class };
+
+
     private static transient Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
 
@@ -165,6 +170,20 @@ abstract public class DataFrame
 	return props;
     }
 
+    public void setValue(String slot, Object value)
+    {
+	setLocalValue(slot, value);
+    }
+
+    public void initializeValues(Properties values)
+    {
+	Iterator itr = values.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    initializeLocalValue((String) entry.getKey(), entry.getValue());
+	}
+    }
+
     public DataFrame relationshipParent()
     {
 	if (frameSet == null) return null;
@@ -205,6 +224,33 @@ abstract public class DataFrame
 	if (frameSet == null) return kind.equals(getKind());
 	return frameSet.descendsFrom(this, kind);
     }
+
+    public Properties getAllSlots()
+    {
+	Properties props = new Properties();
+	Class klass = getClass();
+	java.lang.reflect.Method[] methods = klass.getMethods();
+	for (int i=0; i<methods.length; i++) {
+	    java.lang.reflect.Method meth = methods[i];
+	    Class rtype = meth.getReturnType();
+	    Class[] ptypes = meth.getParameterTypes();
+	    String name = meth.getName();
+	    if (rtype == Object.class && ptypes.length == 0 && name.startsWith("get")) {
+		try {
+		    Object value = meth.invoke(this, ARGS0);
+		    if (value != null) {
+			String attr_name = name.substring(3);
+			props.put(attr_name, value);
+		    }
+		} catch (Exception ex) {
+		    if (log.isWarnEnabled())
+			log.warn("Couldn't invoke " +name+ " on " +this);
+		}
+	    }
+	}
+	return props;
+    }
+
 
 
 
@@ -356,6 +402,86 @@ abstract public class DataFrame
 		fireParentChanges(old_parent, new_parent);
 	    else
 		fireParentChanges(new_parent);
+	}
+    }
+
+
+    private Object getLocalValue(String slot)
+    {
+	// reflection
+	Class klass = getClass();
+	String mname = "get" + FrameGen.fixName(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
+	    Object result = meth.invoke(this, ARGS0);
+	    if (log.isInfoEnabled())
+		log.info("Slot " +slot+ " of " +this+ " = " +result);
+	    return result;
+	} catch (Exception ex) {
+	    // This is not necessarily an error.  It could mean one of
+	    // our children was supposed to have this value and
+	    // didn't, so it asked us.
+	    if (log.isInfoEnabled())
+		log.info("Couldn't get slot " +slot+ " of " +this+
+			  " via " +mname);
+	    return null;
+	}
+    }
+
+    private void setLocalValue(String slot, Object value)
+    {
+	// reflection
+	Class klass = getClass();
+	String mname = "set" + FrameGen.fixName(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
+	    Object[] args1 = { value };
+	    meth.invoke(this, args1);
+	    if (log.isInfoEnabled())
+		log.info("Set slot " +slot+ " of " +this+ " to " + value);
+	} catch (Exception ex) {
+	    log.error("Error setting slot " +slot+ " of " +this+
+		      " via " +mname);
+	}
+    }
+
+    private Object removeLocalValue(String slot)
+    {
+	// reflection
+	Class klass = getClass();
+	String mname = "remove" + FrameGen.fixName(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
+	    Object result = meth.invoke(this, ARGS0);
+	    if (log.isInfoEnabled())
+		log.info("Slot " +slot+ " of " +this+ " = " +result);
+	    return result;
+	} catch (Exception ex) {
+	    // This is not necessarily an error.  It could mean one of
+	    // our children was supposed to have this value and
+	    // didn't, so it asked us.
+	    if (log.isInfoEnabled())
+		log.info("Couldn't get slot " +slot+ " of " +this+
+			  " via " +mname);
+	    return null;
+	}
+    }
+
+    private void initializeLocalValue(String slot, Object value)
+    {
+	// reflection
+	Class klass = getClass();
+	String mname = "initialize" + FrameGen.fixName(slot, true);
+	try {
+	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
+	    Object[] args1 = { value };
+	    meth.invoke(this, args1);
+	    if (log.isInfoEnabled())
+		log.info("Initializing slot " +slot+ " of " +this+ 
+			 " to " + value);
+	} catch (Exception ex) {
+	    log.error("Error initializing slot " +slot+ " of " +this+
+		      " via " +mname);
 	}
     }
 
