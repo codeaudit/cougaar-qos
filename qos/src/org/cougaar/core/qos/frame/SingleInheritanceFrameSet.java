@@ -125,19 +125,19 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    kb.put(object.getUID(), object);
 	}
-	if (object instanceof DataFrame) checkForPendingContainment(); // yuch
-    }
-
-    private void checkForPendingContainment()
-    {
-	synchronized (pending_containment) {
-	    Iterator itr = pending_containment.iterator();
-	    while (itr.hasNext()) {
-		DataFrame frame = (DataFrame) itr.next();
-		boolean success = establishContainment(frame);
-		if (success) {
-		    itr.remove();
-		    return;
+	if (object instanceof DataFrame) {
+	    // Any new DataFrame could potentially resolve up to two
+	    // pending containment relations.
+	    int resolved = 0;
+	    synchronized (pending_containment) {
+		Iterator itr = pending_containment.iterator();
+		while (itr.hasNext()) {
+		    DataFrame frame = (DataFrame) itr.next();
+		    boolean success = establishContainment(frame);
+		    if (success) {
+			itr.remove();
+			if (++resolved == 2) return;
+		    }
 		}
 	    }
 	}
