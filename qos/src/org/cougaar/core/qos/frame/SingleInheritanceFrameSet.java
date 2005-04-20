@@ -54,17 +54,21 @@ import org.cougaar.core.util.UniqueObject;
 public class SingleInheritanceFrameSet
     implements FrameSet
 {
-    private LoggingService log;
-    private UIDService uids;
-    private BlackboardService bbs;
-    private ArrayList change_queue;
-    private Object change_queue_lock;
     private final String name;
-    private HashSet pending_containment;
+    private final String pkg;
+    private final LoggingService log;
+    private final UIDService uids;
+    private final BlackboardService bbs;
+    private final Object change_queue_lock;
+    private ArrayList change_queue;
     private HashMap kb;
-    private HashMap prototypes, containers;
+    private HashMap cached_classes;
+    private HashMap prototypes;
+
+    // Containment hackery
+    private HashSet pending_containment;
+    private HashMap containers;
     private HashSet container_relations;
-    private String pkg;
     private String 
 	container_relation,
 	parent_proto_slot,
@@ -73,7 +77,6 @@ public class SingleInheritanceFrameSet
 	child_proto_slot,
 	child_slot_slot,
 	child_value_slot;
-    private HashMap cached_classes;
     
 
     public SingleInheritanceFrameSet(String pkg,
@@ -99,15 +102,17 @@ public class SingleInheritanceFrameSet
 	uids = (UIDService)
 	    sb.getService(this, UIDService.class, null);
 
-	this.pending_containment = new HashSet();
  	this.kb = new HashMap();
 	this.prototypes = new HashMap();
-	this.containers = new HashMap();
 
-	// The kind tag of Frames representing a parent-child relationship
+	// The kind tag of Frames representing the containment
+	// relationship
 	this.container_relation = container_relation;
 	this.container_relations = new HashSet();
 	this.container_relations.add(container_relation);
+
+	this.pending_containment = new HashSet();
+	this.containers = new HashMap();
 
 	// Any given Frame of this kind will have three slots each,
 	// for the parent and child respectively: a proto, a slot, and

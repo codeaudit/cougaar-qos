@@ -64,34 +64,50 @@ public class FrameSetParser
     }
 
     // Helper structs
-    private class FrameSpec
+    abstract private class FrameSpec
     {
-	String kind;
-	String parent;
 	Properties props;
-
-	FrameSpec(String kind, String parent)
+	String prototype;
+	FrameSpec(String prototype)
 	{
-	    this.kind = kind;
-	    this.parent = parent;
+	    this.prototype = prototype;
 	    props = new Properties();
 	}
-
-	Frame makePrototype(FrameSet frameSet)
-	{
-	    PrototypeFrame frame = frameSet.makePrototype(kind, parent, props);
-	    return frame;
-	}
-
-	Frame makeFrame(FrameSet frameSet)
-	{
-	    return frameSet.makeFrame(kind, props);
-	}
-
 
 	void put(String attr, Object value)
 	{
 	    props.put(attr, value);
+	}
+    }
+
+    private class DataFrameSpec
+	extends FrameSpec
+    {
+	DataFrameSpec(String prototype)
+	{
+	    super(prototype);
+	}
+
+	Frame makeFrame(FrameSet frameSet)
+	{
+	    return frameSet.makeFrame(prototype, props);
+	}
+    }
+
+    private class PrototypeSpec
+	extends FrameSpec
+    {
+	String name;
+
+	PrototypeSpec(String name, String prototype)
+	{
+	    super(prototype);
+	    this.name = name;
+	}
+
+	Frame makePrototype(FrameSet frameSet)
+	{
+	    return frameSet.makePrototype(name, prototype, props);
 	}
 
     }
@@ -131,8 +147,8 @@ public class FrameSetParser
 
     private String frame_set_name;
     private FrameSet frame_set;
-    private FrameSpec frame_spec;
-    private FrameSpec proto_spec;
+    private DataFrameSpec frame_spec;
+    private PrototypeSpec proto_spec;
     private PathSpec path_spec;
     private String current_slot;
     private HashMap path_specs;
@@ -292,7 +308,7 @@ public class FrameSetParser
 
 	String name = attrs.getValue("name");
 	String parent = attrs.getValue("prototype");
-	proto_spec = new FrameSpec(name, parent);
+	proto_spec = new PrototypeSpec(name, parent);
     }
 
     private void endPrototype()
@@ -310,7 +326,7 @@ public class FrameSetParser
 	    log.debug("startFrame");
 
 	String prototype = attrs.getValue("prototype");
-	frame_spec = new FrameSpec(prototype, null);
+	frame_spec = new DataFrameSpec(prototype);
     }
 
     private void endFrame()
