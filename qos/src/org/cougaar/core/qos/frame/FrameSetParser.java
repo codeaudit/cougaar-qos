@@ -83,14 +83,23 @@ public class FrameSetParser
     private class DataFrameSpec
 	extends FrameSpec
     {
-	DataFrameSpec(String prototype)
+	String reference;
+
+	DataFrameSpec(String prototype, String reference)
 	{
 	    super(prototype);
+	    this.reference = reference;
 	}
 
 	Frame makeFrame(FrameSet frameSet)
 	{
-	    return frameSet.makeFrame(prototype, props);
+	    Frame frame = frameSet.makeFrame(prototype, props);
+	    if (reference != null) {
+		synchronized (references) {
+		    references.put(reference, frame);
+		}
+	    }
+	    return frame;
 	}
     }
 
@@ -152,6 +161,7 @@ public class FrameSetParser
     private PathSpec path_spec;
     private String current_slot;
     private HashMap path_specs;
+    private HashMap references;
 
     private ServiceBroker sb;
     private BlackboardService bbs;
@@ -227,7 +237,7 @@ public class FrameSetParser
 	} else if (name.equals("fork")) {
 	    fork(attrs);
 	} else if (name.equals("frames")) {
-	    // no-op
+	    references = new HashMap();
 	} else if (name.equals("frame")) {
 	    startFrame(attrs);
 	} else if (name.equals("path")) {
@@ -244,7 +254,7 @@ public class FrameSetParser
 	} else if (name.equals("prototype")) {
 	    endPrototype();
 	} else if (name.equals("frames")) {
-	    // no-op
+	    references = null;
 	} else if (name.equals("frame")) {
 	    endFrame();
 	} else if (name.equals("path")) {
@@ -257,7 +267,16 @@ public class FrameSetParser
     {
 	if (current_slot != null) {
 	    String value = new String(buf, offset, length);
-// 	    log.shout("Setting " +current_slot+ " to " +value);
+	    if (value.startsWith("?")) {
+		// Better to look up the slot in the prototype to see
+		// if its type is 'reference'.  Do that later.
+		Frame ref;
+		synchronized (references) {
+		    ref = (Frame) references.get(value);
+		}
+		log.shout("Resolved " +value+ " to " +ref);
+		if (ref != null) value = ref.getUID().toString();
+	    }
 	    frame_spec.put(current_slot, value);
 	    current_slot = null;
 	}
@@ -326,7 +345,8 @@ public class FrameSetParser
 	    log.debug("startFrame");
 
 	String prototype = attrs.getValue("prototype");
-	frame_spec = new DataFrameSpec(prototype);
+	String reference = attrs.getValue("reference");
+	frame_spec = new DataFrameSpec(prototype, reference);
     }
 
     private void endFrame()
