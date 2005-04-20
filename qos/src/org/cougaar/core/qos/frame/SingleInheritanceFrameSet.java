@@ -59,7 +59,7 @@ public class SingleInheritanceFrameSet
     private final LoggingService log;
     private final UIDService uids;
     private final BlackboardService bbs;
-    private final Object change_queue_lock;
+    private final Object change_queue_lock, relation_lock;
     private ArrayList change_queue;
     private HashMap kb;
     private HashMap cached_classes;
@@ -93,6 +93,7 @@ public class SingleInheritanceFrameSet
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
 	this.change_queue_lock = new Object();
+	this.relation_lock = new Object();
 	log = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
 	uids = (UIDService)
@@ -148,43 +149,54 @@ public class SingleInheritanceFrameSet
 				String slot_slot,
 				String value_slot)
     {
-	String proto = (String)
-	    relationship.getValue(proto_slot);
-	String slot = (String)
-	    relationship.getValue(slot_slot);
-	Object value = relationship.getValue(value_slot);
+	synchronized (relation_lock) {
+	    DataFrame result = (DataFrame) cache.get(relationship);
+	    if (result != null) {
+		if (log.isInfoEnabled())
+		    log.info(" Found cached relation value " +result);
+		return result;
+	    }
 
-	if (slot == null || proto == null || value == null) {
-	    if (log.isWarnEnabled()) {
-		if (slot == null) {
-		    log.warn("Relationship " +relationship+
-			     " has no value for " +slot_slot);
+	    String proto = (String)
+		relationship.getValue(proto_slot);
+	    String slot = (String)
+		relationship.getValue(slot_slot);
+	    Object value = relationship.getValue(value_slot);
+
+	    if (slot == null || proto == null || value == null) {
+		if (log.isWarnEnabled()) {
+		    if (slot == null) {
+			log.warn("Relationship " +relationship+
+				 " has no value for " +slot_slot);
+		    }
+		    if (proto == null) {
+			log.warn("Relationship " +relationship+
+				 " has no value for " +proto_slot);
+		    }
+		    if (value == null) {
+			log.warn("Relationship " +relationship+
+				 " has no value for " +value_slot);
+		    }
 		}
-		if (proto == null) {
-		    log.warn("Relationship " +relationship+
-			     " has no value for " +proto_slot);
-		}
-		if (value == null) {
-		    log.warn("Relationship " +relationship+
-			     " has no value for " +value_slot);
-		}
+		
+		return null;
 	    }
 	    
-	    return null;
-	} else {
-	    DataFrame result = (DataFrame) findFrame(proto, slot, value);
-	    if (result == null && log.isWarnEnabled())
-		if (result == null)
+	    result = (DataFrame) findFrame(proto, slot, value);
+	    if (result == null) {
+		if (log.isWarnEnabled())
 		    log.warn(" Proto = " +proto+
 			     " Slot = " +slot+
 			     " Value = " +value+
 			     " matches nothing");
-	    if (result != null && log.isInfoEnabled())
-		log.info(" Proto = " +proto+
-			 " Slot = " +slot+
-			 " Value = " +value+
-			 " Result = " +result);
-		    
+	    } else {
+		if (log.isInfoEnabled())
+		    log.info(" Caching: Proto = " +proto+
+			     " Slot = " +slot+
+			     " Value = " +value+
+			     " Result = " +result);
+		cache.put(relationship, result);
+	    }
 	    return result;
 	}
     }
@@ -257,6 +269,11 @@ public class SingleInheritanceFrameSet
 	synchronized (pending_containment) {
 	    pending_containment.remove(relationship);
 	}
+    }
+
+    private boolean isRelation(DataFrame frame)
+    {
+	return descendsFrom(frame, root_relation.getName());
     }
 
     private boolean isContainmentRelation(DataFrame frame)
@@ -643,8 +660,16 @@ public class SingleInheritanceFrameSet
 
     public void valueUpdated(DataFrame frame, String slot, Object value)
     {
-	// handle the modification of container relationship frames
-	if (isContainmentRelation(frame))  establishContainment(frame);
+	if (isRelation(frame)) {
+	    synchronized (relation_lock) {
+		if (slot.equals(child_value_slot))
+		    child_cache.remove(frame);
+		else if (slot.equals(parent_value_slot))
+		    parent_cache.remove(frame);
+	    }
+	    if (isContainmentRelation(frame))  establishContainment(frame);
+	}
+	    
 
 	// Publish the frame itself as the change, or just a change
 	// record for the specific slot?
