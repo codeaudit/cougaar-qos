@@ -63,35 +63,32 @@ public class SingleInheritanceFrameSet
     private ArrayList change_queue;
     private HashMap kb;
     private HashMap cached_classes;
+    private HashMap parent_cache, child_cache;
     private HashMap prototypes;
 
     // Containment hackery
     private HashSet pending_containment;
     private HashMap containers;
-    private String 
-	container_relation,
-	parent_proto_slot,
-	parent_slot_slot,
-	parent_value_slot,
-	child_proto_slot,
-	child_slot_slot,
-	child_value_slot;
+    private PrototypeFrame root_relation, container_relation;
+
+    // Remove the pseudo generality
+    private static final String parent_proto_slot = "parent-prototype";
+    private static final String parent_slot_slot = "parent-slot";
+    private static final String parent_value_slot = "parent-value";
+    private static final String child_proto_slot = "child-prototype";
+    private static final String child_slot_slot = "child-slot";
+    private static final String child_value_slot = "child-value";
     
 
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
 				     BlackboardService bbs,
-				     String name,
-				     String container_relation,
-				     String parent_proto_slot,
-				     String parent_slot_slot,
-				     String parent_value_slot,
-				     String child_proto_slot,
-				     String child_slot_slot,
-				     String child_value_slot)
+				     String name)
     {
 	this.name = name;
 	this.cached_classes = new HashMap();
+	this.parent_cache = new HashMap();
+	this.child_cache = new HashMap();
 	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
@@ -104,25 +101,19 @@ public class SingleInheritanceFrameSet
  	this.kb = new HashMap();
 	this.prototypes = new HashMap();
 
-	// The kind tag of Frames representing the containment
-	// relationship
-	this.container_relation = container_relation;
-
 	this.pending_containment = new HashSet();
 	this.containers = new HashMap();
+    }
 
-	// Any given Frame of this kind will have three slots each,
-	// for the parent and child respectively: a proto, a slot, and
-	// value.  The names of these six slots in the relation Frame
-	// are given here
+    public void setRootRelation(PrototypeFrame frame)
+    {
+	this.root_relation = frame;
+    }
 
-	this.parent_proto_slot = parent_proto_slot;
-	this.parent_slot_slot = parent_slot_slot;
-	this.parent_value_slot = parent_value_slot;
 
-	this.child_proto_slot = child_proto_slot;
-	this.child_slot_slot = child_slot_slot;
-	this.child_value_slot = child_value_slot;
+    public void setContainerRelation(PrototypeFrame frame)
+    {
+	this.container_relation = frame;
     }
 
 
@@ -141,7 +132,7 @@ public class SingleInheritanceFrameSet
 	synchronized (pending_containment) {
 	    Iterator itr = pending_containment.iterator();
 	    while (itr.hasNext()) {
-		Frame frame = (Frame) itr.next();
+		DataFrame frame = (DataFrame) itr.next();
 		boolean success = establishContainment(frame);
 		if (success) {
 		    itr.remove();
@@ -151,7 +142,8 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private DataFrame getRelate(Frame relationship,
+    private DataFrame getRelate(DataFrame relationship,
+				HashMap cache,
 				String proto_slot,
 				String slot_slot,
 				String value_slot)
@@ -206,6 +198,7 @@ public class SingleInheritanceFrameSet
     public DataFrame getRelationshipParent(DataFrame relationship)
     {
 	return getRelate(relationship, 
+			 parent_cache,
 			 parent_proto_slot,
 			 parent_slot_slot,
 			 parent_value_slot);
@@ -214,6 +207,7 @@ public class SingleInheritanceFrameSet
     public DataFrame getRelationshipChild(DataFrame relationship)
     {
 	return getRelate(relationship,
+			 child_cache,
 			 child_proto_slot,
 			 child_slot_slot,
 			 child_value_slot);
@@ -222,20 +216,13 @@ public class SingleInheritanceFrameSet
 
 
 
-    private boolean establishContainment(Frame relationship)
+    private boolean establishContainment(DataFrame relationship)
     {
 	synchronized (containers) {
 	    // cache a containment relationship
 		    
-	    DataFrame parent = getRelate(relationship,
-					 parent_proto_slot, 
-					 parent_slot_slot,
-					 parent_value_slot);
-
-	    DataFrame child = getRelate(relationship,
-					child_proto_slot, 
-					child_slot_slot,
-					child_value_slot);
+	    DataFrame parent = getRelationshipParent(relationship);
+	    DataFrame child = getRelationshipChild(relationship);
 
 	    
 	    if (parent == null || child == null) {
@@ -255,7 +242,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private void disestablishContainment(Frame relationship)
+    private void disestablishContainment(DataFrame relationship)
     {
 	synchronized (containers) {
 	    // decache a containment relationship
@@ -274,7 +261,7 @@ public class SingleInheritanceFrameSet
 
     private boolean isContainmentRelation(DataFrame frame)
     {
-	return descendsFrom(frame, container_relation);
+	return descendsFrom(frame, container_relation.getName());
     }
 
 
@@ -498,15 +485,9 @@ public class SingleInheritanceFrameSet
 		
 
 		if (descendsFrom(relationship, relation_prototype)) {
-		    Frame p = getRelate(relationship,
-					parent_proto_slot, 
-					parent_slot_slot,
-					parent_value_slot);
+		    Frame p = getRelationshipParent(relationship);
 		    if ( p != null && p.equals(parent)) {
-			Frame child = getRelate(relationship,
-						child_proto_slot, 
-						child_slot_slot,
-						child_value_slot);
+			Frame child = getRelationshipChild(relationship);
 			if (child != null) results.add(child);
 		    }		    
 		}
@@ -528,19 +509,13 @@ public class SingleInheritanceFrameSet
 
 
 		if (descendsFrom(relationship, relation_prototype)) {
-		    Frame c = getRelate(relationship,
-					child_proto_slot, 
-					child_slot_slot,
-					child_value_slot);
+		    Frame c = getRelationshipChild(relationship);
 		    if (log.isDebugEnabled())
 			log.debug("Candidate = " +c+
 				  " child = " +child);
 
 		    if ( c != null && c.equals(child)) {
-			Frame parent = getRelate(relationship,
-						parent_proto_slot, 
-						parent_slot_slot,
-						parent_value_slot);
+			Frame parent = getRelationshipParent(relationship);
 			if (log.isDebugEnabled())
 			    log.debug("Adding parent " + parent);
 			if (parent != null) results.add(parent);

@@ -63,14 +63,16 @@ public class FrameSetParser
 	    System.setProperty(DRIVER_PROPERTY, DRIVER_DEFAULT);
     }
 
+
+
+
     // Helper structs
     abstract private class FrameSpec
     {
 	Properties props;
 	String prototype;
-	FrameSpec(String prototype)
+	FrameSpec()
 	{
-	    this.prototype = prototype;
 	    props = new Properties();
 	}
 
@@ -85,10 +87,11 @@ public class FrameSetParser
     {
 	String reference;
 
-	DataFrameSpec(String prototype, String reference)
+	DataFrameSpec(Attributes attrs)
 	{
-	    super(prototype);
-	    this.reference = reference;
+	    super();
+	    prototype = attrs.getValue("prototype");
+	    reference = attrs.getValue("reference");
 	}
 
 	Frame makeFrame(FrameSet frameSet)
@@ -107,16 +110,28 @@ public class FrameSetParser
 	extends FrameSpec
     {
 	String name;
+	boolean is_root, is_container;
 
-	PrototypeSpec(String name, String prototype)
+	PrototypeSpec(Attributes attrs)
 	{
-	    super(prototype);
-	    this.name = name;
+	    super();
+	    name = attrs.getValue("name");
+	    prototype = attrs.getValue("prototype");
+	    String rootp = attrs.getValue("root-relation");
+	    if (rootp != null)
+		is_root = rootp.equalsIgnoreCase("true");
+	    String containerp = attrs.getValue("container-relation");
+	    if (containerp != null)
+		is_container = containerp.equalsIgnoreCase("true");
 	}
 
 	Frame makePrototype(FrameSet frameSet)
 	{
-	    return frameSet.makePrototype(name, prototype, props);
+	    PrototypeFrame frame =
+		frameSet.makePrototype(name, prototype, props);
+	    if (is_root) frameSet.setRootRelation(frame);
+	    if (is_container) frameSet.setContainerRelation(frame);
+	    return frame;
 	}
 
     }
@@ -293,30 +308,13 @@ public class FrameSetParser
 
 	if (frame_set != null) return;
 
-	String pkg_prefix = attrs.getValue("package");
+	String pkg = attrs.getValue("package");
 	String inheritance = attrs.getValue("frame-inheritance");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	String relation_name = attrs.getValue("frame-inheritance-relation");
-	String parent_proto = attrs.getValue("parent-prototype");
-	String parent_slot = attrs.getValue("parent-slot");
-	String parent_value = attrs.getValue("parent-value");
-	String child_proto = attrs.getValue("child-prototype");
-	String child_slot = attrs.getValue("child-slot");
-	String child_value = attrs.getValue("child-value");
-
-	frame_set = new SingleInheritanceFrameSet(pkg_prefix,
-						  sb, bbs,
-						  frame_set_name,
-						  relation_name,
-						  parent_proto,
-						  parent_slot,
-						  parent_value,
-						  child_proto,
-						  child_slot,
-						  child_value);
+	frame_set = new SingleInheritanceFrameSet(pkg, sb, bbs, frame_set_name);
     }
 
 
@@ -325,9 +323,7 @@ public class FrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("startPrototype");
 
-	String name = attrs.getValue("name");
-	String parent = attrs.getValue("prototype");
-	proto_spec = new PrototypeSpec(name, parent);
+	proto_spec = new PrototypeSpec(attrs);
     }
 
     private void endPrototype()
@@ -344,9 +340,7 @@ public class FrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("startFrame");
 
-	String prototype = attrs.getValue("prototype");
-	String reference = attrs.getValue("reference");
-	frame_spec = new DataFrameSpec(prototype, reference);
+	frame_spec = new DataFrameSpec(attrs);
     }
 
     private void endFrame()
