@@ -151,7 +151,7 @@ public interface FrameSet
      * Removes the given Frame from the FrameSet.  As a result of this
      * operation the Frame will also be removed from the Blackboard.
      */
-    public void removeFrame(Frame frame);
+    public void removeFrame(DataFrame frame);
 
     /**
      * Returns the containing Frame of the given Frame, if any.  The
@@ -180,7 +180,7 @@ public interface FrameSet
      * given way.  As a result of this operation, a change will be
      * published to the Blackboard.
      */
-    public void valueUpdated(Frame frame, String slot, Object value);
+    public void valueUpdated(DataFrame frame, String slot, Object value);
 
     /**
      * Forcs the FrameSet to process any queued Blackboard operations.

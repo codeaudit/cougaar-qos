@@ -68,7 +68,6 @@ public class SingleInheritanceFrameSet
     // Containment hackery
     private HashSet pending_containment;
     private HashMap containers;
-    private HashSet container_relations;
     private String 
 	container_relation,
 	parent_proto_slot,
@@ -108,8 +107,6 @@ public class SingleInheritanceFrameSet
 	// The kind tag of Frames representing the containment
 	// relationship
 	this.container_relation = container_relation;
-	this.container_relations = new HashSet();
-	this.container_relations.add(container_relation);
 
 	this.pending_containment = new HashSet();
 	this.containers = new HashMap();
@@ -275,12 +272,9 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private boolean isContainmentRelation(Frame frame)
+    private boolean isContainmentRelation(DataFrame frame)
     {
-	String proto = frame.getKind();
-	synchronized (container_relations) {
-	    return container_relations.contains(proto);
-	}
+	return descendsFrom(frame, container_relation);
     }
 
 
@@ -672,7 +666,7 @@ public class SingleInheritanceFrameSet
     }
 
 
-    public void valueUpdated(Frame frame, String slot, Object value)
+    public void valueUpdated(DataFrame frame, String slot, Object value)
     {
 	// handle the modification of container relationship frames
 	if (isContainmentRelation(frame))  establishContainment(frame);
@@ -826,10 +820,6 @@ public class SingleInheritanceFrameSet
 		prototypes.put(proto, frame); 
 	    }
 	}
-	synchronized (container_relations) { 
-	    if (descendsFrom(frame, container_relation))
-		container_relations.add(proto);
-	}
 	addObject(frame);
 	publishAdd(frame);
 	return frame;
@@ -842,7 +832,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    public void removeFrame(Frame frame)
+    public void removeFrame(DataFrame frame)
     {
 	synchronized (kb) { kb.remove(frame.getUID()); }
 
