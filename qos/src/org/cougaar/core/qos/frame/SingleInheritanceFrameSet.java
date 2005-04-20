@@ -492,54 +492,74 @@ public class SingleInheritanceFrameSet
     Set findChildren(Frame parent, String relation_prototype)
     {
 	HashSet results = new HashSet();
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
+	synchronized (relation_lock) {
+	    Iterator itr = parent_cache.entrySet().iterator();
 	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof DataFrame)) continue;
-
-		DataFrame relationship = (DataFrame) raw;
-		
-
-		if (descendsFrom(relationship, relation_prototype)) {
-		    Frame p = getRelationshipParent(relationship);
-		    if ( p != null && p.equals(parent)) {
-			Frame child = getRelationshipChild(relationship);
-			if (child != null) results.add(child);
-		    }		    
+		Map.Entry entry = (Map.Entry) itr.next();
+		if (entry.getValue().equals(parent)) {
+		    DataFrame relation = (DataFrame) entry.getKey();
+		    results.add(child_cache.get(relation));
 		}
 	    }
 	}
+// 	synchronized (kb) {
+// 	    Iterator itr = kb.values().iterator();
+// 	    while (itr.hasNext()) {
+// 		Object raw = itr.next();
+// 		if (!(raw instanceof DataFrame)) continue;
+
+// 		DataFrame relationship = (DataFrame) raw;
+		
+
+// 		if (descendsFrom(relationship, relation_prototype)) {
+// 		    Frame p = getRelationshipParent(relationship);
+// 		    if ( p != null && p.equals(parent)) {
+// 			Frame child = getRelationshipChild(relationship);
+// 			if (child != null) results.add(child);
+// 		    }		    
+// 		}
+// 	    }
+// 	}
 	return results;
     }
 
     Set findParents(Frame child, String relation_prototype)
     {
 	HashSet results = new HashSet();
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
+	synchronized (relation_lock) {
+	    Iterator itr = child_cache.entrySet().iterator();
 	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof DataFrame)) continue;
-
-		DataFrame relationship = (DataFrame) raw;
-
-
-		if (descendsFrom(relationship, relation_prototype)) {
-		    Frame c = getRelationshipChild(relationship);
-		    if (log.isDebugEnabled())
-			log.debug("Candidate = " +c+
-				  " child = " +child);
-
-		    if ( c != null && c.equals(child)) {
-			Frame parent = getRelationshipParent(relationship);
-			if (log.isDebugEnabled())
-			    log.debug("Adding parent " + parent);
-			if (parent != null) results.add(parent);
-		    }		    
+		Map.Entry entry = (Map.Entry) itr.next();
+		if (entry.getValue().equals(child)) {
+		    DataFrame relation = (DataFrame) entry.getKey();
+		    results.add(parent_cache.get(relation));
 		}
 	    }
 	}
+// 	synchronized (kb) {
+// 	    Iterator itr = kb.values().iterator();
+// 	    while (itr.hasNext()) {
+// 		Object raw = itr.next();
+// 		if (!(raw instanceof DataFrame)) continue;
+
+// 		DataFrame relationship = (DataFrame) raw;
+
+
+// 		if (descendsFrom(relationship, relation_prototype)) {
+// 		    Frame c = getRelationshipChild(relationship);
+// 		    if (log.isDebugEnabled())
+// 			log.debug("Candidate = " +c+
+// 				  " child = " +child);
+
+// 		    if ( c != null && c.equals(child)) {
+// 			Frame parent = getRelationshipParent(relationship);
+// 			if (log.isDebugEnabled())
+// 			    log.debug("Adding parent " + parent);
+// 			if (parent != null) results.add(parent);
+// 		    }		    
+// 		}
+// 	    }
+// 	}
 	return results;
     }
 
@@ -662,10 +682,15 @@ public class SingleInheritanceFrameSet
     {
 	if (isRelation(frame)) {
 	    synchronized (relation_lock) {
-		if (slot.equals(child_value_slot))
+		if (slot.equals(child_value_slot)) {
 		    child_cache.remove(frame);
-		else if (slot.equals(parent_value_slot))
+		    // recache
+		    getRelationshipChild(frame);
+		} else if (slot.equals(parent_value_slot)) {
 		    parent_cache.remove(frame);
+		    // recache
+		    getRelationshipParent(frame);
+		}
 	    }
 	    if (isContainmentRelation(frame))  establishContainment(frame);
 	}
