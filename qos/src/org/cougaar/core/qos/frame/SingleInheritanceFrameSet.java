@@ -452,6 +452,9 @@ public class SingleInheritanceFrameSet
 
     public DataFrame findFrame(String proto, String slot, Object value)
     {
+	Class klass = classForPrototype(proto);
+	if (klass == null) return null;
+
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
 	    while (itr.hasNext()) {
@@ -459,7 +462,7 @@ public class SingleInheritanceFrameSet
 		if (!(raw instanceof DataFrame)) continue;
 		DataFrame frame = (DataFrame) raw;
 		// Check only local value [?]
-		if (descendsFrom(frame, proto)) {
+		if (descendsFrom(frame, klass, proto)) {
 		    Object candidate = frame.getValue(slot);
 		    if (candidate != null && candidate.equals(value)) 
 			return frame;
@@ -473,6 +476,9 @@ public class SingleInheritanceFrameSet
 
     public Set findFrames(String proto, Properties slot_value_pairs)
     {
+	Class klass = classForPrototype(proto);
+	if (klass == null) return null;
+
 	HashSet results = new HashSet();
 	synchronized (kb) {
 	    Iterator itr = kb.values().iterator();
@@ -481,7 +487,7 @@ public class SingleInheritanceFrameSet
 		if (!(raw instanceof DataFrame)) continue;
 		DataFrame frame = (DataFrame) raw;
 		// Check only local value [?]
-		if (descendsFrom(frame, proto) &&
+		if (descendsFrom(frame, klass, proto) &&
 		    frame.matchesSlots(slot_value_pairs))
 		    results.add(frame);
 	    }
@@ -784,13 +790,13 @@ public class SingleInheritanceFrameSet
 
     public boolean descendsFrom(DataFrame frame, String prototype)
     {
-	boolean result;
 	Class klass = classForPrototype(prototype);
-	if (klass != null) {
-	    result = klass.isInstance(frame);
-	} else {
-	    result = false;
-	}
+	return klass != null ? descendsFrom(frame, klass, prototype) : false;
+    }
+
+    boolean descendsFrom(DataFrame frame, Class klass, String prototype)
+    {
+	boolean result = klass.isInstance(frame);
 	if (log.isDebugEnabled())
 	    log.debug(frame+ 
 		      (result ? " descends from " : " does not descend from ") 
@@ -860,11 +866,6 @@ public class SingleInheritanceFrameSet
     public void removeFrame(DataFrame frame)
     {
 	synchronized (kb) { kb.remove(frame.getUID()); }
-
-	String name = (String) frame.getValue("name");
-	synchronized (prototypes) { 
-	    prototypes.remove(name); 
-	}
 
 	// Handle the removal of containment relationship frames
 	if (isContainmentRelation(frame)) disestablishContainment(frame);
