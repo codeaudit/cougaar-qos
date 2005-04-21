@@ -107,7 +107,7 @@ public class SingleInheritanceFrameSet
 	    kb.put(object.getUID(), object);
 	}
 	if (object instanceof RelationFrame) {
-	    checkRelation((RelationFrame) object);
+	    cacheRelation((RelationFrame) object);
 	} else if (object instanceof DataFrame) {
 	    // Any new DataFrame could potentially resolve as yet
 	    // unfilled values in relations.
@@ -116,7 +116,7 @@ public class SingleInheritanceFrameSet
 		Iterator itr = pending_relations.iterator();
 		while (itr.hasNext()) {
 		    RelationFrame frame = (RelationFrame) itr.next();
-		    boolean success = checkRelation(frame);
+		    boolean success = cacheRelation(frame);
 		    if (success) itr.remove();
 		}
 	    }
@@ -200,7 +200,7 @@ public class SingleInheritanceFrameSet
 		    parent_cache.remove(frame);
 		}
 	    }
-	    checkRelation(rframe);
+	    cacheRelation(rframe);
 	}
 	    
 
@@ -428,7 +428,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private boolean checkRelation(RelationFrame relationship)
+    private boolean cacheRelation(RelationFrame relationship)
     {
 	// cache a containment relationship
 		    
