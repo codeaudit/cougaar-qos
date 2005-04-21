@@ -61,10 +61,11 @@ public class SingleInheritanceFrameSet
     private final BlackboardService bbs;
     private final Object change_queue_lock, relation_lock;
     private ArrayList change_queue;
-    private HashMap kb;
-    private HashMap cached_classes;
-    private HashMap parent_cache, child_cache;
-    private HashMap prototypes;
+    private HashMap kb; // UID -> object
+    private HashMap cached_classes; // proto name -> Class
+    private HashMap prototypes; // proto name -> PrototypeFrame
+    private HashMap parent_cache, child_cache; // RelationFrame -> DataFrame
+    private HashMap paths; // path name -> Path
 
     // Containment hackery
     private HashSet pending_relations;
@@ -80,6 +81,7 @@ public class SingleInheritanceFrameSet
 	this.cached_classes = new HashMap();
 	this.parent_cache = new HashMap();
 	this.child_cache = new HashMap();
+	this.paths = new HashMap();
 	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
@@ -183,6 +185,9 @@ public class SingleInheritanceFrameSet
     {
 	UID uid = uids.nextUID();
 	Path path = new Path(uid, name, forks, slot);
+	synchronized (paths) {
+	    paths.put(name, path);
+	}
 	addObject(path);
 	publishAdd(path);
 	return path;
@@ -605,16 +610,9 @@ public class SingleInheritanceFrameSet
 
     public Path findPath(String name)
     {
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
-	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof Path)) continue;
-		Path path = (Path) raw;
-		if (path.getName().equals(name)) return path;
-	    }
+	synchronized (paths) {
+	    return (Path) paths.get(name);
 	}
-	return null;
     }
 
 
