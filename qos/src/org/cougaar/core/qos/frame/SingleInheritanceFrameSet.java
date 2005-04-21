@@ -66,6 +66,7 @@ public class SingleInheritanceFrameSet
     private HashMap prototypes; // proto name -> PrototypeFrame
     private HashMap parent_cache, child_cache; // RelationFrame -> DataFrame
     private HashMap paths; // path name -> Path
+    private HashSet frames; // all DataFrames
 
     // Containment hackery
     private HashSet pending_relations;
@@ -82,6 +83,7 @@ public class SingleInheritanceFrameSet
 	this.parent_cache = new HashMap();
 	this.child_cache = new HashMap();
 	this.paths = new HashMap();
+	this.frames = new HashSet();
 	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
@@ -111,6 +113,9 @@ public class SingleInheritanceFrameSet
 	if (object instanceof RelationFrame) {
 	    cacheRelation((RelationFrame) object);
 	} else if (object instanceof DataFrame) {
+	    synchronized (frames) {
+		frames.add(object);
+	    }
 	    // Any new DataFrame could potentially resolve as yet
 	    // unfilled values in relations.
 	    int resolved = 0;
@@ -506,8 +511,8 @@ public class SingleInheritanceFrameSet
 	Class klass = classForPrototype(proto);
 	if (klass == null) return null;
 
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
+	synchronized (frames) {
+	    Iterator itr = frames.iterator();
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
 		if (!(raw instanceof DataFrame)) continue;
@@ -529,8 +534,8 @@ public class SingleInheritanceFrameSet
 	if (klass == null) return null;
 
 	HashSet results = new HashSet();
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
+	synchronized (frames) {
+	    Iterator itr = frames.iterator();
 	    while (itr.hasNext()) {
 		Object raw = itr.next();
 		if (!(raw instanceof DataFrame)) continue;
