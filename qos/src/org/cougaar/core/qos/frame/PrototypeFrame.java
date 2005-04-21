@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.frame;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -50,6 +51,7 @@ public class PrototypeFrame
     private final String prototype_name;
     private transient Logger log = Logging.getLogger(getClass().getName());
     private transient Properties dynamic_values;
+    private HashMap path_cache;
     private Properties slots;
 
     PrototypeFrame(FrameSet frameSet, 
@@ -62,6 +64,7 @@ public class PrototypeFrame
 	this.prototype_name = prototype_name;
 	this.slots = slots;
 	this.dynamic_values = new Properties();
+	this.path_cache = new HashMap();
     }
 
     public Properties getLocalSlots()
@@ -104,7 +107,14 @@ public class PrototypeFrame
 	    if (value != null) {
 		result = value;
 	    } else if (path_name != null) {
-		Path path = getFrameSet().findPath(path_name);
+		Path path;
+		synchronized (path_cache) {
+		    path = (Path) path_cache.get(path_name);
+		    if (path == null) {
+			path = getFrameSet().findPath(path_name);
+			path_cache.put(path_name, path);
+		    }
+		}
 		result = path.getValue((DataFrame) origin);
 	    } else {
 		if (log.isWarnEnabled())
