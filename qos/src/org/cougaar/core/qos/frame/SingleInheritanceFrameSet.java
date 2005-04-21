@@ -67,7 +67,7 @@ public class SingleInheritanceFrameSet
     private HashMap prototypes;
 
     // Containment hackery
-    private HashSet pending_containment;
+    private HashSet pending_relations;
     private HashMap containers;
     private PrototypeFrame root_relation, container_relation;
 
@@ -93,10 +93,81 @@ public class SingleInheritanceFrameSet
  	this.kb = new HashMap();
 	this.prototypes = new HashMap();
 
-	this.pending_containment = new HashSet();
+	this.pending_relations = new HashSet();
 	this.containers = new HashMap();
     }
 
+
+    // Object creation
+    public DataFrame makeFrame(String proto, Properties values)
+    {
+	UID uid = uids.nextUID();
+	return makeFrame(proto, values, uid);
+    }
+
+    public DataFrame makeFrame(String proto, Properties values, UID uid)
+    {
+	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
+	addObject(frame);
+	publishAdd(frame);
+	return frame;
+    }
+
+    public DataFrame makeFrame(DataFrame frame)
+    {
+	addObject(frame);
+	publishAdd(frame);
+	return frame;
+    }
+
+    // In this case the proto argument refers to what the prototype
+    // should be a prototype of.  
+    public PrototypeFrame makePrototype(String proto, 
+					String parent, 
+					Properties values)
+    {
+	UID uid = uids.nextUID();
+	return makePrototype(proto, parent, values, uid);
+    }
+
+    public PrototypeFrame makePrototype(String proto, 
+					String parent, 
+					Properties values,
+					UID uid)
+    {
+	PrototypeFrame frame = null;
+	synchronized (prototypes) { 
+	    
+	    if (prototypes.containsKey(proto)) {
+		if (log.isWarnEnabled())
+		    log.warn("Ignoring prototype " +proto);
+		return null;
+	    } else {
+		frame = new PrototypeFrame(this, proto, parent, uid, values);
+		if (log.isDebugEnabled())
+		    log.debug("Adding prototype " +frame+
+			      " for " +proto);
+		prototypes.put(proto, frame); 
+	    }
+	}
+	addObject(frame);
+	publishAdd(frame);
+	return frame;
+    }
+
+    public Path makePath(String name, Path.Fork[] forks, String slot)
+    {
+	UID uid = uids.nextUID();
+	Path path = new Path(uid, name, forks, slot);
+	addObject(path);
+	publishAdd(path);
+	return path;
+    }
+
+
+
+
+    // Accessors
     public synchronized void setRootRelation(PrototypeFrame frame)
     {
 	if (root_relation != null)
@@ -114,30 +185,110 @@ public class SingleInheritanceFrameSet
 	container_relation = frame;
     }
 
-
-    private void addObject(UniqueObject object)
+    public String getName()
     {
-	if (log.isInfoEnabled())
-	    log.info("Adding  " +object);
-	synchronized (kb) {
-	    kb.put(object.getUID(), object);
+	return name;
+    }
+
+    public String getPackageName()
+    {
+	return pkg;
+    }
+
+    public Collection getPrototypes()
+    {
+	synchronized (prototypes) {
+	    return new ArrayList(prototypes.values());
 	}
-	if (object instanceof DataFrame) {
-	    // Any new DataFrame could potentially resolve up to two
-	    // pending containment relations.
-	    int resolved = 0;
-	    synchronized (pending_containment) {
-		Iterator itr = pending_containment.iterator();
-		while (itr.hasNext()) {
-		    RelationFrame frame = (RelationFrame) itr.next();
-		    boolean success = establishContainment(frame);
-		    if (success) {
-			itr.remove();
-			if (++resolved == 2) return;
-		    }
-		}
+    }
+
+
+
+    // Hierarchy
+
+    // Old version, replaced by reflection
+    public boolean descendsFromOld(Frame frame, String prototype)
+    {
+	String proto = frame.getKind();
+	if (proto == null) return false;
+	if (proto.equals(prototype)) {
+	    return true;
+	}
+	Frame proto_frame = null;
+	synchronized (prototypes) {
+	    proto_frame = (Frame) prototypes.get(proto);
+	}
+	boolean result =
+	    proto_frame != null &&  descendsFromOld(proto_frame, prototype);
+	return result;
+    }
+
+    private static final Object CNF = new Object();
+    public Class classForPrototype(String prototype)
+    {
+	// cache these!
+	synchronized (cached_classes) {
+	    Object klass = cached_classes.get(prototype);
+	    if (klass == CNF) return null;
+	    if (klass != null) return (Class) klass;
+
+	    
+	    String classname = pkg +"."+ FrameGen.fixName(prototype, true);
+	    try {
+		Class klass2 =  Class.forName(classname);
+		cached_classes.put(prototype, klass2);
+		return klass2;
+	    } catch (Exception ex) {
+		if (log.isWarnEnabled())
+		    log.warn("Couldn't find class for prototype " +prototype);
+		cached_classes.put(prototype, CNF);
+		return null;
 	    }
 	}
+    }
+
+
+    public boolean descendsFrom(DataFrame frame, String prototype)
+    {
+	Class klass = classForPrototype(prototype);
+	return klass != null ? descendsFrom(frame, klass, prototype) : false;
+    }
+
+    boolean descendsFrom(DataFrame frame, Class klass, String prototype)
+    {
+	boolean result = klass.isInstance(frame);
+	if (log.isDebugEnabled())
+	    log.debug(frame+ 
+		      (result ? " descends from " : " does not descend from ") 
+		      +prototype);
+	return result;
+    }
+
+    public boolean descendsFrom(PrototypeFrame frame, String prototype)
+    {
+	boolean result;
+	Class klass1 = classForPrototype(prototype);
+	Class klass2 = classForPrototype(frame.getName());
+	if (klass1 != null && klass2 != null)
+	    result = klass1.isAssignableFrom(klass2);
+	else
+	    result = false;
+
+	if (log.isDebugEnabled())
+	    log.debug(frame+ 
+		      (result ? " descends from " : " does not descend from ") 
+		      +prototype);
+	return result;
+    }
+
+
+
+
+    // Relationships
+
+    private boolean isContainmentRelation(DataFrame frame)
+    {
+	return descendsFrom(frame, container_relation.getName());
     }
 
     // Caller should synchronize on relation_lock
@@ -165,11 +316,6 @@ public class SingleInheritanceFrameSet
 	return result;
     }
 
-
-    public String getPackageName()
-    {
-	return pkg;
-    }
 
     public DataFrame getRelationshipParent(RelationFrame relationship)
     {
@@ -205,63 +351,382 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-
-
-
-    private boolean establishContainment(RelationFrame relationship)
+    private boolean checkRelation(RelationFrame relationship)
     {
-	synchronized (containers) {
-	    // cache a containment relationship
+	// cache a containment relationship
 		    
-	    DataFrame parent = getRelationshipParent(relationship);
-	    DataFrame child = getRelationshipChild(relationship);
+	DataFrame parent = getRelationshipParent(relationship);
+	DataFrame child = getRelationshipChild(relationship);
 
 	    
-	    if (parent == null || child == null) {
-		// Queue for later
-		synchronized (pending_containment) {
-		    pending_containment.add(relationship);
+	if (parent == null || child == null) {
+	    // Queue for later
+	    synchronized (pending_relations) {
+		pending_relations.add(relationship);
+	    }
+	    return false;
+	} else {
+	    if (isContainmentRelation(relationship)) {
+		synchronized (containers) {
+		    DataFrame old = (DataFrame) containers.get(child);
+		    child.containerChange(old, parent);
+		    containers.put(child, parent);
 		}
-		return false;
-	    } else {
-		DataFrame old = (DataFrame) containers.get(child);
-		child.containerChange(old, parent);
-		containers.put(child, parent);
 		if (log.isInfoEnabled())
 		    log.info("Parent of " +child+ " is " +parent);
-		return true;
+	    }
+	    return true;
+	}
+    }
+
+    private void decacheRelationship(RelationFrame relationship)
+    {
+	synchronized (relation_lock) {
+	    child_cache.remove(relationship);
+	    parent_cache.remove(relationship);
+	}
+	synchronized (pending_relations) {
+	    pending_relations.remove(relationship);
+	}
+	if (isContainmentRelation(relationship)) {
+	    synchronized (containers) {
+		Frame child = getRelationshipChild(relationship);
+		if (child != null) containers.remove(child);
 	    }
 	}
     }
 
-    private void disestablishContainment(RelationFrame relationship)
+
+
+
+    // Addding, removing, modifying
+    private void addObject(UniqueObject object)
+    {
+	if (log.isInfoEnabled())
+	    log.info("Adding  " +object);
+	synchronized (kb) {
+	    kb.put(object.getUID(), object);
+	}
+	if (object instanceof RelationFrame) {
+	    checkRelation((RelationFrame) object);
+	} else if (object instanceof DataFrame) {
+	    // Any new DataFrame could potentially resolve as yet
+	    // unfilled values in relations.
+	    int resolved = 0;
+	    synchronized (pending_relations) {
+		Iterator itr = pending_relations.iterator();
+		while (itr.hasNext()) {
+		    RelationFrame frame = (RelationFrame) itr.next();
+		    boolean success = checkRelation(frame);
+		    if (success) itr.remove();
+		}
+	    }
+	}
+    }
+
+    public void valueUpdated(DataFrame frame, String slot, Object value)
+    {
+	if (frame instanceof RelationFrame) {
+	    RelationFrame rframe = (RelationFrame) frame;
+	    synchronized (relation_lock) {
+		if (slot.startsWith("child")) {
+		    child_cache.remove(frame);
+		    // recache
+		    getRelationshipChild(rframe);
+		} else if (slot.startsWith("parent")) {
+		    parent_cache.remove(frame);
+		    // recache
+		    getRelationshipParent(rframe);
+		}
+	    }
+	    checkRelation(rframe);
+	}
+	    
+
+	// Publish the frame itself as the change, or just a change
+	// record for the specific slot?
+	ArrayList changes = new ArrayList(1);
+	Frame.Change change = new Frame.Change(frame.getUID(), slot, value);
+	changes.add(change);
+	publishChange(frame, changes);
+    }
+
+
+    public void removeFrame(DataFrame frame)
+    {
+	synchronized (kb) { kb.remove(frame.getUID()); }
+
+	// Handle the removal of containment relationship frames
+	if (frame instanceof RelationFrame) {
+	    RelationFrame rframe = (RelationFrame) frame;
+	    decacheRelationship(rframe);
+	}
+
+	publishRemove(frame);
+    }
+
+
+
+
+    // Query
+    public DataFrame getContainer(DataFrame frame)
     {
 	synchronized (containers) {
-	    // decache a containment relationship
-	    Frame child = getRelationshipChild(relationship);
-	    if (child != null) containers.remove(child);
-	}
-	synchronized (pending_containment) {
-	    pending_containment.remove(relationship);
+	    return (DataFrame) containers.get(frame);
 	}
     }
 
-
-    private boolean isContainmentRelation(DataFrame frame)
+    public PrototypeFrame getPrototype(Frame frame)
     {
-	return descendsFrom(frame, container_relation.getName());
+	String proto = frame.getKind();
+	if (proto == null) return null;
+	synchronized (prototypes) {
+	    return (PrototypeFrame) prototypes.get(proto);
+	}
+    }
+
+    public Frame findFrame(UID uid)
+    {
+	synchronized (kb) {
+	    Object raw = kb.get(uid);
+	    if (raw instanceof Frame)
+		return (Frame) raw;
+	    else
+		return null;
+	}
+    }
+
+    public DataFrame findFrame(String proto, String slot, Object value)
+    {
+	if (slot == null || proto == null || value == null) return null;
+
+	    
+	Class klass = classForPrototype(proto);
+	if (klass == null) return null;
+
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Object raw = itr.next();
+		if (!(raw instanceof DataFrame)) continue;
+		DataFrame frame = (DataFrame) raw;
+		// Check only local value [?]
+		if (descendsFrom(frame, klass, proto)) {
+		    Object candidate = frame.getValue(slot);
+		    if (candidate != null && candidate.equals(value)) 
+			return frame;
+		}
+	    }
+	}
+	return null;
+    }
+
+    public Set findFrames(String proto, Properties slot_value_pairs)
+    {
+	Class klass = classForPrototype(proto);
+	if (klass == null) return null;
+
+	HashSet results = new HashSet();
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Object raw = itr.next();
+		if (!(raw instanceof DataFrame)) continue;
+		DataFrame frame = (DataFrame) raw;
+		// Check only local value [?]
+		if (descendsFrom(frame, klass, proto) &&
+		    frame.matchesSlots(slot_value_pairs))
+		    results.add(frame);
+	    }
+	}
+	return results;
+      }
+
+    Set findChildren(Frame parent, String relation_prototype)
+    {
+	HashSet results = new HashSet();
+	synchronized (relation_lock) {
+	    Iterator itr = parent_cache.entrySet().iterator();
+	    while (itr.hasNext()) {
+		Map.Entry entry = (Map.Entry) itr.next();
+		if (entry.getValue().equals(parent)) {
+		    RelationFrame relation = (RelationFrame) entry.getKey();
+		    results.add(child_cache.get(relation));
+		}
+	    }
+	}
+	return results;
+    }
+
+    Set findParents(Frame child, String relation_prototype)
+    {
+	HashSet results = new HashSet();
+	synchronized (relation_lock) {
+	    Iterator itr = child_cache.entrySet().iterator();
+	    while (itr.hasNext()) {
+		Map.Entry entry = (Map.Entry) itr.next();
+		if (entry.getValue().equals(child)) {
+		    RelationFrame relation = (RelationFrame) entry.getKey();
+		    results.add(parent_cache.get(relation));
+		}
+	    }
+	}
+	return results;
+    }
+
+    public Set findRelations(Frame root, String role, String relation)
+    {
+	if (role.equals("parent")) {
+	    return findParents(root, relation);
+	} else if (role.equals("child")) {
+	    return findChildren(root, relation);
+	} else {
+	    if (log.isWarnEnabled())
+		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+	    return null;
+	}
+				
+    }
+
+    public Path findPath(UID uid)
+    {
+	synchronized (kb) {
+	    Object raw = kb.get(uid);
+	    if (raw instanceof Path)
+		return (Path) raw;
+	    else
+		return null;
+	}
+    }
+
+    public Path findPath(String name)
+    {
+	synchronized (kb) {
+	    Iterator itr = kb.values().iterator();
+	    while (itr.hasNext()) {
+		Object raw = itr.next();
+		if (!(raw instanceof Path)) continue;
+		Path path = (Path) raw;
+		if (path.getName().equals(name)) return path;
+	    }
+	}
+	return null;
     }
 
 
 
-    public String getName()
-    {
-	return name;
+
+		
+    // BBS queue
+
+    private static class Add {
+	UniqueObject object;
+	Add(UniqueObject object)
+	{
+	    this.object = object;
+	}
     }
+
+    private static class Change {
+	UniqueObject object;
+	Collection changes;
+	Change(UniqueObject object, Collection changes)
+	{
+	    this.object = object;
+	    this.changes = changes;
+	}
+    }
+
+    private static class Remove {
+	UniqueObject object;
+	Remove(UniqueObject object)
+	{
+	    this.object = object;
+	}
+    }
+
+
+    // Synchronized for a shorter time but doesn't work reliably.
+    // Sometimes items are added while this is in progress and
+    // execute doesn't run again.
+    public void processQueue()
+    {
+	ArrayList changes = null;
+	synchronized (change_queue_lock) {
+	    changes = new ArrayList(change_queue);
+	    change_queue = new ArrayList();
+	}
+	int count = changes.size();
+	for (int i=0; i<count; i++) {
+	    Object change = changes.get(i);
+	    if (log.isDebugEnabled())
+		log.debug("about to publish " + change);
+	    if (change instanceof Change) {
+		Change chng = (Change) change;
+		bbs.publishChange(chng.object, chng.changes);
+	    } else  if (change instanceof Add) {
+		Add add = (Add) change;
+		bbs.publishAdd(add.object);
+	    } else  if (change instanceof Remove) {
+		Remove rem = (Remove) change;
+		bbs.publishRemove(rem.object);
+	    }
+	}
+    }
+
+    // Old version
+    public void processQueueSlow()
+    {
+	synchronized (change_queue_lock) {
+	    int count = change_queue.size();
+	    for (int i=0; i<count; i++) {
+		Object change = change_queue.get(i);
+		if (change instanceof Change) {
+		    Change chng = (Change) change;
+		    bbs.publishChange(chng.object, chng.changes);
+		} else  if (change instanceof Add) {
+		    Add add = (Add) change;
+		    bbs.publishAdd(add.object);
+		} else  if (change instanceof Remove) {
+		    Remove rem = (Remove) change;
+		    bbs.publishRemove(rem.object);
+		}
+	    }
+	    change_queue.clear();
+	}
+    }
+	
+    void publishAdd(UniqueObject object)
+    {
+	synchronized (change_queue_lock) {
+	    change_queue.add(new Add(object));
+	    bbs.signalClientActivity();
+	}
+    }
+
+    void publishChange(UniqueObject object, ArrayList changes)
+    {
+	synchronized (change_queue_lock) {
+	    change_queue.add(new Change(object, changes));
+	    bbs.signalClientActivity();
+	}
+    }
+
+    void publishRemove(UniqueObject object)
+    {
+	synchronized (change_queue_lock) {
+	    change_queue.add(new Remove(object));
+	    bbs.signalClientActivity();
+	}
+    }
+
+
+
 
 
 
     // XML dumping
+
     void dumpDataFrames(PrintWriter writer, int indentation, int offset)
     {
 	synchronized (kb) {
@@ -365,455 +830,6 @@ public class SingleInheritanceFrameSet
     {
 	dumpPrototypes(proto_file, 0, 2);
 	dumpData(data_file, 0, 2);
-    }
-
-
-    public Path findPath(UID uid)
-    {
-	synchronized (kb) {
-	    Object raw = kb.get(uid);
-	    if (raw instanceof Path)
-		return (Path) raw;
-	    else
-		return null;
-	}
-    }
-
-    public Path findPath(String name)
-    {
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
-	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof Path)) continue;
-		Path path = (Path) raw;
-		if (path.getName().equals(name)) return path;
-	    }
-	}
-	return null;
-    }
-
-
-		
-    public Frame findFrame(UID uid)
-    {
-	synchronized (kb) {
-	    Object raw = kb.get(uid);
-	    if (raw instanceof Frame)
-		return (Frame) raw;
-	    else
-		return null;
-	}
-    }
-
-    public DataFrame findFrame(String proto, String slot, Object value)
-    {
-	if (slot == null || proto == null || value == null) return null;
-
-	    
-	Class klass = classForPrototype(proto);
-	if (klass == null) return null;
-
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
-	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof DataFrame)) continue;
-		DataFrame frame = (DataFrame) raw;
-		// Check only local value [?]
-		if (descendsFrom(frame, klass, proto)) {
-		    Object candidate = frame.getValue(slot);
-		    if (candidate != null && candidate.equals(value)) 
-			return frame;
-		}
-	    }
-	}
-	return null;
-    }
-
-
-
-    public Set findFrames(String proto, Properties slot_value_pairs)
-    {
-	Class klass = classForPrototype(proto);
-	if (klass == null) return null;
-
-	HashSet results = new HashSet();
-	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
-	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof DataFrame)) continue;
-		DataFrame frame = (DataFrame) raw;
-		// Check only local value [?]
-		if (descendsFrom(frame, klass, proto) &&
-		    frame.matchesSlots(slot_value_pairs))
-		    results.add(frame);
-	    }
-	}
-	return results;
-      }
-
-    Set findChildren(Frame parent, String relation_prototype)
-    {
-	HashSet results = new HashSet();
-	synchronized (relation_lock) {
-	    Iterator itr = parent_cache.entrySet().iterator();
-	    while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry) itr.next();
-		if (entry.getValue().equals(parent)) {
-		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    results.add(child_cache.get(relation));
-		}
-	    }
-	}
-	return results;
-    }
-
-    Set findParents(Frame child, String relation_prototype)
-    {
-	HashSet results = new HashSet();
-	synchronized (relation_lock) {
-	    Iterator itr = child_cache.entrySet().iterator();
-	    while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry) itr.next();
-		if (entry.getValue().equals(child)) {
-		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    results.add(parent_cache.get(relation));
-		}
-	    }
-	}
-	return results;
-    }
-
-    public Set findRelations(Frame root, String role, String relation)
-    {
-	if (role.equals("parent")) {
-	    return findParents(root, relation);
-	} else if (role.equals("child")) {
-	    return findChildren(root, relation);
-	} else {
-	    if (log.isWarnEnabled())
-		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
-	    return null;
-	}
-				
-    }
-
-    private static class Add {
-	UniqueObject object;
-	Add(UniqueObject object)
-	{
-	    this.object = object;
-	}
-    }
-
-    private static class Change {
-	UniqueObject object;
-	Collection changes;
-	Change(UniqueObject object, Collection changes)
-	{
-	    this.object = object;
-	    this.changes = changes;
-	}
-    }
-
-    private static class Remove {
-	UniqueObject object;
-	Remove(UniqueObject object)
-	{
-	    this.object = object;
-	}
-    }
-
-
-    // Synchronized for a shorter time but doesn't work reliably.
-    // Sometimes items are added while this is in progress and
-    // execute doesn't run again.
-    public void processQueue()
-    {
-	ArrayList changes = null;
-	synchronized (change_queue_lock) {
-	    changes = new ArrayList(change_queue);
-	    change_queue = new ArrayList();
-	}
-	int count = changes.size();
-	for (int i=0; i<count; i++) {
-	    Object change = changes.get(i);
-	    if (log.isDebugEnabled())
-		log.debug("about to publish " + change);
-	    if (change instanceof Change) {
-		Change chng = (Change) change;
-		bbs.publishChange(chng.object, chng.changes);
-	    } else  if (change instanceof Add) {
-		Add add = (Add) change;
-		bbs.publishAdd(add.object);
-	    } else  if (change instanceof Remove) {
-		Remove rem = (Remove) change;
-		bbs.publishRemove(rem.object);
-	    }
-	}
-    }
-
-    public void processQueueSlow()
-    {
-	synchronized (change_queue_lock) {
-	    int count = change_queue.size();
-	    for (int i=0; i<count; i++) {
-		Object change = change_queue.get(i);
-		if (change instanceof Change) {
-		    Change chng = (Change) change;
-		    bbs.publishChange(chng.object, chng.changes);
-		} else  if (change instanceof Add) {
-		    Add add = (Add) change;
-		    bbs.publishAdd(add.object);
-		} else  if (change instanceof Remove) {
-		    Remove rem = (Remove) change;
-		    bbs.publishRemove(rem.object);
-		}
-	    }
-	    change_queue.clear();
-	}
-    }
-	
-    void publishAdd(UniqueObject object)
-    {
-	synchronized (change_queue_lock) {
-	    change_queue.add(new Add(object));
-	    bbs.signalClientActivity();
-	}
-    }
-
-    void publishChange(UniqueObject object, ArrayList changes)
-    {
-	synchronized (change_queue_lock) {
-	    change_queue.add(new Change(object, changes));
-	    bbs.signalClientActivity();
-	}
-    }
-
-    void publishRemove(UniqueObject object)
-    {
-	synchronized (change_queue_lock) {
-	    change_queue.add(new Remove(object));
-	    bbs.signalClientActivity();
-	}
-    }
-
-
-    public void valueUpdated(DataFrame frame, String slot, Object value)
-    {
-	if (frame instanceof RelationFrame) {
-	    RelationFrame rframe = (RelationFrame) frame;
-	    synchronized (relation_lock) {
-		if (slot.startsWith("child")) {
-		    child_cache.remove(frame);
-		    // recache
-		    getRelationshipChild(rframe);
-		} else if (slot.startsWith("parent")) {
-		    parent_cache.remove(frame);
-		    // recache
-		    getRelationshipParent(rframe);
-		}
-	    }
-	    if (isContainmentRelation(rframe)) establishContainment(rframe);
-	}
-	    
-
-	// Publish the frame itself as the change, or just a change
-	// record for the specific slot?
-	ArrayList changes = new ArrayList(1);
-	Frame.Change change = new Frame.Change(frame.getUID(), slot, value);
-	changes.add(change);
-	publishChange(frame, changes);
-    }
-
-    public DataFrame makeFrame(String proto, Properties values)
-    {
-	UID uid = uids.nextUID();
-	return makeFrame(proto, values, uid);
-    }
-
-    public DataFrame makeFrame(String proto, Properties values, UID uid)
-    {
-	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
-
-	if (isContainmentRelation(frame)) {
-	    RelationFrame rframe = (RelationFrame) frame;
-	    establishContainment(rframe);
-	}
-
-	addObject(frame);
-	publishAdd(frame);
-	return frame;
-    }
-
-    public DataFrame makeFrame(DataFrame frame)
-    {
-	if (isContainmentRelation(frame)) {
-	    RelationFrame rframe = (RelationFrame) frame;
-	    establishContainment(rframe);
-	}
-
-	addObject(frame);
-	publishAdd(frame);
-	return frame;
-    }
-
-
-    public Path makePath(String name, Path.Fork[] forks, String slot)
-    {
-	UID uid = uids.nextUID();
-	Path path = new Path(uid, name, forks, slot);
-	addObject(path);
-	publishAdd(path);
-	return path;
-    }
-
-    // Replaced by reflection
-    public boolean descendsFromOld(Frame frame, String prototype)
-    {
-	String proto = frame.getKind();
-	if (proto == null) return false;
-	if (proto.equals(prototype)) {
-	    return true;
-	}
-	Frame proto_frame = null;
-	synchronized (prototypes) {
-	    proto_frame = (Frame) prototypes.get(proto);
-	}
-	boolean result =
-	    proto_frame != null &&  descendsFromOld(proto_frame, prototype);
-	return result;
-    }
-
-    private static final Object CNF = new Object();
-    public Class classForPrototype(String prototype)
-    {
-	// cache these!
-	synchronized (cached_classes) {
-	    Object klass = cached_classes.get(prototype);
-	    if (klass == CNF) return null;
-	    if (klass != null) return (Class) klass;
-
-	    
-	    String classname = pkg +"."+ FrameGen.fixName(prototype, true);
-	    try {
-		Class klass2 =  Class.forName(classname);
-		cached_classes.put(prototype, klass2);
-		return klass2;
-	    } catch (Exception ex) {
-		if (log.isWarnEnabled())
-		    log.warn("Couldn't find class for prototype " +prototype);
-		cached_classes.put(prototype, CNF);
-		return null;
-	    }
-	}
-    }
-
-
-    public boolean descendsFrom(DataFrame frame, String prototype)
-    {
-	Class klass = classForPrototype(prototype);
-	return klass != null ? descendsFrom(frame, klass, prototype) : false;
-    }
-
-    boolean descendsFrom(DataFrame frame, Class klass, String prototype)
-    {
-	boolean result = klass.isInstance(frame);
-	if (log.isDebugEnabled())
-	    log.debug(frame+ 
-		      (result ? " descends from " : " does not descend from ") 
-		      +prototype);
-	return result;
-    }
-
-    public boolean descendsFrom(PrototypeFrame frame, String prototype)
-    {
-	boolean result;
-	Class klass1 = classForPrototype(prototype);
-	Class klass2 = classForPrototype(frame.getName());
-	if (klass1 != null && klass2 != null)
-	    result = klass1.isAssignableFrom(klass2);
-	else
-	    result = false;
-
-	if (log.isDebugEnabled())
-	    log.debug(frame+ 
-		      (result ? " descends from " : " does not descend from ") 
-		      +prototype);
-	return result;
-    }
-
-    // In this case the proto argument refers to what the prototype
-    // should be a prototype of.  
-    public PrototypeFrame makePrototype(String proto, 
-					String parent, 
-					Properties values)
-    {
-	UID uid = uids.nextUID();
-	return makePrototype(proto, parent, values, uid);
-    }
-
-    public PrototypeFrame makePrototype(String proto, 
-					String parent, 
-					Properties values,
-					UID uid)
-    {
-	PrototypeFrame frame = null;
-	synchronized (prototypes) { 
-	    
-	    if (prototypes.containsKey(proto)) {
-		if (log.isWarnEnabled())
-		    log.warn("Ignoring prototype " +proto);
-		return null;
-	    } else {
-		frame = new PrototypeFrame(this, proto, parent, uid, values);
-		if (log.isDebugEnabled())
-		    log.debug("Adding prototype " +frame+
-			      " for " +proto);
-		prototypes.put(proto, frame); 
-	    }
-	}
-	addObject(frame);
-	publishAdd(frame);
-	return frame;
-    }
-
-    public Collection getPrototypes()
-    {
-	synchronized (prototypes) {
-	    return new ArrayList(prototypes.values());
-	}
-    }
-
-    public void removeFrame(DataFrame frame)
-    {
-	synchronized (kb) { kb.remove(frame.getUID()); }
-
-	// Handle the removal of containment relationship frames
-	if (isContainmentRelation(frame)) {
-	    RelationFrame rframe = (RelationFrame) frame;
-	    disestablishContainment(rframe);
-	}
-
-	publishRemove(frame);
-    }
-
-    public DataFrame getContainer(DataFrame frame)
-    {
-	synchronized (containers) {
-	    return (DataFrame) containers.get(frame);
-	}
-    }
-
-    public PrototypeFrame getPrototype(Frame frame)
-    {
-	String proto = frame.getKind();
-	if (proto == null) return null;
-	synchronized (prototypes) {
-	    return (PrototypeFrame) prototypes.get(proto);
-	}
     }
 
 
