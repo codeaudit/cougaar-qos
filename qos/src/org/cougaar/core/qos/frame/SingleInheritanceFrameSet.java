@@ -99,6 +99,30 @@ public class SingleInheritanceFrameSet
 
 
     // Object creation
+    private void addObject(UniqueObject object)
+    {
+	if (log.isInfoEnabled())
+	    log.info("Adding  " +object);
+	synchronized (kb) {
+	    kb.put(object.getUID(), object);
+	}
+	if (object instanceof RelationFrame) {
+	    checkRelation((RelationFrame) object);
+	} else if (object instanceof DataFrame) {
+	    // Any new DataFrame could potentially resolve as yet
+	    // unfilled values in relations.
+	    int resolved = 0;
+	    synchronized (pending_relations) {
+		Iterator itr = pending_relations.iterator();
+		while (itr.hasNext()) {
+		    RelationFrame frame = (RelationFrame) itr.next();
+		    boolean success = checkRelation(frame);
+		    if (success) itr.remove();
+		}
+	    }
+	}
+    }
+
     public DataFrame makeFrame(String proto, Properties values)
     {
 	UID uid = uids.nextUID();
@@ -164,10 +188,47 @@ public class SingleInheritanceFrameSet
 	return path;
     }
 
+    // Removing and modifying frames
+    public void valueUpdated(DataFrame frame, String slot, Object value)
+    {
+	if (frame instanceof RelationFrame) {
+	    RelationFrame rframe = (RelationFrame) frame;
+	    synchronized (relation_lock) {
+		if (slot.startsWith("child")) {
+		    child_cache.remove(frame);
+		} else if (slot.startsWith("parent")) {
+		    parent_cache.remove(frame);
+		}
+	    }
+	    checkRelation(rframe);
+	}
+	    
+
+	// Publish the frame itself as the change, or just a change
+	// record for the specific slot?
+	ArrayList changes = new ArrayList(1);
+	Frame.Change change = new Frame.Change(frame.getUID(), slot, value);
+	changes.add(change);
+	publishChange(frame, changes);
+    }
+
+
+    public void removeFrame(DataFrame frame)
+    {
+	synchronized (kb) { kb.remove(frame.getUID()); }
+
+	// Handle the removal of containment relationship frames
+	if (frame instanceof RelationFrame) {
+	    RelationFrame rframe = (RelationFrame) frame;
+	    decacheRelation(rframe);
+	}
+
+	publishRemove(frame);
+    }
 
 
 
-    // Accessors
+    // FrameSet Accessors
     public synchronized void setRootRelation(PrototypeFrame frame)
     {
 	if (root_relation != null)
@@ -415,71 +476,6 @@ public class SingleInheritanceFrameSet
 
 
 
-    // Addding, removing, modifying
-    private void addObject(UniqueObject object)
-    {
-	if (log.isInfoEnabled())
-	    log.info("Adding  " +object);
-	synchronized (kb) {
-	    kb.put(object.getUID(), object);
-	}
-	if (object instanceof RelationFrame) {
-	    checkRelation((RelationFrame) object);
-	} else if (object instanceof DataFrame) {
-	    // Any new DataFrame could potentially resolve as yet
-	    // unfilled values in relations.
-	    int resolved = 0;
-	    synchronized (pending_relations) {
-		Iterator itr = pending_relations.iterator();
-		while (itr.hasNext()) {
-		    RelationFrame frame = (RelationFrame) itr.next();
-		    boolean success = checkRelation(frame);
-		    if (success) itr.remove();
-		}
-	    }
-	}
-    }
-
-    public void valueUpdated(DataFrame frame, String slot, Object value)
-    {
-	if (frame instanceof RelationFrame) {
-	    RelationFrame rframe = (RelationFrame) frame;
-	    synchronized (relation_lock) {
-		if (slot.startsWith("child")) {
-		    child_cache.remove(frame);
-		    // recache
-		    getRelationshipChild(rframe);
-		} else if (slot.startsWith("parent")) {
-		    parent_cache.remove(frame);
-		    // recache
-		    getRelationshipParent(rframe);
-		}
-	    }
-	    checkRelation(rframe);
-	}
-	    
-
-	// Publish the frame itself as the change, or just a change
-	// record for the specific slot?
-	ArrayList changes = new ArrayList(1);
-	Frame.Change change = new Frame.Change(frame.getUID(), slot, value);
-	changes.add(change);
-	publishChange(frame, changes);
-    }
-
-
-    public void removeFrame(DataFrame frame)
-    {
-	synchronized (kb) { kb.remove(frame.getUID()); }
-
-	// Handle the removal of containment relationship frames
-	if (frame instanceof RelationFrame) {
-	    RelationFrame rframe = (RelationFrame) frame;
-	    decacheRelation(rframe);
-	}
-
-	publishRemove(frame);
-    }
 
 
 
@@ -545,6 +541,8 @@ public class SingleInheritanceFrameSet
 
     Set findChildren(Frame parent, String relation_prototype)
     {
+	Class klass = classForPrototype(relation_prototype);
+	if (klass == null) return null;
 	HashSet results = new HashSet();
 	synchronized (relation_lock) {
 	    Iterator itr = parent_cache.entrySet().iterator();
@@ -552,7 +550,8 @@ public class SingleInheritanceFrameSet
 		Map.Entry entry = (Map.Entry) itr.next();
 		if (entry.getValue().equals(parent)) {
 		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    results.add(child_cache.get(relation));
+		    if (descendsFrom(relation, klass, relation_prototype))
+			results.add(child_cache.get(relation));
 		}
 	    }
 	}
@@ -561,6 +560,9 @@ public class SingleInheritanceFrameSet
 
     Set findParents(Frame child, String relation_prototype)
     {
+	Class klass = classForPrototype(relation_prototype);
+	if (klass == null) return null;
+
 	HashSet results = new HashSet();
 	synchronized (relation_lock) {
 	    Iterator itr = child_cache.entrySet().iterator();
@@ -568,7 +570,8 @@ public class SingleInheritanceFrameSet
 		Map.Entry entry = (Map.Entry) itr.next();
 		if (entry.getValue().equals(child)) {
 		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    results.add(parent_cache.get(relation));
+		    if (descendsFrom(relation, klass, relation_prototype))
+			results.add(parent_cache.get(relation));
 		}
 	    }
 	}
