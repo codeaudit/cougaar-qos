@@ -140,6 +140,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
+    // Caller should synchronize on relation_lock
     private DataFrame getRelate(RelationFrame relationship,
 				HashMap cache,
 				String proto,
