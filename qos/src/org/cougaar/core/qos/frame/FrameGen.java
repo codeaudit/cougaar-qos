@@ -63,10 +63,10 @@ public class FrameGen
     private String dir_name;
     private String path;
     private HashMap slots;
-    private HashMap proto_parents;
-    private HashMap proto_containers;
+    private HashMap proto_attrs;
     private HashMap proto_slots;
     private String current_prototype;
+    private String root_relation;
 
 
     public FrameGen(String path)
@@ -76,9 +76,8 @@ public class FrameGen
 
     public void parseProtoFile(File xml_file)
     {
-	proto_parents = new HashMap();
 	proto_slots = new HashMap();
-	proto_containers = new HashMap();
+	proto_attrs = new HashMap();
 	try {
 	    XMLReader producer = XMLReaderFactory.createXMLReader();
 	    DefaultHandler consumer = this; 
@@ -133,9 +132,23 @@ public class FrameGen
 
 
     // Utilities
+    private boolean descendsFrom(String child_proto, String parent_proto)
+    {
+	if (child_proto == null || parent_proto == null) {
+	    return false;
+	} else if (child_proto.equals(parent_proto)) {
+	    return true;
+	} else {
+	    Attributes attrs = (Attributes) proto_attrs.get(child_proto);
+	    return descendsFrom(attrs.getValue("prototype"), parent_proto);
+	}
+    }
+
+
     private boolean inheritsSlot(String proto, String slot)
     {
-	String parent = (String) proto_parents.get(proto);
+	Attributes attrs = (Attributes) proto_attrs.get(proto);
+	String parent = attrs.getValue("prototype");
 	if (parent == null) return false;
 	HashMap pslots = (HashMap) proto_slots.get(parent);
 	if (pslots != null && pslots.containsKey(slot)) return true;
@@ -144,19 +157,13 @@ public class FrameGen
 
     private String ancestorForSlot(String proto, String slot)
     {
-// 	System.out.println("Looking for ancestor of " +proto+
-// 			   " defining slot " +slot);
-	String parent = (String) proto_parents.get(proto);
+	Attributes attrs = (Attributes) proto_attrs.get(proto);
+	String parent = attrs.getValue("prototype");
 	if (parent == null) {
-// 	    System.out.println("No ancestor of " +proto+
-// 			       " for slot " +slot);
 	    return null;
 	}
 	HashMap pslots = (HashMap) proto_slots.get(parent);
 	if (pslots != null && pslots.containsKey(slot)) {
-// 	    System.out.println("Ancestor of " +proto+
-// 			       " for slot " +slot+
-// 			       " is " +parent);
 	    return parent;
 	}
 	return ancestorForSlot(parent, slot);
@@ -172,8 +179,9 @@ public class FrameGen
     private void collectSlots(String proto, HashSet slots)
     {
 	HashMap local_slots = (HashMap) proto_slots.get(proto);
-	String parent = (String) proto_parents.get(proto);
-	String container = (String) proto_containers.get(proto);
+	Attributes attrs = (Attributes) proto_attrs.get(proto);
+	String parent = attrs.getValue("prototype");
+	String container = attrs.getValue("container");
 	if (local_slots != null) slots.addAll(local_slots.keySet());
 	if (parent != null) collectSlots(parent, slots);
 	if (container != null) collectSlots(container, slots);
@@ -262,10 +270,11 @@ public class FrameGen
     private void startPrototype(Attributes attrs)
     {
 	current_prototype = attrs.getValue("name");
-	String parent = attrs.getValue("prototype");
-	if (parent != null) proto_parents.put(current_prototype, parent);
-	String container = attrs.getValue("container");
-	if (container != null) proto_containers.put(current_prototype, container);
+	String rootp = attrs.getValue("root-relation");
+	if (rootp != null && rootp.equalsIgnoreCase("true")) {
+	    root_relation = current_prototype;
+	}
+	proto_attrs.put(current_prototype, new AttributesImpl(attrs));
 	slots = new HashMap();
     }
 
@@ -298,8 +307,9 @@ public class FrameGen
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String prototype = (String) entry.getKey();
-	    String parent = (String) proto_parents.get(prototype);
-	    String container = (String) proto_containers.get(prototype);
+	    Attributes attrs = (Attributes) proto_attrs.get(prototype);
+	    String parent = attrs.getValue("prototype");
+	    String container = attrs.getValue("container");
 	    HashMap slots = (HashMap) entry.getValue();
 	    HashMap override_slots = new HashMap();
 	    HashMap local_slots = new HashMap();
@@ -308,11 +318,11 @@ public class FrameGen
 	    while (itr2.hasNext()) {
 		Map.Entry entry2 = (Map.Entry) itr2.next();
 		String slot = (String) entry2.getKey();
-		Attributes attrs = (Attributes) entry2.getValue();
+		Attributes slot_attrs = (Attributes) entry2.getValue();
 		if (inheritsSlot(prototype, slot)) {
-		    override_slots.put(slot, attrs);
+		    override_slots.put(slot, slot_attrs);
 		} else {
-		    local_slots.put(slot, attrs);
+		    local_slots.put(slot, slot_attrs);
 		}
 	    }
 
@@ -357,13 +367,22 @@ public class FrameGen
 			   String prototype, 
 			   String parent)
     {
+	boolean is_root_relation = 
+	    parent == null &&
+	    root_relation != null && 
+	    prototype.equalsIgnoreCase(root_relation);
 	String name = fixName(prototype, true);
 	writer.println("package " +package_name+ ";\n");
 	writer.println("import org.cougaar.core.util.UID;");
 	writer.println("import org.cougaar.core.qos.frame.FrameSet;");
 	writer.println("import org.cougaar.core.qos.frame.DataFrame;");
+	if (is_root_relation) {
+	    writer.println("import org.cougaar.core.qos.frame.RelationFrame;");
+	}
 	writer.println("\npublic class " +name);
-	if (parent != null) {
+	if (is_root_relation) {
+	    writer.println("    extends RelationFrame");
+	} else if (parent != null) {
 	    writer.println("    extends " +fixName(parent, true));
 	} else {
 	    writer.println("    extends DataFrame");

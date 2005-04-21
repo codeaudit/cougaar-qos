@@ -71,15 +71,6 @@ public class SingleInheritanceFrameSet
     private HashMap containers;
     private PrototypeFrame root_relation, container_relation;
 
-    // Remove the pseudo generality
-    private static final String parent_proto_slot = "parent-prototype";
-    private static final String parent_slot_slot = "parent-slot";
-    private static final String parent_value_slot = "parent-value";
-    private static final String child_proto_slot = "child-prototype";
-    private static final String child_slot_slot = "child-slot";
-    private static final String child_value_slot = "child-value";
-    
-
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
 				     BlackboardService bbs,
@@ -106,15 +97,21 @@ public class SingleInheritanceFrameSet
 	this.containers = new HashMap();
     }
 
-    public void setRootRelation(PrototypeFrame frame)
+    public synchronized void setRootRelation(PrototypeFrame frame)
     {
-	this.root_relation = frame;
+	if (root_relation != null)
+	    throw new RuntimeException("Root relation of " +this+
+				       " is already set!");
+	root_relation = frame;
     }
 
 
     public void setContainerRelation(PrototypeFrame frame)
     {
-	this.container_relation = frame;
+	if (container_relation != null)
+	    throw new RuntimeException("Container relation of " +this+
+				       " is already set!");
+	container_relation = frame;
     }
 
 
@@ -132,7 +129,7 @@ public class SingleInheritanceFrameSet
 	    synchronized (pending_containment) {
 		Iterator itr = pending_containment.iterator();
 		while (itr.hasNext()) {
-		    DataFrame frame = (DataFrame) itr.next();
+		    RelationFrame frame = (RelationFrame) itr.next();
 		    boolean success = establishContainment(frame);
 		    if (success) {
 			itr.remove();
@@ -143,62 +140,28 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private DataFrame getRelate(DataFrame relationship,
+    private DataFrame getRelate(RelationFrame relationship,
 				HashMap cache,
-				String proto_slot,
-				String slot_slot,
-				String value_slot)
+				String proto,
+				String slot,
+				Object value)
     {
-	synchronized (relation_lock) {
-	    DataFrame result = (DataFrame) cache.get(relationship);
-	    if (result != null) {
-		if (log.isInfoEnabled())
-		    log.info(" Found cached relation value " +result);
-		return result;
-	    }
-
-	    String proto = (String)
-		relationship.getValue(proto_slot);
-	    String slot = (String)
-		relationship.getValue(slot_slot);
-	    Object value = relationship.getValue(value_slot);
-
-	    if (slot == null || proto == null || value == null) {
-		if (log.isWarnEnabled()) {
-		    if (slot == null) {
-			log.warn("Relationship " +relationship+
-				 " has no value for " +slot_slot);
-		    }
-		    if (proto == null) {
-			log.warn("Relationship " +relationship+
-				 " has no value for " +proto_slot);
-		    }
-		    if (value == null) {
-			log.warn("Relationship " +relationship+
-				 " has no value for " +value_slot);
-		    }
-		}
-		
-		return null;
-	    }
-	    
-	    result = (DataFrame) findFrame(proto, slot, value);
-	    if (result == null) {
-		if (log.isWarnEnabled())
-		    log.warn(" Proto = " +proto+
-			     " Slot = " +slot+
-			     " Value = " +value+
-			     " matches nothing");
-	    } else {
-		if (log.isInfoEnabled())
-		    log.info(" Caching: Proto = " +proto+
-			     " Slot = " +slot+
-			     " Value = " +value+
-			     " Result = " +result);
-		cache.put(relationship, result);
-	    }
-	    return result;
+	DataFrame result = (DataFrame) findFrame(proto, slot, value);
+	if (result == null) {
+	    if (log.isWarnEnabled())
+		log.warn(" Proto = " +proto+
+			 " Slot = " +slot+
+			 " Value = " +value+
+			 " matches nothing");
+	} else {
+	    if (log.isInfoEnabled())
+		log.info(" Caching: Proto = " +proto+
+			 " Slot = " +slot+
+			 " Value = " +value+
+			 " Result = " +result);
+	    cache.put(relationship, result);
 	}
+	return result;
     }
 
 
@@ -207,28 +170,44 @@ public class SingleInheritanceFrameSet
 	return pkg;
     }
 
-    public DataFrame getRelationshipParent(DataFrame relationship)
+    public DataFrame getRelationshipParent(RelationFrame relationship)
     {
-	return getRelate(relationship, 
-			 parent_cache,
-			 parent_proto_slot,
-			 parent_slot_slot,
-			 parent_value_slot);
+	synchronized (relation_lock) {
+	    DataFrame result = (DataFrame) parent_cache.get(relationship);
+	    if (result != null) {
+		if (log.isInfoEnabled())
+		    log.info(" Found cached relation value " +result);
+		return result;
+	    }
+
+	    String proto = (String) relationship.getParentPrototype();
+	    String slot = (String) relationship.getParentSlot();
+	    Object value = relationship.getParentValue();
+	    return getRelate(relationship, parent_cache, proto, slot, value);
+	}
     }
 
-    public DataFrame getRelationshipChild(DataFrame relationship)
+    public DataFrame getRelationshipChild(RelationFrame relationship)
     {
-	return getRelate(relationship,
-			 child_cache,
-			 child_proto_slot,
-			 child_slot_slot,
-			 child_value_slot);
+	synchronized (relation_lock) {
+	    DataFrame result = (DataFrame) child_cache.get(relationship);
+	    if (result != null) {
+		if (log.isInfoEnabled())
+		    log.info(" Found cached relation value " +result);
+		return result;
+	    }
+
+	    String proto = (String) relationship.getChildPrototype();
+	    String slot = (String) relationship.getChildSlot();
+	    Object value = relationship.getChildValue();
+	    return getRelate(relationship, child_cache, proto, slot, value);
+	}
     }
 
 
 
 
-    private boolean establishContainment(DataFrame relationship)
+    private boolean establishContainment(RelationFrame relationship)
     {
 	synchronized (containers) {
 	    // cache a containment relationship
@@ -254,16 +233,11 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private void disestablishContainment(DataFrame relationship)
+    private void disestablishContainment(RelationFrame relationship)
     {
 	synchronized (containers) {
 	    // decache a containment relationship
-	    String child_proto = (String)
-		relationship.getValue(child_proto_slot);
-	    String child_slot = (String)
-		relationship.getValue(child_slot_slot);
-	    Object child_value = relationship.getValue(child_value_slot);
-	    Frame child = findFrame(child_proto, child_slot, child_value);
+	    Frame child = getRelationshipChild(relationship);
 	    if (child != null) containers.remove(child);
 	}
 	synchronized (pending_containment) {
@@ -271,10 +245,6 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private boolean isRelation(DataFrame frame)
-    {
-	return descendsFrom(frame, root_relation.getName());
-    }
 
     private boolean isContainmentRelation(DataFrame frame)
     {
@@ -371,21 +341,6 @@ public class SingleInheritanceFrameSet
 	writer.println("  frame-inheritance=\"single\"");
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("  package=\"" +pkg+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  frame-inheritance-relation=\"" +container_relation+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  parent-prototype=\"" +parent_proto_slot+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  parent-slot=\"" +parent_slot_slot+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  parent-value=\"" +parent_value_slot+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  child-prototype=\"" +child_proto_slot+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  child-slot=\"" +child_slot_slot+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  child-value=\"" +child_value_slot+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println(">");
 
 
@@ -452,6 +407,9 @@ public class SingleInheritanceFrameSet
 
     public DataFrame findFrame(String proto, String slot, Object value)
     {
+	if (slot == null || proto == null || value == null) return null;
+
+	    
 	Class klass = classForPrototype(proto);
 	if (klass == null) return null;
 
@@ -503,29 +461,11 @@ public class SingleInheritanceFrameSet
 	    while (itr.hasNext()) {
 		Map.Entry entry = (Map.Entry) itr.next();
 		if (entry.getValue().equals(parent)) {
-		    DataFrame relation = (DataFrame) entry.getKey();
+		    RelationFrame relation = (RelationFrame) entry.getKey();
 		    results.add(child_cache.get(relation));
 		}
 	    }
 	}
-// 	synchronized (kb) {
-// 	    Iterator itr = kb.values().iterator();
-// 	    while (itr.hasNext()) {
-// 		Object raw = itr.next();
-// 		if (!(raw instanceof DataFrame)) continue;
-
-// 		DataFrame relationship = (DataFrame) raw;
-		
-
-// 		if (descendsFrom(relationship, relation_prototype)) {
-// 		    Frame p = getRelationshipParent(relationship);
-// 		    if ( p != null && p.equals(parent)) {
-// 			Frame child = getRelationshipChild(relationship);
-// 			if (child != null) results.add(child);
-// 		    }		    
-// 		}
-// 	    }
-// 	}
 	return results;
     }
 
@@ -537,35 +477,11 @@ public class SingleInheritanceFrameSet
 	    while (itr.hasNext()) {
 		Map.Entry entry = (Map.Entry) itr.next();
 		if (entry.getValue().equals(child)) {
-		    DataFrame relation = (DataFrame) entry.getKey();
+		    RelationFrame relation = (RelationFrame) entry.getKey();
 		    results.add(parent_cache.get(relation));
 		}
 	    }
 	}
-// 	synchronized (kb) {
-// 	    Iterator itr = kb.values().iterator();
-// 	    while (itr.hasNext()) {
-// 		Object raw = itr.next();
-// 		if (!(raw instanceof DataFrame)) continue;
-
-// 		DataFrame relationship = (DataFrame) raw;
-
-
-// 		if (descendsFrom(relationship, relation_prototype)) {
-// 		    Frame c = getRelationshipChild(relationship);
-// 		    if (log.isDebugEnabled())
-// 			log.debug("Candidate = " +c+
-// 				  " child = " +child);
-
-// 		    if ( c != null && c.equals(child)) {
-// 			Frame parent = getRelationshipParent(relationship);
-// 			if (log.isDebugEnabled())
-// 			    log.debug("Adding parent " + parent);
-// 			if (parent != null) results.add(parent);
-// 		    }		    
-// 		}
-// 	    }
-// 	}
 	return results;
     }
 
@@ -686,19 +602,20 @@ public class SingleInheritanceFrameSet
 
     public void valueUpdated(DataFrame frame, String slot, Object value)
     {
-	if (isRelation(frame)) {
+	if (frame instanceof RelationFrame) {
+	    RelationFrame rframe = (RelationFrame) frame;
 	    synchronized (relation_lock) {
-		if (slot.equals(child_value_slot)) {
+		if (slot.startsWith("child")) {
 		    child_cache.remove(frame);
 		    // recache
-		    getRelationshipChild(frame);
-		} else if (slot.equals(parent_value_slot)) {
+		    getRelationshipChild(rframe);
+		} else if (slot.startsWith("parent")) {
 		    parent_cache.remove(frame);
 		    // recache
-		    getRelationshipParent(frame);
+		    getRelationshipParent(rframe);
 		}
 	    }
-	    if (isContainmentRelation(frame))  establishContainment(frame);
+	    if (isContainmentRelation(rframe)) establishContainment(rframe);
 	}
 	    
 
@@ -720,7 +637,10 @@ public class SingleInheritanceFrameSet
     {
 	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
 
-	if (isContainmentRelation(frame)) establishContainment(frame);
+	if (isContainmentRelation(frame)) {
+	    RelationFrame rframe = (RelationFrame) frame;
+	    establishContainment(rframe);
+	}
 
 	addObject(frame);
 	publishAdd(frame);
@@ -729,7 +649,10 @@ public class SingleInheritanceFrameSet
 
     public DataFrame makeFrame(DataFrame frame)
     {
-	if (isContainmentRelation(frame)) establishContainment(frame);
+	if (isContainmentRelation(frame)) {
+	    RelationFrame rframe = (RelationFrame) frame;
+	    establishContainment(rframe);
+	}
 
 	addObject(frame);
 	publishAdd(frame);
@@ -868,7 +791,10 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) { kb.remove(frame.getUID()); }
 
 	// Handle the removal of containment relationship frames
-	if (isContainmentRelation(frame)) disestablishContainment(frame);
+	if (isContainmentRelation(frame)) {
+	    RelationFrame rframe = (RelationFrame) frame;
+	    disestablishContainment(rframe);
+	}
 
 	publishRemove(frame);
     }

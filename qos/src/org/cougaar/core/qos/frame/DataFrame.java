@@ -174,18 +174,6 @@ abstract public class DataFrame
 	}
     }
 
-    public DataFrame relationshipParent()
-    {
-	if (frameSet == null) return null;
-	return frameSet.getRelationshipParent(this);
-    }
-
-    public DataFrame relationshipChild()
-    {
-	if (frameSet == null) return null;
-	return frameSet.getRelationshipChild(this);
-    }
-
     public String getContainerKind()
     {
 	Frame container = containerFrame();

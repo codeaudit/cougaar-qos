@@ -168,12 +168,12 @@ public interface FrameSet
     /**
      * Returns the matching 'parent' Frame in the given relationship.
      */
-    public DataFrame getRelationshipParent(DataFrame relationship);
+    public DataFrame getRelationshipParent(RelationFrame relationship);
 
     /**
      * Returns the matching 'child' Frame in the given relationship.
      */
-    public DataFrame getRelationshipChild(DataFrame relationship);
+    public DataFrame getRelationshipChild(RelationFrame relationship);
     
     /**
      * Inform the FrameSet that the given frame was changed in the
