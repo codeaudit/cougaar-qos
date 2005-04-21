@@ -206,6 +206,15 @@ public class SingleInheritanceFrameSet
 
     // Hierarchy
 
+    public PrototypeFrame getPrototype(Frame frame)
+    {
+	String proto = frame.getKind();
+	if (proto == null) return null;
+	synchronized (prototypes) {
+	    return (PrototypeFrame) prototypes.get(proto);
+	}
+    }
+
     // Old version, replaced by reflection
     public boolean descendsFromOld(Frame frame, String prototype)
     {
@@ -289,6 +298,13 @@ public class SingleInheritanceFrameSet
     private boolean isContainmentRelation(DataFrame frame)
     {
 	return descendsFrom(frame, container_relation.getName());
+    }
+
+    public DataFrame getContainer(DataFrame frame)
+    {
+	synchronized (containers) {
+	    return (DataFrame) containers.get(frame);
+	}
     }
 
     // Caller should synchronize on relation_lock
@@ -379,7 +395,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private void decacheRelationship(RelationFrame relationship)
+    private void decacheRelation(RelationFrame relationship)
     {
 	synchronized (relation_lock) {
 	    child_cache.remove(relationship);
@@ -459,7 +475,7 @@ public class SingleInheritanceFrameSet
 	// Handle the removal of containment relationship frames
 	if (frame instanceof RelationFrame) {
 	    RelationFrame rframe = (RelationFrame) frame;
-	    decacheRelationship(rframe);
+	    decacheRelation(rframe);
 	}
 
 	publishRemove(frame);
@@ -469,21 +485,6 @@ public class SingleInheritanceFrameSet
 
 
     // Query
-    public DataFrame getContainer(DataFrame frame)
-    {
-	synchronized (containers) {
-	    return (DataFrame) containers.get(frame);
-	}
-    }
-
-    public PrototypeFrame getPrototype(Frame frame)
-    {
-	String proto = frame.getKind();
-	if (proto == null) return null;
-	synchronized (prototypes) {
-	    return (PrototypeFrame) prototypes.get(proto);
-	}
-    }
 
     public Frame findFrame(UID uid)
     {

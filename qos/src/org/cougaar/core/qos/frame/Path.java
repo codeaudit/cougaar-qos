@@ -126,6 +126,7 @@ public class Path
 	    DataFrame next = (DataFrame) itr.next();
 	    Object result = getNextValue(next, ++index);
 	    if (result != null) return result;
+	    if (index == forks.length) return null;
 	}
 	return null;
     }
