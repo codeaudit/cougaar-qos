@@ -514,10 +514,7 @@ public class SingleInheritanceFrameSet
 	synchronized (frames) {
 	    Iterator itr = frames.iterator();
 	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof DataFrame)) continue;
-		DataFrame frame = (DataFrame) raw;
-		// Check only local value [?]
+		DataFrame frame = (DataFrame) itr.next();
 		if (descendsFrom(frame, klass, proto)) {
 		    Object candidate = frame.getValue(slot);
 		    if (candidate != null && candidate.equals(value)) 
@@ -537,10 +534,7 @@ public class SingleInheritanceFrameSet
 	synchronized (frames) {
 	    Iterator itr = frames.iterator();
 	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (!(raw instanceof DataFrame)) continue;
-		DataFrame frame = (DataFrame) raw;
-		// Check only local value [?]
+		DataFrame frame = (DataFrame) itr.next();
 		if (descendsFrom(frame, klass, proto) &&
 		    frame.matchesSlots(slot_value_pairs))
 		    results.add(frame);
