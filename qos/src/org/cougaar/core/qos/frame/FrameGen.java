@@ -609,13 +609,35 @@ public class FrameGen
 	slots.addAll(local_slots.keySet());
 	boolean is_root = parent == null;
 	if (!slots.isEmpty()) {
+	    generateHashConstants(writer, slots);
 	    writeDynamicSetter(writer, slots, is_root);
 	    writeDynamicInitializer(writer, slots, is_root);
 	    writeDynamicRemover(writer, slots, is_root);
 	}
-	if (container != null) slots.addAll(collectSlots(container));
+	if (container != null) {
+	    Set pslots = collectSlots(container);
+	    pslots.removeAll(slots);
+	    generateHashConstants(writer, pslots);
+	    slots.addAll(pslots);
+	}
 	if (!slots.isEmpty())
 	    writeDynamicGetter(writer, slots, is_root);
+    }
+
+    private String slotHashVar(String slot)
+    {
+	return fixName(slot, false) +"__HashVar__";
+    }
+
+    private void generateHashConstants(PrintWriter writer, Set slots)
+    {
+	Iterator itr = slots.iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    String slot_hash_var = slotHashVar(slot);
+	    writer.println("    private static final int " +slot_hash_var+
+			   " = \"" +slot+ "\".hashCode();");
+	}
     }
 
     private void writeDynamicGetter(PrintWriter writer, 
@@ -624,23 +646,23 @@ public class FrameGen
     {
 	writer.println("\n\n    protected Object getLocalValue(String __slot)");
 	writer.println("    {");
+	writer.println("       int __key = __slot.hashCode();");
 	Iterator itr = slots.iterator();
-	boolean first = true;
+	writer.print("      ");
 	while(itr.hasNext()) {
 	    String slot = (String) itr.next();
+	    String slot_hash_var = slotHashVar(slot);
 	    String method = "get" + fixName(slot, true);
-	    writer.print("        ");
-	    if (!first) writer.print("} else ");
-	    first = false;
-	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.println(" if (" +slot_hash_var+ " == __key)");
 	    writer.println("            return " +method+ "();");
+	    writer.print("       else");
 	}
-	writer.println("        } else {");
+	writer.println("");
+	writer.print("           return ");
 	if (is_root)
-	    writer.println("            return null;");
+	    writer.println("null;");
 	else
-	    writer.println("            return super.getLocalValue(__slot);");
-	writer.println("        }");
+	    writer.println("super.getLocalValue(__slot);");
 	writer.println("    }");
     }
 
@@ -651,23 +673,22 @@ public class FrameGen
 	writer.println("\n\n    protected void setLocalValue(String __slot,");
 	writer.println("                                 Object __value)");
 	writer.println("    {");
+	writer.println("       int __key = __slot.hashCode();");
 	Iterator itr = slots.iterator();
 	boolean first = true;
 	while(itr.hasNext()) {
 	    String slot = (String) itr.next();
+	    String slot_hash_var = slotHashVar(slot);
 	    String method = "set" + fixName(slot, true);
-	    writer.print("        ");
-	    if (!first) writer.print("} else ");
-	    first = false;
-	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.print("      ");
+	    if (!first) writer.print(" else");
+	    writer.println(" if (" +slot_hash_var+ " == __key)");
 	    writer.println("            " +method+ "(__value);");
+	    first = false;
 	}
-	if (is_root) {
-	    writer.println("        }");
-	} else {
-	    writer.println("        } else {");
+	if (!is_root) {
+	    writer.println("       else");
 	    writer.println("            super.setLocalValue(__slot, __value);");
-	    writer.println("        }");
 	}
 	writer.println("    }");
     }
@@ -677,25 +698,24 @@ public class FrameGen
 					 boolean is_root)
     {
 	writer.println("\n\n    protected void initializeLocalValue(String __slot,");
-	writer.println("                                        Object __value)");
+	writer.println("                                 Object __value)");
 	writer.println("    {");
+	writer.println("       int __key = __slot.hashCode();");
 	Iterator itr = slots.iterator();
 	boolean first = true;
 	while(itr.hasNext()) {
 	    String slot = (String) itr.next();
+	    String slot_hash_var = slotHashVar(slot);
 	    String method = "initialize" + fixName(slot, true);
-	    writer.print("        ");
-	    if (!first) writer.print("} else ");
-	    first = false;
-	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.print("      ");
+	    if (!first) writer.print(" else");
+	    writer.println(" if (" +slot_hash_var+ " == __key)");
 	    writer.println("            " +method+ "(__value);");
+	    first = false;
 	}
-	if (is_root) {
-	    writer.println("        }");
-	} else {
-	    writer.println("        } else {");
+	if (!is_root) {
+	    writer.println("       else");
 	    writer.println("            super.initializeLocalValue(__slot, __value);");
-	    writer.println("        }");
 	}
 	writer.println("    }");
     }
@@ -706,23 +726,22 @@ public class FrameGen
     {
 	writer.println("\n\n    protected void removeLocalValue(String __slot)");
 	writer.println("    {");
+	writer.println("       int __key = __slot.hashCode();");
 	Iterator itr = slots.iterator();
 	boolean first = true;
 	while(itr.hasNext()) {
 	    String slot = (String) itr.next();
+	    String slot_hash_var = slotHashVar(slot);
 	    String method = "remove" + fixName(slot, true);
-	    writer.print("        ");
-	    if (!first) writer.print("} else ");
-	    first = false;
-	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.print("      ");
+	    if (!first) writer.print(" else");
+	    writer.println(" if (" +slot_hash_var+ " == __key)");
 	    writer.println("            " +method+ "();");
+	    first = false;
 	}
-	if (is_root) {
-	    writer.println("        }");
-	} else {
-	    writer.println("        } else {");
+	if (!is_root) {
+	    writer.println("       else");
 	    writer.println("            super.removeLocalValue(__slot);");
-	    writer.println("        }");
 	}
 	writer.println("    }");
     }
