@@ -424,15 +424,25 @@ public class FrameGen
     {
 	// Define values for inherited slots!
 	String cname = fixName(name, true);
-	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
-	writer.println("               UID uid)");
+
+	writer.println("\n\n    public " +cname + "(UID uid)");
 	writer.println("    {");
-	writer.println("        this(frameSet, \"" +name+ "\", uid);");
+	writer.println("        super(null, \"" +name+ "\", uid);");
 	writer.println("    }");
 
 	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
-	writer.println("               String kind,");
-	writer.println("               UID uid)");
+	int spaces = 12 + cname.length();
+	for (int i=0; i<spaces; i++) writer.print(' ');
+	writer.println("UID uid)");
+	writer.println("    {");
+	writer.println("        super(frameSet, \"" +name+ "\", uid);");
+	writer.println("    }");
+
+	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
+	for (int i=0; i<spaces; i++) writer.print(' ');
+	writer.println("String kind,");
+	for (int i=0; i<spaces; i++) writer.print(' ');
+	writer.println("UID uid)");
 	writer.println("    {");
 	writer.println("        super(frameSet, kind, uid);");
 	writer.println("    }");
