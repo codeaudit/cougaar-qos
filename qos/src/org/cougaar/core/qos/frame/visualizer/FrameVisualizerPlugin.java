@@ -26,6 +26,9 @@
 
 package org.cougaar.core.qos.frame.visualizer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -37,7 +40,12 @@ import org.cougaar.core.qos.frame.*;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.UnaryPredicate;
+
+import org.cougaar.core.qos.frame.visualizer.test.TickEvent;
+
+import javax.swing.*;
 
 
 public class FrameVisualizerPlugin
@@ -45,13 +53,23 @@ public class FrameVisualizerPlugin
 {
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
-	       return (o instanceof DataFrame) &&
-		    ((DataFrame) o).getFrameSet().getName().equals(frameSetName);
+	       return ((o instanceof DataFrame) &&
+		    ((DataFrame) o).getFrameSet().getName().equals(frameSetName)) ;
 	    }
 	};
     private IncrementalSubscription sub;
     private LoggingService log;
     private String frameSetName;
+    private DisplayWindow pluginDisplay;
+    private ArrayList frameCache;
+
+
+    FrameHelper helper;
+    boolean newFramesPresent;
+    static String TICK_EVENT_LABEL = "TICK";
+    int tickNumber = 0;
+
+
 
     public void load()
     {
@@ -65,9 +83,26 @@ public class FrameVisualizerPlugin
 
     public void start()
     {
-
 	frameSetName = (String) getParameter("frame-set");
+	
+	frameCache = new ArrayList();
+	newFramesPresent = false;
+	
+	String specFileName = (String) getParameter("spec-file");
+	File xml_file = ConfigFinder.getInstance().locateFile(specFileName);
+	pluginDisplay = new DisplayWindow(xml_file);
+	//SwingUtilities.invokeLater(new CreateWindowHelper(xml_file));  
 	super.start();
+    }
+
+    class CreateWindowHelper implements Runnable {
+        File xmlFile;
+        public CreateWindowHelper(File xmlFile){
+            CreateWindowHelper.this.xmlFile = xmlFile;
+        }
+        public void run() {
+            pluginDisplay = new DisplayWindow(xmlFile);
+        }
     }
 
     private void do_execute(BlackboardService bbs)
@@ -77,22 +112,37 @@ public class FrameVisualizerPlugin
 		log.debug("No Frame changes");
 	    return;
 	}
-
+	if (log.isDebugEnabled())
+	    log.debug("There are changes.");
 	Enumeration en;
 		
 	// New Frames
 	en = sub.getAddedList();
+	FrameSet frameSet = null;
 	while (en.hasMoreElements()) {
 	    Frame frame = (Frame) en.nextElement();
+	    if (frameSet == null)
+		frameSet = frame.getFrameSet();
 	    if (log.isDebugEnabled()) {
 		log.debug("Observed added "+frame);
 	    }
 	    // Handle new Frame
+	    frameCache.add(frame);
+	    newFramesPresent = true;
+	}
+	
+	if (helper == null || newFramesPresent) {
+	    if (log.isDebugEnabled()) 
+		log.debug("setting frames on the display");
+	    helper = new FrameHelper(frameCache, frameSet);
+	    pluginDisplay.setFrameHelper(helper);
+	    newFramesPresent = false;
 	}
 		
 		
 	// Changed Frames
 	en = sub.getChangedList();
+	ArrayList transitions = new ArrayList();
 	while (en.hasMoreElements()) {
 	    Frame frame = (Frame) en.nextElement();
 	    if (log.isDebugEnabled()) {
@@ -101,14 +151,16 @@ public class FrameVisualizerPlugin
 	    Collection changes = sub.getChangeReports(frame);
 	    // A collection of Frame.Change instances.
 	    if (changes != null) {
-		Iterator itr = changes.iterator();
-		while (itr.hasNext()) {
-		    Frame.Change change = (Frame.Change) itr.next();
-		    // Handle change to existing frame
-		}
+		if (frame.isa("relationship"))  
+		    transitions.addAll(processRelationshipChanges(frame, changes.iterator()));
 	    }
 	}
-		
+	if (transitions.size() > 0) {
+	    //pluginDisplay.updateFrameView();
+	    pluginDisplay.tickEventOccured(new TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
+    }
+
+
 	// Remove Frames.  Won't happen.
 	en = sub.getRemovedList();
 	while (en.hasMoreElements()) {
@@ -119,6 +171,47 @@ public class FrameVisualizerPlugin
 	}
     }
 
+
+
+
+    protected Collection processRelationshipChanges(Frame frame, Iterator changes) {
+	String slotName;
+	Object value;
+	ShapeGraphic child, parent;
+	Frame ff[];
+	ArrayList transitions = new ArrayList();
+
+	while (changes.hasNext()) {
+	    Frame.Change change = (Frame.Change) changes.next();
+	    // Handle change to existing frame
+	    slotName = change.getSlotName();
+	    value    = change.getValue();
+
+	    if (log.isDebugEnabled()) 
+		log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
+
+	    ff = helper.getParentAndChild(frame);
+	    if (log.isDebugEnabled()) 
+		log.debug("processRelationshipChanges parentFrame="+ff[0]+"  childFrame="+ff[1]);
+ 
+	    parent = pluginDisplay.findShape(ff[0]);
+	    child  = pluginDisplay.findShape(ff[1]);
+	    if (parent == null || child == null) {
+		if (log.isDebugEnabled()) 
+		    log.debug("did not find shapes");
+		continue;
+	    }
+	    if (child.getParent() == null || child.getParent().getId().equals(parent.getId())) {
+		if (log.isDebugEnabled()) 
+		    log.debug("error: old parent = "+child.getParent()+" new parent="+parent+", ignoring..."); 
+		continue;
+	    }
+	    transitions.add(new Transition(child, child.getParent(), (ShapeContainer)parent));
+	}
+ 	return transitions;
+    } 
+
+    
     protected void execute()
     {
 	BlackboardService bbs = getBlackboardService();
