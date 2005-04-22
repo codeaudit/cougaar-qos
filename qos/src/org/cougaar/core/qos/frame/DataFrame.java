@@ -83,7 +83,6 @@ abstract public class DataFrame
 				     UID uid,
 				     Properties values)
     {
-	// use reflection here!
 	Class klass = frameSet.classForPrototype(proto);
 	if (klass == null) return null;
 
@@ -116,6 +115,14 @@ abstract public class DataFrame
 	this.props = new Properties();
 	this.pcs = new PropertyChangeSupport(this);
     }
+
+    // Subclass responsibility
+    abstract protected Object getLocalValue(String slot);
+    abstract protected void setLocalValue(String slot, Object value);
+    abstract protected void removeLocalValue(String slot);
+    abstract protected void initializeLocalValue(String slot, Object value);
+
+
 
     // Serialization
     private void readObject(java.io.ObjectInputStream in)
@@ -382,9 +389,12 @@ abstract public class DataFrame
     }
 
 
-    private Object getLocalValue(String slot)
+
+    
+    // The following four methods are no longer used and are kept here
+    // for documentation purposes.
+    private Object getLocalValueReflective(String slot)
     {
-	// reflection
 	Class klass = getClass();
 	String mname = "get" + FrameGen.fixName(slot, true);
 	try {
@@ -404,9 +414,8 @@ abstract public class DataFrame
 	}
     }
 
-    private void setLocalValue(String slot, Object value)
+    private void setLocalValueReflective(String slot, Object value)
     {
-	// reflection
 	Class klass = getClass();
 	String mname = "set" + FrameGen.fixName(slot, true);
 	try {
@@ -421,31 +430,25 @@ abstract public class DataFrame
 	}
     }
 
-    private Object removeLocalValue(String slot)
+
+    private void removeLocalValueReflective(String slot)
     {
-	// reflection
 	Class klass = getClass();
 	String mname = "remove" + FrameGen.fixName(slot, true);
 	try {
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
-	    Object result = meth.invoke(this, ARGS0);
+	    meth.invoke(this, ARGS0);
 	    if (log.isInfoEnabled())
-		log.info("Slot " +slot+ " of " +this+ " = " +result);
-	    return result;
+		log.info("Removed value of slot " +slot);
 	} catch (Exception ex) {
-	    // This is not necessarily an error.  It could mean one of
-	    // our children was supposed to have this value and
-	    // didn't, so it asked us.
 	    if (log.isInfoEnabled())
-		log.info("Couldn't get slot " +slot+ " of " +this+
+		log.info("Couldn't remove value of slot " +slot+ " of " +this+
 			  " via " +mname);
-	    return null;
 	}
     }
 
-    private void initializeLocalValue(String slot, Object value)
+    private void initializeLocalValueReflective(String slot, Object value)
     {
-	// reflection
 	Class klass = getClass();
 	String mname = "initialize" + FrameGen.fixName(slot, true);
 	try {

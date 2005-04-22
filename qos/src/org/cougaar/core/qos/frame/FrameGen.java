@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -357,6 +358,7 @@ public class FrameGen
 	writeAccessors(writer, prototype, local_slots, override_slots);
 	writeContainerReaders(writer, prototype, local_slots, container);
 	writeUpdaters(writer, prototype, local_slots, container);
+	writeDynamicAccessors(writer, prototype, parent,local_slots, container);
 	writer.println("}");
 
 	writer.close();
@@ -594,6 +596,134 @@ public class FrameGen
 	else
 	    writer.println("        setProperty(\"" +slot+ "\", new_value);");
 	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
+	writer.println("    }");
+    }
+
+    private void writeDynamicAccessors(PrintWriter writer, 
+				       String prototype,
+				       String parent,
+				       HashMap local_slots,
+				       String container)
+    {
+	HashSet slots = new HashSet();
+	slots.addAll(local_slots.keySet());
+	boolean is_root = parent == null;
+	if (!slots.isEmpty()) {
+	    writeDynamicSetter(writer, slots, is_root);
+	    writeDynamicInitializer(writer, slots, is_root);
+	    writeDynamicRemover(writer, slots, is_root);
+	}
+	if (container != null) slots.addAll(collectSlots(container));
+	if (!slots.isEmpty())
+	    writeDynamicGetter(writer, slots, is_root);
+    }
+
+    private void writeDynamicGetter(PrintWriter writer, 
+				    Set slots,
+				    boolean is_root)
+    {
+	writer.println("\n\n    protected Object getLocalValue(String __slot)");
+	writer.println("    {");
+	Iterator itr = slots.iterator();
+	boolean first = true;
+	while(itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    String method = "get" + fixName(slot, true);
+	    writer.print("        ");
+	    if (!first) writer.print("} else ");
+	    first = false;
+	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.println("            return " +method+ "();");
+	}
+	writer.println("        } else {");
+	if (is_root)
+	    writer.println("            return null;");
+	else
+	    writer.println("            return super.getLocalValue(__slot);");
+	writer.println("        }");
+	writer.println("    }");
+    }
+
+    private void writeDynamicSetter(PrintWriter writer, 
+				    Set slots,
+				    boolean is_root)
+    {
+	writer.println("\n\n    protected void setLocalValue(String __slot,");
+	writer.println("                                 Object __value)");
+	writer.println("    {");
+	Iterator itr = slots.iterator();
+	boolean first = true;
+	while(itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    String method = "set" + fixName(slot, true);
+	    writer.print("        ");
+	    if (!first) writer.print("} else ");
+	    first = false;
+	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.println("            " +method+ "(__value);");
+	}
+	if (is_root) {
+	    writer.println("        }");
+	} else {
+	    writer.println("        } else {");
+	    writer.println("            super.setLocalValue(__slot, __value);");
+	    writer.println("        }");
+	}
+	writer.println("    }");
+    }
+
+    private void writeDynamicInitializer(PrintWriter writer, 
+					 Set slots,
+					 boolean is_root)
+    {
+	writer.println("\n\n    protected void initializeLocalValue(String __slot,");
+	writer.println("                                        Object __value)");
+	writer.println("    {");
+	Iterator itr = slots.iterator();
+	boolean first = true;
+	while(itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    String method = "initialize" + fixName(slot, true);
+	    writer.print("        ");
+	    if (!first) writer.print("} else ");
+	    first = false;
+	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.println("            " +method+ "(__value);");
+	}
+	if (is_root) {
+	    writer.println("        }");
+	} else {
+	    writer.println("        } else {");
+	    writer.println("            super.initializeLocalValue(__slot, __value);");
+	    writer.println("        }");
+	}
+	writer.println("    }");
+    }
+
+    private void writeDynamicRemover(PrintWriter writer, 
+				     Set slots,
+				     boolean is_root)
+    {
+	writer.println("\n\n    protected void removeLocalValue(String __slot)");
+	writer.println("    {");
+	Iterator itr = slots.iterator();
+	boolean first = true;
+	while(itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    String method = "remove" + fixName(slot, true);
+	    writer.print("        ");
+	    if (!first) writer.print("} else ");
+	    first = false;
+	    writer.println("if (__slot.equals(\"" +slot+ "\")) {");
+	    writer.println("            " +method+ "();");
+	}
+	if (is_root) {
+	    writer.println("        }");
+	} else {
+	    writer.println("        } else {");
+	    writer.println("            super.removeLocalValue(__slot);");
+	    writer.println("        }");
+	}
 	writer.println("    }");
     }
 
