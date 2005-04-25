@@ -64,6 +64,14 @@ public class Transition {
      
 	if (firstStep) {
             fromContainer.remove(shape);
+
+            if (!Display.ENABLE_ANIMATION) {
+                lastStep = true;
+                toContainer.add(shape);
+                return true;
+            }
+
+
             firstStep = false;
             shape.reshape(fromPos.x, fromPos.y, r.getWidth(), r.getHeight());
 
@@ -83,7 +91,7 @@ public class Transition {
         yoff = (transVec.getX() < 0 ? -1d : 1d) * speed*Math.sin(angle);
 
 	    if (log.isDebugEnabled())
-		log.debug("starting transition, shape='"+shape.getId()+"' from '"+fromContainer.getId()+"' to '"+toContainer.getId()+"'start x="+fromPos.x+" y="+fromPos.y+"  end x="+toPos.x+" y="+toPos.y+"  length="+tLength+" angle = "+angle);
+		    log.debug("starting transition, shape='"+shape.getId()+"' from '"+fromContainer.getId()+"' to '"+toContainer.getId()+"'start x="+fromPos.x+" y="+fromPos.y+"  end x="+toPos.x+" y="+toPos.y+"  length="+tLength+" angle = "+angle);
 	    
         }
 	

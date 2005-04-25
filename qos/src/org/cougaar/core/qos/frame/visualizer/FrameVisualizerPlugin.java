@@ -112,8 +112,8 @@ public class FrameVisualizerPlugin
 		log.debug("No Frame changes");
 	    return;
 	}
-	//if (log.isDebugEnabled())
-	//  log.debug("There are changes.");
+	if (log.isDebugEnabled())
+	    log.debug("There are changes.");
 	Enumeration en;
 		
 	// New Frames
@@ -151,8 +151,8 @@ public class FrameVisualizerPlugin
 	    Collection changes = sub.getChangeReports(frame);
 	    // A collection of Frame.Change instances.
 	    if (changes != null) {
-		if (frame.isa("relationship"))  
-		    transitions.addAll(processRelationshipChanges(frame, changes.iterator()));
+		if (frame instanceof RelationFrame) //frame.isa("relationship"))  
+		    transitions.addAll(processRelationshipChanges((RelationFrame)frame, changes.iterator()));
 	    }
 	}
 	if (transitions.size() > 0) {
@@ -174,48 +174,52 @@ public class FrameVisualizerPlugin
 
 
 
-    protected Collection processRelationshipChanges(Frame frame, Iterator changes) {
-	String slotName;
-	Object value;
-	ShapeGraphic child, parent;
-	Frame ff[];
-	ArrayList transitions = new ArrayList();
+    protected Collection processRelationshipChanges(RelationFrame frame, Iterator changes) {
+        String slotName;
+        Object value;
+        ShapeGraphic child, parent;
+        Frame fch, fp;
+        ArrayList transitions = new ArrayList();
 
-	while (changes.hasNext()) {
-	    Frame.Change change = (Frame.Change) changes.next();
-	    // Handle change to existing frame
-	    slotName = change.getSlotName();
-	    value    = change.getValue();
+        while (changes.hasNext()) {
+            Frame.Change change = (Frame.Change) changes.next();
+            // Handle change to existing frame
+            slotName = change.getSlotName();
+            value    = change.getValue();
 
-	    //if (log.isDebugEnabled()) 
-	    //log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
+            if (log.isDebugEnabled())
+                log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
 
-	    ff = helper.getParentAndChild(frame);
-	    //if (log.isDebugEnabled()) 
-	    //log.debug("processRelationshipChanges parentFrame="+ff[0]+"  childFrame="+ff[1]);
- 
-	    parent = pluginDisplay.findShape(ff[0]);
-	    child  = pluginDisplay.findShape(ff[1]);
-	    if (parent == null || child == null) {
-		//if (log.isDebugEnabled()) 
-		//  log.debug("did not find shapes");
-		continue;
-	    }
-	    if (child.getParent() == null || child.getParent().getId().equals(parent.getId())) {
-		//if (log.isDebugEnabled()) 
-		//  log.debug("error: old parent = "+child.getParent()+" new parent="+parent+", ignoring..."); 
-		continue;
-	    }
-	    transitions.add(new Transition(child, child.getParent(), (ShapeContainer)parent));
-	}
- 	return transitions;
+            fp = frame.relationshipParent();
+            fch  = frame.relationshipChild();
+
+            if (log.isDebugEnabled())
+                log.debug("processRelationshipChanges parentFrame="+fp+"  childFrame="+fch);
+
+            parent = pluginDisplay.findShape(fp);
+            child  = pluginDisplay.findShape(fch);
+            if (parent == null || child == null) {
+                if (log.isDebugEnabled())
+                    log.debug("did not find shapes");
+                continue;
+            }
+            if (child.getParent() == null || child.getParent().getId().equals(parent.getId())) {
+                if (log.isDebugEnabled())
+                    log.debug("error: old parent = "+child.getParent()+" new parent="+parent+", ignoring...");
+                continue;
+            }
+	    //log.debug("parent="+parent.getClass().getName());
+	    //log.debug("child ="+child.getClass().getName());
+            transitions.add(new Transition(child, child.getParent(), (ShapeContainer)parent));
+        }
+        return transitions;
     } 
 
     
     protected void execute()
     {
-	BlackboardService bbs = getBlackboardService();
-	do_execute(bbs);
+        BlackboardService bbs = getBlackboardService();
+        do_execute(bbs);
     }
 
     protected void setupSubscriptions() 

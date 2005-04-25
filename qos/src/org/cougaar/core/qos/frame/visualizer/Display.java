@@ -6,6 +6,7 @@ import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
 import org.cougaar.core.qos.frame.visualizer.util.ChangeModel;
 import org.cougaar.core.qos.frame.visualizer.test.TickEvent;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
+import org.cougaar.core.qos.frame.visualizer.test.TestTransition;
 import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
@@ -19,9 +20,10 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
+import java.awt.event.MouseEvent;
 
 
 import org.xml.sax.Attributes;
@@ -34,6 +36,8 @@ import org.xml.sax.Attributes;
  * To change this template use File | Settings | File Templates.
  */
 public class Display extends AnimatedCanvas {
+    public static boolean ENABLE_ANIMATION = false;//true;
+
      ShapeContainer root;
      boolean initialized, processingTickEvent;
      ArrayList transitions, tickEventQueue;
@@ -75,10 +79,10 @@ public class Display extends AnimatedCanvas {
         changes.addListener(l);
     }
 
-    public JPanel getControlPanel() {
+    public Component getControlPanel() {
 	if (cPanel == null) 
 	    cPanel = new ControlPanel();
-	return cPanel;
+	    return cPanel;
     }
 
 
@@ -145,7 +149,7 @@ public class Display extends AnimatedCanvas {
     }
 
     public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
-	return root.find(f);
+	    return root.find(f);
     }
 
 
@@ -157,8 +161,8 @@ public class Display extends AnimatedCanvas {
     } 
 
     public void processNextTickEvent() {
-	TickEvent tickEvent=null;
-	synchronized (tickEventQueue) {
+        TickEvent tickEvent=null;
+        synchronized (tickEventQueue) {
             if (tickEventQueue.size() > 0) {
                 tickEvent = (TickEvent)tickEventQueue.get(0);
                 tickEventQueue.remove(0);
@@ -175,32 +179,66 @@ public class Display extends AnimatedCanvas {
 
 
     public void setFrameHelper(FrameHelper h) {
-	this.frameHelper = h;
-	root.setFrameHelper(frameHelper);
+        this.frameHelper = h;
+        root.setFrameHelper(frameHelper);
     }
 
 
 
 
 
-    class ControlPanel extends JPanel implements ChangeListener {
-	JSlider animationDelaySlider;
+    class ControlPanel extends Box implements ChangeListener {
+        JSlider animationDelaySlider;
+        JCheckBox animationOn;
 
-	public ControlPanel() {
-	    super(new FlowLayout(FlowLayout.LEFT));
-	    animationDelaySlider = new JSlider(0, 100, (int) sleepAmount);
-	    add(animationDelaySlider);
-	}
+        public ControlPanel() {
+            super(BoxLayout.X_AXIS);
+            animationDelaySlider = new JSlider(0, 1000, (int) sleepAmount);
+            animationDelaySlider.addChangeListener(this);
+            //animationDelaySlider.setPaintLabels(true);
+            animationOn = new JCheckBox("Animation On");
+            animationOn.setSelected(Display.ENABLE_ANIMATION);
+            animationOn.addChangeListener(this);
+            add(new JLabel("Animation delay:"));
+            add(animationDelaySlider);
+            add(Box.createHorizontalStrut(20));
+            add(animationOn);
+        }
 
 
-	public void stateChanged(ChangeEvent e) {
-	    if (e.getSource() == animationDelaySlider) {
-		sleepAmount = (long) animationDelaySlider.getValue();
-	    }
-
-	}
-
+        public void stateChanged(ChangeEvent e) {
+            Object source = e.getSource();
+            if (source == animationDelaySlider) {
+                sleepAmount = (long) animationDelaySlider.getValue();
+            } else if (source == animationOn) {
+                Display.ENABLE_ANIMATION = animationOn.isSelected();
+            }
+        }
     }
 
+    /*
+    public void p(String msg) {
+        System.out.println(msg);
+    }
+
+    public void mousePressed(MouseEvent evt) {
+        //super.mousePressed(evt);
+        p("Display.mousePressed count="+count);
+        if(mouseMoveFlag==false) {
+          mousePoint=evt.getPoint();
+          count = (++count)%2;
+          if (count == 0) {
+              lastPoint = mousePoint;
+          } else if (count == 1 && lastPoint != null) {
+              p("creating a transition from  "+lastPoint.x+","+lastPoint.y+"  to "+mousePoint.x+", "+mousePoint.y);
+              transitions.add(new TestTransition(new Point2D.Double((double)lastPoint.x, (double)lastPoint.y),
+                                 new Point2D.Double((double)mousePoint.x, (double)mousePoint.y)));
+              lastPoint = null;
+          }
+
+        }
+        super.mousePressed(evt);
+    }
+   */
 }
 

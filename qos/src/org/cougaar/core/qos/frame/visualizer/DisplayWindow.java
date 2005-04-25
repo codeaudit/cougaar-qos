@@ -32,7 +32,7 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
         super("");
         tabbedPane = new JTabbedPane();
         display = new Display(xmlFile);
-	    JPanel controlPanel = display.getControlPanel();
+	    Component controlPanel = display.getControlPanel();
         containerView = new ContainerTreeView();
         frameView = new FrameTreeView();
 

@@ -2,11 +2,13 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
+import org.cougaar.core.qos.frame.visualizer.test.TestTransition;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.*;
 
 
@@ -21,11 +23,14 @@ import java.util.*;
 public class AnimatedCanvas extends AnimatingSurface implements MouseListener, MouseMotionListener {
     protected HashMap shapes;
     protected boolean mouseMoveFlag =false;
-    protected Point   mousePoint=null;
+    protected Point   mousePoint=null, lastPoint=null;
     protected Point   mouseStartDragPoint=null;
     protected ShapeGraphic selectedShape;
     protected Dimension oldSize;
     private transient Logger log = Logging.getLogger(getClass().getName());
+
+    //temp
+    int count=0;
 
     public AnimatedCanvas() {
         super();
