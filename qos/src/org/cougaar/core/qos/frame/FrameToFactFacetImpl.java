@@ -26,18 +26,11 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.util.Enumeration;
-import java.util.Collection;
-import java.util.Iterator;
-
-import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.ca.BeanToFactFacetImpl;
 import org.cougaar.core.qos.ca.ConnectionSpec;
 import org.cougaar.core.qos.ca.CoordinationArtifact;
-import org.cougaar.core.qos.ca.FacetImpl;
 import org.cougaar.core.qos.ca.RolePlayer;
-import org.cougaar.core.service.BlackboardService;
-import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
 
 
@@ -49,19 +42,16 @@ import org.cougaar.util.UnaryPredicate;
  * @see FrameCoordinationArtifactProvider
  */
 abstract public class FrameToFactFacetImpl
-    extends FacetImpl
+    extends BeanToFactFacetImpl
 {
 
-    // This should check the frameset_name!!!
     private UnaryPredicate framePred = new UnaryPredicate() {
 	    public boolean execute(Object o) {
-	       return (o instanceof DataFrame) &&
+		return (o instanceof DataFrame) &&
 		    ((Frame) o).getFrameSet().getName().equals(frameset_name);
 	    }
 	};
-    private IncrementalSubscription sub;
-    private LoggingService log;
-    private final String frameset_name;
+    private String frameset_name;
 
     protected FrameToFactFacetImpl(CoordinationArtifact owner,
 				   ServiceBroker sb,
@@ -69,88 +59,17 @@ abstract public class FrameToFactFacetImpl
 				   RolePlayer player)
     {
 	super(owner, sb, spec, player);
-	log = (LoggingService)
-           sb.getService(this, LoggingService.class, null);
+    }
+
+    protected void initialize(ConnectionSpec spec)
+    {
 	this.frameset_name = spec.ca_parameters.getProperty("frame-set");
-	linkPlayer();
     }
 
-    abstract protected Object frameToFact(DataFrame frame);
-    abstract protected Object changesToFact(DataFrame frame, 
-					    Collection changes);
-
-    private void do_execute(BlackboardService bbs)
+    protected UnaryPredicate getPredicate()
     {
-	if (!sub.hasChanged()) {
-	    if (log.isDebugEnabled())
-		log.debug("No Frame changes");
-	    return;
-	}
-
-	RolePlayer player = getPlayer();
-
-	Enumeration en;
-		
-	// New Frames
-	en = sub.getAddedList();
-	while (en.hasMoreElements()) {
-	    DataFrame frame = (DataFrame) en.nextElement();
-	    if (log.isDebugEnabled()) {
-		log.debug("Observed added "+frame);
-	    }
-	    Object fact = frameToFact(frame);
-	    if (fact instanceof Collection) {
-		Iterator itr = ((Collection) fact).iterator();
-		while (itr.hasNext())  player.assertFact(itr.next());
-	    } else if (fact != null) {
-		player.assertFact(fact);
-	    }
-	}
-		
-		
-	// Changed Frames
-	en = sub.getChangedList();
-	while (en.hasMoreElements()) {
-	    DataFrame frame = (DataFrame) en.nextElement();
-	    if (log.isDebugEnabled()) {
-		log.debug("Observed changed "+frame);
-	    }
-	    Collection changes = sub.getChangeReports(frame);
-	    Object fact = changesToFact(frame, changes);
-	    if (fact instanceof Collection) {
-		Iterator itr = ((Collection) fact).iterator();
-		while (itr.hasNext())  player.assertFact(itr.next());
-	    } else if (fact != null) {
-		player.assertFact(fact);
-	    }
-	}
-		
-	// Remove Frames.  TBD/
-	en = sub.getRemovedList();
-	while (en.hasMoreElements()) {
-	    Frame frame = (Frame) en.nextElement();
-	    if (log.isDebugEnabled()) {			
-		log.debug("Observed removed "+frame);
-	    }
-	}
+	return framePred;
     }
 
-    public void setupSubscriptions(BlackboardService bbs) 
-    {
-	if (log.isDebugEnabled())
-	    log.debug("FrameSet name is " + frameset_name);
-
-	sub = (IncrementalSubscription)
-	    bbs.subscribe(framePred);
-	
-	if (!sub.getAddedCollection().isEmpty() && log.isDebugEnabled())
-	    log.debug("Subscription has initial contents");
-	do_execute(bbs);
-    }
-
-    public void execute(BlackboardService bbs)
-    {
-	do_execute(bbs);
-    }
 
 }
