@@ -17,25 +17,25 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class Transition {
-    Point2D.Double fromPos;
-    Point2D.Double toPos;
-    ShapeGraphic shape;
-    ShapeContainer fromContainer, toContainer;
-    boolean firstStep, lastStep;
+    protected Point2D.Double fromPos;
+    protected Point2D.Double toPos;
+    protected ShapeGraphic shape;
+    protected ShapeContainer fromContainer, toContainer;
+    protected boolean firstStep, lastStep;
     //double increment = 30d;
-    double angle, speed = 30d, tLength, xoff,yoff;
+    protected double angle, speed = 30d, tLength, xoff,yoff;
 
-    Vec2d startVec, endVec, transVec;
+    protected Vec2d startVec, endVec, transVec;
 
-    private transient Logger log = Logging.getLogger(getClass().getName());
+    protected  transient Logger log = Logging.getLogger(getClass().getName());
 
 
     public Transition(ShapeGraphic shape, ShapeContainer fromContainer, ShapeContainer toContainer) {
         this.shape = shape;
         this.fromContainer = fromContainer;
         this.toContainer = toContainer;
-        this.fromPos = fromContainer.getNextInsertPosition();
-        this.toPos   = toContainer.getNextInsertPosition();
+        this.fromPos = (fromContainer != null ? fromContainer.getNextInsertPosition(): null);
+        this.toPos   = (toContainer != null ? toContainer.getNextInsertPosition() : null);
         firstStep = true;
         lastStep = false;
     }
@@ -79,8 +79,8 @@ public class Transition {
 	    
 	    double d= (transVec.getY() / (transVec.getX() == 0d ? 0.01 : transVec.getX()));
 	    angle = Math.atan(d);
-	    xoff = speed*Math.cos(angle);
-	    yoff = speed*Math.sin(angle);
+	    xoff = (transVec.getX() < 0 ? -1d : 1d) * speed*Math.cos(angle);
+        yoff = (transVec.getX() < 0 ? -1d : 1d) * speed*Math.sin(angle);
 
 	    if (log.isDebugEnabled())
 		log.debug("starting transition, shape='"+shape.getId()+"' from '"+fromContainer.getId()+"' to '"+toContainer.getId()+"'start x="+fromPos.x+" y="+fromPos.y+"  end x="+toPos.x+" y="+toPos.y+"  length="+tLength+" angle = "+angle);

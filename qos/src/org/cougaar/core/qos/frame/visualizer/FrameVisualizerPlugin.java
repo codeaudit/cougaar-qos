@@ -112,8 +112,8 @@ public class FrameVisualizerPlugin
 		log.debug("No Frame changes");
 	    return;
 	}
-	if (log.isDebugEnabled())
-	    log.debug("There are changes.");
+	//if (log.isDebugEnabled())
+	//  log.debug("There are changes.");
 	Enumeration en;
 		
 	// New Frames
@@ -187,23 +187,23 @@ public class FrameVisualizerPlugin
 	    slotName = change.getSlotName();
 	    value    = change.getValue();
 
-	    if (log.isDebugEnabled()) 
-		log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
+	    //if (log.isDebugEnabled()) 
+	    //log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
 
 	    ff = helper.getParentAndChild(frame);
-	    if (log.isDebugEnabled()) 
-		log.debug("processRelationshipChanges parentFrame="+ff[0]+"  childFrame="+ff[1]);
+	    //if (log.isDebugEnabled()) 
+	    //log.debug("processRelationshipChanges parentFrame="+ff[0]+"  childFrame="+ff[1]);
  
 	    parent = pluginDisplay.findShape(ff[0]);
 	    child  = pluginDisplay.findShape(ff[1]);
 	    if (parent == null || child == null) {
-		if (log.isDebugEnabled()) 
-		    log.debug("did not find shapes");
+		//if (log.isDebugEnabled()) 
+		//  log.debug("did not find shapes");
 		continue;
 	    }
 	    if (child.getParent() == null || child.getParent().getId().equals(parent.getId())) {
-		if (log.isDebugEnabled()) 
-		    log.debug("error: old parent = "+child.getParent()+" new parent="+parent+", ignoring..."); 
+		//if (log.isDebugEnabled()) 
+		//  log.debug("error: old parent = "+child.getParent()+" new parent="+parent+", ignoring..."); 
 		continue;
 	    }
 	    transitions.add(new Transition(child, child.getParent(), (ShapeContainer)parent));
