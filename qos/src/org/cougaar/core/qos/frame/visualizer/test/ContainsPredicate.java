@@ -26,11 +26,11 @@ public class ContainsPredicate extends FramePredicate {
 
         if (o instanceof Frame) {
             f = (Frame) o;
-	    boolean kindBool = (kind != null ?  f.isa(kind) : true);
-	    if (!kindBool)
-		return false;
+            boolean kindBool = (kind != null ?  f.isa(kind) : true);
+            if (!kindBool)
+                return false;
             String p = (String) f.getValue("parent-value");
-	    return (p!= null && p.equals(parent));
+            return (p!= null && p.equals(parent));
         }
         return false;
     }
