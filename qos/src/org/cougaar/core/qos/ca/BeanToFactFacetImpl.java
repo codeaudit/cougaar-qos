@@ -108,7 +108,10 @@ abstract public class BeanToFactFacetImpl
 	    Object fact = changesToFact(bean, changes);
 	    if (fact instanceof Collection) {
 		Iterator itr = ((Collection) fact).iterator();
-		while (itr.hasNext())  player.assertFact(itr.next());
+		while (itr.hasNext()) {
+		    Object change_fact = itr.next();
+		    if (change_fact != null) player.assertFact(change_fact);
+		}
 	    } else if (fact != null) {
 		player.assertFact(fact);
 	    }
