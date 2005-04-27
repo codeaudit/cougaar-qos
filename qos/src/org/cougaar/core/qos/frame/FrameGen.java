@@ -67,7 +67,7 @@ public class FrameGen
     private HashMap proto_attrs;
     private HashMap proto_slots;
     private String current_prototype;
-    private String root_relation;
+    private String container_relation, root_relation;
 
 
     public FrameGen(String path)
@@ -259,6 +259,7 @@ public class FrameGen
     {
 	package_name = attrs.getValue("package");
 
+	container_relation = attrs.getValue("container-relation");
 	String inheritance = attrs.getValue("frame-inheritance");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
@@ -271,10 +272,6 @@ public class FrameGen
     private void startPrototype(Attributes attrs)
     {
 	current_prototype = attrs.getValue("name");
-	String rootp = attrs.getValue("root-relation");
-	if (rootp != null && rootp.equalsIgnoreCase("true")) {
-	    root_relation = current_prototype;
-	}
 	proto_attrs.put(current_prototype, new AttributesImpl(attrs));
 	slots = new HashMap();
     }
@@ -304,7 +301,19 @@ public class FrameGen
 
     private void generateCode()
     {
-	Iterator itr = proto_slots.entrySet().iterator();
+	Iterator itr;
+
+	// Find root_relation
+	String relation = container_relation;
+	while (relation != null) {
+	    Attributes attrs = (Attributes) proto_attrs.get(relation);
+	    String proto = attrs.getValue("prototype");
+	    if (proto == null) root_relation = relation;
+	    relation = proto;
+	}
+	
+
+	itr = proto_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String prototype = (String) entry.getKey();

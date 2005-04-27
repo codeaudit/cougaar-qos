@@ -71,14 +71,16 @@ public class SingleInheritanceFrameSet
     // Containment hackery
     private HashSet pending_relations;
     private HashMap containers;
-    private PrototypeFrame root_relation, container_relation;
+    private String container_relation;
 
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
 				     BlackboardService bbs,
-				     String name)
+				     String name,
+				     String container_relation)
     {
 	this.name = name;
+	this.container_relation = container_relation;
 	this.cached_classes = new HashMap();
 	this.parent_cache = new HashMap();
 	this.child_cache = new HashMap();
@@ -238,24 +240,6 @@ public class SingleInheritanceFrameSet
 
 
 
-    // FrameSet Accessors
-    public synchronized void setRootRelation(PrototypeFrame frame)
-    {
-	if (root_relation != null)
-	    throw new RuntimeException("Root relation of " +this+
-				       " is already set!");
-	root_relation = frame;
-    }
-
-
-    public void setContainerRelation(PrototypeFrame frame)
-    {
-	if (container_relation != null)
-	    throw new RuntimeException("Container relation of " +this+
-				       " is already set!");
-	container_relation = frame;
-    }
-
     public String getName()
     {
 	return name;
@@ -368,7 +352,7 @@ public class SingleInheritanceFrameSet
 
     private boolean isContainmentRelation(DataFrame frame)
     {
-	return descendsFrom(frame, container_relation.getName());
+	return descendsFrom(frame, container_relation);
     }
 
     public DataFrame getContainer(DataFrame frame)

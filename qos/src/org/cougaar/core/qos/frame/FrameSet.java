@@ -203,15 +203,4 @@ public interface FrameSet
     public void dump(File proto_file, File data_file)
 	throws java.io.IOException;
 
-    /**
-     * Specify the root relationship of this set.  Can only be called
-     * once - subsequent calls generate a RuntimeException.
-     */
-    void setRootRelation(PrototypeFrame frame);
-
-    /**
-     * Specify the containment relationship of this set.  Can only be
-     * called once - subsequent calls generate a RuntimeException.
-     */
-    void setContainerRelation(PrototypeFrame frame);
 }

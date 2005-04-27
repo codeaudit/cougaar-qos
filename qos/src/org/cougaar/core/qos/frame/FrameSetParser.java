@@ -110,27 +110,18 @@ public class FrameSetParser
 	extends FrameSpec
     {
 	String name;
-	boolean is_root, is_container;
 
 	PrototypeSpec(Attributes attrs)
 	{
 	    super();
 	    name = attrs.getValue("name");
 	    prototype = attrs.getValue("prototype");
-	    String rootp = attrs.getValue("root-relation");
-	    if (rootp != null)
-		is_root = rootp.equalsIgnoreCase("true");
-	    String containerp = attrs.getValue("container-relation");
-	    if (containerp != null)
-		is_container = containerp.equalsIgnoreCase("true");
 	}
 
 	Frame makePrototype(FrameSet frameSet)
 	{
 	    PrototypeFrame frame =
 		frameSet.makePrototype(name, prototype, props);
-	    if (is_root) frameSet.setRootRelation(frame);
-	    if (is_container) frameSet.setContainerRelation(frame);
 	    return frame;
 	}
 
@@ -309,12 +300,14 @@ public class FrameSetParser
 	if (frame_set != null) return;
 
 	String pkg = attrs.getValue("package");
+	String container_relation = attrs.getValue("container-relation");
 	String inheritance = attrs.getValue("frame-inheritance");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	frame_set = new SingleInheritanceFrameSet(pkg, sb, bbs, frame_set_name);
+	frame_set = new SingleInheritanceFrameSet(pkg, sb, bbs, frame_set_name,
+						  container_relation);
     }
 
 
