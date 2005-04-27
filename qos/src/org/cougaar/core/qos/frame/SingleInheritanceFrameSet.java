@@ -732,8 +732,6 @@ public class SingleInheritanceFrameSet
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
 
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frameset>");
 	indentation += offset;
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("<frames>");
@@ -743,8 +741,6 @@ public class SingleInheritanceFrameSet
 
 	indentation -= offset;
 	writer.println("</frames>");
-	indentation -= offset;
-	writer.println("</frameset>");
 
 
 	writer.close();
@@ -792,6 +788,8 @@ public class SingleInheritanceFrameSet
 	writer.println("  frame-inheritance=\"single\"");
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("  package=\"" +pkg+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  container-relation=\"" +container_relation+ "\"");
 	writer.println(">");
 
 

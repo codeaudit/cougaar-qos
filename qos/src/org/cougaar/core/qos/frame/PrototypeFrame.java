@@ -179,9 +179,11 @@ public class PrototypeFrame
 
     void dump(PrintWriter writer, int indentation, int offset)
     {
+	String kind = getKind();
 	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<prototype name=" +prototype_name+
-		       " prototype=\"" +getKind()+ "\">");
+	writer.print("<prototype name=" +prototype_name);
+	if (kind != null) writer.print(" prototype=\"" +kind+ "\"");
+	writer.println(">");
 	dumpLocalSlots(writer, indentation+offset, offset);
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("</frame>");
