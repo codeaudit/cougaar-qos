@@ -67,6 +67,21 @@ public class PrototypeFrame
 	this.path_cache = new HashMap();
     }
 
+    public Properties getSlotDefinitions()
+    {
+	// return a copy
+	Properties defs = new Properties();
+	Iterator itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    Object key = entry.getKey();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    defs.put(key, new AttributesImpl(attrs));
+	}
+	return defs;
+    }
+	
+
     public Properties getLocalSlots()
     {
 	Properties result = new VisibleProperties();
