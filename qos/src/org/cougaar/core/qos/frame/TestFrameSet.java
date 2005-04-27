@@ -53,9 +53,7 @@ import org.cougaar.util.log.Logger;
  * single inheritance in both the prototype hierarchy and the
  * containment hierarchy.
  */
-public class TestFrameSet
-    implements FrameSet
-{
+public class TestFrameSet implements FrameSet {
     private final String name;
     private final String pkg;
     private final Object change_queue_lock, relation_lock;
@@ -70,14 +68,17 @@ public class TestFrameSet
     // Containment hackery
     private HashSet pending_relations;
     private HashMap containers;
-    private PrototypeFrame root_relation, container_relation;
+    private String container_relation;
+
     private transient Logger log = Logging.getLogger(getClass().getName());
 
 
     public TestFrameSet(String pkg,
-				     String name)
+				     String name,
+				     String container_relation)
     {
 	this.name = name;
+	this.container_relation = container_relation;
 	this.cached_classes = new HashMap();
 	this.parent_cache = new HashMap();
 	this.child_cache = new HashMap();
@@ -94,7 +95,8 @@ public class TestFrameSet
 	this.containers = new HashMap();
     }
 
-    public Collection getAllFrames() {
+
+      public Collection getAllFrames() {
         return frames;
     }
 
@@ -108,6 +110,7 @@ public class TestFrameSet
 	}
 	if (object instanceof RelationFrame) {
 	    cacheRelation((RelationFrame) object);
+        frames.add(object);
 	} else if (object instanceof DataFrame) {
 	    synchronized (frames) {
 		frames.add(object);
@@ -125,11 +128,14 @@ public class TestFrameSet
 	    }
 	}
     }
+
     public static int counter=0;
+
     public DataFrame makeFrame(String proto, Properties values)
     {
-	UID uid = new UID(getName(), counter++);//uids.nextUID();
-	return makeFrame(proto, values, uid);
+        counter++;
+        UID uid = new UID(Integer.toString(counter), counter);
+        return makeFrame(proto, values, uid);
     }
 
     public DataFrame makeFrame(String proto, Properties values, UID uid)
@@ -153,7 +159,8 @@ public class TestFrameSet
 					String parent,
 					Properties values)
     {
-	UID uid = new UID(getName(), counter++);
+	counter++;
+    UID uid = new UID(Integer.toString(counter), counter);
 	return makePrototype(proto, parent, values, uid);
     }
 
@@ -184,7 +191,8 @@ public class TestFrameSet
 
     public Path makePath(String name, Path.Fork[] forks, String slot)
     {
-	UID uid = new UID(getName(), counter++);
+	counter++;
+    UID uid = new UID(Integer.toString(counter), counter);
 	Path path = new Path(uid, name, forks, slot);
 	synchronized (paths) {
 	    paths.put(name, path);
@@ -233,24 +241,6 @@ public class TestFrameSet
     }
 
 
-
-    // FrameSet Accessors
-    public synchronized void setRootRelation(PrototypeFrame frame)
-    {
-	if (root_relation != null)
-	    throw new RuntimeException("Root relation of " +this+
-				       " is already set!");
-	root_relation = frame;
-    }
-
-
-    public void setContainerRelation(PrototypeFrame frame)
-    {
-	if (container_relation != null)
-	    throw new RuntimeException("Container relation of " +this+
-				       " is already set!");
-	container_relation = frame;
-    }
 
     public String getName()
     {
@@ -364,7 +354,7 @@ public class TestFrameSet
 
     private boolean isContainmentRelation(DataFrame frame)
     {
-	return descendsFrom(frame, container_relation.getName());
+	return descendsFrom(frame, container_relation);
     }
 
     public DataFrame getContainer(DataFrame frame)
@@ -659,13 +649,13 @@ public class TestFrameSet
 	    if (log.isDebugEnabled())
 		log.debug("about to publish " + change);
 	    if (change instanceof Change) {
-		//Change chng = (Change) change;
+		Change chng = (Change) change;
 		//bbs.publishChange(chng.object, chng.changes);
 	    } else  if (change instanceof Add) {
-		//Add add = (Add) change;
+		Add add = (Add) change;
 		//bbs.publishAdd(add.object);
 	    } else  if (change instanceof Remove) {
-		//Remove rem = (Remove) change;
+		Remove rem = (Remove) change;
 		//bbs.publishRemove(rem.object);
 	    }
 	}
@@ -679,13 +669,13 @@ public class TestFrameSet
 	    for (int i=0; i<count; i++) {
 		Object change = change_queue.get(i);
 		if (change instanceof Change) {
-		    //Change chng = (Change) change;
+		    Change chng = (Change) change;
 		    //bbs.publishChange(chng.object, chng.changes);
 		} else  if (change instanceof Add) {
-		    //Add add = (Add) change;
+		    Add add = (Add) change;
 		    //bbs.publishAdd(add.object);
 		} else  if (change instanceof Remove) {
-		    //Remove rem = (Remove) change;
+		    Remove rem = (Remove) change;
 		    //bbs.publishRemove(rem.object);
 		}
 	    }
@@ -744,8 +734,6 @@ public class TestFrameSet
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
 
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frameset>");
 	indentation += offset;
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("<frames>");
@@ -755,8 +743,6 @@ public class TestFrameSet
 
 	indentation -= offset;
 	writer.println("</frames>");
-	indentation -= offset;
-	writer.println("</frameset>");
 
 
 	writer.close();
@@ -804,6 +790,8 @@ public class TestFrameSet
 	writer.println("  frame-inheritance=\"single\"");
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("  package=\"" +pkg+ "\"");
+	for (int i=0; i<indentation; i++) writer.print(' ');
+	writer.println("  container-relation=\"" +container_relation+ "\"");
 	writer.println(">");
 
 

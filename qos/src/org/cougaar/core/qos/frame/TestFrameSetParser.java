@@ -1,18 +1,30 @@
+/*
+ * <copyright>
+ *
+ *  Copyright 1997-2004 BBNT Solutions, LLC
+ *  under sponsorship of the Defense Advanced Research Projects
+ *  Agency (DARPA).
+ *
+ *  You can redistribute this software and/or modify it under the
+ *  terms of the Cougaar Open Source License as published on the
+ *  Cougaar Open Source Website (www.cougaar.org).
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * </copyright>
+ */
+
 package org.cougaar.core.qos.frame;
-
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-import org.xml.sax.helpers.AttributesImpl;
-import org.xml.sax.XMLReader;
-import org.xml.sax.Attributes;
-
-
-import java.util.Properties;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.io.File;
-import java.net.URL;
-
 
 import java.io.File;
 import java.net.URL;
@@ -31,8 +43,8 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.ConfigFinder;
-import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
+import org.cougaar.util.log.Logger;
 
 
 /**
@@ -40,11 +52,10 @@ import org.cougaar.util.log.Logging;
  * corresponding {@link PrototypeFrame}s and {@link DataFrame}s .  The
  * parsing is SAX.
  */
-public class TestFrameSetParser
-    extends DefaultHandler
-{
+public class TestFrameSetParser extends DefaultHandler {
     private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
-    private static final String DRIVER_DEFAULT ="org.apache.crimson.parser.XMLReaderImpl";
+    private static final String DRIVER_DEFAULT =
+	"org.apache.crimson.parser.XMLReaderImpl";
 
     static {
 	String driver = System.getProperty(DRIVER_PROPERTY);
@@ -52,35 +63,66 @@ public class TestFrameSetParser
 	    System.setProperty(DRIVER_PROPERTY, DRIVER_DEFAULT);
     }
 
-    // Helper structs
-    private class FrameSpec
-    {
-	String kind;
-	String parent;
-	Properties props;
 
-	FrameSpec(String kind, String parent)
+
+
+    // Helper structs
+    abstract private class FrameSpec
+    {
+	Properties props;
+	String prototype;
+	FrameSpec()
 	{
-	    this.kind = kind;
-	    this.parent = parent;
 	    props = new Properties();
 	}
-
-	Frame makePrototype(FrameSet frameSet)
-	{
-	    PrototypeFrame frame = frameSet.makePrototype(kind, parent, props);
-	    return frame;
-	}
-
-	Frame makeFrame(FrameSet frameSet)
-	{
-	    return frameSet.makeFrame(kind, props);
-	}
-
 
 	void put(String attr, Object value)
 	{
 	    props.put(attr, value);
+	}
+    }
+
+    private class DataFrameSpec
+	extends FrameSpec
+    {
+	String reference;
+
+	DataFrameSpec(Attributes attrs)
+	{
+	    super();
+	    prototype = attrs.getValue("prototype");
+	    reference = attrs.getValue("reference");
+	}
+
+	Frame makeFrame(FrameSet frameSet)
+	{
+	    Frame frame = frameSet.makeFrame(prototype, props);
+	    if (reference != null) {
+		synchronized (references) {
+		    references.put(reference, frame);
+		}
+	    }
+	    return frame;
+	}
+    }
+
+    private class PrototypeSpec
+	extends FrameSpec
+    {
+	String name;
+
+	PrototypeSpec(Attributes attrs)
+	{
+	    super();
+	    name = attrs.getValue("name");
+	    prototype = attrs.getValue("prototype");
+	}
+
+	Frame makePrototype(FrameSet frameSet)
+	{
+	    PrototypeFrame frame =
+		frameSet.makePrototype(name, prototype, props);
+	    return frame;
 	}
 
     }
@@ -120,19 +162,19 @@ public class TestFrameSetParser
 
     private String frame_set_name;
     private FrameSet frame_set;
-    private FrameSpec frame_spec;
-    private FrameSpec proto_spec;
+    private DataFrameSpec frame_spec;
+    private PrototypeSpec proto_spec;
     private PathSpec path_spec;
     private String current_slot;
     private HashMap path_specs;
+    private HashMap references;
 
-   // private ServiceBroker sb;
-    //private BlackboardService bbs;
-     private transient Logger log = Logging.getLogger(getClass().getName());
+    private transient Logger log = Logging.getLogger(getClass().getName());
 
     public TestFrameSetParser()
     {
-        path_specs = new HashMap();
+
+	path_specs = new HashMap();
     }
 
     public FrameSet parseFrameSetFiles(String name, String[] xml_filenames)
@@ -159,7 +201,7 @@ public class TestFrameSetParser
 
 	this.frame_set = frameSet;
 	this.frame_set_name = name;
-	File xml_file = new File(xml_filename); //ConfigFinder.getInstance().locateFile(xml_filename);
+	File xml_file = new File(xml_filename);//ConfigFinder.getInstance().locateFile(xml_filename);
 	if (xml_file == null) {
 	    if (log.isWarnEnabled())
 		log.warn("Can't find FrameSet file " + xml_filename);
@@ -196,7 +238,7 @@ public class TestFrameSetParser
 	} else if (name.equals("fork")) {
 	    fork(attrs);
 	} else if (name.equals("frames")) {
-	    // no-op
+	    references = new HashMap();
 	} else if (name.equals("frame")) {
 	    startFrame(attrs);
 	} else if (name.equals("path")) {
@@ -213,7 +255,7 @@ public class TestFrameSetParser
 	} else if (name.equals("prototype")) {
 	    endPrototype();
 	} else if (name.equals("frames")) {
-	    // no-op
+	    references = null;
 	} else if (name.equals("frame")) {
 	    endFrame();
 	} else if (name.equals("path")) {
@@ -226,7 +268,16 @@ public class TestFrameSetParser
     {
 	if (current_slot != null) {
 	    String value = new String(buf, offset, length);
-// 	    log.shout("Setting " +current_slot+ " to " +value);
+	    if (value.startsWith("?")) {
+		// Better to look up the slot in the prototype to see
+		// if its type is 'reference'.  Do that later.
+		Frame ref;
+		synchronized (references) {
+		    ref = (Frame) references.get(value);
+		}
+		log.shout("Resolved " +value+ " to " +ref);
+		if (ref != null) value = ref.getUID().toString();
+	    }
 	    frame_spec.put(current_slot, value);
 	    current_slot = null;
 	}
@@ -243,28 +294,14 @@ public class TestFrameSetParser
 
 	if (frame_set != null) return;
 
-	String pkg_prefix = attrs.getValue("package");
+	String pkg = attrs.getValue("package");
+	String container_relation = attrs.getValue("container-relation");
 	String inheritance = attrs.getValue("frame-inheritance");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	String relation_name = attrs.getValue("frame-inheritance-relation");
-	String parent_proto = attrs.getValue("parent-prototype");
-	String parent_slot = attrs.getValue("parent-slot");
-	String parent_value = attrs.getValue("parent-value");
-	String child_proto = attrs.getValue("child-prototype");
-	String child_slot = attrs.getValue("child-slot");
-	String child_value = attrs.getValue("child-value");
-      System.out.println("pkg_prefix="+pkg_prefix+"\ninheritance="+inheritance+"\nrelation_name="+relation_name+"\nparent_proto="+parent_proto+"\nparent_slot="+parent_slot);
-        frame_set = new TestFrameSet(pkg_prefix,frame_set_name);
-						  //relation_name,
-						  //parent_proto,
-						  //parent_slot,
-						  //parent_value,
-						  //child_proto,
-						  //child_slot,
-						  //child_value);
+	frame_set = new TestFrameSet(pkg, frame_set_name, container_relation);
     }
 
 
@@ -273,9 +310,7 @@ public class TestFrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("startPrototype");
 
-	String name = attrs.getValue("name");
-	String parent = attrs.getValue("prototype");
-	proto_spec = new FrameSpec(name, parent);
+	proto_spec = new PrototypeSpec(attrs);
     }
 
     private void endPrototype()
@@ -292,8 +327,7 @@ public class TestFrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("startFrame");
 
-	String prototype = attrs.getValue("prototype");
-	frame_spec = new FrameSpec(prototype, null);
+	frame_spec = new DataFrameSpec(attrs);
     }
 
     private void endFrame()
@@ -325,11 +359,11 @@ public class TestFrameSetParser
 
     private void endPath()
     {
-        if (log.isDebugEnabled())
-            log.debug("endPath");
+	if (log.isDebugEnabled())
+	    log.debug("endPath");
 
-        path_specs.put(path_spec.name, path_spec.makePath(frame_set));
-        path_spec = null;
+	path_specs.put(path_spec.name, path_spec.makePath(frame_set));
+	path_spec = null;
     }
 
 
@@ -337,17 +371,17 @@ public class TestFrameSetParser
 
     private void slot(Attributes attrs)
     {
-        if (log.isDebugEnabled())
-            log.debug("slot");
+	if (log.isDebugEnabled())
+	    log.debug("slot");
 
-        String slot = attrs.getValue("name");
-        if (path_spec != null) {
-            path_spec.setSlot(slot);
-        } else if (proto_spec != null) {
-            proto_spec.put(slot, new AttributesImpl(attrs));
-        } else {
-            // log
-        }
+	String slot = attrs.getValue("name");
+	if (path_spec != null) {
+	    path_spec.setSlot(slot);
+	} else if (proto_spec != null) {
+	    proto_spec.put(slot, new AttributesImpl(attrs));
+	} else {
+	    // log
+	}
     }
 
     private void endFrameset()
