@@ -87,7 +87,7 @@ abstract public class Frame
     }
 
 
-    Frame getPrototype()
+    public Frame getPrototype()
     {
 	if (frameSet == null) return null;
 	Frame result = frameSet.getPrototype(this);
