@@ -141,7 +141,7 @@ public class PrototypeFrame
 	    return result;
 	} else {
 	    // Not owned by us, check super
-	    return getInheritedValue((DataFrame) origin, slot_name);
+	    return getInheritedValue(origin, slot_name);
 	}
     }
 
