@@ -565,7 +565,7 @@ public class FrameGen
 	writer.println("\n\n    public Object get" +accessor_name+ "()");
 	writer.println("    {");
 	String result_var = "__result";
-	writer.println("        Object " +result_var+ " = get" +accessor_name+
+	writer.println("        Object " +result_var+ " = super.get" +accessor_name+
 		       "();");
 	writer.println("        if (" +result_var+ " != null) return "
 		       +result_var+ ";");
