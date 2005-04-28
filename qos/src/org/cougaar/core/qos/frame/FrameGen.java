@@ -368,6 +368,7 @@ public class FrameGen
 	writeContainerReaders(writer, prototype, local_slots, container);
 	writeUpdaters(writer, prototype, local_slots, container);
 	writeDynamicAccessors(writer, prototype, parent,local_slots, container);
+	writeDescriptionGetters(writer, prototype, local_slots, container);
 	writer.println("}");
 
 	writer.close();
@@ -656,6 +657,125 @@ public class FrameGen
 	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
 	writer.println("    }");
     }
+
+    private void writeDescriptionGetters(PrintWriter writer,
+					 String prototype,
+					 HashMap slots,
+					 String container)
+    {
+	Iterator itr;
+	HashSet container_slots = new HashSet();
+	if (container != null) {
+	    HashSet container_accessors = collectSlots(container);
+	    itr = container_accessors.iterator();
+	    while (itr.hasNext()) {
+		String slot = (String) itr.next();
+		if(!slots.containsKey(slot) && !inheritsSlot(prototype, slot))
+		    container_slots.add(slot);
+	    }
+	}
+
+	itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    writeDescriptionGetter(writer, prototype, slot, attrs);
+	}
+	
+	itr = container_slots.iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    writeContainerDescriptionGetter(writer, container, slot);
+	}
+
+	if (slots.isEmpty() && container_slots.isEmpty()) return;
+
+	writer.println("\n\n    protected void collectSlotDescriptions(java.util.List list)");
+	writer.println("    {");
+	writer.println("        super.collectSlotDescriptions(list);");
+	itr = slots.keySet().iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    String accessor = fixName(slot, true);
+	    writer.println("        list.add(" +accessor+ "Description());");
+	}
+	itr = container_slots.iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    String accessor = fixName(slot, true);
+	    writer.println("        list.add(" +accessor+ "Description());");
+	}
+	writer.println("    }");
+    }
+
+    private void writeDescriptionGetter(PrintWriter writer, 
+					String prototype,
+					String slot,
+					Attributes attrs)
+    {
+	String accessor_name = fixName(slot, true);
+	String fixed_name = fixName(slot, false);
+	String default_value = attrs.getValue("value");
+	String path = attrs.getValue("path");
+	boolean memberp = isMember(prototype, slot, attrs);
+	boolean staticp = path == null && isStatic(prototype, slot, attrs);
+	writer.println("\n\n    public SlotDescription " +accessor_name+ "Description()");
+	writer.println("    {");
+	writer.println("        SlotDescription __desc = new SlotDescription();");
+	writer.println("        __desc.name = \"" +slot+ "\";");
+	writer.println("        __desc.prototype = \"" +prototype+ "\";");
+	writer.println("        __desc.is_writable = true;");
+	writer.println("        Object __value;");
+	if (memberp) {
+	    writer.println("        __value = " +fixed_name+ ";");
+	} else {
+	    writer.println("        __value = getProperty(\""  +slot+ "\");");
+	}
+	writer.println("        if (__value != null) {");
+	writer.println("            __desc.is_overridden = true;");
+	writer.println("            __desc.value = __value;");
+	writer.println("        } else {");
+	writer.println("            __desc.is_overridden = false;");
+	if (staticp) {
+	    if (default_value != null) {
+		// Zinky suggestion: NIL -> null
+		if (default_value.equals("NIL")) {
+		    writer.println("            __desc.value = null;");
+		} else {
+		    writer.println("            __desc.value = \"" +default_value+ "\";");
+		}
+	    }
+	} else {
+	    writer.println("            __desc.value = getInheritedValue(this, \"" 
+			   +slot+ "\");");
+	}
+	writer.println("        }");
+	writer.println("        return __desc;");
+	writer.println("    }");
+    }
+
+
+
+    private void writeContainerDescriptionGetter(PrintWriter writer, 
+						 String prototype,
+						 String slot)
+    {
+	String accessor_name = fixName(slot, true);
+	String owner = ancestorForSlot(prototype, slot);
+	writer.println("\n\n    public SlotDescription " +accessor_name+ "Description()");
+	writer.println("    {");
+	writer.println("        SlotDescription __desc = new SlotDescription();");
+	writer.println("        __desc.name = \"" +slot+ "\";");
+	writer.println("        __desc.prototype = \"" +owner+ "\";");
+	writer.println("        __desc.value = get" +accessor_name+ "();");
+	writer.println("        __desc.is_overridden = false;");
+	writer.println("        __desc.is_writable = false;");
+	writer.println("        return __desc;");
+	writer.println("    }");
+    }
+
+
 
     private void writeDynamicAccessors(PrintWriter writer, 
 				       String prototype,
