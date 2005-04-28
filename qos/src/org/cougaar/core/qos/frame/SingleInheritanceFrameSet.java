@@ -540,8 +540,10 @@ public class SingleInheritanceFrameSet
 		Map.Entry entry = (Map.Entry) itr.next();
 		if (entry.getValue().equals(parent)) {
 		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    if (descendsFrom(relation, klass, relation_prototype))
-			results.add(child_cache.get(relation));
+		    Object child = child_cache.get(relation);
+		    if (child != null &&
+			descendsFrom(relation, klass, relation_prototype))
+			results.add(child);
 		}
 	    }
 	}
@@ -560,8 +562,10 @@ public class SingleInheritanceFrameSet
 		Map.Entry entry = (Map.Entry) itr.next();
 		if (entry.getValue().equals(child)) {
 		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    if (descendsFrom(relation, klass, relation_prototype))
-			results.add(parent_cache.get(relation));
+		    Object parent = parent_cache.get(relation);
+		    if (parent != null &&
+			descendsFrom(relation, klass, relation_prototype))
+			results.add(parent);
 		}
 	    }
 	}
