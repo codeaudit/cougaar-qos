@@ -384,12 +384,13 @@ public class FrameGen
 	    prototype.equalsIgnoreCase(root_relation);
 	String name = fixName(prototype, true);
 	writer.println("package " +package_name+ ";\n");
-	writer.println("import org.cougaar.core.util.UID;");
-	writer.println("import org.cougaar.core.qos.frame.FrameSet;");
 	writer.println("import org.cougaar.core.qos.frame.DataFrame;");
+	writer.println("import org.cougaar.core.qos.frame.FrameSet;");
 	if (is_root_relation) {
 	    writer.println("import org.cougaar.core.qos.frame.RelationFrame;");
 	}
+	writer.println("import org.cougaar.core.qos.frame.SlotDescription;");
+	writer.println("import org.cougaar.core.util.UID;");
 	writer.println("\npublic class " +name);
 	if (is_root_relation) {
 	    writer.println("    extends RelationFrame");
@@ -424,7 +425,7 @@ public class FrameGen
 	boolean staticp = isStatic(prototype, slot, attrs);
 	if (memberp) {
 	    String fixed_name = fixName(slot, false);
-	    writer.println("    protected Object " +fixed_name+ ";");
+	    writer.println("    private Object " +fixed_name+ ";");
 	}
     }
 
@@ -502,7 +503,7 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeGetter(writer, prototype, slot, attrs);
+	    writeOverrideGetter(writer, prototype, slot, attrs);
 	}
     }
 
@@ -530,6 +531,44 @@ public class FrameGen
 	    writer.println("        if (" +result_var+ " != null) return "
 			   +result_var+ ";");
 	}
+	if (staticp) {
+	    if (default_value != null) {
+		// Zinky suggestion: NIL -> null
+		if (default_value.equals("NIL")) {
+		    writer.println("        return null;");
+		} else {
+		    writer.println("        return \"" +default_value+ "\";");
+		}
+	    } else {
+		writer.println("        getLogger().warn(this + \" has no value for " 
+			       +accessor_name+
+			       "\");");
+		writer.println("        return null;");
+	    }
+	} else {
+	    writer.println("        return getInheritedValue(this, \"" 
+			   +slot+ "\");");
+	}
+
+	writer.println("    }");
+    }
+
+    private void writeOverrideGetter(PrintWriter writer, 
+				     String prototype,
+				     String slot,
+				     Attributes attrs)
+    {
+	String accessor_name = fixName(slot, true);
+	String default_value = attrs.getValue("value");
+	boolean staticp = isStatic(prototype, slot, attrs);
+	writer.println("\n\n    public Object get" +accessor_name+ "()");
+	writer.println("    {");
+	String result_var = "__result";
+	writer.println("        Object " +result_var+ " = get" +accessor_name+
+		       "();");
+	writer.println("        if (" +result_var+ " != null) return "
+		       +result_var+ ";");
+	
 	if (staticp) {
 	    if (default_value != null) {
 		// Zinky suggestion: NIL -> null

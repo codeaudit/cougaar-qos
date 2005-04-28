@@ -30,8 +30,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -167,6 +169,13 @@ abstract public class DataFrame
 	return props;
     }
 
+    public List slotDescriptions()
+    {
+	List result = new ArrayList();
+	collectSlotDescriptions(result);
+	return result;
+    }
+
     public void setValue(String slot, Object value)
     {
 	setLocalValue(slot, value);
@@ -281,6 +290,11 @@ abstract public class DataFrame
     }
 
     protected void fireContainerChanges(DataFrame new_frame)
+    {
+	// default is no-op
+    }
+
+    protected void collectSlotDescriptions(List list)
     {
 	// default is no-op
     }
