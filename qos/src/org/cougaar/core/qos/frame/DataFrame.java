@@ -162,10 +162,21 @@ abstract public class DataFrame
 
     
     // Public accesssors
+
+    // In this context "local" means: include slots the prototype tree
+    // but not from the container tree.
     public Properties getLocalSlots()
     {
 	Properties props = new VisibleProperties();
 	collectSlotValues(props);
+	return props;
+    }
+
+    public Properties getAllSlots()
+    {
+	Properties props = new VisibleProperties();
+	collectSlotValues(props);
+	collectContainerSlotValues(props);
 	return props;
     }
 
@@ -219,7 +230,8 @@ abstract public class DataFrame
 	return frameSet.descendsFrom(this, kind);
     }
 
-    public Properties getAllSlots()
+    // Not used, here for documentation
+    public Properties getAllSlotsReflective()
     {
 	Properties props = new VisibleProperties();
 	Class klass = getClass();
@@ -300,6 +312,11 @@ abstract public class DataFrame
     }
 
     protected void collectSlotValues(Properties props)
+    {
+	// default is no-op
+    }
+
+    protected void collectContainerSlotValues(Properties props)
     {
 	// default is no-op
     }

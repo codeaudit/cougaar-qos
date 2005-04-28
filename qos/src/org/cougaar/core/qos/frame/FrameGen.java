@@ -374,7 +374,7 @@ public class FrameGen
 	writer.println("{");
 	writeSlots(writer, prototype, local_slots);
 	writeConstructors(writer, prototype);
-	writeCollector(writer, prototype, local_slots);
+	writeCollector(writer, prototype, local_slots, container_slots);
 	writeAccessors(writer, prototype, local_slots, override_slots);
 	if (container != null) {
 	    writeContainerReaders(writer, container, container_slots);
@@ -475,27 +475,45 @@ public class FrameGen
 
     private void writeCollector(PrintWriter writer,
 				String prototype, 
-				HashMap local_slots)
+				HashMap local_slots,
+				HashSet container_slots)
     {
-	Iterator itr = local_slots.entrySet().iterator();
-	if (!itr.hasNext()) return; // no local slots
-
 	String props = "__props";
 	String val = "__value";
-	writer.println("\n\n    protected void collectSlotValues(java.util.Properties "
-		       +props+ ")");
-	writer.println("    {");
-	writer.println("        super.collectSlotValues(__props);");
-	writer.println("        Object " +val+ ";");
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    String slot = (String) entry.getKey();
-	    String getter = "get" + fixName(slot, true);
-	    writer.println("        " +val+ " = " +getter+ "();");
-	    writer.print("        if (" +val+ " != null)");
-	    writer.println(props+ ".put(\"" +slot+ "\", " +val+ ");");
+	Iterator itr = local_slots.entrySet().iterator();
+	if (itr.hasNext()) {
+	    writer.println("\n\n    protected void collectSlotValues(java.util.Properties "
+			   +props+ ")");
+	    writer.println("    {");
+	    writer.println("        super.collectSlotValues(__props);");
+	    writer.println("        Object " +val+ ";");
+	    while (itr.hasNext()) {
+		Map.Entry entry = (Map.Entry) itr.next();
+		String slot = (String) entry.getKey();
+		String getter = "get" + fixName(slot, true);
+		writer.println("        " +val+ " = " +getter+ "();");
+		writer.print("        if (" +val+ " != null)");
+		writer.println(props+ ".put(\"" +slot+ "\", " +val+ ");");
+	    }
+	    writer.println("    }");
 	}
-	writer.println("    }");
+
+	itr = container_slots.iterator();
+	if (itr.hasNext()) {
+	    writer.println("\n\n    protected void collectContainerSlotValues(java.util.Properties "
+			   +props+ ")");
+	    writer.println("    {");
+	    writer.println("        super.collectContainerSlotValues(__props);");
+	    writer.println("        Object " +val+ ";");
+	    while (itr.hasNext()) {
+		String slot = (String) itr.next();
+		String getter = "get" + fixName(slot, true);
+		writer.println("        " +val+ " = " +getter+ "();");
+		writer.print("        if (" +val+ " != null)");
+		writer.println(props+ ".put(\"" +slot+ "\", " +val+ ");");
+	    }
+	    writer.println("    }");
+	}
     }
 
     private void writeAccessors(PrintWriter writer,
