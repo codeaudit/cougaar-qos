@@ -658,6 +658,12 @@ public class FrameGen
 	writer.println("    }");
     }
 
+    private String slotDescriptionMethod(String slot)
+    {
+	String accessor = fixName(slot, true);
+	return "slotMetaData__" +accessor;
+    }
+
     private void writeDescriptionGetters(PrintWriter writer,
 					 String prototype,
 					 HashMap slots,
@@ -697,14 +703,14 @@ public class FrameGen
 	itr = slots.keySet().iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    String accessor = fixName(slot, true);
-	    writer.println("        list.add(" +accessor+ "Description());");
+	    writer.println("        list.add(" +slotDescriptionMethod(slot)+
+			   "());");
 	}
 	itr = container_slots.iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    String accessor = fixName(slot, true);
-	    writer.println("        list.add(" +accessor+ "Description());");
+	    writer.println("        list.add(" +slotDescriptionMethod(slot)+
+			   "());");
 	}
 	writer.println("    }");
     }
@@ -720,7 +726,9 @@ public class FrameGen
 	String path = attrs.getValue("path");
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = path == null && isStatic(prototype, slot, attrs);
-	writer.println("\n\n    public SlotDescription " +accessor_name+ "Description()");
+	writer.println("\n\n    public SlotDescription " 
+		       +slotDescriptionMethod(slot)+
+		       "()");
 	writer.println("    {");
 	writer.println("        SlotDescription __desc = new SlotDescription();");
 	writer.println("        __desc.name = \"" +slot+ "\";");
@@ -763,7 +771,8 @@ public class FrameGen
     {
 	String accessor_name = fixName(slot, true);
 	String owner = ancestorForSlot(prototype, slot);
-	writer.println("\n\n    public SlotDescription " +accessor_name+ "Description()");
+	writer.println("\n\n    public SlotDescription " 
+		       +slotDescriptionMethod(slot)+ "()");
 	writer.println("    {");
 	writer.println("        SlotDescription __desc = new SlotDescription();");
 	writer.println("        __desc.name = \"" +slot+ "\";");
