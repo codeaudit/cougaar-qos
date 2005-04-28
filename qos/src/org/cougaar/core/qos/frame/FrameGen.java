@@ -359,16 +359,30 @@ public class FrameGen
 	    System.exit(-1);
 	}
 
+	HashSet container_slots = new HashSet();
+	if (container != null) {
+	    HashSet container_accessors = collectSlots(container);
+	    Iterator itr = container_accessors.iterator();
+	    while (itr.hasNext()) {
+		String slot = (String) itr.next();
+		if(!local_slots.containsKey(slot) && !inheritsSlot(prototype, slot))
+		    container_slots.add(slot);
+	    }
+	}
+
 	writeDecl(writer, prototype, parent);
 	writer.println("{");
 	writeSlots(writer, prototype, local_slots);
 	writeConstructors(writer, prototype);
 	writeCollector(writer, prototype, local_slots);
 	writeAccessors(writer, prototype, local_slots, override_slots);
-	writeContainerReaders(writer, prototype, local_slots, container);
-	writeUpdaters(writer, prototype, local_slots, container);
+	if (container != null) {
+	    writeContainerReaders(writer, container, container_slots);
+	    writeUpdaters(writer, prototype, container_slots, container);
+	}
 	writeDynamicAccessors(writer, prototype, parent,local_slots, container);
-	writeDescriptionGetters(writer, prototype, local_slots, container);
+	writeDescriptionGetters(writer, prototype, container,
+				local_slots, container_slots);
 	writer.println("}");
 
 	writer.close();
@@ -666,20 +680,11 @@ public class FrameGen
 
     private void writeDescriptionGetters(PrintWriter writer,
 					 String prototype,
+					 String container,
 					 HashMap slots,
-					 String container)
+					 HashSet container_slots)
     {
 	Iterator itr;
-	HashSet container_slots = new HashSet();
-	if (container != null) {
-	    HashSet container_accessors = collectSlots(container);
-	    itr = container_accessors.iterator();
-	    while (itr.hasNext()) {
-		String slot = (String) itr.next();
-		if(!slots.containsKey(slot) && !inheritsSlot(prototype, slot))
-		    container_slots.add(slot);
-	    }
-	}
 
 	itr = slots.entrySet().iterator();
 	while (itr.hasNext()) {
@@ -934,17 +939,14 @@ public class FrameGen
     }
 
     private void writeContainerReaders(PrintWriter writer, 
-				       String prototype,
-				       HashMap local_slots,
-				       String container)
+				       String container,
+				       HashSet container_slots)
     {
 	if (container == null) return;
-	HashSet container_accessors = collectSlots(container);
-	Iterator itr = container_accessors.iterator();
+	Iterator itr = container_slots.iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    if(!local_slots.containsKey(slot) && !inheritsSlot(prototype, slot))
-		writeContainerReader(writer, container, slot);
+	    writeContainerReader(writer, container, slot);
 	}
     }
 
@@ -973,12 +975,11 @@ public class FrameGen
 
     private void writeUpdaters(PrintWriter writer, 
 			       String prototype,
-			       HashMap local_slots,
+			       HashSet container_slots,
 			       String container)
     {
 	if (container == null) return;
-	HashSet container_accessors = collectSlots(container);
-	Iterator itr = container_accessors.iterator();
+	Iterator itr = container_slots.iterator();
 
 	String old_arg = "__old_frame";
 	String new_arg = "__new_frame";
@@ -997,8 +998,6 @@ public class FrameGen
 	writer.println("        Object " +new_var+ ";");
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    if(local_slots.containsKey(slot) || inheritsSlot(prototype, slot))
-		continue;
 
 	    String fixed_name = fixName(slot, true);
 	    String bean_name = fixName(slot, true, true);
@@ -1015,7 +1014,7 @@ public class FrameGen
 	}
 	writer.println("    }");
 
-	itr = container_accessors.iterator();
+	itr = container_slots.iterator();
 	writer.println("\n\n    protected void fireContainerChanges(DataFrame __raw)");
 	writer.println("    {");
 	writer.println("        " +classname+ " " +new_arg+ " = ("
@@ -1023,8 +1022,6 @@ public class FrameGen
 	writer.println("        Object " +new_var+ ";");
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    if(local_slots.containsKey(slot) || inheritsSlot(prototype, slot))
-		continue;
 
 	    String fixed_name = fixName(slot, true);
 	    String bean_name = fixName(slot, true, true);
