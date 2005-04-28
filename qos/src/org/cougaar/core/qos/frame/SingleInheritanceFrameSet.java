@@ -112,21 +112,23 @@ public class SingleInheritanceFrameSet
 	synchronized (kb) {
 	    kb.put(object.getUID(), object);
 	}
-	if (object instanceof RelationFrame) {
-	    cacheRelation((RelationFrame) object);
-	} else if (object instanceof DataFrame) {
+	if (object instanceof DataFrame) {
 	    synchronized (frames) {
 		frames.add(object);
 	    }
-	    // Any new DataFrame could potentially resolve as yet
-	    // unfilled values in relations.
-	    int resolved = 0;
-	    synchronized (pending_relations) {
-		Iterator itr = pending_relations.iterator();
-		while (itr.hasNext()) {
-		    RelationFrame frame = (RelationFrame) itr.next();
-		    boolean success = cacheRelation(frame);
-		    if (success) itr.remove();
+	    if (object instanceof RelationFrame) {
+		cacheRelation((RelationFrame) object);
+	    } else {
+		// Any new DataFrame could potentially resolve as yet
+		// unfilled values in relations.
+		int resolved = 0;
+		synchronized (pending_relations) {
+		    Iterator itr = pending_relations.iterator();
+		    while (itr.hasNext()) {
+			RelationFrame frame = (RelationFrame) itr.next();
+			boolean success = cacheRelation(frame);
+			if (success) itr.remove();
+		    }
 		}
 	    }
 	}

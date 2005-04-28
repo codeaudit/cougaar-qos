@@ -124,6 +124,10 @@ public class Path
 	Iterator itr = frames.iterator();
 	while (itr.hasNext()) {
 	    DataFrame next = (DataFrame) itr.next();
+	    if (next == null) {
+		log.shout("Null in frames!!! ");
+		return null;
+	    }
 	    Object result = getNextValue(next, ++index);
 	    if (result != null) return result;
 	    if (index == forks.length) return null;
