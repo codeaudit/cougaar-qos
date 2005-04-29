@@ -492,8 +492,8 @@ public class FrameGen
 		String slot = (String) entry.getKey();
 		String getter = "get" + fixName(slot, true);
 		writer.println("        " +val+ " = " +getter+ "();");
-		writer.print("        if (" +val+ " != null)");
-		writer.println(props+ ".put(\"" +slot+ "\", " +val+ ");");
+		writer.println("        " +props+ ".put(\"" +slot+ "\", "
+			       +val+ " != null ? " +val+ " : NIL);");
 	    }
 	    writer.println("    }");
 	}
@@ -509,8 +509,8 @@ public class FrameGen
 		String slot = (String) itr.next();
 		String getter = "get" + fixName(slot, true);
 		writer.println("        " +val+ " = " +getter+ "();");
-		writer.print("        if (" +val+ " != null)");
-		writer.println(props+ ".put(\"" +slot+ "\", " +val+ ");");
+		writer.println("        " +props+ ".put(\"" +slot+ "\", " 
+			       +val+ " != null ? " +val+ " : NIL);");
 	    }
 	    writer.println("    }");
 	}
@@ -797,8 +797,6 @@ public class FrameGen
 	while (owner == null) {
 	    Attributes attrs = (Attributes) proto_attrs.get(prototype);
 	    prototype = attrs.getValue("container");
-	    System.out.println("### Looking for owner of " +slot+
-			       " in " +prototype);
 	    if (prototype == null) break;
 	    owner = ancestorForSlot(prototype, slot);
 	}

@@ -55,7 +55,7 @@ abstract public class DataFrame
     private static final Object[] ARGS0 = {};
     private static final Class[] TYPES0 = {};
     private static final Class[] TYPES1 = { Object.class };
-
+    protected static final String NIL = "NIL";
 
     private static transient Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
