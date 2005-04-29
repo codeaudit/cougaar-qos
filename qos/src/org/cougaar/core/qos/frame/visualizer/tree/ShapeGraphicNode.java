@@ -12,19 +12,23 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * To change this template use File | Settings | File Templates.
  */
 public class ShapeGraphicNode extends DefaultMutableTreeNode {
-        ShapeGraphic graphic;
+    ShapeGraphic graphic;
 
-        public ShapeGraphicNode() {
-            super();
-        }
+    public ShapeGraphicNode() {
+        super("");
+        graphic = null;
+    }
 
-        public ShapeGraphicNode(ShapeGraphic graphic) {
-            super(graphic);
-            this.graphic = graphic;
-        }
+    public ShapeGraphicNode(ShapeGraphic graphic) {
+        super(graphic);
+        this.graphic = graphic;
+    }
     
     public String toString() {
-	return (graphic != null ? graphic.getId() : "null");
+	    return (graphic != null ? graphic.getId() : "null");
     }
 
+    public ShapeGraphic getShapeGraphic() {
+        return graphic;
     }
+}

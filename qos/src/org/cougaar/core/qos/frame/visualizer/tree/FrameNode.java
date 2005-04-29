@@ -1,7 +1,11 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
+import org.cougaar.core.qos.frame.PrototypeFrame;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,19 +19,45 @@ public class FrameNode extends DefaultMutableTreeNode {
         HashMap relationshipNodes;
         String relationship;
         String label;
+        //this is a little weird, but this is a list of Proxy nodes that reference this node
+        ArrayList proxies;
+
+        public FrameNode() {
+            this((String)null);
+        }
 
         public FrameNode(String relationship) {
             super(relationship);
             this.relationship = relationship;
-	    this.relationshipNodes = new HashMap();
+	        this.relationshipNodes = new HashMap();
+            this.proxies = new ArrayList();
             this.frame = null;
             this.label = relationship;
         }
         public FrameNode(org.cougaar.core.qos.frame.Frame frame) {
             super(frame);
             this.frame = frame;
-	    this.relationshipNodes = new HashMap();
-            this.label = (String) frame.getValue("name");
+            this.relationship = null;
+	        this.relationshipNodes = new HashMap();
+            this.proxies = new ArrayList();
+            this.label = (frame instanceof PrototypeFrame ? ((PrototypeFrame)frame).getName() : (String) frame.getValue("name"));
+        }
+
+        // hack
+        public void addProxy(FrameNodeProxy p) {
+            proxies.add(p);
+        }
+        // hack
+        public Collection getProxies() {
+            return proxies;
+        }
+
+        public boolean isRelationNode() {
+            return relationship != null;
+        }
+
+        public String getRelationshioName() {
+            return relationship;
         }
 
         public String toString() {
@@ -44,5 +74,9 @@ public class FrameNode extends DefaultMutableTreeNode {
 
         public FrameNode getRelationshipNode(String relationship) {
             return (FrameNode) relationshipNodes.get(relationship);
+        }
+
+        public org.cougaar.core.qos.frame.Frame getFrame() {
+            return frame;
         }
     }
