@@ -6,8 +6,12 @@
 
 <body>
 
-<p> <b>Frames</b> are a simple, lightweight form of knowledge
-representation.  A <b>{@link org.cougaar.core.qos.frame.DataFrame}</b>
+Overview: Frames are a lightweight form of knowledge representation
+supporting multiple inheritance hierarchies and code generation.
+
+<h2>Frames and FrameSets</h2>
+
+<p>A <b>{@link org.cougaar.core.qos.frame.DataFrame}</b>
 is a unit of knowledge, consisting of a type specification (what kind
 of frame it is) and a set of name-value pairs representing its current
 state.  The pairs, also known as <b>slots</b>, can change dynamically
@@ -23,7 +27,9 @@ relationship between other DataFrames.  In the latter case, each of
 two parts of the binary relation are specified by a type/slot/value
 triple which is expected to match at most one DataFrame (i.e., at most
 one frame of the given type should have the given value in the given
-slot).  </p>
+slot).  NB:  In the current release we assume that slots used in
+relationship matching are immutable, but this immutability is not
+enforced.</p>
 
 <p> The meta-data in the Cougaar frame system is derived from
 <b>prototypes</b> described in xml.  These prototypes correspond to
@@ -87,7 +93,159 @@ support, Path-valued slots are an exception at the moment: if the
 value of Path-valued slot changes, listeners will not be notified. We
 hope to deal with this in a future release. <p>
 
+<h2>XML Specification</h2>
 
+<p>FrameSets and Frames can be loaded into Cougaar via xml file.  This
+section describes the relevant XML entities, their attributes and
+their semantic interpretation.
+
+<dl>
+
+  <dt><b>frameset</b></dt>
+
+  <dd>A frameset entity is used to describe a FrameSet.  It has three
+    required attributes.  The <b>frame-inheritance</b> describes the
+    prototype inheritance structure.  The only supported value right
+    now is "single" (i.e., single inheritance).  The
+    <b>container-relation</b> attribute specifies which relation
+    prototype defines the containment hierarchy.  Any defined relation
+    prototype can be specified here.  The <b>package</b> attribute is
+    used by the code generator: the classes generated for this
+    frameset's prototypes will be put in the given package and the
+    files will be written to the corresponding directory stucture,
+    following standard Java conventions.<p> </dd>
+
+    <dt><b>prototypes</b></dt>
+
+    <dd> A prototypes entity can be used to group prototype entities.
+      It has no attributes and is not required.  Ordinarily a
+      prototypes entity would be within a frameset entity in an XML
+      file. But it can also be at the top level if the file is being
+      read in to an existing FrameSet.<p></dd>
+
+    <dt><b>prototype</b></dt>
+
+    <dd>A prototype entity defines a PrototypeFrame.  It has one
+      required attributes, <b>name</b>, which is the name of the
+      prototype.  It also supports two optional attributes:
+      <b>prototype</b>, which specifies the "super" of this one; and
+      <b>container</b>, which specifies the prototype of frames that
+      can act as containers for frames of this prototype.  The
+      remaining structure of a prototype is specified by <a
+      href="#slot">slot</a> entities.  <p></dd>
+
+    <dt><b>path</b></dt>
+
+    <dd>A path entity defines a <a href="#paths">Path</a>.  It has one
+      required attribute, <b>name</b>.  The entities it contains are
+      any number of forks (order is significant) followed by one one
+      slot.  The slot entity in this case is simply a reference by
+      name to a slot defined in a prototype.<p></dd>
+
+    
+    <a name="slot"></a><dt><b>slot</b></dt>
+
+    <dd> Slot entities are used within prototype entities to define
+      the prototypes named fields. They have one required attribute,
+      <b>name</b>, which is the name of the slot.  Slot entities a
+      range of optional attributes:
+
+      <dl>
+
+	<dt><b>value</b></dt>
+
+	<dd>This attribute gives a default value of the slot.  The
+	  value can be any string.  If a slot has neither a value nor
+	  a path attribute, then the slot has no default value.  In
+	  this case, the generated accessor code will issue a warning
+	  if it has no frame-specific value for this slot.  The
+	  special string "NIL" can be used to indicate that the slot
+	  has no default but that warnings should not be issued.  <p>
+	  </dd>
+
+	<dt><b>path</b></dt>
+
+	<dd> The presence of this attribute indicates that the default
+	  value for this slot is computed by following a path.  The
+	  value of the attribute is the name of path.
+	  <p>
+	</dd>
+
+	<dt><b>member</b></dt>
+
+	<dd>This boolean valued attribute indicates wheter or not the
+	  generated code for this slot treats it as a data member or
+	  as a property.  The former is more efficient for slots whose
+	  value is usually frame-specific, the latter is more
+	  efficient for slots whose value is usually defaulted. The
+	  default for this attribute is "true".  <p> </dd>
+
+	<dt><b>static</b></dt>
+
+	<dd> <i>[Deprecated, likely to be removed]</i> This boolean
+	  valued attribute indicates whether or not the default value
+	  of this slot can be changed dynmaically.  The default for
+	  this attribute is "false".  <p></dd>
+
+	<dt><b>type</b></dt>
+
+	<dd><i>[Proposed but not yet implemented]</i> This attribute
+	  will be used to specify the Java type of values of this
+	  slot.  The default is String. <p> </dd>
+
+	<dt><b>immutable</b></dt>
+
+	<dd><i>[Proposed but not yet implemented]</i> This boolean
+	  valued attribute indicates whether or not the value of the
+	  slot in any given DataFrame can be chaged after
+	  initialization.  The default is "false".
+	  <p>
+	</dd>
+
+	<dt><b>transient</b></dt>
+
+	<dd><i>[Proposed but not yet implemented]</i>This boolean
+	  valued attribute indicates whether or not the corresponding
+	  data member in the generated class will be declared
+	  transient.  The default is "false".  <p> </dd>
+
+	<dt><b>signal-on-change</b></dt>
+	<i>[Proposed but not yet implemented]</i>This attribute
+	specifies the signal behavior when the slot is changed.  It
+	has four possible values: "none" (no signalling), "blackboard"
+	(notify the blackboard only), "bean" (use a property event to
+	notify listeners), or "all" (do all forms of signalling).  The
+	default is "all".
+	<dd>
+	  <p>
+	</dd>
+	
+
+      </dl>
+
+      <p>Slot entities also appear in paths, but as a references
+      rather than definitions: the only relevant attribute in this
+      context is <b>name</b>.  <p></dd>
+
+
+    <dt><b>frames</b></dt>
+
+    <dd> A frames entity can be used to group frame entities.  It has
+    no attributes and is not required.  Ordinarily a frames entity
+    would be within a frameset entity in an XML file. But it can also
+    be at the top level if the file is being read in to an existing
+    FrameSet.<p></dd>
+      
+    <dt><b>frame</b></dt>
+
+    <dd>A frame entity describes a DataFrame.  It has one required
+    attributes, <b>prototype</b>, which must name a PrototypeFrame in
+    the same FrameSet.  Entities with a frame describe initial slot
+    values.  The names of these sub-entities are simply slot names.
+    <p></dd>
+
+
+</dl>
 
 </body>
 </html>
