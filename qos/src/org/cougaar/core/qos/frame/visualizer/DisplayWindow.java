@@ -33,11 +33,14 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
         tabbedPane = new JTabbedPane();
         display = new Display(xmlFile);
 	    Component controlPanel = display.getControlPanel();
+        JPanel displPanel = new JPanel(new BorderLayout());
+        displPanel.add(display, BorderLayout.CENTER);
+        displPanel.add(controlPanel, BorderLayout.SOUTH);
         containerView = new ContainerTreeView();
         frameView = new FrameTreeView();
 
-        tabbedPane.addTab("Graphic", display);
-        tabbedPane.addTab("Container Tree", containerView);
+        tabbedPane.addTab("Graphic", displPanel);
+        tabbedPane.addTab("View Tree", containerView);
         tabbedPane.addTab("Frames", frameView);
 
         ViewConfigParser.WindowSpec w = display.getWindowSpec();
@@ -55,7 +58,7 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
         });
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
-	    getContentPane().add(controlPanel, BorderLayout.SOUTH);
+	    //getContentPane().add(controlPanel, BorderLayout.SOUTH);
         pack();
         setSize(d);
         setVisible(true);

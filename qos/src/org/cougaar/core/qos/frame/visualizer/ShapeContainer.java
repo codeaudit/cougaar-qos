@@ -40,7 +40,7 @@ public abstract class ShapeContainer extends ShapeGraphic {
     public ShapeContainer(String id, String label) {
         super(id,label);
         children = new ArrayList();
-	frameChildren = new HashMap();
+	    frameChildren = new HashMap();
         prototypes = new HashMap();
         //insertContainers = new HashMap();
     }
@@ -307,6 +307,7 @@ public abstract class ShapeContainer extends ShapeGraphic {
                 key = (String) ii.next();
                 child = (ShapeGraphic) prototypes.get(key);
                 clonedChild = child.createInstance(child.frame);
+                clonedChild.setPrototype(true);
                 clonedChild.setParent(cloned);
                 cloned.prototypes.put(key, clonedChild);
 	        }

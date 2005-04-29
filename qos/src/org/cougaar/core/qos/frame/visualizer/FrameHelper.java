@@ -75,6 +75,10 @@ public class FrameHelper {
     public Collection getAllFrames() {
 	    return allFrames;
     }
+
+    public Collection getRelationshipFrames() {
+        return relationshipFrames;
+    }
    /*
     public org.cougaar.core.qos.frame.Frame findFrame(String name) {
         if (log.isDebugEnabled())
@@ -124,7 +128,7 @@ public class FrameHelper {
     }
 
 
-    private void printResult(Collection result) {
+    protected void printResult(Collection result) {
         if (log.isDebugEnabled() && result.size()> 0) {
             StringBuffer sb = new StringBuffer("found: \n");
             for (Iterator jj=result.iterator(); jj.hasNext();) {
@@ -158,9 +162,10 @@ public class FrameHelper {
             log.debug("getAllChildren(parent="+parent+" relationship="+relationship+")");
 
         Collection childrenRelationships = findFrames(new ContainsPredicate(relationship, (String)parent.getValue("name")));
-
+        //System.out.println("getAllChildren of "+parent+"   relation="+relationship);
         //Set childrenRelationships = frameSet.findRelations(parent, "child", relationship);
-        org.cougaar.core.qos.frame.RelationFrame f;
+        org.cougaar.core.qos.frame.Frame f;
+         org.cougaar.core.qos.frame.RelationFrame rf;
         org.cougaar.core.qos.frame.Frame ch;
         String name;
         ArrayList result = new ArrayList();
@@ -169,6 +174,7 @@ public class FrameHelper {
             f = (org.cougaar.core.qos.frame.RelationFrame) ii.next();
             //if (f instanceof RelationFrame) {
                 ch = ((RelationFrame)f).relationshipChild();
+                //System.out.println((String) f.getValue("child-value"));
                 //name = (String) f.getValue("child-value");
                 //ch = (org.cougaar.core.qos.frame.Frame) frameMap.get(name);
                 if (ch == null)
