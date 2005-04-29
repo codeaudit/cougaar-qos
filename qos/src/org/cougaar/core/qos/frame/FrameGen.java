@@ -158,15 +158,13 @@ public class FrameGen
 
     private String ancestorForSlot(String proto, String slot)
     {
+	if (proto == null) return null;
+
+	HashMap pslots = (HashMap) proto_slots.get(proto);
+	if (pslots != null && pslots.containsKey(slot)) return proto;
+
 	Attributes attrs = (Attributes) proto_attrs.get(proto);
 	String parent = attrs.getValue("prototype");
-	if (parent == null) {
-	    return null;
-	}
-	HashMap pslots = (HashMap) proto_slots.get(parent);
-	if (pslots != null && pslots.containsKey(slot)) {
-	    return parent;
-	}
 	return ancestorForSlot(parent, slot);
     }
 
@@ -228,7 +226,9 @@ public class FrameGen
     {
 	String attrstr = attrs.getValue(attr);
 	if (attrstr == null) {
-	    String ancestor = ancestorForSlot(prototype, slot);
+	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+	    String parent = p_attrs.getValue("prototype");
+	    String ancestor = ancestorForSlot(parent, slot);
 	    if (ancestor != null) {
 		HashMap slots = (HashMap) proto_slots.get(ancestor);
 		Attributes inherited = (Attributes) slots.get(slot);
@@ -715,7 +715,7 @@ public class FrameGen
 	itr = container_slots.iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    writeContainerDescriptionGetter(writer, container, slot);
+	    writeContainerDescriptionGetter(writer, prototype, slot);
 	}
 
 	if (slots.isEmpty() && container_slots.isEmpty()) return;
@@ -793,13 +793,25 @@ public class FrameGen
 						 String slot)
     {
 	String accessor_name = fixName(slot, true);
-	String owner = ancestorForSlot(prototype, slot);
+	String owner = null;
+	while (owner == null) {
+	    Attributes attrs = (Attributes) proto_attrs.get(prototype);
+	    prototype = attrs.getValue("container");
+	    System.out.println("### Looking for owner of " +slot+
+			       " in " +prototype);
+	    if (prototype == null) break;
+	    owner = ancestorForSlot(prototype, slot);
+	}
 	writer.println("\n\n    public SlotDescription " 
 		       +slotDescriptionMethod(slot)+ "()");
 	writer.println("    {");
 	writer.println("        SlotDescription __desc = new SlotDescription();");
 	writer.println("        __desc.name = \"" +slot+ "\";");
-	writer.println("        __desc.prototype = \"" +owner+ "\";");
+	writer.print("        __desc.prototype = ");
+	if (owner == null) {
+	    writer.println("null;");
+	} else
+	    writer.println("\"" +owner+ "\";");
 	writer.println("        __desc.value = get" +accessor_name+ "();");
 	writer.println("        __desc.is_overridden = false;");
 	writer.println("        __desc.is_writable = false;");
