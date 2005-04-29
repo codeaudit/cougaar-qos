@@ -62,7 +62,7 @@ public class FrameHelper {
 
     
     public FrameHelper(Collection allFrames, FrameSet frameSet) {
-       	this.allFrames = allFrames;
+       	this.allFrames = new HashSet(allFrames);
         this.frameSet = frameSet;
         process(allFrames);
         if (log.isDebugEnabled())

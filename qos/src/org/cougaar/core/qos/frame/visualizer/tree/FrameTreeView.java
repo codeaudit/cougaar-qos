@@ -134,8 +134,11 @@ public class FrameTreeView extends TreeView {
             name = (String) f.getValue("name");
             if (frameMap.get(name) != null)
                 continue;
-            else
+            else {
+		if (log.isDebugEnabled())
+		    log.debug("creating FrameNode for frame '"+name+"'");
                 frameMap.put(name, new FrameNode(f));
+	    }
         }
 	if (log.isDebugEnabled())
 	    log.debug("FrameTreeView: found "+ relationships.size() + " relation frames and "+frameMap.values().size()+" framenodes");
@@ -158,15 +161,21 @@ public class FrameTreeView extends TreeView {
                 FrameNode tmp = child;
                 child = new FrameNodeProxy(child);
                 tmp.addProxy((FrameNodeProxy)child);
+		if (log.isDebugEnabled())
+		    log.debug("creating *FrameNodeProxy for frame '"+childName+"'  relation="+relationship);
             }
             if (parent != null && child != null) {
                 FrameNode relationNode = parent.getRelationshipNode(relationship);
                 if (relationNode == null) {
+		    if (log.isDebugEnabled())
+			log.debug("creating RelationFrameNode:  "+parentName+"=>"+relationship+"==>"+childName);
                     relationNode = new FrameNode(relationship);
                     parent.addRelationshipNode(relationNode);
                 }
                 relationNode.add(child);
             } else {
+		if (log.isDebugEnabled())
+		    log.debug("can't create node: parent='"+parentName+"'("+(parent!=null?"found":"not found")+") childName='"+childName+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
                 ;// print something here
             }
        }
