@@ -526,7 +526,8 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeGetter(writer, prototype, slot, attrs);
+	    writeGetter(writer, prototype, slot, attrs, true);
+	    writeGetter(writer, prototype, slot, attrs, false);
 	    writeSetter(writer, prototype, slot, attrs);
 	    writeInitializer(writer, prototype, slot, attrs);
 	    writeRemover(writer, prototype, slot, attrs);
@@ -536,7 +537,8 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeOverrideGetter(writer, prototype, slot, attrs);
+	    writeOverrideGetter(writer, prototype, slot, attrs, true);
+	    writeOverrideGetter(writer, prototype, slot, attrs, false);
 	}
     }
 
@@ -544,7 +546,8 @@ public class FrameGen
     private void writeGetter(PrintWriter writer, 
 			     String prototype,
 			     String slot,
-			     Attributes attrs)
+			     Attributes attrs,
+			     boolean warn)
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
@@ -552,7 +555,9 @@ public class FrameGen
 	String path = attrs.getValue("path");
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = path == null && isStatic(prototype, slot, attrs);
-	writer.println("\n\n    public Object get" +accessor_name+ "()");
+	writer.print("\n\n    public Object get" +accessor_name);
+	if (!warn) writer.print("__NoWarn");
+	writer.println("()");
 	writer.println("    {");
 	if (memberp) {
 	    writer.println("        if (" +fixed_name+ " != null) return "
@@ -573,9 +578,10 @@ public class FrameGen
 		    writer.println("        return \"" +default_value+ "\";");
 		}
 	    } else {
-		writer.println("        getLogger().warn(this + \" has no value for " 
-			       +accessor_name+
-			       "\");");
+		if (warn)
+		    writer.println("        getLogger().warn(this + \" has no value for " 
+				   +accessor_name+
+				   "\");");
 		writer.println("        return null;");
 	    }
 	} else {
@@ -589,16 +595,19 @@ public class FrameGen
     private void writeOverrideGetter(PrintWriter writer, 
 				     String prototype,
 				     String slot,
-				     Attributes attrs)
+				     Attributes attrs,
+				     boolean warn)
     {
 	String accessor_name = fixName(slot, true);
 	String default_value = attrs.getValue("value");
 	boolean staticp = isStatic(prototype, slot, attrs);
-	writer.println("\n\n    public Object get" +accessor_name+ "()");
+	writer.print("\n\n    public Object get" +accessor_name);
+	if (!warn) writer.print("__NoWarn");
+	writer.println("()");
 	writer.println("    {");
 	String result_var = "__result";
-	writer.println("        Object " +result_var+ " = super.get" +accessor_name+
-		       "();");
+	writer.println("        Object " +result_var+ " = super.get" 
+		       +accessor_name+ "__NoWarn();");
 	writer.println("        if (" +result_var+ " != null) return "
 		       +result_var+ ";");
 	
@@ -611,9 +620,10 @@ public class FrameGen
 		    writer.println("        return \"" +default_value+ "\";");
 		}
 	    } else {
-		writer.println("        getLogger().warn(this + \" has no value for " 
-			       +accessor_name+
-			       "\");");
+		if (warn)
+		    writer.println("        getLogger().warn(this + \" has no value for " 
+				   +accessor_name+
+				   "\");");
 		writer.println("        return null;");
 	    }
 	} else {

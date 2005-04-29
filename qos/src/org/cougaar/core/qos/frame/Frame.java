@@ -91,9 +91,6 @@ abstract public class Frame
     {
 	if (frameSet == null) return null;
 	Frame result = frameSet.getPrototype(this);
-	if (result == null) {
-	    if (log.isWarnEnabled()) log.warn(this + " has no prototype!");
-	}
 	return result;
     }
 
