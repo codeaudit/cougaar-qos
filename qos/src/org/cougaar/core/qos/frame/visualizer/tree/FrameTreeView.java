@@ -13,6 +13,8 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 import java.net.URL;
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class FrameTreeView extends TreeView {
     FrameInheritenceView frameInheritenceView;
     JLabel selectedLabel, selectedFrameLabel;
 
+    private transient Logger log = Logging.getLogger(getClass().getName());
 
 
     public FrameTreeView() {
@@ -100,18 +103,21 @@ public class FrameTreeView extends TreeView {
 
 
     public void buildFrameTree(FrameHelper frameHelper) {
-	    this.frameHelper = frameHelper;
+	this.frameHelper = frameHelper;
         root = new DefaultMutableTreeNode("frameset '"+frameHelper.getFrameSetName()+"'");
-        //frameMap.clear();
+        frameMap.clear();
+	
+	if (log.isDebugEnabled())
+	    log.debug("buildFrameTree frameHelper="+frameHelper); 
 
         Collection relationshipFrames = process(frameHelper.getAllFrames());
         processRelationships(relationshipFrames);
         Collection rootNodes = findRootLevelNodes();
-
+	
         for (Iterator ii=rootNodes.iterator(); ii.hasNext();) {
             root.add((DefaultMutableTreeNode) ii.next());
         }
-	    tree.setModel(new DefaultTreeModel(root));
+	tree.setModel(new DefaultTreeModel(root));
     }
 
     protected Collection process(Collection frames) {
@@ -131,8 +137,11 @@ public class FrameTreeView extends TreeView {
             else
                 frameMap.put(name, new FrameNode(f));
         }
+	if (log.isDebugEnabled())
+	    log.debug("FrameTreeView: found "+ relationships.size() + " relation frames and "+frameMap.values().size()+" framenodes");
         return relationships;
     }
+
 
     protected void processRelationships(Collection relationshipFrames) {
         org.cougaar.core.qos.frame.RelationFrame f;
@@ -222,41 +231,5 @@ public class FrameTreeView extends TreeView {
         }
     }
 
-
-       /*
-    class FrameNodeProxy extends FrameNode {
-        FrameNode node;
-
-        public FrameNodeProxy(FrameNode node) {
-            super(node);
-            this.node = node;
-        }
-
-        public boolean isRelationNode() {
-            return node.isRelationNode();
-        }
-
-        public String getRelationshioName() {
-            return node.getRelationshioName();
-        }
-
-        public String toString() {
-             return node.toString();
-        }
-
-        public void addRelationshipNode(FrameNode rnode) {
-            node.addRelationshipNode(rnode);
-        }
-
-        public FrameNode getRelationshipNode(String relationship) {
-            return node.getRelationshipNode(relationship);
-        }
-
-        public org.cougaar.core.qos.frame.Frame getFrame() {
-            return node.getFrame();
-        }
-
-    }
-    */
 
 }

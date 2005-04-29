@@ -52,7 +52,9 @@ import org.cougaar.util.log.Logger;
  * corresponding {@link PrototypeFrame}s and {@link DataFrame}s .  The
  * parsing is SAX.
  */
-public class TestFrameSetParser extends DefaultHandler {
+public class TestFrameSetParser
+    extends DefaultHandler
+{
     private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
     private static final String DRIVER_DEFAULT =
 	"org.apache.crimson.parser.XMLReaderImpl";
@@ -168,8 +170,9 @@ public class TestFrameSetParser extends DefaultHandler {
     private String current_slot;
     private HashMap path_specs;
     private HashMap references;
-
     private transient Logger log = Logging.getLogger(getClass().getName());
+
+
 
     public TestFrameSetParser()
     {
@@ -201,7 +204,7 @@ public class TestFrameSetParser extends DefaultHandler {
 
 	this.frame_set = frameSet;
 	this.frame_set_name = name;
-	File xml_file = new File(xml_filename);//ConfigFinder.getInstance().locateFile(xml_filename);
+	File xml_file = new File(xml_filename); //ConfigFinder.getInstance().locateFile(xml_filename);
 	if (xml_file == null) {
 	    if (log.isWarnEnabled())
 		log.warn("Can't find FrameSet file " + xml_filename);

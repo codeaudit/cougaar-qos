@@ -54,6 +54,7 @@ public class FrameHelper {
     protected Collection relationshipFrames;
 
     protected HashMap frameMap;
+    private Object lock = new Object();
 
     private transient Logger log = Logging.getLogger(getClass().getName());
 
@@ -72,26 +73,23 @@ public class FrameHelper {
 	    return frameSet.getName();
     }
 
-    public Collection getAllFrames() {
-	    return allFrames;
+    public String toString() {
+	return "FrameHelper:  frameset='"+getFrameSetName()+"' has "+allFrames.size()+" frames, "+dataFrames.size()+" data frames"; 
     }
 
-    public Collection getRelationshipFrames() {
+    public synchronized Collection getAllFrames() {
+	return new ArrayList(allFrames);
+    }
+
+    public synchronized Collection getRelationshipFrames() {
         return relationshipFrames;
     }
-   /*
-    public org.cougaar.core.qos.frame.Frame findFrame(String name) {
-        if (log.isDebugEnabled())
-                log.debug("findFrame(name="+name+") "+ (frameMap.get(name)==null ? "not found" : "found"));
 
-        return (org.cougaar.core.qos.frame.Frame) frameMap.get(name);
-    }
-    */
     public org.cougaar.core.qos.frame.Frame findFrame(FramePredicate predicate) {
 	    return findFrame(allFrames, predicate);
     }
 
-    public org.cougaar.core.qos.frame.Frame findFrame(Collection frames, FramePredicate predicate) {
+    public synchronized org.cougaar.core.qos.frame.Frame findFrame(Collection frames, FramePredicate predicate) {
         if (log.isDebugEnabled())
                 log.debug("findFrame(frames["+frames.size()+"], predicate="+predicate+")");
         org.cougaar.core.qos.frame.Frame f;
@@ -110,7 +108,7 @@ public class FrameHelper {
 	    return findFrames(allFrames, predicate);
     }
 
-    public Collection findFrames(Collection frames, FramePredicate predicate) {
+    public synchronized Collection findFrames(Collection frames, FramePredicate predicate) {
         if (log.isDebugEnabled())
                 log.debug("findFrames(frames["+frames.size()+"], predicate="+predicate+")");
 
@@ -139,7 +137,7 @@ public class FrameHelper {
             log.debug("found no matches");
     }
 
-    public org.cougaar.core.qos.frame.Frame[] getParentAndChild(RelationFrame relationshipFrame) {
+    public synchronized org.cougaar.core.qos.frame.Frame[] getParentAndChild(RelationFrame relationshipFrame) {
         org.cougaar.core.qos.frame.Frame f[] = new org.cougaar.core.qos.frame.Frame[2];
         //String parentName, childName;
         //parentName = (String) relationshipFrame.getValue("parent-value");
@@ -157,7 +155,7 @@ public class FrameHelper {
 	
     //    }
 
-    public Collection getAllChildren(org.cougaar.core.qos.frame.Frame parent, String relationship) {
+    public synchronized Collection getAllChildren(org.cougaar.core.qos.frame.Frame parent, String relationship) {
         if (log.isDebugEnabled())
             log.debug("getAllChildren(parent="+parent+" relationship="+relationship+")");
 

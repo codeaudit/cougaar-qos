@@ -206,24 +206,6 @@ public abstract class ShapeContainer extends ShapeGraphic {
         return children;
     }
 
-    /*
-    public Collection processChildFrames(Collection containFrames, Collection frames) {
-        org.cougaar.core.qos.frame.Frame  frame, f;
-        String fname;
-        ArrayList alist = new ArrayList();
-        for (Iterator ii=containFrames.iterator(); ii.hasNext(); ) {
-            fname = (String) ((org.cougaar.core.qos.frame.Frame)ii.next()).getValue("child-value");
-            f= findFrame(frames, fname);
-            if (f!=null)
-                alist.add(f);
-        }
-        return alist;
-    }
-    */
-
-//    public String findPrototype(String kind) {
-//  }
-
 
 
     public void setFrameHelper(FrameHelper helper) {
@@ -245,24 +227,6 @@ public abstract class ShapeContainer extends ShapeGraphic {
             add((org.cougaar.core.qos.frame.Frame) ii.next());
 
             }
-            /*String kind;
-            ShapeContainer sh;
-            ShapeGraphic shg;
-
-
-            for (Iterator ii=prototypes.values().iterator(); ii.hasNext();) {
-            shg = (ShapeGraphic) ii.next();
-            // now find out which of the child frames can be created by this ShapeContainer
-            // --> check which childrent match any of the prototypes
-            Collection c = frameHelper.findFrames(childFrames, new FramePredicate(shg.predicate, frameName));
-
-            for (Iterator jj=c.iterator(); jj.hasNext();) {
-                f2=(org.cougaar.core.qos.frame.Frame) jj.next();
-                if (log.isDebugEnabled())
-                log.debug("\t frame:"+frameName+" adding "+f2.getValue("name"));
-                add( f2 );
-            }
-            }*/
 
         }
         ShapeGraphic ch;
@@ -321,71 +285,5 @@ public abstract class ShapeContainer extends ShapeGraphic {
     
 
 
-
-
-
-    /*
-  public void setFrames(Collection frames) {
-    if (log.isDebugEnabled())
-	    log.debug("setFrames:" +toString());
-    super.setFrames(frames);
-
-    org.cougaar.core.qos.frame.Frame  f2, f = getFrame();
-    FramePredicate fp = getFramePredicate();
-    if (f != null) {
-        String frameName = (String) f.getValue("name");
-	Set containedFrames = f.getFrameSet().findRelations(f, "parent", (fp!=null?fp.getParentRelationship():"contains"));
-
-        //Collection containFrames = findFrames(frames, new ContainsPredicate((fp!=null?fp.getParentRelationship():"contains"), frameName));
-        //Collection containedFrames= processChildFrames(containFrames, frames);
-
-        String kind;
-        ShapeContainer sh;
-        ShapeGraphic shg;
-
-        for (Iterator ii=prototypes.values().iterator(); ii.hasNext();) {
-            shg = (ShapeGraphic) ii.next();
-	    //Frame child = findFrame(child_proto, child_slot, child_value);
-            Collection c = findFrames(containedFrames, new FramePredicate(shg.predicate, frameName));
-
-            for (Iterator jj=c.iterator(); jj.hasNext();) {
-                f2=(org.cougaar.core.qos.frame.Frame) jj.next();
-                if (log.isDebugEnabled())
-                    log.debug("\t frame:"+frameName+" adding "+f2.getValue("name"));
-                add( f2 );
-            }
-        }
-    
-    }
-    ShapeGraphic ch;
-    for (Iterator ii=children.iterator(); ii.hasNext();) {
-	ch=(ShapeGraphic) ii.next();
-	ch.setFrames(frames);
-    }
-  }
-    */
-
-
-
-  /*
-    protected Collection getFrameChildren(Collection frames, org.cougaar.core.qos.frame.Frame frame) {
-        ArrayList ch = new ArrayList();
-        org.cougaar.core.qos.frame.Frame f;
-        for (Iterator ii=frames.iterator(); ii.hasNext();) {
-            f = (org.cougaar.core.qos.frame.Frame) ii.next();
-            if (f.isa("contains") && f.getValue("parent-value").equals(frame.getValue("name") ))
-                ch.add(f);
-        }
-        System.out.println("getFrameChildren -- found "+ch.size()+" children");
-        return ch;
-    }
-   */
-
-
-    // clone thyself and assign the given frame
-    //public ShapeGraphic createInstance(org.cougaar.core.qos.frame.Frame frame) {
-    //ShapeGraphic cloned = super.createInstance(frame);
-    //  return cloned;
-    //}
 
 }

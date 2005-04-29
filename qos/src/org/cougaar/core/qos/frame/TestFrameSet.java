@@ -53,9 +53,14 @@ import org.cougaar.util.log.Logger;
  * single inheritance in both the prototype hierarchy and the
  * containment hierarchy.
  */
-public class TestFrameSet implements FrameSet {
+public class TestFrameSet
+    implements FrameSet
+{
     private final String name;
     private final String pkg;
+
+   //private final UIDService uids;
+   // private final BlackboardService bbs;
     private final Object change_queue_lock, relation_lock;
     private ArrayList change_queue;
     private HashMap kb; // UID -> object
@@ -73,6 +78,7 @@ public class TestFrameSet implements FrameSet {
     private transient Logger log = Logging.getLogger(getClass().getName());
 
 
+
     public TestFrameSet(String pkg,
 				     String name,
 				     String container_relation)
@@ -85,9 +91,11 @@ public class TestFrameSet implements FrameSet {
 	this.paths = new HashMap();
 	this.frames = new HashSet();
 	this.pkg = pkg;
+
 	this.change_queue = new ArrayList();
 	this.change_queue_lock = new Object();
 	this.relation_lock = new Object();
+
  	this.kb = new HashMap();
 	this.prototypes = new HashMap();
 
@@ -95,8 +103,7 @@ public class TestFrameSet implements FrameSet {
 	this.containers = new HashMap();
     }
 
-
-      public Collection getAllFrames() {
+    public Collection getAllFrames() {
         return frames;
     }
 
@@ -128,14 +135,12 @@ public class TestFrameSet implements FrameSet {
 	    }
 	}
     }
-
     public static int counter=0;
-
     public DataFrame makeFrame(String proto, Properties values)
     {
-        counter++;
+	counter++;
         UID uid = new UID(Integer.toString(counter), counter);
-        return makeFrame(proto, values, uid);
+	return makeFrame(proto, values, uid);
     }
 
     public DataFrame makeFrame(String proto, Properties values, UID uid)
@@ -160,7 +165,7 @@ public class TestFrameSet implements FrameSet {
 					Properties values)
     {
 	counter++;
-    UID uid = new UID(Integer.toString(counter), counter);
+        UID uid = new UID(Integer.toString(counter), counter);
 	return makePrototype(proto, parent, values, uid);
     }
 
@@ -192,7 +197,7 @@ public class TestFrameSet implements FrameSet {
     public Path makePath(String name, Path.Fork[] forks, String slot)
     {
 	counter++;
-    UID uid = new UID(Integer.toString(counter), counter);
+        UID uid = new UID(Integer.toString(counter), counter);
 	Path path = new Path(uid, name, forks, slot);
 	synchronized (paths) {
 	    paths.put(name, path);
@@ -653,7 +658,7 @@ public class TestFrameSet implements FrameSet {
 		//bbs.publishChange(chng.object, chng.changes);
 	    } else  if (change instanceof Add) {
 		Add add = (Add) change;
-		//bbs.publishAdd(add.object);
+		///bbs.publishAdd(add.object);
 	    } else  if (change instanceof Remove) {
 		Remove rem = (Remove) change;
 		//bbs.publishRemove(rem.object);
@@ -703,7 +708,7 @@ public class TestFrameSet implements FrameSet {
     {
 	synchronized (change_queue_lock) {
 	    change_queue.add(new Remove(object));
-	    //bbs.signalClientActivity();
+	   // bbs.signalClientActivity();
 	}
     }
 
