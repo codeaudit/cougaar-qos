@@ -142,8 +142,12 @@ public class FrameTableModel extends TBLModel {
   public int getRowCount() { return frameSlotNames.size();}
 
   public Object getValueAt(int row, int col) {
-    if (row >-1 && row < frameSlotNames.size())
-       return ( col == 0 ? frameSlotNames.get(row) : frameSlots.getProperty((String) frameSlotNames.get(row)));
+      if (row >-1 && row < frameSlotNames.size()) {
+        String val= (String) ( col == 0 ? frameSlotNames.get(row) : frameSlots.getProperty((String) frameSlotNames.get(row)));
+	if (val.equals("NIL"))// == DataFrame.NIL)
+	    return "";
+	return val;
+      }
     return null;
   }
 
@@ -158,7 +162,7 @@ public class FrameTableModel extends TBLModel {
   public void setValueAt(Object value, int row, int col) {
     if (row >-1 && row < frameSlotNames.size() && !isReadOnly(row)) {
         frameSlots.setProperty((String)frameSlotNames.get(row), (String) value);
-        frame.setValue((String)frameSlotNames.get(row), value);
+        //frame.setValue((String)frameSlotNames.get(row), value);
     }
   }
 
