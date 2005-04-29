@@ -1,0 +1,62 @@
+
+This directory contains the "process_logs.plx" script, which reads
+"*.log" and generates ".csv" and ".png" views of the profiling data.
+
+NOTE:
+This script worked once, but is very messy!  It generates
+hundreds of csv/png files, of which only a small percentage may
+be interesting!
+
+Usage:
+
+1)
+Create your society config with the profiler enabled.
+See the profile javadocs and example in
+  configs/profile/ProfilePing.xml
+For the scripts to work, you must set this system property on all
+nodes:
+  -Dorg.cougaar.core.logging.addAgentPrefix=false
+and you must leave the profiling period at the default value of
+60000 (once per minute).
+      
+2)
+Run a profiled experiment, redirecting the stdout to
+per-node logs, e.g.:
+  `cougaar mySociety.xml MyNode > MyNode.log`
+
+3)
+Copy the logs to this directory, or fix all script
+references to "./"   (i.e. `grep \\\.\/ *.sh *.plx`)
+
+4)
+Run `process_logs.plx`.  Most errors can be ignored.
+
+5)
+Look at the generated ".png" files.  Some that may be
+interesting:
+
+  # load average at each node:
+  loadavg.png
+
+  # agent messaging count throughput:
+  msg_count_sent_agent_rate.png 
+
+  # agent messaging byte throughput:
+  msg_bytes_sent_agent_rate.png 
+
+  # aggregate message count throughput:
+  msg_count_sent_host_all.png 
+
+  # cpu load in "jiffies"
+  cpu_user_rate.png
+
+  # network send rate
+  network_eth0_sent_rate.png
+
+  # blackboard "execute()" calls
+  transactions_count_rate.png
+
+6)
+Run `./bb_pie_csv.plx count`.  This will print a CSV that
+can be plotted as a pie chart of the blackboard contents.
+
