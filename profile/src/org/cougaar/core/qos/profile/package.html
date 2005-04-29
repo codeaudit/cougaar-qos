@@ -1,0 +1,189 @@
+<body>
+
+Utility components to periodically log performance metrics, such as
+the cpu load and message traffic.
+
+<p>
+<hr>
+<p>
+
+The simplest configuration option is to profile the aggregate
+"messages per second" throughput.  Add the following components
+to all nodes:
+<pre>
+  &lt;!-- required profiler-management component --&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.ProfilerCoordinator'
+      priority='HIGH'
+      insertionpoint='Node.AgentManager.Agent.Component'&gt;
+    &lt;!-- optional period between logs, defaults to 60000 millis --&gt;
+    &lt;argument&gt;period=10000&lt;/argument&gt;
+  &lt;/component&gt;
+<font color='grey'>
+      &lt;!-- message transport sensor --&gt;
+      &lt;component
+          class='org.cougaar.mts.std.StatisticsAspect'
+          insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'/&gt;
+</font>
+  &lt;!-- messaging throughput profiler --&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.Throughput'/&gt;
+</pre>
+Example output:
+<pre>
+2005-04-29 13:23:39,297 SHOUT [throughput] - NodeA: #agent_send_count_per_second, total_send_count_per_second, agent_send_count, total_send_count,
+2005-04-29 13:23:39,362 SHOUT [throughput] - NodeA: 0.00, 0.00, 0, 3
+2005-04-29 13:23:49,103 SHOUT [throughput] - NodeA: 0.56, 1.78, 5, 19
+2005-04-29 13:23:59,101 SHOUT [throughput] - NodeA: 27.22, 27.22, 250, 264
+2005-04-29 13:24:09,102 SHOUT [throughput] - NodeA: 121.50, 121.50, 1465, 1479
+2005-04-29 13:24:19,101 SHOUT [throughput] - NodeA: 160.89, 161.11, 2913, 2929
+</pre>
+In the above example, the agents on NodeA are sending an aggregate 161
+messages/second.  This output is from a two-node "ping" test from
+AgentA on NodeA to a remote AgentB on NodeB.
+<p>
+<hr>
+<p>
+
+For more detailed profiling, add the following components to all nodes:
+<pre>
+  &lt;!-- required profiler-management component --&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.ProfilerCoordinator'
+      priority='HIGH'
+      insertionpoint='Node.AgentManager.Agent.Component'/&gt;
+
+  &lt;!-- mts components --&gt;<font color='grey'>
+      &lt;component
+          class='org.cougaar.mts.std.StatisticsAspect'
+          insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'/&gt;
+      &lt;component
+          class='org.cougaar.mts.tmatrix.AgentFlowAspect'
+          insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'/&gt;
+</font>
+  &lt;!-- optional mts-internal profilers (select none, any, or all) --&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.LocalTraffic'
+      insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.RemoteTraffic'
+      insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.Throughput'
+      insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.TrafficMatrix'
+      insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/&gt;
+
+  &lt;!-- metrics components and plugins --&gt;<font color='grey'>
+      &lt;component
+          class='org.cougaar.core.qos.rss.AgentHostUpdaterComponent'
+          insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'/&gt;
+      &lt;component
+          class='org.cougaar.lib.mquo.SyscondFactory'
+          insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'/&gt;
+      &lt;component
+          class='org.cougaar.core.qos.rss.ConfigFinderDataFeedComponent'
+          insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'&gt;
+        &lt;argument&gt;name=sites&lt;/argument&gt;
+        &lt;argument&gt;url=cougaarconfig:TIC-Sites.conf&lt;/argument&gt;
+      &lt;/component&gt;
+      &lt;component
+          class='org.cougaar.core.qos.rss.ConfigFinderDataFeedComponent'
+          insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'&gt;
+        &lt;argument&gt;name=hosts&lt;/argument&gt;
+        &lt;argument&gt;url=cougaarconfig:TIC-Hosts.conf&lt;/argument&gt;
+      &lt;/component&gt;
+
+      &lt;component
+          class='org.cougaar.mts.tmatrix.AgentFlowRatePlugin'/&gt;
+      &lt;component
+          class='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'/&gt;
+      &lt;component
+          class='org.cougaar.core.thread.AgentLoadSensorPlugin'/&gt;
+      &lt;component
+          class='org.cougaar.core.thread.AgentLoadRatePlugin'/&gt;
+      &lt;component
+          class='org.cougaar.mts.std.StatisticsPlugin'/&gt;
+  </font>
+  &lt;!-- optional profilers (select none, any, or all) --&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.BlackboardSize'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.JvmHeapSize'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.Load'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.NodeTraffic'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.PersistSize'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.ProcLoadAvg'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.ProcNetDev'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.ProcMemInfo'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.ProcStat'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.ProcStatus'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.Resources'/&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.VmStat'/&gt;
+
+  &lt;!-- optional, required if above BlackboardSize is loaded --&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.BlackboardSizeInAgent'/&gt;
+</pre>
+
+Plus add the following components to all agents:
+
+<pre>
+  &lt;!-- optional, required if above PersistSize is loaded --&gt;
+  &lt;component 
+      class='org.cougaar.core.qos.metrics.PersistenceAdapterPlugin'/&gt;
+
+  &lt;!-- optional, required if above BlackboardSize is loaded --&gt;
+  &lt;component
+      class='org.cougaar.core.qos.profile.BlackboardSizeInAgent'/&gt;
+</pre>
+
+<p>
+<hr>
+<p>
+
+Some useful system properties:<pre>
+
+  &lt;!-- enable persistence, for PersistSize activity --&gt;
+  &lt;vm_parameter&gt;
+    -Dorg.cougaar.core.persistence.enable=true
+  &lt;/vm_parameter&gt;
+
+  &lt;!-- disable the "NodeA: " logging prefix --&gt;
+  &lt;vm_parameter&gt;
+    -Dorg.cougaar.core.logging.addAgentPrefix=false
+  &lt;/vm_parameter&gt;
+
+  &lt;!-- turn off +/- logging on message activity --&gt;
+  &lt;vm_parameter&gt;
+    -Dorg.cougaar.core.agent.quiet=true
+  &lt;/vm_parameter&gt;
+
+  &lt;!-- reduce naming &amp; mts startup time --&gt;
+  &lt;vm_parameter&gt;
+    -Dorg.cougaar.core.wp.resolver.rmi.minLookup=500
+  &lt;/vm_parameter&gt;
+  &lt;vm_parameter&gt;
+    -Dorg.cougaar.core.wp.resolver.rmi.maxLookup=2000
+  &lt;/vm_parameter&gt;
+  &lt;vm_parameter&gt;
+    -Dorg.cougaar.core.wp.server.failTTD=1000
+  &lt;/vm_parameter&gt;
+  &lt;vm_parameter&gt;
+    -Dorg.cougaar.core.mts.destq.retry.maxTimeout=30000
+  &lt;/vm_parameter&gt;
+
+</pre>
+
+</body>
