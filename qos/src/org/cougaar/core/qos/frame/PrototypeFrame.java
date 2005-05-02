@@ -49,6 +49,7 @@ public class PrototypeFrame
     extends Frame
 {
     private final String prototype_name;
+    private final String parent_prototype;
     private transient Logger log = Logging.getLogger(getClass().getName());
     private transient Properties dynamic_values;
     private HashMap path_cache;
@@ -60,11 +61,17 @@ public class PrototypeFrame
 		   UID uid, 
 		   Properties slots)
     {
-	super(frameSet, parent, uid);
+	super(frameSet, uid);
+	this.parent_prototype = parent;
 	this.prototype_name = prototype_name;
 	this.slots = slots;
 	this.dynamic_values = new Properties();
 	this.path_cache = new HashMap();
+    }
+
+    public String getKind()
+    {
+	return parent_prototype;
     }
 
     public Properties getSlotDefinitions()

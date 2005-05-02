@@ -374,6 +374,7 @@ public class FrameGen
 	writer.println("{");
 	writeSlots(writer, prototype, local_slots);
 	writeConstructors(writer, prototype);
+	writeKind(writer, prototype);
 	writeCollector(writer, prototype, local_slots, container_slots);
 	writeAccessors(writer, prototype, local_slots, override_slots);
 	if (container != null) {
@@ -452,7 +453,7 @@ public class FrameGen
 
 	writer.println("\n\n    public " +cname + "(UID uid)");
 	writer.println("    {");
-	writer.println("        super(null, \"" +name+ "\", uid);");
+	writer.println("        super(null, uid);");
 	writer.println("    }");
 
 	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
@@ -460,17 +461,9 @@ public class FrameGen
 	for (int i=0; i<spaces; i++) writer.print(' ');
 	writer.println("UID uid)");
 	writer.println("    {");
-	writer.println("        super(frameSet, \"" +name+ "\", uid);");
+	writer.println("        super(frameSet, uid);");
 	writer.println("    }");
 
-	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
-	for (int i=0; i<spaces; i++) writer.print(' ');
-	writer.println("String kind,");
-	for (int i=0; i<spaces; i++) writer.print(' ');
-	writer.println("UID uid)");
-	writer.println("    {");
-	writer.println("        super(frameSet, kind, uid);");
-	writer.println("    }");
     }
 
     private void writeCollector(PrintWriter writer,
@@ -514,6 +507,14 @@ public class FrameGen
 	    }
 	    writer.println("    }");
 	}
+    }
+
+    private void writeKind(PrintWriter writer, String prototype)
+    {
+	writer.println("\n\n    public String getKind()");
+	writer.println("    {");
+	writer.println("        return \"" +prototype+ "\";");
+	writer.println("    }");
     }
 
     private void writeAccessors(PrintWriter writer,

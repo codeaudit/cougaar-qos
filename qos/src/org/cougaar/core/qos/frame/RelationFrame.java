@@ -35,11 +35,9 @@ import org.cougaar.core.util.UID;
 abstract public class RelationFrame
     extends DataFrame 
 {
-    protected RelationFrame(FrameSet frameSet, 
-			    String kind, 
-			    UID uid)
+    protected RelationFrame(FrameSet frameSet, UID uid)
     {
-	super(frameSet, kind, uid);
+	super(frameSet, uid);
     }
 
     abstract public Object getParentPrototype();

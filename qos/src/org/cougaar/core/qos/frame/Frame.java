@@ -45,18 +45,17 @@ abstract public class Frame
     implements UniqueObject, Cloneable
 {
     private final UID uid;
-    private final String kind;
     protected transient FrameSet frameSet;
     private static Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.Frame.class);
 
-    Frame(FrameSet frameSet, String kind, UID uid)
+    Frame(FrameSet frameSet, UID uid)
     {
 	this.frameSet = frameSet;
 	this.uid = uid;
-	this.kind = kind;
     }
 
+    abstract public String getKind();
     abstract public Properties getLocalSlots();
     abstract public void setValue(String slot, Object value);
     abstract public boolean isa(String kind);
@@ -72,18 +71,6 @@ abstract public class Frame
 	    log.error(null, ex);
 	    return null;
 	}
-    }
-
-    public String toString()
-    {
-	return "<Frame " +kind+ " " +uid+ ">";
-    }
-
-    // Basic accessors
-
-    public String getKind()
-    {
-	return kind;
     }
 
 

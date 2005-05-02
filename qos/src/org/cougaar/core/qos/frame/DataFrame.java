@@ -75,9 +75,7 @@ abstract public class DataFrame
 	return newFrame(pkg, frameSet, proto, uid, initial_values);
     }
 
-    private static final Class[] CTYPES = { FrameSet.class, 
-					    String.class,
-					    UID.class};
+    private static final Class[] CTYPES = { FrameSet.class, UID.class};
 
     public static DataFrame newFrame(String pkg,
 				     FrameSet frameSet,
@@ -89,7 +87,7 @@ abstract public class DataFrame
 	if (klass == null) return null;
 
 	DataFrame frame = null;
-	Object[] args = { frameSet, proto, uid };
+	Object[] args = { frameSet, uid };
 	try {
 	    java.lang.reflect.Constructor cons = klass.getConstructor(CTYPES);
 	    frame = (DataFrame) cons.newInstance(args);
@@ -109,11 +107,9 @@ abstract public class DataFrame
     private Properties props;
     private transient PropertyChangeSupport pcs;
 
-    protected DataFrame(FrameSet frameSet, 
-			String kind, 
-			UID uid)
+    protected DataFrame(FrameSet frameSet, UID uid)
     {
-	super(frameSet, kind, uid);
+	super(frameSet, uid);
 	this.props = new Properties();
 	this.pcs = new PropertyChangeSupport(this);
     }
