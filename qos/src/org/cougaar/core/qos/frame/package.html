@@ -152,6 +152,63 @@ their semantic interpretation.
 
       <dl>
 
+	<dt><b>immutable</b></dt>
+
+	<dd><i>[Proposed but not yet implemented]</i> This boolean
+	  valued attribute indicates whether or not the value of the
+	  slot in any given DataFrame can be chaged after
+	  initialization.  The default is "false" (ie, values can be
+	  changed after initialization).
+	  <p>
+	</dd>
+
+	<dt><b>member</b></dt>
+
+	<dd>This boolean valued attribute indicates whether or not the
+	  generated code for this slot treats it as a data member or
+	  as a property.  The former is more efficient for slots whose
+	  value is usually frame-specific, the latter is more
+	  efficient for slots whose value is usually defaulted. The
+	  default for this attribute is "true".  <p> </dd>
+
+	<dt><b>path</b></dt>
+
+	<dd> The presence of this attribute indicates that the default
+	  value for this slot is computed by following a path.  The
+	  value of the attribute is the name of path.
+	  <p>
+	</dd>
+
+	<dt><b>signal-on-change</b></dt>
+
+	<dd> <i>[Proposed but not yet implemented]</i>This attribute
+	specifies the signal behavior when the slot is changed.  It
+	has four possible values: "none" (no signalling), "blackboard"
+	(notify the blackboard only), "bean" (use a property event to
+	notify listeners), or "all" (do all forms of signalling).  The
+	default is "all".  <p> </dd>
+	
+	<dt><b>static</b></dt>
+
+	<dd> <i>[Deprecated, likely to be removed]</i> This boolean
+	  valued attribute indicates whether or not the default value
+	  of this slot can be changed dynmaically.  The default for
+	  this attribute is "true" (ie, cannot be changed
+	  dynamicall).  <p></dd>
+
+	<dt><b>transient</b></dt>
+
+	<dd><i>[Proposed but not yet implemented]</i>This boolean
+	  valued attribute indicates whether or not the corresponding
+	  data member in the generated class will be declared
+	  transient.  The default is "false".  <p> </dd>
+
+	<dt><b>type</b></dt>
+
+	<dd><i>[Proposed but not yet implemented]</i> This attribute
+	  will be used to specify the Java type of values of this
+	  slot.  The default is String. <p> </dd>
+
 	<dt><b>value</b></dt>
 
 	<dd>This attribute gives a default value of the slot.  The
@@ -163,61 +220,12 @@ their semantic interpretation.
 	  has no default but that warnings should not be issued.  <p>
 	  </dd>
 
-	<dt><b>path</b></dt>
+	<dt><b>warn</b></dt>
 
-	<dd> The presence of this attribute indicates that the default
-	  value for this slot is computed by following a path.  The
-	  value of the attribute is the name of path.
-	  <p>
-	</dd>
+	<dd>This boolean valued attribute indicates whether or not a
+	  warning is generated at runtime if the slot has no
+	  value. The default for this attribute is "true".  <p> </dd>
 
-	<dt><b>member</b></dt>
-
-	<dd>This boolean valued attribute indicates wheter or not the
-	  generated code for this slot treats it as a data member or
-	  as a property.  The former is more efficient for slots whose
-	  value is usually frame-specific, the latter is more
-	  efficient for slots whose value is usually defaulted. The
-	  default for this attribute is "true".  <p> </dd>
-
-	<dt><b>static</b></dt>
-
-	<dd> <i>[Deprecated, likely to be removed]</i> This boolean
-	  valued attribute indicates whether or not the default value
-	  of this slot can be changed dynmaically.  The default for
-	  this attribute is "false".  <p></dd>
-
-	<dt><b>type</b></dt>
-
-	<dd><i>[Proposed but not yet implemented]</i> This attribute
-	  will be used to specify the Java type of values of this
-	  slot.  The default is String. <p> </dd>
-
-	<dt><b>immutable</b></dt>
-
-	<dd><i>[Proposed but not yet implemented]</i> This boolean
-	  valued attribute indicates whether or not the value of the
-	  slot in any given DataFrame can be chaged after
-	  initialization.  The default is "false".
-	  <p>
-	</dd>
-
-	<dt><b>transient</b></dt>
-
-	<dd><i>[Proposed but not yet implemented]</i>This boolean
-	  valued attribute indicates whether or not the corresponding
-	  data member in the generated class will be declared
-	  transient.  The default is "false".  <p> </dd>
-
-	<dt><b>signal-on-change</b></dt>
-
-	<dd> <i>[Proposed but not yet implemented]</i>This attribute
-	specifies the signal behavior when the slot is changed.  It
-	has four possible values: "none" (no signalling), "blackboard"
-	(notify the blackboard only), "bean" (use a property event to
-	notify listeners), or "all" (do all forms of signalling).  The
-	default is "all".  <p> </dd>
-	
 
       </dl>
 

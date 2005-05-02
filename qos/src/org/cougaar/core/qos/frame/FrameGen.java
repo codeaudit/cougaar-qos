@@ -253,6 +253,11 @@ public class FrameGen
 	return getBooleanAttribute(prototype, slot, attrs, "member", true);
     }
 
+    private boolean isWarn(String prototype, String slot, Attributes attrs)
+    {
+	return getBooleanAttribute(prototype, slot, attrs, "warn", true);
+    }
+
     // Parsing 
 
     private void startFrameset(Attributes attrs)
@@ -576,6 +581,7 @@ public class FrameGen
 	String path = attrs.getValue("path");
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = path == null && isStatic(prototype, slot, attrs);
+	boolean warnp = isWarn(prototype, slot, attrs);
 	writer.print("\n\n    public Object get" +accessor_name);
 	if (!warn) writer.print("__NoWarn");
 	writer.println("()");
@@ -592,14 +598,9 @@ public class FrameGen
 	}
 	if (staticp) {
 	    if (default_value != null) {
-		// Zinky suggestion: NIL -> null
-		if (default_value.equals("NIL")) {
-		    writer.println("        return null;");
-		} else {
-		    writer.println("        return \"" +default_value+ "\";");
-		}
+		writer.println("        return \"" +default_value+ "\";");
 	    } else {
-		if (warn)
+		if (warn && warnp)
 		    writer.println("        getLogger().warn(this + \" has no value for " 
 				   +accessor_name+
 				   "\");");
