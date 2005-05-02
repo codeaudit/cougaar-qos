@@ -247,6 +247,11 @@ public class FrameGen
 	return getBooleanAttribute(prototype, slot, attrs, "static", true);
     }
 
+    private boolean isTransient(String prototype, String slot, Attributes attrs)
+    {
+	return getBooleanAttribute(prototype, slot, attrs, "transient", false);
+    }
+
 
     private boolean isMember(String prototype, String slot, Attributes attrs)
     {
@@ -446,9 +451,12 @@ public class FrameGen
 	String value = attrs.getValue("value");
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = isStatic(prototype, slot, attrs);
+	boolean transientp = isTransient(prototype, slot, attrs);
 	if (memberp) {
 	    String fixed_name = fixName(slot, false);
-	    writer.println("    private Object " +fixed_name+ ";");
+	    writer.print("    private");
+	    if (transientp) writer.print(" transient");
+	    writer.println(" Object " +fixed_name+ ";");
 	}
     }
 
