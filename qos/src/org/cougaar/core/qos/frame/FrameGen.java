@@ -263,6 +263,20 @@ public class FrameGen
 	return getBooleanAttribute(prototype, slot, attrs, "warn", true);
     }
 
+    private boolean notifyListeners(String prototype, String slot, 
+				    Attributes attrs)
+    {
+	return getBooleanAttribute(prototype, slot, attrs, "notify-listeners", 
+				   true);
+    }
+
+    private boolean notifyBlackboard(String prototype, String slot, 
+				    Attributes attrs)
+    {
+	return getBooleanAttribute(prototype, slot, attrs, "notify-blackboard", 
+				   true);
+    }
+
     // Parsing 
 
     private void startFrameset(Attributes attrs)
@@ -672,7 +686,8 @@ public class FrameGen
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot, attrs);
-
+	boolean notify_listeners_p = notifyListeners(prototype, slot, attrs);
+	boolean notify_blackboard_p = notifyBlackboard(prototype, slot, attrs);
 	writer.println("\n\n    public void set" +accessor_name+
 		       "(Object __new_value)");
 	writer.println("    {");
@@ -683,7 +698,10 @@ public class FrameGen
 	    writer.println("        Object __old_value = getProperty(\"" +slot+ "\");");
 	    writer.println("        setProperty(\"" +slot+ "\", __new_value);");
 	}
-	writer.println("        slotModified(\"" +slot+ "\", __old_value, __new_value);");
+	writer.println("        slotModified(\"" +slot+ 
+		       "\", __old_value, __new_value, "
+		       +notify_listeners_p+ ", " +notify_blackboard_p
+		       + ");");
 	writer.println("    }");
     }
 
@@ -695,6 +713,8 @@ public class FrameGen
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot, attrs);
+	boolean notify_listeners_p = notifyListeners(prototype, slot, attrs);
+	boolean notify_blackboard_p = notifyBlackboard(prototype, slot, attrs);
 	writer.println("\n\n    public void remove" +accessor_name+ "()");
 	writer.println("    {");
 	if (memberp) {
@@ -706,7 +726,9 @@ public class FrameGen
 	    writer.println("        removeProperty(\"" +slot+ "\");");
 	}
 	writer.println("        slotModified(\"" 
-		       +slot+ "\", __old_value, get" +accessor_name+ "());");
+		       +slot+ "\", __old_value, get" +accessor_name+ "(), "
+		       +notify_listeners_p+ ", " +notify_blackboard_p
+		       +");");
 	writer.println("    }");
     }
 

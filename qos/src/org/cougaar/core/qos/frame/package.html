@@ -171,6 +171,18 @@ their semantic interpretation.
 	  efficient for slots whose value is usually defaulted. The
 	  default for this attribute is "true".  <p> </dd>
 
+	<dt><b>notify-blackboard</b></dt>
+
+	<dd>This attribute specifies whether or not a change should be
+	published on the Blackboard when the slot value changes.  The
+	default is "true".  <p> </dd>
+
+	<dt><b>notify-listeners</b></dt>
+
+	<dd>This attribute specifies whether or not PropertyChange
+	listeners should be notified when the slot value changes.  The
+	default is "true".  <p> </dd>
+	
 	<dt><b>path</b></dt>
 
 	<dd> The presence of this attribute indicates that the default
@@ -179,15 +191,6 @@ their semantic interpretation.
 	  <p>
 	</dd>
 
-	<dt><b>signal-on-change</b></dt>
-
-	<dd> <i>[Proposed but not yet implemented]</i>This attribute
-	specifies the signal behavior when the slot is changed.  It
-	has four possible values: "none" (no signalling), "blackboard"
-	(notify the blackboard only), "bean" (use a property event to
-	notify listeners), or "all" (do all forms of signalling).  The
-	default is "all".  <p> </dd>
-	
 	<dt><b>static</b></dt>
 
 	<dd> <i>[Deprecated, likely to be removed]</i> This boolean

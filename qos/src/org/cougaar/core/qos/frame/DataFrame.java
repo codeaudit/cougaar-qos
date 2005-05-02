@@ -309,11 +309,18 @@ abstract public class DataFrame
 
     // Support
 
-    protected void slotModified(String slot, Object old_value, Object new_value)
+    protected void slotModified(String slot, 
+				Object old_value, 
+				Object new_value,
+				boolean notify_listeners,
+				boolean notify_blackboard)
     {
-	if (frameSet != null) frameSet.valueUpdated(this, slot, new_value);
-	String fixed_name = FrameGen.fixName(slot, true, true);
-	fireChange(fixed_name, old_value, new_value);
+	if (notify_blackboard && frameSet != null) 
+	    frameSet.valueUpdated(this, slot, new_value);
+	if (notify_listeners) {
+	    String fixed_name = FrameGen.fixName(slot, true, true);
+	    fireChange(fixed_name, old_value, new_value);
+	}
     }
 
 
