@@ -161,7 +161,6 @@ abstract public class DataFrame
     protected DataFrame(FrameSet frameSet, UID uid)
     {
 	super(frameSet, uid);
-	this.props = new Properties();
 	this.pcs = new PropertyChangeSupport(this);
     }
 
@@ -368,19 +367,21 @@ abstract public class DataFrame
 	// default is no-op
     }
 
-    protected Object getProperty(String slot)
+    protected synchronized Object getProperty(String slot)
     {
+	if (props == null) props = new Properties();
 	return props.get(slot);
     }
 
-    protected void setProperty(String slot, Object value)
+    protected synchronized void setProperty(String slot, Object value)
     {
+	if (props == null) props = new Properties();
 	props.put(slot, value);
     }
 
-    protected void removeProperty(String slot)
+    protected synchronized void removeProperty(String slot)
     {
-	props.remove(slot);
+	if (props != null) props.remove(slot);
     }
 
     protected Object getInheritedValue(Frame origin, String slot)
