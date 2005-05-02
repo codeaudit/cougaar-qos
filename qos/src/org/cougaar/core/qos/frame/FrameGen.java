@@ -263,6 +263,11 @@ public class FrameGen
 	return getBooleanAttribute(prototype, slot, attrs, "warn", true);
     }
 
+    private boolean isImmutable(String prototype, String slot, Attributes attrs)
+    {
+	return getBooleanAttribute(prototype, slot, attrs, "immutable", false);
+    }
+
     private boolean notifyListeners(String prototype, String slot, 
 				    Attributes attrs)
     {
@@ -692,6 +697,8 @@ public class FrameGen
 			     String slot,
 			     Attributes attrs)
     {
+	if (isImmutable(prototype, slot, attrs)) return;
+
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot, attrs);
@@ -719,12 +726,13 @@ public class FrameGen
 			      String slot,
 			      Attributes attrs)
     {
+	if (isImmutable(prototype, slot, attrs)) return;
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean notify_listeners_p = notifyListeners(prototype, slot, attrs);
 	boolean notify_blackboard_p = notifyBlackboard(prototype, slot, attrs);
-	writer.println("\n\n    public void remove" +accessor_name+ "()");
+	writer.println("\n\n    protected void remove" +accessor_name+ "()");
 	writer.println("    {");
 	if (memberp) {
 	    writer.println("        Object __old_value = " +fixed_name+ ";");
@@ -750,7 +758,7 @@ public class FrameGen
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot, attrs);
 
-	writer.println("\n\n    public void initialize" +accessor_name+
+	writer.println("\n\n    protected void initialize" +accessor_name+
 		       "(Object new_value)");
 	writer.println("    {");
 	if (memberp)
@@ -901,9 +909,9 @@ public class FrameGen
 	boolean is_root = parent == null;
 	if (!slots.isEmpty()) {
 	    generateHashConstants(writer, slots);
-	    writeDynamicSetter(writer, slots, is_root);
-	    writeDynamicInitializer(writer, slots, is_root);
-	    writeDynamicRemover(writer, slots, is_root);
+	    writeDynamicSetter(writer, prototype, local_slots, is_root);
+	    writeDynamicInitializer(writer, prototype, slots, is_root);
+	    writeDynamicRemover(writer, prototype, local_slots, is_root);
 	}
 	if (container != null) {
 	    Set pslots = collectSlots(container);
@@ -912,7 +920,7 @@ public class FrameGen
 	    slots.addAll(pslots);
 	}
 	if (!slots.isEmpty())
-	    writeDynamicGetter(writer, slots, is_root);
+	    writeDynamicGetter(writer, prototype, slots, is_root);
     }
 
     private String slotHashVar(String slot)
@@ -932,6 +940,7 @@ public class FrameGen
     }
 
     private void writeDynamicGetter(PrintWriter writer, 
+				    String prototype,
 				    Set slots,
 				    boolean is_root)
     {
@@ -958,17 +967,21 @@ public class FrameGen
     }
 
     private void writeDynamicSetter(PrintWriter writer, 
-				    Set slots,
+				    String prototype,
+				    Map slots,
 				    boolean is_root)
     {
 	writer.println("\n\n    protected void setLocalValue(String __slot,");
 	writer.println("                                 Object __value)");
 	writer.println("    {");
 	writer.println("       int __key = __slot.hashCode();");
-	Iterator itr = slots.iterator();
+	Iterator itr = slots.entrySet().iterator();
 	boolean first = true;
 	while(itr.hasNext()) {
-	    String slot = (String) itr.next();
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    String slot = (String) entry.getKey();
+	    if (isImmutable(prototype, slot, attrs)) continue;
 	    String slot_hash_var = slotHashVar(slot);
 	    String method = "set" + fixName(slot, true);
 	    writer.print("      ");
@@ -985,6 +998,7 @@ public class FrameGen
     }
 
     private void writeDynamicInitializer(PrintWriter writer, 
+					 String prototype,
 					 Set slots,
 					 boolean is_root)
     {
@@ -1012,16 +1026,20 @@ public class FrameGen
     }
 
     private void writeDynamicRemover(PrintWriter writer, 
-				     Set slots,
+				     String prototype,
+				     Map slots,
 				     boolean is_root)
     {
 	writer.println("\n\n    protected void removeLocalValue(String __slot)");
 	writer.println("    {");
 	writer.println("       int __key = __slot.hashCode();");
-	Iterator itr = slots.iterator();
+	Iterator itr = slots.entrySet().iterator();
 	boolean first = true;
 	while(itr.hasNext()) {
-	    String slot = (String) itr.next();
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    String slot = (String) entry.getKey();
+	    if (isImmutable(prototype, slot, attrs)) continue;
 	    String slot_hash_var = slotHashVar(slot);
 	    String method = "remove" + fixName(slot, true);
 	    writer.print("      ");
