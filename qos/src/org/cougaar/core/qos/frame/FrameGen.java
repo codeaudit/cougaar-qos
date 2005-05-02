@@ -91,7 +91,7 @@ public class FrameGen
 	    return;
 	}
 
-	generateCode();
+	generateCode(package_name);
 
     }
 
@@ -299,7 +299,7 @@ public class FrameGen
 
     // Code Generation 
 
-    private void generateCode()
+    private void generateCode(String pkg)
     {
 	Iterator itr;
 
@@ -337,12 +337,13 @@ public class FrameGen
 	    }
 
 
-	    generateCode(prototype, parent, container, 
+	    generateCode(prototype, pkg, parent, container, 
 			 local_slots, override_slots);
 	}
     }
 
     private void generateCode(String prototype, 
+			      String pkg,
 			      String parent, 
 			      String container,
 			      HashMap local_slots,
@@ -372,6 +373,7 @@ public class FrameGen
 
 	writeDecl(writer, prototype, parent);
 	writer.println("{");
+	writeRegisterer(writer, pkg, prototype);
 	writeSlots(writer, prototype, local_slots);
 	writeConstructors(writer, prototype);
 	writeKind(writer, prototype);
@@ -444,6 +446,24 @@ public class FrameGen
 	    writer.println("    private Object " +fixed_name+ ";");
 	}
     }
+
+    private void writeRegisterer(PrintWriter writer,
+				 String pkg,
+				 String prototype)
+    {
+	String classname = fixName(prototype, true);
+	writer.println("    static {");
+	writer.println("        org.cougaar.core.qos.frame.FrameMaker __fm = ");
+	writer.println("            new org.cougaar.core.qos.frame.FrameMaker() {");
+	writer.println("                public DataFrame makeFrame(FrameSet frameSet, UID uid) {");
+	writer.println("                     return new " +classname+ "(frameSet, uid);");
+	writer.println("                }");
+	writer.println("            };");
+	writer.println("            DataFrame.registerFrameMaker(\""
+		     +pkg+ "\", \"" +prototype+ "\", __fm);");
+	writer.println("    }");
+    }
+		       
 
     private void writeConstructors(PrintWriter writer,
 				   String name)

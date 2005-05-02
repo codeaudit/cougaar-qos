@@ -25,12 +25,12 @@
  */
 
 package org.cougaar.core.qos.frame;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -52,13 +52,35 @@ abstract public class DataFrame
     extends Frame
     implements PropertyChangeListener
 {
+    // Used only by the reflective methods. none of which are called
+    // anymore.
     private static final Object[] ARGS0 = {};
     private static final Class[] TYPES0 = {};
     private static final Class[] TYPES1 = { Object.class };
-    public static final String NIL = "NIL";
+    private static final Class[] CTYPES = { FrameSet.class, UID.class};
 
-    private static transient Logger log = 
+    public static final String NIL = "NIL";
+    
+    private static HashMap FramePackages;
+    private static Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
+
+
+    protected synchronized static void registerFrameMaker(String pkg,
+							  String proto,
+							  FrameMaker maker)
+    {
+	if (FramePackages == null) FramePackages = new HashMap();
+	if (log.isDebugEnabled())
+	    log.debug("Registering FrameMaker " +maker+ " for prototype "
+		      +proto+ " in package " +pkg);
+	HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
+	if (frameTypeMap == null) {
+	    frameTypeMap = new HashMap();
+	    FramePackages.put(pkg, frameTypeMap);
+	}
+	frameTypeMap.put(proto, maker);
+    }
 
     protected static Logger getLogger()
     {
@@ -75,13 +97,42 @@ abstract public class DataFrame
 	return newFrame(pkg, frameSet, proto, uid, initial_values);
     }
 
-    private static final Class[] CTYPES = { FrameSet.class, UID.class};
 
-    public static DataFrame newFrame(String pkg,
-				     FrameSet frameSet,
-				     String proto, 
-				     UID uid,
-				     Properties values)
+    public static synchronized DataFrame newFrame(String pkg,
+						  FrameSet frameSet,
+						  String proto, 
+						  UID uid,
+						  Properties values)
+    {
+	if (log.isDebugEnabled())
+	    log.debug("Searching for FrameMaker for prototype "
+		      +proto+ " in package " +pkg);
+	// force a class load (ugh)
+	Class klass = frameSet.classForPrototype(proto);
+	DataFrame frame = null;
+	HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
+	if (frameTypeMap != null) {
+	    FrameMaker maker = (FrameMaker) frameTypeMap.get(proto);
+	    if (maker != null) {
+		frame = maker.makeFrame(frameSet, uid);
+		frame.initializeValues(values);
+	    } else {
+		log.warn("No prototype " +proto+ " in package " +pkg);
+	    }
+	} else {
+	    log.warn("No prototypes in package " +pkg);
+	}
+	return frame;
+    }
+
+    
+
+    // Not used anymore, here for documentation
+    public static DataFrame newFrameReflective(String pkg,
+					       FrameSet frameSet,
+					       String proto, 
+					       UID uid,
+					       Properties values)
     {
 	Class klass = frameSet.classForPrototype(proto);
 	if (klass == null) return null;
