@@ -344,6 +344,7 @@ public class FrameGen
 	    Attributes attrs = (Attributes) proto_attrs.get(prototype);
 	    String parent = attrs.getValue("prototype");
 	    String container = attrs.getValue("container");
+	    String doc = attrs.getValue("doc");
 	    HashMap slots = (HashMap) entry.getValue();
 	    HashMap override_slots = new HashMap();
 	    HashMap local_slots = new HashMap();
@@ -361,13 +362,15 @@ public class FrameGen
 	    }
 
 
-	    generateCode(prototype, pkg, parent, container, 
+	    generateCode(prototype, pkg, doc,
+			 parent, container, 
 			 local_slots, override_slots);
 	}
     }
 
     private void generateCode(String prototype, 
 			      String pkg,
+			      String doc,
 			      String parent, 
 			      String container,
 			      HashMap local_slots,
@@ -395,7 +398,7 @@ public class FrameGen
 	    }
 	}
 
-	writeDecl(writer, prototype, parent);
+	writeDecl(writer, prototype, doc, parent);
 	writer.println("{");
 	writeRegisterer(writer, pkg, prototype);
 	writeSlots(writer, prototype, local_slots);
@@ -418,6 +421,7 @@ public class FrameGen
     
     private void writeDecl(PrintWriter writer,
 			   String prototype, 
+			   String doc,
 			   String parent)
     {
 	boolean is_root_relation = 
@@ -433,6 +437,11 @@ public class FrameGen
 	}
 	writer.println("import org.cougaar.core.qos.frame.SlotDescription;");
 	writer.println("import org.cougaar.core.util.UID;");
+	if (doc != null) {
+	    writer.println("\n/**");
+	    writer.println(doc);
+	    writer.print("*/");
+	}
 	writer.println("\npublic class " +name);
 	if (is_root_relation) {
 	    writer.println("    extends RelationFrame");

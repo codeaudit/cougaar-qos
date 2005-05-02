@@ -127,12 +127,13 @@ their semantic interpretation.
 
     <dd>A prototype entity defines a PrototypeFrame.  It has one
       required attributes, <b>name</b>, which is the name of the
-      prototype.  It also supports two optional attributes:
-      <b>prototype</b>, which specifies the "super" of this one; and
+      prototype.  It also supports three optional attributes:
+      <b>prototype</b>, which specifies the "super" of this one;
       <b>container</b>, which specifies the prototype of frames that
-      can act as containers for frames of this prototype.  The
-      remaining structure of a prototype is specified by <a
-      href="#slot">slot</a> entities.  <p></dd>
+      can act as containers for frames of this prototype;
+      and <b>doc</b>, which will be used as javadoc in the generated
+      class.  The remaining structure of a prototype is specified
+      by <a href="#slot">slot</a> entities.  <p></dd>
 
     <dt><b>path</b></dt>
 
