@@ -128,11 +128,11 @@ abstract public class DataFrame
     
 
     // Not used anymore, here for documentation
-    public static DataFrame newFrameReflective(String pkg,
-					       FrameSet frameSet,
-					       String proto, 
-					       UID uid,
-					       Properties values)
+    private static DataFrame newFrameReflective(String pkg,
+						FrameSet frameSet,
+						String proto, 
+						UID uid,
+						Properties values)
     {
 	Class klass = frameSet.classForPrototype(proto);
 	if (klass == null) return null;
@@ -277,7 +277,7 @@ abstract public class DataFrame
     }
 
     // Not used, here for documentation
-    public Properties getAllSlotsReflective()
+    private Properties getAllSlotsReflective()
     {
 	Properties props = new VisibleProperties();
 	Class klass = getClass();

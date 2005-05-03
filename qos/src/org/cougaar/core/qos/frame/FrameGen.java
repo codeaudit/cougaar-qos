@@ -533,7 +533,6 @@ public class FrameGen
 	String value = attrs.getValue("value");
 	String type = getSlotType(prototype, slot, attrs);
 	boolean memberp = isMember(prototype, slot, attrs);
-	boolean staticp = isStatic(prototype, slot, attrs);
 	boolean transientp = isTransient(prototype, slot, attrs);
 	if (memberp) {
 	    String fixed_name = fixName(slot, false);
@@ -685,6 +684,7 @@ public class FrameGen
 	}
     }
 
+    private static final String NoWarn = "__NoWarn";
 
     private void writeGetter(PrintWriter writer, 
 			     String prototype,
@@ -700,8 +700,11 @@ public class FrameGen
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = path == null && isStatic(prototype, slot, attrs);
 	boolean warnp = isWarn(prototype, slot, attrs);
-	writer.print("\n\n    public "+type+" get" +accessor_name);
-	if (!warn) writer.print("__NoWarn");
+	if (warn) {
+	    writer.print("\n\n    public "+type+" get" +accessor_name);
+	} else {
+	    writer.print("\n\n    "+type+" get" +accessor_name+ NoWarn);
+	}
 	writer.println("()");
 	writer.println("    {");
 	if (memberp) {
@@ -742,13 +745,16 @@ public class FrameGen
 	String accessor_name = fixName(slot, true);
 	String default_value = attrs.getValue("value");
 	boolean staticp = isStatic(prototype, slot, attrs);
-	writer.print("\n\n    public "+type+" get" +accessor_name);
-	if (!warn) writer.print("__NoWarn");
+	if (warn) {
+	    writer.print("\n\n    public "+type+" get" +accessor_name);
+	} else {
+	    writer.print("\n\n    "+type+" get" +accessor_name+	 NoWarn);
+	}
 	writer.println("()");
 	writer.println("    {");
 	String result_var = "__result";
 	writer.println("        "+type+" " +result_var+ " = super.get" 
-		       +accessor_name+ "__NoWarn();");
+		       +accessor_name+ NoWarn+ "();");
 	writer.println("        if (" +result_var+ " != null) return "
 		       +result_var+ ";");
 	
