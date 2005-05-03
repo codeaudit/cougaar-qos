@@ -282,9 +282,16 @@ public class FrameGen
     }
 
 
+    // Transient -> member. Likewise, non-Object type -> member
     private boolean isMember(String prototype, String slot, Attributes attrs)
     {
-	return getBooleanAttribute(prototype, slot, attrs, "member", true);
+	boolean attr = 
+	    getBooleanAttribute(prototype, slot, attrs, "member", true);
+	if (attr) return true;
+	if (isTransient(prototype, slot, attrs)) return true;
+	String type = getSlotType(prototype, slot, attrs);
+	if (!type.equals("Object")) return true;
+	return false;
     }
 
     private boolean isWarn(String prototype, String slot, Attributes attrs)
