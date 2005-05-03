@@ -60,6 +60,40 @@ abstract public class RelationFrame
 	return frameSet.getRelationshipChild(this);
     }
 
+    protected void collectSlotValues(java.util.Properties __props)
+    {
+        super.collectSlotValues(__props);
+	Object __value;
+        __value = getParentPrototype();
+        __props.put("parent-prototype", __value != null ? __value : NIL);
+        __value = getChildPrototype();
+        __props.put("child-prototype", __value != null ? __value : NIL);
+        __value = getParentSlot();
+        __props.put("parent-slot", __value != null ? __value : NIL);
+        __value = getChildSlot();
+        __props.put("child-slot", __value != null ? __value : NIL);
+    }
+
+    private SlotDescription makeMetaDescription(String name, Object value)
+    {
+        SlotDescription __desc = new SlotDescription();
+        __desc.name = name;
+        __desc.prototype = "relation-frame";
+        __desc.is_writable = false;
+	__desc.is_overridden = true;
+        __desc.value = value;
+        return __desc;
+    }
+
+    protected void collectSlotDescriptions(java.util.List list)
+    {
+        super.collectSlotDescriptions(list);
+	list.add(makeMetaDescription("parent-prototype", getParentPrototype()));
+	list.add(makeMetaDescription("parent-slot", getParentSlot()));
+	list.add(makeMetaDescription("child-prototype", getChildPrototype()));
+	list.add(makeMetaDescription("child-slot", getChildSlot()));
+    }
+
 
 }
 

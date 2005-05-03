@@ -238,6 +238,8 @@ public class FrameSetParser
 	    // no-op
 	} else if (name.equals("prototype")) {
 	    startPrototype(attrs);
+	} else if (name.equals("relation-prototype")) {
+	    startPrototype(attrs);
 	} else if (name.equals("slot")) {
 	    slot(attrs);
 	} else if (name.equals("fork")) {
@@ -258,6 +260,8 @@ public class FrameSetParser
 	} else if (name.equals("prototypes")) {
 	    // no-op
 	} else if (name.equals("prototype")) {
+	    endPrototype();
+	} else if (name.equals("relation-prototype")) {
 	    endPrototype();
 	} else if (name.equals("frames")) {
 	    references = null;

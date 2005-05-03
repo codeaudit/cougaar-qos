@@ -66,8 +66,9 @@ public class FrameGen
     private HashMap slots;
     private HashMap proto_attrs;
     private HashMap proto_slots;
+    private HashSet relation_prototypes;
     private String current_prototype;
-    private String container_relation, root_relation;
+    private String container_relation;
 
 
     public FrameGen(String path)
@@ -79,6 +80,7 @@ public class FrameGen
     {
 	proto_slots = new HashMap();
 	proto_attrs = new HashMap();
+	relation_prototypes = new HashSet();
 	try {
 	    XMLReader producer = XMLReaderFactory.createXMLReader();
 	    DefaultHandler consumer = this; 
@@ -106,6 +108,8 @@ public class FrameGen
 	    // no-op
 	} else if (name.equals("prototype")) {
 	    startPrototype(attrs);
+	} else if (name.equals("relation-prototype")) {
+	    startRelationPrototype(attrs);
 	} else if (name.equals("slot")) {
 	    slot(attrs);
 	} 
@@ -119,6 +123,8 @@ public class FrameGen
 	    // no-op
 	} else if (name.equals("prototype")) {
 	    endPrototype();
+	} else if (name.equals("relation-prototype")) {
+	    endRelationPrototype();
 	} 
     }
 
@@ -312,6 +318,23 @@ public class FrameGen
 	slots = null;
     }
 
+
+    private void startRelationPrototype(Attributes attrs)
+    {
+	current_prototype = attrs.getValue("name");
+	proto_attrs.put(current_prototype, new AttributesImpl(attrs));
+	relation_prototypes.add(current_prototype);
+	slots = new HashMap();
+    }
+
+    private void endRelationPrototype()
+    {
+	proto_slots.put(current_prototype, slots);
+	current_prototype = null;
+	slots = null;
+    }
+
+
     private void slot(Attributes attrs)
     {
 	if (slots != null) {
@@ -332,14 +355,14 @@ public class FrameGen
     {
 	Iterator itr;
 
-	// Find root_relation
-	String relation = container_relation;
-	while (relation != null) {
-	    Attributes attrs = (Attributes) proto_attrs.get(relation);
-	    String proto = attrs.getValue("prototype");
-	    if (proto == null) root_relation = relation;
-	    relation = proto;
-	}
+// 	// Find root_relation
+// 	String relation = container_relation;
+// 	while (relation != null) {
+// 	    Attributes attrs = (Attributes) proto_attrs.get(relation);
+// 	    String proto = attrs.getValue("prototype");
+// 	    if (proto == null) root_relation = relation;
+// 	    relation = proto;
+// 	}
 	
 
 	itr = proto_slots.entrySet().iterator();
@@ -410,6 +433,8 @@ public class FrameGen
 	writeConstructors(writer, prototype);
 	writeKind(writer, prototype);
 	writeCollector(writer, prototype, local_slots, container_slots);
+	if (relation_prototypes.contains(prototype))
+	    writeRelationAccessors(writer, prototype);
 	writeAccessors(writer, prototype, local_slots, override_slots);
 	if (container != null) {
 	    writeContainerReaders(writer, container, container_slots);
@@ -430,9 +455,7 @@ public class FrameGen
 			   String parent)
     {
 	boolean is_root_relation = 
-	    parent == null &&
-	    root_relation != null && 
-	    prototype.equalsIgnoreCase(root_relation);
+	    parent == null && relation_prototypes.contains(prototype);
 	String name = fixName(prototype, true);
 	writer.println("package " +package_name+ ";\n");
 	writer.println("import org.cougaar.core.qos.frame.DataFrame;");
@@ -576,6 +599,30 @@ public class FrameGen
 	writer.println("    {");
 	writer.println("        return \"" +prototype+ "\";");
 	writer.println("    }");
+    }
+
+    private void writeRelationAccessor(PrintWriter writer, 
+				       Attributes attrs,
+				       String attr)
+    {
+	String value = attrs.getValue(attr);
+	if (value == null) return;
+
+	writer.println("\n\n    public Object get" +fixName(attr, true)+
+		       "()");
+	writer.println("    {");
+	writer.println("        return \"" +value+ "\";");
+	writer.println("    }");
+    }
+
+    private void writeRelationAccessors(PrintWriter writer, String prototype)
+    {
+	Attributes attrs = (Attributes) proto_attrs.get(prototype);
+	if (attrs == null) return;
+	writeRelationAccessor(writer, attrs, "parent-prototype");
+	writeRelationAccessor(writer, attrs, "parent-slot");
+	writeRelationAccessor(writer, attrs, "child-prototype");
+	writeRelationAccessor(writer, attrs, "child-slot");
     }
 
     private void writeAccessors(PrintWriter writer,
