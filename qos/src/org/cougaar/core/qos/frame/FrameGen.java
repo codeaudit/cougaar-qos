@@ -828,6 +828,7 @@ public class FrameGen
 	String path = attrs.getValue("path");
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = path == null && isStatic(prototype, slot, attrs);
+	boolean immutablep = isImmutable(prototype, slot, attrs);
 	writer.println("\n\n    public SlotDescription " 
 		       +slotDescriptionMethod(slot)+
 		       "()");
@@ -835,7 +836,8 @@ public class FrameGen
 	writer.println("        SlotDescription __desc = new SlotDescription();");
 	writer.println("        __desc.name = \"" +slot+ "\";");
 	writer.println("        __desc.prototype = \"" +prototype+ "\";");
-	writer.println("        __desc.is_writable = true;");
+	writer.println("        __desc.is_writable = " 
+		       +!immutablep+ ";");
 	writer.println("        Object __value;");
 	if (memberp) {
 	    writer.println("        __value = " +fixed_name+ ";");
