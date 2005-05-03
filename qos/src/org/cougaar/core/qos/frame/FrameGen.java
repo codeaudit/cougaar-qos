@@ -174,20 +174,22 @@ public class FrameGen
 	return ancestorForSlot(parent, slot);
     }
 
-    private HashSet collectSlots(String proto)
+    private HashMap collectSlots(String proto)
     {
-	HashSet slots = new HashSet();
+	HashMap slots = new HashMap();
 	collectSlots(proto, slots);
 	return slots;
     }
 
-    private void collectSlots(String proto, HashSet slots)
+    private void collectSlots(String proto, HashMap slots)
     {
 	HashMap local_slots = (HashMap) proto_slots.get(proto);
 	Attributes attrs = (Attributes) proto_attrs.get(proto);
 	String parent = attrs.getValue("prototype");
 	String container = attrs.getValue("container");
-	if (local_slots != null) slots.addAll(local_slots.keySet());
+	if (local_slots != null) {
+	    slots.putAll(local_slots);
+	}
 	if (parent != null) collectSlots(parent, slots);
 	if (container != null) collectSlots(container, slots);
     }
@@ -245,6 +247,27 @@ public class FrameGen
 	    }
 	} else {
 	    return attrstr.equalsIgnoreCase("true");
+	}
+    }
+
+    private String getSlotType(String prototype,
+			       String slot,
+			       Attributes attrs)
+    {
+	String attrstr = attrs.getValue("type");
+	if (attrstr == null) {
+	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+	    String parent = p_attrs.getValue("prototype");
+	    String ancestor = ancestorForSlot(parent, slot);
+	    if (ancestor != null) {
+		HashMap slots = (HashMap) proto_slots.get(ancestor);
+		Attributes inherited = (Attributes) slots.get(slot);
+		return getSlotType(ancestor, slot, inherited);
+	    } else {
+		return "Object";
+	    }
+	} else {
+	    return attrstr;
 	}
     }
 
@@ -417,10 +440,11 @@ public class FrameGen
 
 	HashSet container_slots = new HashSet();
 	if (container != null) {
-	    HashSet container_accessors = collectSlots(container);
-	    Iterator itr = container_accessors.iterator();
+	    Map container_accessors = collectSlots(container);
+	    Iterator itr = container_accessors.entrySet().iterator();
 	    while (itr.hasNext()) {
-		String slot = (String) itr.next();
+		Map.Entry entry = (Map.Entry) itr.next();
+		String slot = (String) entry.getKey();
 		if(!local_slots.containsKey(slot) && !inheritsSlot(prototype, slot))
 		    container_slots.add(slot);
 	    }
@@ -500,6 +524,7 @@ public class FrameGen
 			   Attributes attrs)
     {
 	String value = attrs.getValue("value");
+	String type = getSlotType(prototype, slot, attrs);
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = isStatic(prototype, slot, attrs);
 	boolean transientp = isTransient(prototype, slot, attrs);
@@ -507,7 +532,7 @@ public class FrameGen
 	    String fixed_name = fixName(slot, false);
 	    writer.print("    private");
 	    if (transientp) writer.print(" transient");
-	    writer.println(" Object " +fixed_name+ ";");
+	    writer.println(" "+type+" " +fixed_name+ ";");
 	}
     }
 
@@ -608,7 +633,7 @@ public class FrameGen
 	String value = attrs.getValue(attr);
 	if (value == null) return;
 
-	writer.println("\n\n    public Object get" +fixName(attr, true)+
+	writer.println("\n\n    public String get" +fixName(attr, true)+
 		       "()");
 	writer.println("    {");
 	writer.println("        return \"" +value+ "\";");
@@ -635,19 +660,21 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeGetter(writer, prototype, slot, attrs, true);
-	    writeGetter(writer, prototype, slot, attrs, false);
-	    writeSetter(writer, prototype, slot, attrs);
-	    writeInitializer(writer, prototype, slot, attrs);
-	    writeRemover(writer, prototype, slot, attrs);
+	    String type = getSlotType(prototype, slot, attrs);
+	    writeGetter(writer, prototype, slot, attrs, type, true);
+	    writeGetter(writer, prototype, slot, attrs, type, false);
+	    writeSetter(writer, prototype, slot, attrs, type);
+	    writeInitializer(writer, prototype, slot, attrs, type);
+	    writeRemover(writer, prototype, slot, attrs, type);
 	}
 	itr = override_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    writeOverrideGetter(writer, prototype, slot, attrs, true);
-	    writeOverrideGetter(writer, prototype, slot, attrs, false);
+	    String type = getSlotType(prototype, slot, attrs);
+	    writeOverrideGetter(writer, prototype, slot, attrs, type, true);
+	    writeOverrideGetter(writer, prototype, slot, attrs, type, false);
 	}
     }
 
@@ -656,6 +683,7 @@ public class FrameGen
 			     String prototype,
 			     String slot,
 			     Attributes attrs,
+			     String type,
 			     boolean warn)
     {
 	String accessor_name = fixName(slot, true);
@@ -665,7 +693,7 @@ public class FrameGen
 	boolean memberp = isMember(prototype, slot, attrs);
 	boolean staticp = path == null && isStatic(prototype, slot, attrs);
 	boolean warnp = isWarn(prototype, slot, attrs);
-	writer.print("\n\n    public Object get" +accessor_name);
+	writer.print("\n\n    public "+type+" get" +accessor_name);
 	if (!warn) writer.print("__NoWarn");
 	writer.println("()");
 	writer.println("    {");
@@ -674,7 +702,7 @@ public class FrameGen
 			   +fixed_name+ ";");
 	} else {
 	    String result_var = "__result";
-	    writer.println("        Object " +result_var+ " = getProperty(\"" 
+	    writer.println("        "+type+" " +result_var+ " = getProperty(\"" 
 			   +slot+ "\");");
 	    writer.println("        if (" +result_var+ " != null) return "
 			   +result_var+ ";");
@@ -690,7 +718,7 @@ public class FrameGen
 		writer.println("        return null;");
 	    }
 	} else {
-	    writer.println("        return getInheritedValue(this, \"" 
+	    writer.println("        return ("+type+") getInheritedValue(this, \"" 
 			   +slot+ "\");");
 	}
 
@@ -701,17 +729,18 @@ public class FrameGen
 				     String prototype,
 				     String slot,
 				     Attributes attrs,
+				     String type,
 				     boolean warn)
     {
 	String accessor_name = fixName(slot, true);
 	String default_value = attrs.getValue("value");
 	boolean staticp = isStatic(prototype, slot, attrs);
-	writer.print("\n\n    public Object get" +accessor_name);
+	writer.print("\n\n    public "+type+" get" +accessor_name);
 	if (!warn) writer.print("__NoWarn");
 	writer.println("()");
 	writer.println("    {");
 	String result_var = "__result";
-	writer.println("        Object " +result_var+ " = super.get" 
+	writer.println("        "+type+" " +result_var+ " = super.get" 
 		       +accessor_name+ "__NoWarn();");
 	writer.println("        if (" +result_var+ " != null) return "
 		       +result_var+ ";");
@@ -742,7 +771,8 @@ public class FrameGen
     private void writeSetter(PrintWriter writer,
 			     String prototype,
 			     String slot,
-			     Attributes attrs)
+			     Attributes attrs,
+			     String type)
     {
 	if (isImmutable(prototype, slot, attrs)) return;
 
@@ -752,13 +782,13 @@ public class FrameGen
 	boolean notify_listeners_p = notifyListeners(prototype, slot, attrs);
 	boolean notify_blackboard_p = notifyBlackboard(prototype, slot, attrs);
 	writer.println("\n\n    public void set" +accessor_name+
-		       "(Object __new_value)");
+		       "("+type+" __new_value)");
 	writer.println("    {");
 	if (memberp) {
-	    writer.println("        Object __old_value = " +fixed_name+ ";");
+	    writer.println("        "+type+" __old_value = " +fixed_name+ ";");
 	    writer.println("        this." +fixed_name+ " = __new_value;");
 	} else {
-	    writer.println("        Object __old_value = getProperty(\"" +slot+ "\");");
+	    writer.println("        "+type+" __old_value = getProperty(\"" +slot+ "\");");
 	    writer.println("        setProperty(\"" +slot+ "\", __new_value);");
 	}
 	writer.println("        slotModified(\"" +slot+ 
@@ -771,7 +801,8 @@ public class FrameGen
     private void writeRemover(PrintWriter writer, 
 			      String prototype,
 			      String slot,
-			      Attributes attrs)
+			      Attributes attrs,
+			      String type)
     {
 	if (isImmutable(prototype, slot, attrs)) return;
 	String accessor_name = fixName(slot, true);
@@ -782,10 +813,10 @@ public class FrameGen
 	writer.println("\n\n    protected void remove" +accessor_name+ "()");
 	writer.println("    {");
 	if (memberp) {
-	    writer.println("        Object __old_value = " +fixed_name+ ";");
+	    writer.println("        "+type+" __old_value = " +fixed_name+ ";");
 	    writer.println("        " +fixed_name+ " = null;");
 	} else {
-	    writer.println("        Object __old_value = getProperty(\"" 
+	    writer.println("        "+type+" __old_value = getProperty(\"" 
 			   +slot+ "\");");
 	    writer.println("        removeProperty(\"" +slot+ "\");");
 	}
@@ -799,14 +830,15 @@ public class FrameGen
     private void writeInitializer(PrintWriter writer, 
 				  String prototype,
 				  String slot,
-				  Attributes attrs)
+				  Attributes attrs,
+				  String type)
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot, attrs);
 
 	writer.println("\n\n    protected void initialize" +accessor_name+
-		       "(Object new_value)");
+		       "("+type+" new_value)");
 	writer.println("    {");
 	if (memberp)
 	    writer.println("        this." +fixed_name+ " = new_value;");
@@ -953,23 +985,32 @@ public class FrameGen
 				       HashMap local_slots,
 				       String container)
     {
-	HashSet slots = new HashSet();
-	slots.addAll(local_slots.keySet());
 	boolean is_root = parent == null;
-	if (!slots.isEmpty()) {
-	    generateHashConstants(writer, slots);
+	Map all_slots = null;
+	if (container != null) {
+	    all_slots = collectSlots(container);
+	    Iterator itr = local_slots.entrySet().iterator();
+	    while (itr.hasNext()) {
+		Map.Entry entry = (Map.Entry) itr.next();
+		Object key = entry.getKey();
+		Object value = entry.getValue();
+		all_slots.put(key, value);
+	    }
+	    if (!all_slots.isEmpty()) {
+		generateHashConstants(writer, all_slots);
+		writeDynamicGetter(writer, prototype, all_slots, is_root);
+	    }
+	}
+	if (!local_slots.isEmpty()) {
+	    if (container == null) {
+		generateHashConstants(writer, local_slots);
+		writeDynamicGetter(writer, prototype, local_slots, is_root);
+	    }
 	    writeDynamicSetter(writer, prototype, local_slots, is_root);
-	    writeDynamicInitializer(writer, prototype, slots, is_root);
+	    writeDynamicInitializer(writer, prototype, local_slots, is_root);
 	    writeDynamicRemover(writer, prototype, local_slots, is_root);
 	}
-	if (container != null) {
-	    Set pslots = collectSlots(container);
-	    pslots.removeAll(slots);
-	    generateHashConstants(writer, pslots);
-	    slots.addAll(pslots);
-	}
-	if (!slots.isEmpty())
-	    writeDynamicGetter(writer, prototype, slots, is_root);
+
     }
 
     private String slotHashVar(String slot)
@@ -977,9 +1018,9 @@ public class FrameGen
 	return fixName(slot, false) +"__HashVar__";
     }
 
-    private void generateHashConstants(PrintWriter writer, Set slots)
+    private void generateHashConstants(PrintWriter writer, Map slots)
     {
-	Iterator itr = slots.iterator();
+	Iterator itr = slots.keySet().iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
 	    String slot_hash_var = slotHashVar(slot);
@@ -990,16 +1031,17 @@ public class FrameGen
 
     private void writeDynamicGetter(PrintWriter writer, 
 				    String prototype,
-				    Set slots,
+				    Map slots,
 				    boolean is_root)
     {
 	writer.println("\n\n    protected Object getLocalValue(String __slot)");
 	writer.println("    {");
 	writer.println("       int __key = __slot.hashCode();");
-	Iterator itr = slots.iterator();
+	Iterator itr = slots.entrySet().iterator();
 	writer.print("      ");
 	while(itr.hasNext()) {
-	    String slot = (String) itr.next();
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
 	    String slot_hash_var = slotHashVar(slot);
 	    String method = "get" + fixName(slot, true);
 	    writer.println(" if (" +slot_hash_var+ " == __key)");
@@ -1031,6 +1073,7 @@ public class FrameGen
 	    Attributes attrs = (Attributes) entry.getValue();
 	    String slot = (String) entry.getKey();
 	    if (isImmutable(prototype, slot, attrs)) continue;
+	    String type = getSlotType(prototype, slot, attrs);
 	    String slot_hash_var = slotHashVar(slot);
 	    String method = "set" + fixName(slot, true);
 	    writer.print("      ");
@@ -1048,17 +1091,20 @@ public class FrameGen
 
     private void writeDynamicInitializer(PrintWriter writer, 
 					 String prototype,
-					 Set slots,
+					 Map slots,
 					 boolean is_root)
     {
 	writer.println("\n\n    protected void initializeLocalValue(String __slot,");
 	writer.println("                                 Object __value)");
 	writer.println("    {");
 	writer.println("       int __key = __slot.hashCode();");
-	Iterator itr = slots.iterator();
+	Iterator itr = slots.entrySet().iterator();
 	boolean first = true;
 	while(itr.hasNext()) {
-	    String slot = (String) itr.next();
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    String type = getSlotType(prototype, slot, attrs);
 	    String slot_hash_var = slotHashVar(slot);
 	    String method = "initialize" + fixName(slot, true);
 	    writer.print("      ");

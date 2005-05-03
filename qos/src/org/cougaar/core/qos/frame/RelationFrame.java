@@ -40,12 +40,12 @@ abstract public class RelationFrame
 	super(frameSet, uid);
     }
 
-    abstract public Object getParentPrototype();
-    abstract public Object getParentSlot();
+    abstract public String getParentPrototype();
+    abstract public String getParentSlot();
     abstract public Object getParentValue();
 
-    abstract public Object getChildPrototype();
-    abstract public Object getChildSlot();
+    abstract public String getChildPrototype();
+    abstract public String getChildSlot();
     abstract public Object getChildValue();
 
     public DataFrame relationshipParent()

@@ -121,7 +121,8 @@ their semantic interpretation.
       It has no attributes and is not required.  Ordinarily a
       prototypes entity would be within a frameset entity in an XML
       file. But it can also be at the top level if the file is being
-      read in to an existing FrameSet.<p></dd>
+      read in to an existing FrameSet.<p>
+    </dd>
 
     <dt><b>prototype</b></dt>
 
@@ -135,7 +136,16 @@ their semantic interpretation.
       class.  The remaining structure of a prototype is specified
       by <a href="#slot">slot</a> entities.  <p></dd>
 
-    <dt><b>path</b></dt>
+      <dt><b>relation-prototype</b></dt>
+
+      <dd>A relation-prototype entity defines a PrototypeFrame
+	representing a relationship.  The attributes are a superset of
+	the attributes of prototype entities.  The additional
+	attributes, all optional, are <b>parent-prototype</b>,
+	<b>parent-slot</b>, <b>child-prototype</b> and
+	<b>child-slot</b> </p> </dd>
+
+      <dt><b>path</b></dt>
 
     <dd>A path entity defines a <a href="#paths">Path</a>.  It has one
       required attribute, <b>name</b>.  The entities it contains are
@@ -207,9 +217,9 @@ their semantic interpretation.
 
 	<dt><b>type</b></dt>
 
-	<dd><i>[Proposed but not yet implemented]</i> This attribute
-	  will be used to specify the Java type of values of this
-	  slot.  The default is String. <p> </dd>
+	<dd> This attribute is used to specify the Java type of values
+	  of this slot.  The default is String.  Other possible values
+	  are int, long, float, double and boolean. <p> </dd>
 
 	<dt><b>value</b></dt>
 
