@@ -747,12 +747,7 @@ public class FrameGen
 	
 	if (staticp) {
 	    if (default_value != null) {
-		// Zinky suggestion: NIL -> null
-		if (default_value.equals("NIL")) {
-		    writer.println("        return null;");
-		} else {
-		    writer.println("        return \"" +default_value+ "\";");
-		}
+		writer.println("        return \"" +default_value+ "\";");
 	    } else {
 		if (warn)
 		    writer.println("        getLogger().warn(this + \" has no value for " 
@@ -930,12 +925,7 @@ public class FrameGen
 	writer.println("            __desc.is_overridden = false;");
 	if (staticp) {
 	    if (default_value != null) {
-		// Zinky suggestion: NIL -> null
-		if (default_value.equals("NIL")) {
-		    writer.println("            __desc.value = null;");
-		} else {
-		    writer.println("            __desc.value = \"" +default_value+ "\";");
-		}
+		writer.println("            __desc.value = \"" +default_value+ "\";");
 	    }
 	} else {
 	    writer.println("            __desc.value = getInheritedValue(this, \"" 
