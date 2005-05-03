@@ -1,52 +1,103 @@
 package org.cougaar.core.qos.frame.visualizer;
 
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
+import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListener;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ArrayList;
 
-public abstract class ShapeGraphic implements Cloneable {
+public class ShapeGraphic implements Cloneable {
     protected String id, label;
-    protected Shape shape;
+    protected LabelRenderer labelRenderer;
+    protected ShapeRenderer renderer;
+    protected RectangularShape shape, shapePrototype;
     protected double x,y,width,height;
-    protected boolean visible, selected, isPrototype;
+    protected boolean visible, selected, mouseOver, isPrototype;
+    protected ShapeContainer parent;
+
+    // data
     protected org.cougaar.core.qos.frame.Frame frame;
     protected String frameidSlotName = "";
     protected FramePredicate predicate;
     protected FrameHelper frameHelper;
-    protected ShapeContainer parent;
+
+    // slot value triggers
+    protected ArrayList slotListeners;
+    // logging
     protected Logger log = Logging.getLogger(getClass().getName());
 
 
-    protected ShapeGraphic() {
-        this.id = null;
+
+
+    public ShapeGraphic() {
+        this(null, null);
+        /*this.id = null;
         this.label = null;
         x=y=0d;
         width=height=10d; // default?
         visible = true;
         selected = false;
-        isPrototype = false;
+        isPrototype = false; */
     }
 
     protected ShapeGraphic(String id, String label) {
         this.id = id;
         this.label = label;
         x=y=0d;
-        width=height=0d;
+        width=height=10d;
         visible = true;
-        selected = false;
+        selected = mouseOver =false;
+        slotListeners = new ArrayList();
     }
 
+    public void setMouseOver(boolean mouseOver) {
+        this.mouseOver = mouseOver;
+    }
+
+    public boolean isMouseOver() {
+        return mouseOver;
+    }
+
+    public void addSlotListener(SlotChangeListener l) {
+        l.setShapeGraphic(this);
+        slotListeners.add(l);
+    }
+
+    public void validateListeners() {
+        SlotChangeListener sl;
+        for (Iterator ii=slotListeners.iterator(); ii.hasNext();) {
+            sl = (SlotChangeListener) ii.next();
+            sl.validate();
+        }
+    }
+
+    public void processFrameChange(org.cougaar.core.qos.frame.Frame f, org.cougaar.core.qos.frame.Frame.Change change) {
+        if (f == frame && slotListeners.size()>0) {
+            for (Iterator ii=slotListeners.iterator(); ii.hasNext();)
+                ((SlotChangeListener)ii.next()).slotChanged(f, change);
+        }
+    }
+
+    public void setLabelRenderer(LabelRenderer lbl) {
+        this.labelRenderer = lbl;
+    }
+
+    public LabelRenderer getLabelRenderer() {
+        return labelRenderer;
+    }
+    public void setRenderer(ShapeRenderer shapeRenderer) {
+        this.renderer = shapeRenderer;
+    }
 
     public String toString() {
         return "["+(isContainer()?"Container":"Component")+" id="+id+" name="+label+" proto="+isPrototype+" "+predicate+"]";
-
     }
 
     public boolean isContainer() {
@@ -83,66 +134,23 @@ public abstract class ShapeGraphic implements Cloneable {
 
     public void setFrame(org.cougaar.core.qos.frame.Frame frame) {
         this.frame = frame;
-	if (frame != null) {
-	    this.id = (String) frame.getValue("name"); //frameidSlotName);
-	    this.label = id;
-	    if (log.isDebugEnabled())
-		log.debug(label+".setFrame():  id="+this.id+":  "+this.toString());
-	} else {
-	    this.id = "";
-	    this.label = "";
-	}
+        if (frame != null) {
+            this.id = (String) frame.getValue("name"); //frameidSlotName);
+            this.label = id;
+            if (log.isDebugEnabled())
+            log.debug(label+".setFrame():  id="+this.id+":  "+this.toString());
+        } else {
+            this.id = "";
+            this.label = "";
+        }
     }
 
-    
     public void setFrameHelper(FrameHelper helper) {
-	frameHelper = helper;
-	if (frame == null && predicate != null) {
-	    setFrame(frameHelper.findFrame(predicate));
-	}
+        frameHelper = helper;
+        if (frame == null && predicate != null) {
+            setFrame(frameHelper.findFrame(predicate));
+        }
     }
-
-    /*
-    protected org.cougaar.core.qos.frame.Frame findFrame(Collection frames, String frameName) {
-        org.cougaar.core.qos.frame.Frame f;
-        String fname;
-        for (Iterator ii=frames.iterator(); ii.hasNext();) {
-           f = (org.cougaar.core.qos.frame.Frame) ii.next();
-           fname = ((String)f.getValue("name"));
-           if (fname != null && fname.equals(frameName)) {
-               return f;
-           }
-       }
-       return null;
-   }
-
-    protected org.cougaar.core.qos.frame.Frame findFrame(Collection frames, FramePredicate predicate) {
-       org.cougaar.core.qos.frame.Frame f;
-       for (Iterator ii=frames.iterator(); ii.hasNext();) {
-           f = (org.cougaar.core.qos.frame.Frame) ii.next();
-           if (predicate.execute(f))
-               return f;
-       }
-       return null;
-   }
-
-    protected Collection findFrames(Collection frames, FramePredicate predicate) {
-       org.cougaar.core.qos.frame.Frame f;
-       ArrayList flist = new ArrayList();
-       for (Iterator ii=frames.iterator(); ii.hasNext();) {
-           f = (org.cougaar.core.qos.frame.Frame) ii.next();
-           if (predicate.execute(f))
-               flist.add(f);
-       }
-       return flist;
-   }
-
-    public void setFrames(Collection frames) {
-        if (frame == null && predicate != null)
-            setFrame(findFrame(frames, predicate));
-    }
-
-    */
 
     public boolean hasFrame() {
         return frame != null;
@@ -215,11 +223,27 @@ public abstract class ShapeGraphic implements Cloneable {
         return shape;
     }
 
-    protected abstract Shape createShape();
+    public void setShapePrototype(RectangularShape shape) {
+        this.shapePrototype = shape;
+    }
+    public RectangularShape createShape() {
+        if (shapePrototype != null) {
+            RectangularShape tmp = shape;
+            shape = (RectangularShape) shapePrototype.clone();
+            if (tmp != null)
+                shape.setFrame(tmp.getFrame());
+        }
+        return shape;
+    }
 
-    public abstract boolean contains(double mx, double my);
+    public boolean contains(double mx, double my) {
+        Shape sh = getShape();
+        return (sh != null ? sh.contains(mx,my) : false);
+    }
 
-    public abstract ShapeGraphic find(double mx, double my);
+    public ShapeGraphic find(double mx, double my) {
+        return (contains(mx,my) ? this : null);
+    }
 
     public ShapeGraphic find(org.cougaar.core.qos.frame.Frame f) {
 	if (frame != null && id != null && id.equals((String) f.getValue("name")))
@@ -232,13 +256,20 @@ public abstract class ShapeGraphic implements Cloneable {
         this.y = y;
         this.width = width;
         this.height= height;
+        if (shape != null)
+            shape.setFrame(x,y,width,height);
     }
 
     public Point2D.Double getPosition() {
         return new Point2D.Double(x,y);
     }
 
-    public abstract void draw(Graphics2D g2);
+    public void draw(Graphics2D g2) {
+        if (renderer != null && visible)
+            renderer.drawShape(g2, this);
+        if (labelRenderer != null && visible)
+            labelRenderer.drawLabel(g2, this);
+    }
 
     public Dimension getSize() {
         Rectangle r = getBounds();
@@ -259,12 +290,20 @@ public abstract class ShapeGraphic implements Cloneable {
             ShapeGraphic cloned = (ShapeGraphic) this.clone();
 	    if (frame != null)
 		cloned.setFrame(frame);
-            cloned.setPrototype(false);
+        cloned.setPrototype(false);
+        cloned.shapePrototype = (shapePrototype != null ? ((RectangularShape) shapePrototype.clone()) : null);
 	    cloned.shape = cloned.createShape();
 	    org.cougaar.core.qos.frame.Frame parent = getFrame();
 	    if (cloned.predicate != null && parent != null) 
 		cloned.predicate = new FramePredicate(cloned.predicate, (String) parent.getValue("name"));
-	    
+
+        if (slotListeners.size() > 0) {
+            cloned.slotListeners = new ArrayList();
+            for (Iterator ii=slotListeners.iterator(); ii.hasNext();) {
+                cloned.addSlotListener(((SlotChangeListener)ii.next()).cloneInstance());
+            }
+        }
+        cloned.validateListeners();
 	    return cloned;
         } catch (CloneNotSupportedException ee) {
             ee.printStackTrace();

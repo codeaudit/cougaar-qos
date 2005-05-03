@@ -146,14 +146,23 @@ public class FrameVisualizerPlugin
 	while (en.hasMoreElements()) {
 	    Frame frame = (Frame) en.nextElement();
 	    if (log.isDebugEnabled()) {
-		log.debug("Observed changed "+frame);
+		    log.debug("Observed changed "+frame);
 	    }
 	    Collection changes = sub.getChangeReports(frame);
 	    // A collection of Frame.Change instances.
 	    if (changes != null) {
 		if (frame instanceof RelationFrame) //frame.isa("relationship"))  
 		    transitions.addAll(processRelationshipChanges((RelationFrame)frame, changes.iterator()));
-	    }
+	    } else {
+            ShapeGraphic sh = pluginDisplay.findShape(frame);
+            if (log.isDebugEnabled())
+		        log.debug("Observed changed "+frame+ "  container="+sh);
+
+            if (sh != null) {
+                for (Iterator ii=changes.iterator(); ii.hasNext();)
+                    sh.processFrameChange(frame, (Frame.Change) ii.next());
+            }
+        }
 	}
 	if (transitions.size() > 0) {
 	    //pluginDisplay.updateFrameView();

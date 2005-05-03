@@ -2,7 +2,7 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-import org.cougaar.core.qos.frame.visualizer.test.TestTransition;
+
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -25,7 +25,7 @@ public class AnimatedCanvas extends AnimatingSurface implements MouseListener, M
     protected boolean mouseMoveFlag =false;
     protected Point   mousePoint=null, lastPoint=null;
     protected Point   mouseStartDragPoint=null;
-    protected ShapeGraphic selectedShape;
+    protected ShapeGraphic selectedShape, mouseOverShape;
     protected Dimension oldSize;
     private transient Logger log = Logging.getLogger(getClass().getName());
 
@@ -36,6 +36,7 @@ public class AnimatedCanvas extends AnimatingSurface implements MouseListener, M
         super();
         shapes = new HashMap();
         selectedShape = null;
+        mouseOverShape = null;
         addMouseListener(this);
         addMouseMotionListener(this);
     }
@@ -142,5 +143,17 @@ public class AnimatedCanvas extends AnimatingSurface implements MouseListener, M
           mousePoint=e.getPoint();
     }
 
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+        //System.out.println("mouseMoved");
+        Point mp = e.getPoint();
+        ShapeGraphic tmp = mouseOverShape;
+        mouseOverShape = findShape(mp.x,  mp.y);
+        if (tmp == mouseOverShape)
+            return;
+        if (tmp != null)
+            tmp.setMouseOver(false);
+
+        if (mouseOverShape != null)
+            mouseOverShape.setMouseOver(true);
+    }
 }

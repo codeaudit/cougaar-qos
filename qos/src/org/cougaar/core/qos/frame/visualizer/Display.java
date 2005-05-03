@@ -6,7 +6,6 @@ import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
 import org.cougaar.core.qos.frame.visualizer.util.ChangeModel;
 import org.cougaar.core.qos.frame.visualizer.test.TickEvent;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.visualizer.test.TestTransition;
 import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
