@@ -61,25 +61,37 @@ abstract public class DataFrame
 
     public static final String NIL = "NIL";
     
-    private static HashMap FramePackages;
+    private static HashMap FramePackages = new HashMap();;
     private static Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
 
 
-    protected synchronized static void registerFrameMaker(String pkg,
-							  String proto,
-							  FrameMaker maker)
+    protected static void registerFrameMaker(String pkg,
+					     String proto,
+					     FrameMaker maker)
     {
-	if (FramePackages == null) FramePackages = new HashMap();
 	if (log.isDebugEnabled())
 	    log.debug("Registering FrameMaker " +maker+ " for prototype "
 		      +proto+ " in package " +pkg);
-	HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
-	if (frameTypeMap == null) {
-	    frameTypeMap = new HashMap();
-	    FramePackages.put(pkg, frameTypeMap);
+	synchronized (FramePackages) {
+	    HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
+	    if (frameTypeMap == null) {
+		frameTypeMap = new HashMap();
+		FramePackages.put(pkg, frameTypeMap);
+	    }
+	    frameTypeMap.put(proto, maker);
 	}
-	frameTypeMap.put(proto, maker);
+    }
+
+    protected static FrameMaker findFrameMaker(String pkg, String proto)
+    {
+	synchronized (FramePackages) {
+	    HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
+	    if (frameTypeMap != null) 
+		return (FrameMaker) frameTypeMap.get(proto);
+	    else
+		return null;
+	}
     }
 
     protected static Logger getLogger()
@@ -98,11 +110,11 @@ abstract public class DataFrame
     }
 
 
-    public static synchronized DataFrame newFrame(String pkg,
-						  FrameSet frameSet,
-						  String proto, 
-						  UID uid,
-						  Properties values)
+    public static DataFrame newFrame(String pkg,
+				     FrameSet frameSet,
+				     String proto, 
+				     UID uid,
+				     Properties values)
     {
 	if (log.isDebugEnabled())
 	    log.debug("Searching for FrameMaker for prototype "
@@ -110,17 +122,12 @@ abstract public class DataFrame
 	// force a class load (ugh)
 	Class klass = frameSet.classForPrototype(proto);
 	DataFrame frame = null;
-	HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
-	if (frameTypeMap != null) {
-	    FrameMaker maker = (FrameMaker) frameTypeMap.get(proto);
-	    if (maker != null) {
-		frame = maker.makeFrame(frameSet, uid);
-		frame.initializeValues(values);
-	    } else {
-		log.warn("No prototype " +proto+ " in package " +pkg);
-	    }
+	FrameMaker maker = findFrameMaker(pkg, proto);
+	if (maker != null) {
+	    frame = maker.makeFrame(frameSet, uid);
+	    frame.initializeValues(values);
 	} else {
-	    log.warn("No prototypes in package " +pkg);
+	    log.error("No FrameMaker for " +proto+ " in package " +pkg);
 	}
 	return frame;
     }
