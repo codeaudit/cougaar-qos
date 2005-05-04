@@ -51,7 +51,7 @@ public class FrameTableModel extends TBLModel {
         if (isReadOnly())
             return true;
         SlotDescription slotDesc = getSlotDescription(row);
-        return (slotDesc != null ? slotDesc.is_writable : false);
+        return (slotDesc != null ? !slotDesc.is_writable : false);
     }
 
     public SlotDescription getSlotDescription(int row) {
@@ -96,7 +96,7 @@ public class FrameTableModel extends TBLModel {
     }
     if (frame instanceof DataFrame) {
             SlotDescription sd;
-            for (Iterator ii=((DataFrame)frame).slotDescriptions().iterator(); ii.hasNext();) {
+            for (Iterator ii=((DataFrame)frame).slotDescriptions().values().iterator(); ii.hasNext();) {
                 sd = (SlotDescription) ii.next();
                 slotDescriptions.put(sd.name, sd);
                 //System.out.println(sd.name+" Prototype: "+sd.prototype+ " "+ (sd.is_overridden ? "overridden" : "inherited"));
@@ -143,8 +143,8 @@ public class FrameTableModel extends TBLModel {
 
   public Object getValueAt(int row, int col) {
       if (row >-1 && row < frameSlotNames.size()) {
-        String val= (String) ( col == 0 ? frameSlotNames.get(row) : frameSlots.getProperty((String) frameSlotNames.get(row)));
-	if (val.equals("NIL"))// == DataFrame.NIL)
+        Object val= (Object) ( col == 0 ? frameSlotNames.get(row) : frameSlots.getProperty((String) frameSlotNames.get(row)));
+	if (val == null || val.equals(DataFrame.NIL))
 	    return "";
 	return val;
       }

@@ -60,6 +60,9 @@ public class FrameGen
 	    System.setProperty(DRIVER_PROPERTY, DRIVER_DEFAULT);
     }
 
+    private static final String NoWarn = "__NoWarn";
+    private static final String AsObject = "__AsObject";
+
     private String package_name;
     private String dir_name;
     private String path;
@@ -228,20 +231,18 @@ public class FrameGen
 
     private boolean getBooleanAttribute(String prototype,
 					String slot,
-					Attributes attrs,
 					String attr,
 					boolean default_value)
     {
-	String attrstr = attrs.getValue(attr);
+	HashMap slots = (HashMap) proto_slots.get(prototype);
+	Attributes attrs = (Attributes) slots.get(slot);
+
+	String attrstr = attrs != null ? attrs.getValue(attr) : null;
 	if (attrstr == null) {
 	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
 	    String parent = p_attrs.getValue("prototype");
-	    String ancestor = ancestorForSlot(parent, slot);
-	    if (ancestor != null) {
-		HashMap slots = (HashMap) proto_slots.get(ancestor);
-		Attributes inherited = (Attributes) slots.get(slot);
-		return getBooleanAttribute(ancestor, slot, inherited, attr, 
-					   default_value);
+	    if (parent != null) {
+		return getBooleanAttribute(parent, slot, attr, default_value);
 	    } else {
 		return default_value;
 	    }
@@ -250,73 +251,137 @@ public class FrameGen
 	}
     }
 
-    private String getSlotType(String prototype,
-			       String slot,
-			       Attributes attrs)
+    private String getSlotTypeFromPrototypeTree(String prototype, String slot)
     {
-	String attrstr = attrs.getValue("type");
+	HashMap slots = (HashMap) proto_slots.get(prototype);
+	Attributes attrs = (Attributes) slots.get(slot);
+	String attrstr = attrs != null ? attrs.getValue("type") : null;
 	if (attrstr == null) {
 	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
 	    String parent = p_attrs.getValue("prototype");
-	    String ancestor = ancestorForSlot(parent, slot);
-	    if (ancestor != null) {
-		HashMap slots = (HashMap) proto_slots.get(ancestor);
-		Attributes inherited = (Attributes) slots.get(slot);
-		return getSlotType(ancestor, slot, inherited);
+	    if (parent != null) {
+		return getSlotTypeFromPrototypeTree(parent, slot);
 	    } else {
-		return "Object";
+		return null;
 	    }
 	} else {
 	    return attrstr;
 	}
     }
 
-    private boolean isStatic(String prototype, String slot, Attributes attrs)
+    private String getSlotType(String prototype, String slot)
     {
-	return getBooleanAttribute(prototype, slot, attrs, "static", true);
+	String type = getSlotTypeFromPrototypeTree(prototype, slot);
+	if (type != null) return type;
+
+	// Try the containment hierarchy
+	Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+	String container = p_attrs.getValue("container");
+	if (container != null) {
+	    return getSlotType(container, slot);
+	} else {
+	    return "String";
+	}
     }
 
-    private boolean isTransient(String prototype, String slot, Attributes attrs)
+
+    private boolean isTransient(String prototype, String slot)
     {
-	return getBooleanAttribute(prototype, slot, attrs, "transient", false);
+	return getBooleanAttribute(prototype, slot, "transient", false);
+    }
+
+    private boolean isMember(String prototype, String slot)
+    {
+	// Path-valued slots can't be members
+	HashMap slots = (HashMap) proto_slots.get(prototype);
+	Attributes attrs = (Attributes) slots.get(slot);
+	String path = attrs != null ? attrs.getValue("path") : null;
+	if (path != null) return false;
+
+	// Non-Object types must be members
+	String type = getSlotType(prototype, slot);
+	if (!isObjectType(type)) return true;
+
+	// Transient slots must be members
+	if (isTransient(prototype, slot)) return true;
+
+	// Otherwise return the value of member attribute, 
+	// defaulting to true.
+	return getBooleanAttribute(prototype, slot,  "member", true);
+    }
+
+    private boolean isWarn(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "warn", true);
+    }
+
+    private boolean isImmutable(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "immutable", false);
+    }
+
+    private boolean notifyListeners(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "notify-listeners", true);
+    }
+
+    private boolean notifyBlackboard(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "notify-blackboard", true);
+    }
+
+    private boolean isObjectType(String type)
+    {
+	return 
+	    type.equals("String") ||
+	    type.equals("Double") ||
+	    type.equals("Float") ||
+	    type.equals("Long") ||
+	    type.equals("Integer") ||
+	    type.equals("Boolean");
     }
 
 
-    // Transient -> member. Likewise, non-Object type -> member
-    private boolean isMember(String prototype, String slot, Attributes attrs)
+    private String objectToType(String type, String var)
     {
-	boolean attr = 
-	    getBooleanAttribute(prototype, slot, attrs, "member", true);
-	if (attr) return true;
-	if (isTransient(prototype, slot, attrs)) return true;
-	String type = getSlotType(prototype, slot, attrs);
-	if (!type.equals("Object")) return true;
-	return false;
+	return "force_"+type+"(" +var+ ")";
     }
 
-    private boolean isWarn(String prototype, String slot, Attributes attrs)
+
+    private String literalToObject(String type, String var)
     {
-	return getBooleanAttribute(prototype, slot, attrs, "warn", true);
+	if (type.equals("String"))
+	    return "\"" +var+ "\"";
+	else if (type.equalsIgnoreCase("double"))
+	    return "new Double(" +var+ ")";
+	else if (type.equalsIgnoreCase("float"))
+	    return "new Float(" +var+ ")";
+	else if (type.equalsIgnoreCase("long"))
+	    return "new Long(" +var+ ")";
+	else if (type.equals("int") || type.equals("Integer"))
+	    return "new Integer(" +var+ ")";
+	else if (type.equalsIgnoreCase("boolean"))
+	    return "new Boolean(" +var+ ")";
+	else
+	    return null;
     }
 
-    private boolean isImmutable(String prototype, String slot, Attributes attrs)
+    private String typeToObject(String type, String var)
     {
-	return getBooleanAttribute(prototype, slot, attrs, "immutable", false);
+	if (isObjectType(type))
+	    return var;
+	else 
+	    return literalToObject(type, var);
     }
 
-    private boolean notifyListeners(String prototype, String slot, 
-				    Attributes attrs)
+    private String simpleValue(String type, String value)
     {
-	return getBooleanAttribute(prototype, slot, attrs, "notify-listeners", 
-				   true);
+	if (isObjectType(type))
+	    return literalToObject(type, value);
+	else 
+	    return value;
     }
 
-    private boolean notifyBlackboard(String prototype, String slot, 
-				    Attributes attrs)
-    {
-	return getBooleanAttribute(prototype, slot, attrs, "notify-blackboard", 
-				   true);
-    }
 
     // Parsing 
 
@@ -385,16 +450,6 @@ public class FrameGen
     {
 	Iterator itr;
 
-// 	// Find root_relation
-// 	String relation = container_relation;
-// 	while (relation != null) {
-// 	    Attributes attrs = (Attributes) proto_attrs.get(relation);
-// 	    String proto = attrs.getValue("prototype");
-// 	    if (proto == null) root_relation = relation;
-// 	    relation = proto;
-// 	}
-	
-
 	itr = proto_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
@@ -461,7 +516,7 @@ public class FrameGen
 	writer.println("{");
 	writeRegisterer(writer, pkg, prototype);
 	writeSlots(writer, prototype, local_slots);
-	writeConstructors(writer, prototype);
+	writeConstructors(writer, prototype, local_slots);
 	writeKind(writer, prototype);
 	writeCollector(writer, prototype, local_slots, container_slots);
 	if (relation_prototypes.contains(prototype))
@@ -531,9 +586,9 @@ public class FrameGen
 			   Attributes attrs)
     {
 	String value = attrs.getValue("value");
-	String type = getSlotType(prototype, slot, attrs);
-	boolean memberp = isMember(prototype, slot, attrs);
-	boolean transientp = isTransient(prototype, slot, attrs);
+	String type = getSlotType(prototype, slot);
+	boolean memberp = isMember(prototype, slot);
+	boolean transientp = isTransient(prototype, slot);
 	if (memberp) {
 	    String fixed_name = fixName(slot, false);
 	    writer.print("    private");
@@ -561,14 +616,15 @@ public class FrameGen
 		       
 
     private void writeConstructors(PrintWriter writer,
-				   String name)
+				   String prototype,
+				   Map slots)
     {
 	// Define values for inherited slots!
-	String cname = fixName(name, true);
+	String cname = fixName(prototype, true);
 
 	writer.println("\n\n    public " +cname + "(UID uid)");
 	writer.println("    {");
-	writer.println("        super(null, uid);");
+	writer.println("        this(null, uid);");
 	writer.println("    }");
 
 	writer.println("\n\n    public " +cname + "(FrameSet frameSet,");
@@ -577,6 +633,20 @@ public class FrameGen
 	writer.println("UID uid)");
 	writer.println("    {");
 	writer.println("        super(frameSet, uid);");
+	Iterator itr = slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    if (!isMember(prototype, slot)) continue;
+	    Attributes attrs = (Attributes) entry.getValue();
+	    String value = attrs.getValue("value");
+	    String type = getSlotType(prototype, slot);
+	    if (value != null) {
+		String method = "initialize" + fixName(slot, true);
+		String vstr = simpleValue(type, value);
+		writer.println("        " +method+ "(" +vstr+ ");");
+	    }
+	}
 	writer.println("    }");
 
     }
@@ -598,7 +668,7 @@ public class FrameGen
 	    while (itr.hasNext()) {
 		Map.Entry entry = (Map.Entry) itr.next();
 		String slot = (String) entry.getKey();
-		String getter = "get" + fixName(slot, true);
+		String getter = "get" + fixName(slot, true) +AsObject;
 		writer.println("        " +val+ " = " +getter+ "();");
 		writer.println("        " +props+ ".put(\"" +slot+ "\", "
 			       +val+ " != null ? " +val+ " : NIL);");
@@ -615,7 +685,7 @@ public class FrameGen
 	    writer.println("        Object " +val+ ";");
 	    while (itr.hasNext()) {
 		String slot = (String) itr.next();
-		String getter = "get" + fixName(slot, true);
+		String getter = "get" +fixName(slot, true)+ AsObject;
 		writer.println("        " +val+ " = " +getter+ "();");
 		writer.println("        " +props+ ".put(\"" +slot+ "\", " 
 			       +val+ " != null ? " +val+ " : NIL);");
@@ -666,25 +736,29 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    String type = getSlotType(prototype, slot, attrs);
+	    String type = getSlotType(prototype, slot);
 	    writeGetter(writer, prototype, slot, attrs, type, true);
 	    writeGetter(writer, prototype, slot, attrs, type, false);
+	    writeGetterAsObject(writer, prototype, slot, attrs, type);
 	    writeSetter(writer, prototype, slot, attrs, type);
+	    writeSetterAsObject(writer, prototype, slot, attrs, type);
 	    writeInitializer(writer, prototype, slot, attrs, type);
+	    writeInitializerAsObject(writer, prototype, slot, attrs, type);
 	    writeRemover(writer, prototype, slot, attrs, type);
 	}
 	itr = override_slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
+	    if (isMember(prototype, slot)) continue;
 	    Attributes attrs = (Attributes) entry.getValue();
-	    String type = getSlotType(prototype, slot, attrs);
+	    String type = getSlotType(prototype, slot);
 	    writeOverrideGetter(writer, prototype, slot, attrs, type, true);
 	    writeOverrideGetter(writer, prototype, slot, attrs, type, false);
-	}
+ 	    writeOverrideGetterAsObject(writer, prototype, slot, attrs, type);
+ 	}
     }
 
-    private static final String NoWarn = "__NoWarn";
 
     private void writeGetter(PrintWriter writer, 
 			     String prototype,
@@ -697,9 +771,8 @@ public class FrameGen
 	String fixed_name = fixName(slot, false);
 	String default_value = attrs.getValue("value");
 	String path = attrs.getValue("path");
-	boolean memberp = isMember(prototype, slot, attrs);
-	boolean staticp = path == null && isStatic(prototype, slot, attrs);
-	boolean warnp = isWarn(prototype, slot, attrs);
+	boolean memberp = isMember(prototype, slot);
+	boolean warnp = isWarn(prototype, slot);
 	if (warn) {
 	    writer.print("\n\n    public "+type+" get" +accessor_name);
 	} else {
@@ -708,32 +781,62 @@ public class FrameGen
 	writer.println("()");
 	writer.println("    {");
 	if (memberp) {
-	    writer.println("        if (" +fixed_name+ " != null) return "
-			   +fixed_name+ ";");
+	    writer.println("        return "  +fixed_name+ ";");
 	} else {
 	    String result_var = "__result";
-	    writer.println("        "+type+" " +result_var+ " = getProperty(\"" 
+	    writer.println("        "+type+" " +result_var+ " = ("
+			   +type+ ") getProperty(\"" 
 			   +slot+ "\");");
 	    writer.println("        if (" +result_var+ " != null) return "
 			   +result_var+ ";");
-	}
-	if (staticp) {
 	    if (default_value != null) {
-		writer.println("        return \"" +default_value+ "\";");
+		writer.println("        return " 
+			       +literalToObject(type, default_value)+ ";");
 	    } else {
-		if (warn && warnp)
-		    writer.println("        getLogger().warn(this + \" has no value for " 
-				   +accessor_name+
-				   "\");");
-		writer.println("        return null;");
+		writer.println("        return ("+type+
+			       ") getInheritedValue(this, \"" 
+			       +slot+ "\");");
 	    }
-	} else {
-	    writer.println("        return ("+type+") getInheritedValue(this, \"" 
-			   +slot+ "\");");
 	}
-
 	writer.println("    }");
     }
+
+    private void writeGetterAsObject(PrintWriter writer, 
+				     String prototype,
+				     String slot,
+				     Attributes attrs,
+				     String type)
+    {
+	String accessor_name = fixName(slot, true);
+	String fixed_name = fixName(slot, false);
+	String default_value = attrs.getValue("value");
+	String path = attrs.getValue("path");
+	boolean memberp = isMember(prototype, slot);
+	boolean warnp = isWarn(prototype, slot);
+	writer.print("\n\n    Object get" +accessor_name+ AsObject);
+	writer.println("()");
+	writer.println("    {");
+	if (memberp) {
+	    writer.println("        return "
+			   +typeToObject(type, fixed_name)+ ";");
+	} else {
+	    String result_var = "__result";
+	    writer.println("        Object " +result_var+ " = getProperty(\"" 
+			   +slot+ "\");");
+	    writer.println("        if (" +result_var+ " != null) return "
+			   +result_var+ ";");
+	    if (default_value != null) {
+		writer.println("        return " 
+			       +literalToObject(type, default_value)+ ";");
+	    } else {
+		writer.println("        return getInheritedValue(this, \"" 
+			       +slot+ "\");");
+	    }
+	}
+	writer.println("    }");
+    }
+
+
 
     private void writeOverrideGetter(PrintWriter writer, 
 				     String prototype,
@@ -744,7 +847,6 @@ public class FrameGen
     {
 	String accessor_name = fixName(slot, true);
 	String default_value = attrs.getValue("value");
-	boolean staticp = isStatic(prototype, slot, attrs);
 	if (warn) {
 	    writer.print("\n\n    public "+type+" get" +accessor_name);
 	} else {
@@ -758,23 +860,34 @@ public class FrameGen
 	writer.println("        if (" +result_var+ " != null) return "
 		       +result_var+ ";");
 	
-	if (staticp) {
-	    if (default_value != null) {
-		writer.println("        return \"" +default_value+ "\";");
-	    } else {
-		if (warn)
-		    writer.println("        getLogger().warn(this + \" has no value for " 
-				   +accessor_name+
-				   "\");");
-		writer.println("        return null;");
-	    }
-	} else {
-	    writer.println("        return getInheritedValue(this, \"" 
-			   +slot+ "\");");
-	}
-
+	writer.println("        return " 
+		       +literalToObject(type, default_value)+ ";");
 	writer.println("    }");
     }
+
+
+    private void writeOverrideGetterAsObject(PrintWriter writer, 
+					     String prototype,
+					     String slot,
+					     Attributes attrs,
+					     String type)
+    {
+	String accessor_name = fixName(slot, true);
+	String default_value = attrs.getValue("value");
+	writer.print("\n\n    Object get" +accessor_name+ AsObject);
+	writer.println("()");
+	writer.println("    {");
+	String result_var = "__result";
+	writer.println("        Object " +result_var+ " = super.get" 
+		       +accessor_name+ AsObject+ "();");
+	writer.println("        if (" +result_var+ " != null) return "
+		       +result_var+ ";");
+	
+	writer.println("        return " 
+		       +literalToObject(type, default_value)+ ";");
+	writer.println("    }");
+    }
+
 
     private void writeSetter(PrintWriter writer,
 			     String prototype,
@@ -782,13 +895,13 @@ public class FrameGen
 			     Attributes attrs,
 			     String type)
     {
-	if (isImmutable(prototype, slot, attrs)) return;
+	if (isImmutable(prototype, slot)) return;
 
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	boolean memberp = isMember(prototype, slot, attrs);
-	boolean notify_listeners_p = notifyListeners(prototype, slot, attrs);
-	boolean notify_blackboard_p = notifyBlackboard(prototype, slot, attrs);
+	boolean memberp = isMember(prototype, slot);
+	boolean notify_listeners_p = notifyListeners(prototype, slot);
+	boolean notify_blackboard_p = notifyBlackboard(prototype, slot);
 	writer.println("\n\n    public void set" +accessor_name+
 		       "("+type+" __new_value)");
 	writer.println("    {");
@@ -796,8 +909,45 @@ public class FrameGen
 	    writer.println("        "+type+" __old_value = " +fixed_name+ ";");
 	    writer.println("        this." +fixed_name+ " = __new_value;");
 	} else {
-	    writer.println("        "+type+" __old_value = getProperty(\"" +slot+ "\");");
+	    writer.println("        "+type+" __old_value = ("
+			   +type+ ") getProperty(\"" +slot+ "\");");
 	    writer.println("        setProperty(\"" +slot+ "\", __new_value);");
+	}
+	writer.println("        slotModified(\"" +slot+ "\", "
+		       +typeToObject(type, "__old_value")+ ", "
+		       +typeToObject(type, "__new_value")+ ", "
+		       +notify_listeners_p+ ", " +notify_blackboard_p
+		       + ");");
+	writer.println("    }");
+    }
+
+
+    private void writeSetterAsObject(PrintWriter writer,
+				     String prototype,
+				     String slot,
+				     Attributes attrs,
+				     String type)
+    {
+	if (isImmutable(prototype, slot)) return;
+
+	String accessor_name = fixName(slot, true);
+	String fixed_name = fixName(slot, false);
+	boolean memberp = isMember(prototype, slot);
+	boolean notify_listeners_p = notifyListeners(prototype, slot);
+	boolean notify_blackboard_p = notifyBlackboard(prototype, slot);
+	writer.println("\n\n    public void set" +accessor_name+ AsObject+
+		       "(Object __new_value)");
+	writer.println("    {");
+	if (memberp) {
+	    writer.println("        Object __old_value = get" 
+			   +accessor_name+AsObject+ "();");
+	    writer.println("        this." +fixed_name+ " = "
+			   + objectToType(type, "__new_value")+ ";");
+	} else {
+	    writer.println("        Object __old_value = getProperty(\"" +slot+ "\");");
+	    writer.println("        setProperty(\"" +slot+ "\", "
+			   +objectToType(type, "__new_value")+
+			   ");");
 	}
 	writer.println("        slotModified(\"" +slot+ 
 		       "\", __old_value, __new_value, "
@@ -812,22 +962,19 @@ public class FrameGen
 			      Attributes attrs,
 			      String type)
     {
-	if (isImmutable(prototype, slot, attrs)) return;
+	if (isImmutable(prototype, slot)) return;
+	boolean memberp = isMember(prototype, slot);
+	if (memberp) return;
+
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	boolean memberp = isMember(prototype, slot, attrs);
-	boolean notify_listeners_p = notifyListeners(prototype, slot, attrs);
-	boolean notify_blackboard_p = notifyBlackboard(prototype, slot, attrs);
+	boolean notify_listeners_p = notifyListeners(prototype, slot);
+	boolean notify_blackboard_p = notifyBlackboard(prototype, slot);
 	writer.println("\n\n    protected void remove" +accessor_name+ "()");
 	writer.println("    {");
-	if (memberp) {
-	    writer.println("        "+type+" __old_value = " +fixed_name+ ";");
-	    writer.println("        " +fixed_name+ " = null;");
-	} else {
-	    writer.println("        "+type+" __old_value = getProperty(\"" 
-			   +slot+ "\");");
-	    writer.println("        removeProperty(\"" +slot+ "\");");
-	}
+	writer.println("        Object __old_value = getProperty(\"" 
+		       +slot+ "\");");
+	writer.println("        removeProperty(\"" +slot+ "\");");
 	writer.println("        slotModified(\"" 
 		       +slot+ "\", __old_value, get" +accessor_name+ "(), "
 		       +notify_listeners_p+ ", " +notify_blackboard_p
@@ -843,7 +990,7 @@ public class FrameGen
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	boolean memberp = isMember(prototype, slot, attrs);
+	boolean memberp = isMember(prototype, slot);
 
 	writer.println("\n\n    protected void initialize" +accessor_name+
 		       "("+type+" new_value)");
@@ -852,6 +999,32 @@ public class FrameGen
 	    writer.println("        this." +fixed_name+ " = new_value;");
 	else
 	    writer.println("        setProperty(\"" +slot+ "\", new_value);");
+	writer.println("        slotInitialized(\"" +slot+ "\", "
+		       +typeToObject(type, "new_value")+ ");");
+	writer.println("    }");
+    }
+
+    private void writeInitializerAsObject(PrintWriter writer, 
+					  String prototype,
+					  String slot,
+					  Attributes attrs,
+					  String type)
+    {
+	String accessor_name = fixName(slot, true);
+	String fixed_name = fixName(slot, false);
+	boolean memberp = isMember(prototype, slot);
+
+	writer.println("\n\n    void initialize" +accessor_name+
+		       AsObject+ "(Object new_value)");
+	writer.println("    {");
+	if (memberp) {
+	    writer.println("        this." +fixed_name+ " = "
+			   +objectToType(type, "new_value")+ ";");
+	} else {
+	    writer.println("        setProperty(\"" +slot+ "\", "
+			   +objectToType(type, "new_value")+ 
+			   ");");
+	}
 	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
 	writer.println("    }");
     }
@@ -886,19 +1059,21 @@ public class FrameGen
 
 	if (slots.isEmpty() && container_slots.isEmpty()) return;
 
-	writer.println("\n\n    protected void collectSlotDescriptions(java.util.List list)");
+	writer.println("\n\n    protected void collectSlotDescriptions(java.util.Map map)");
 	writer.println("    {");
-	writer.println("        super.collectSlotDescriptions(list);");
+	writer.println("        super.collectSlotDescriptions(map);");
 	itr = slots.keySet().iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    writer.println("        list.add(" +slotDescriptionMethod(slot)+
+	    writer.println("        map.put(\""  +slot+ "\", "
+			   +slotDescriptionMethod(slot)+
 			   "());");
 	}
 	itr = container_slots.iterator();
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
-	    writer.println("        list.add(" +slotDescriptionMethod(slot)+
+	    writer.println("        map.put(\"" +slot+ "\", "
+			   +slotDescriptionMethod(slot)+
 			   "());");
 	}
 	writer.println("    }");
@@ -913,9 +1088,9 @@ public class FrameGen
 	String fixed_name = fixName(slot, false);
 	String default_value = attrs.getValue("value");
 	String path = attrs.getValue("path");
-	boolean memberp = isMember(prototype, slot, attrs);
-	boolean staticp = path == null && isStatic(prototype, slot, attrs);
-	boolean immutablep = isImmutable(prototype, slot, attrs);
+	boolean memberp = isMember(prototype, slot);
+	boolean immutablep = isImmutable(prototype, slot);
+	String type = getSlotType(prototype, slot);
 	writer.println("\n\n    public SlotDescription " 
 		       +slotDescriptionMethod(slot)+
 		       "()");
@@ -927,7 +1102,9 @@ public class FrameGen
 		       +!immutablep+ ";");
 	writer.println("        Object __value;");
 	if (memberp) {
-	    writer.println("        __value = " +fixed_name+ ";");
+	    writer.println("        __value = " 
+			   +typeToObject(type,fixed_name)+ 
+			   ";");
 	} else {
 	    writer.println("        __value = getProperty(\""  +slot+ "\");");
 	}
@@ -936,9 +1113,10 @@ public class FrameGen
 	writer.println("            __desc.value = __value;");
 	writer.println("        } else {");
 	writer.println("            __desc.is_overridden = false;");
-	if (staticp) {
+	if (path == null) {
 	    if (default_value != null) {
-		writer.println("            __desc.value = \"" +default_value+ "\";");
+		writer.println("            __desc.value = " 
+			       +literalToObject(type, default_value)+ ";");
 	    }
 	} else {
 	    writer.println("            __desc.value = getInheritedValue(this, \"" 
@@ -973,7 +1151,8 @@ public class FrameGen
 	    writer.println("null;");
 	} else
 	    writer.println("\"" +owner+ "\";");
-	writer.println("        __desc.value = get" +accessor_name+ "();");
+	writer.println("        __desc.value = get" +accessor_name+ AsObject+
+		       "();");
 	writer.println("        __desc.is_overridden = false;");
 	writer.println("        __desc.is_writable = false;");
 	writer.println("        return __desc;");
@@ -1011,7 +1190,6 @@ public class FrameGen
 	    }
 	    writeDynamicSetter(writer, prototype, local_slots, is_root);
 	    writeDynamicInitializer(writer, prototype, local_slots, is_root);
-	    writeDynamicRemover(writer, prototype, local_slots, is_root);
 	}
 
     }
@@ -1046,7 +1224,7 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    String slot_hash_var = slotHashVar(slot);
-	    String method = "get" + fixName(slot, true);
+	    String method = "get" + fixName(slot, true) + AsObject;
 	    writer.println(" if (" +slot_hash_var+ " == __key)");
 	    writer.println("            return " +method+ "();");
 	    writer.print("       else");
@@ -1075,10 +1253,10 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    Attributes attrs = (Attributes) entry.getValue();
 	    String slot = (String) entry.getKey();
-	    if (isImmutable(prototype, slot, attrs)) continue;
-	    String type = getSlotType(prototype, slot, attrs);
+	    if (isImmutable(prototype, slot)) continue;
+	    String type = getSlotType(prototype, slot);
 	    String slot_hash_var = slotHashVar(slot);
-	    String method = "set" + fixName(slot, true);
+	    String method = "set" + fixName(slot, true) + AsObject;
 	    writer.print("      ");
 	    if (!first) writer.print(" else");
 	    writer.println(" if (" +slot_hash_var+ " == __key)");
@@ -1107,9 +1285,9 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    String type = getSlotType(prototype, slot, attrs);
+	    String type = getSlotType(prototype, slot);
 	    String slot_hash_var = slotHashVar(slot);
-	    String method = "initialize" + fixName(slot, true);
+	    String method = "initialize" + fixName(slot, true) +AsObject;
 	    writer.print("      ");
 	    if (!first) writer.print(" else");
 	    writer.println(" if (" +slot_hash_var+ " == __key)");
@@ -1123,35 +1301,6 @@ public class FrameGen
 	writer.println("    }");
     }
 
-    private void writeDynamicRemover(PrintWriter writer, 
-				     String prototype,
-				     Map slots,
-				     boolean is_root)
-    {
-	writer.println("\n\n    protected void removeLocalValue(String __slot)");
-	writer.println("    {");
-	writer.println("       int __key = __slot.hashCode();");
-	Iterator itr = slots.entrySet().iterator();
-	boolean first = true;
-	while(itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    Attributes attrs = (Attributes) entry.getValue();
-	    String slot = (String) entry.getKey();
-	    if (isImmutable(prototype, slot, attrs)) continue;
-	    String slot_hash_var = slotHashVar(slot);
-	    String method = "remove" + fixName(slot, true);
-	    writer.print("      ");
-	    if (!first) writer.print(" else");
-	    writer.println(" if (" +slot_hash_var+ " == __key)");
-	    writer.println("            " +method+ "();");
-	    first = false;
-	}
-	if (!is_root) {
-	    writer.println("       else");
-	    writer.println("            super.removeLocalValue(__slot);");
-	}
-	writer.println("    }");
-    }
 
     private void writeContainerReaders(PrintWriter writer, 
 				       String container,
@@ -1162,6 +1311,7 @@ public class FrameGen
 	while (itr.hasNext()) {
 	    String slot = (String) itr.next();
 	    writeContainerReader(writer, container, slot);
+	    writeContainerReaderAsObject(writer, container, slot);
 	}
     }
 
@@ -1171,9 +1321,34 @@ public class FrameGen
     {
 	String reader_name = "get"+fixName(slot, true);
 	String container_class = fixName(container, true);
+	String type = getSlotType(container, slot);
 	String raw_container_var = "__raw_container";
 	String container_var = "__container";
-	writer.println("\n\n    public Object " +reader_name+ "()");
+	writer.println("\n\n    public "+type+ " " +reader_name+ "()");
+	writer.println("    {");
+	writer.println("       Object " +raw_container_var+ " = containerFrame();");
+	writer.println("       if ( " + raw_container_var + 
+		       " == null)");
+	writer.println("            throw new RuntimeException(\"No container!\");");
+	writer.println("       if (!("  +raw_container_var+ " instanceof "
+		       +container_class+ "))");
+	writer.println("            throw new RuntimeException(\"Bogus container!\");");
+	writer.println("       " +container_class+  " " +container_var+ " = ("
+		       +container_class+ ") " +raw_container_var+ ";");
+	writer.println("       return " +container_var+ "." +reader_name+ "();");
+	writer.println("    }");
+    }
+
+    private void writeContainerReaderAsObject(PrintWriter writer, 
+					      String container,
+					      String slot)
+    {
+	String reader_name = "get"+fixName(slot, true)+AsObject;
+	String container_class = fixName(container, true);
+	String type = getSlotType(container, slot);
+	String raw_container_var = "__raw_container";
+	String container_var = "__container";
+	writer.println("\n\n    Object " +reader_name+ "()");
 	writer.println("    {");
 	writer.println("       Object " +raw_container_var+ " = containerFrame();");
 	writer.println("       if ( " + raw_container_var + " == null) return null;");
@@ -1187,6 +1362,7 @@ public class FrameGen
 	writer.println("       return " +container_var+ "." +reader_name+ "();");
 	writer.println("    }");
     }
+
 
     private void writeUpdaters(PrintWriter writer, 
 			       String prototype,
@@ -1216,7 +1392,7 @@ public class FrameGen
 
 	    String fixed_name = fixName(slot, true);
 	    String bean_name = fixName(slot, true, true);
-	    String reader = "get" +fixed_name+ "();";
+	    String reader = "get" +fixed_name+ AsObject+ "();";
 	    writer.println("        " +old_var+ " = " +old_arg+ "." + reader);
 	    writer.println("        " +new_var+ " = " +new_arg+ "." + reader);
 	    writer.println("        if (" +new_var+ " != null) {");
@@ -1240,7 +1416,7 @@ public class FrameGen
 
 	    String fixed_name = fixName(slot, true);
 	    String bean_name = fixName(slot, true, true);
-	    String reader = "get" +fixed_name+ "();";
+	    String reader = "get" +fixed_name+ AsObject+ "();";
 	    writer.println("        " +new_var+ " = " +new_arg+ "." + reader);
 	    writer.println("        if (" +new_var+ " != null) {");
 	    writer.println("            fireChange(\"" +bean_name+ "\", "

@@ -26,6 +26,8 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.util.Map;
+
 import org.cougaar.core.util.UID;
 
 /**
@@ -42,11 +44,11 @@ abstract public class RelationFrame
 
     abstract public String getParentPrototype();
     abstract public String getParentSlot();
-    abstract public Object getParentValue();
+    abstract public String getParentValue();
 
     abstract public String getChildPrototype();
     abstract public String getChildSlot();
-    abstract public Object getChildValue();
+    abstract public String getChildValue();
 
     public DataFrame relationshipParent()
     {
@@ -74,7 +76,7 @@ abstract public class RelationFrame
         __props.put("child-slot", __value != null ? __value : NIL);
     }
 
-    private SlotDescription makeMetaDescription(String name, Object value)
+    private void makeMetaDescription(String name, Object value,	Map map)
     {
         SlotDescription __desc = new SlotDescription();
         __desc.name = name;
@@ -82,16 +84,16 @@ abstract public class RelationFrame
         __desc.is_writable = false;
 	__desc.is_overridden = true;
         __desc.value = value;
-        return __desc;
+	map.put(name, __desc);
     }
 
-    protected void collectSlotDescriptions(java.util.List list)
+    protected void collectSlotDescriptions(Map map)
     {
-        super.collectSlotDescriptions(list);
-	list.add(makeMetaDescription("parent-prototype", getParentPrototype()));
-	list.add(makeMetaDescription("parent-slot", getParentSlot()));
-	list.add(makeMetaDescription("child-prototype", getChildPrototype()));
-	list.add(makeMetaDescription("child-slot", getChildSlot()));
+        super.collectSlotDescriptions(map);
+	makeMetaDescription("parent-prototype", getParentPrototype(), map);
+	makeMetaDescription("parent-slot", getParentSlot(), map);
+	makeMetaDescription("child-prototype", getChildPrototype(), map);
+	makeMetaDescription("child-slot", getChildSlot(), map);
     }
 
 

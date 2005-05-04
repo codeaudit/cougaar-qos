@@ -167,7 +167,7 @@ abstract public class DataFrame
     // Subclass responsibility
     abstract protected Object getLocalValue(String slot);
     abstract protected void setLocalValue(String slot, Object value);
-    abstract protected void removeLocalValue(String slot);
+//     abstract protected void removeLocalValue(String slot);
     abstract protected void initializeLocalValue(String slot, Object value);
 
 
@@ -226,11 +226,11 @@ abstract public class DataFrame
 	return props;
     }
 
-    public List slotDescriptions()
+    public Map slotDescriptions()
     {
-	List result = new ArrayList();
-	collectSlotDescriptions(result);
-	return result;
+	HashMap descriptions = new HashMap();
+	collectSlotDescriptions(descriptions);
+	return descriptions;
     }
 
     public void setValue(String slot, Object value)
@@ -243,7 +243,13 @@ abstract public class DataFrame
 	Iterator itr = values.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
-	    initializeLocalValue((String) entry.getKey(), entry.getValue());
+	    try {
+		initializeLocalValue((String) entry.getKey(), entry.getValue());
+	    } catch (Throwable t) {
+		log.error("Error initializing slot " +entry.getKey()+
+			  " of " +this+ " to "+entry.getValue(),
+			  t);
+	    }
 	}
     }
 
@@ -330,6 +336,123 @@ abstract public class DataFrame
     }
 
 
+    //  Converters used in generated code
+    protected String force_String(Object x)
+    {
+	if (x instanceof String)
+	    return ((String) x);
+	else
+	    return x.toString(); // hmm
+    }
+
+    protected double force_double(Object x)
+    {
+	if (x instanceof String)
+	    return Double.parseDouble((String) x);
+	else if (x instanceof Double)
+	    return ((Double) x).doubleValue();
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a double");
+    }
+
+    protected Double force_Double(Object x)
+    {
+	if (x instanceof String) {
+	    return Double.valueOf((String) x);
+	} else if (x instanceof Double) {
+	    return (Double) x;
+	} else {
+	    throw new RuntimeException(x + " cannot be coerced to a Double");
+	}
+    }
+
+    protected float force_float(Object x)
+    {
+	if (x instanceof String)
+	    return Float.parseFloat((String) x);
+	else if (x instanceof Float)
+	    return ((Float) x).floatValue();
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a float");
+    }
+
+    protected Float force_Float(Object x)
+    {
+	if (x instanceof String)
+	    return Float.valueOf((String) x);
+	else if (x instanceof Float)
+	    return (Float) x;
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a Float");
+    }
+
+
+    protected long force_long(Object x)
+    {
+	if (x instanceof String)
+	    return Long.parseLong((String) x);
+	else if (x instanceof Long)
+	    return ((Long) x).longValue();
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a long");
+    }
+
+
+    protected Long force_Long(Object x)
+    {
+	if (x instanceof String)
+	    return Long.valueOf((String) x);
+	else if (x instanceof Long)
+	    return (Long) x;
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a Long");
+    }
+
+
+    protected int force_int(Object x)
+    {
+	if (x instanceof String)
+	    return Integer.parseInt((String) x);
+	else if (x instanceof Integer)
+	    return ((Integer) x).intValue();
+	else
+	    throw new RuntimeException(x + " cannot be coerced to an int");
+    }
+
+    protected Integer force_Integer(Object x)
+    {
+	if (x instanceof String)
+	    return Integer.valueOf((String) x);
+	else if (x instanceof Integer)
+	    return (Integer) x;
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a Long");
+    }
+
+
+    protected boolean force_boolean(Object x)
+    {
+	if (x instanceof String)
+	    return ((String) x).equalsIgnoreCase("true");
+	else if (x instanceof Boolean)
+	    return ((Boolean) x).booleanValue();
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a boolean");
+    }
+
+
+    protected Boolean force_Boolean(Object x)
+    {
+	if (x instanceof String)
+	    return Boolean.valueOf((String) x);
+	else if (x instanceof Boolean)
+	    return (Boolean) x;
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a Long");
+    }
+
+
+
 
     protected void fireChange(String property, 
 			      Object old_value, 
@@ -359,7 +482,7 @@ abstract public class DataFrame
 	// default is no-op
     }
 
-    protected void collectSlotDescriptions(List list)
+    protected void collectSlotDescriptions(Map map)
     {
 	// default is no-op
     }
