@@ -113,163 +113,204 @@ their semantic interpretation.
     used by the code generator: the classes generated for this
     frameset's prototypes will be put in the given package and the
     files will be written to the corresponding directory stucture,
-    following standard Java conventions.<p> </dd>
+    following standard Java conventions.<p>
 
-    <dt><b>prototypes</b></dt>
+  </dd>
 
-    <dd> A <code>prototypes</code> entity can be used to group
-      <code>prototype</code> entities.  It has no attributes and is
-      not required.  Ordinarily a <code>prototypes</code> entity would
-      be within a <code>frameset</code> entity in an XML file. But it
-      can also be at the top level if the file is being read in to an
-      existing FrameSet.<p>
-    </dd>
+  <dt><b>prototypes</b></dt>
 
-    <dt><b>prototype</b></dt>
+  <dd> A <code>prototypes</code> entity can be used to group
+    <code>prototype</code> entities.  It has no attributes and is
+    not required.  Ordinarily a <code>prototypes</code> entity would
+    be within a <code>frameset</code> entity in an XML file. But it
+    can also be at the top level if the file is being read in to an
+    existing FrameSet.<p>
+    
+  </dd>
 
-    <dd>A <code>prototype</code> entity defines a PrototypeFrame.  It
-      has one required attribute, <b>name</b>, which is the name of
-      the prototype.  It also supports three optional attributes:
-      <b>prototype</b>, which specifies the "super" of this one;
-      <b>container</b>, which specifies the prototype of frames that
-      can act as containers for frames of this prototype; and
-      <b>doc</b>, which will be used as javadoc in the generated
-      class.  The remaining structure of a prototype is specified by
-      the <a href="#slot"><code>slot</code></a> entities it contains.
-      <p></dd>
+  <dt><b>prototype</b></dt>
 
-      <dt><b>relation-prototype</b></dt>
+  <dd>A <code>prototype</code> entity defines a PrototypeFrame.  It
+    has one required attribute, <b>name</b>, which is the name of
+    the prototype.  It also supports three optional attributes:
+    <b>prototype</b>, which specifies the "super" of this one;
+    <b>container</b>, which specifies the prototype of frames that
+    can act as containers for frames of this prototype; and
+    <b>doc</b>, which will be used as javadoc in the generated
+    class.  The remaining structure of a prototype is specified by
+    the <a href="#slot"><code>slot</code></a> entities it contains.
+    <p>
 
-      <dd>A <code>relation-prototype</code> entity defines a
-	PrototypeFrame representing a relationship.  The attributes
-	are a superset of the attributes of <code>prototype</code>
-	entities.  The additional attributes, all optional, are
-	<b>parent-prototype</b>, <b>parent-slot</b>,
-	<b>child-prototype</b> and <b>child-slot</b> </p> </dd>
+  </dd>
 
+  <dt><b>relation-prototype</b></dt>
+
+  <dd>A <code>relation-prototype</code> entity defines a
+    PrototypeFrame representing a relationship.  The attributes
+    are a superset of the attributes of <code>prototype</code>
+    entities.  The additional attributes, all optional, are
+    <b>parent-prototype</b>, <b>parent-slot</b>,
+    <b>child-prototype</b> and <b>child-slot</b> </p>
+
+  </dd>
+
+  <dt><b>path</b></dt>
+
+  <dd>A <code>path</code> entity defines a <a
+    href="#paths">Path</a>.  It has one required attribute,
+    <b>name</b>.  The entities it contains are any number of
+    <code>forks</code> (order is significant) followed by one
+    <code>slot</code>.  The <code>slot</code> entity in this case is
+    simply a reference by name to a <code>slot</code> defined in a
+    prototype.<p>
+
+  </dd>
+
+  <dt><b>fork</b></dt>
+
+  <dd>A <code>fork</code> entity defines a "hop" in its enclosing
+  <code>path</code>, where a hop consists of a relation prototype and
+  a role the next object on the path should play in that
+  relationshoip.  Correspondingly, a <fork> entity has two required
+  attributes: <code>relation</code> (the relation prototype name) and
+  <code>role</code> ("parent" or "child").<p>
+
+  </dd>
+  
+  
+  <a name="slot"></a><dt><b>slot</b></dt>
+
+  <dd> A <code>slot</code> entity is used within
+    <code>prototype</code> entity to define one of the prototype's
+    named fields. It has one required attribute, <b>name</b>, which
+    is the name of the slot, and a range of optional attributes:
+
+    <dl>
+
+      <dt><b>immutable</b></dt>
+
+      <dd> This boolean valued attribute indicates whether or not
+	the value of the slot in any given DataFrame can be chaged
+	after initialization.  The default is "false" (ie, values
+	can be changed after initialization).
+	<p>
+	
+      </dd>
+
+      <dt><b>member</b></dt>
+
+      <dd>This boolean valued attribute indicates whether or not the
+	generated code for this slot treats it as a data member or
+	as a property.  The former is more efficient for slots whose
+	value is usually frame-specific, the latter is more
+	efficient for slots whose value is usually defaulted. The
+	default for this attribute is "true".
+	
+	<p>Other slot attributes can render this one irrelevant.  In
+	particular, if a slot has a <code>path</code>, it will never
+	be a data member, regardless of the setting of this
+	attribute.  Conversely, if the slot is declared to have a
+	simple <code>type</code>, or if it's declared to be
+	<code>transient</code>, it will always be a data member,
+	regardless of the setting of this attribute.
+
+	<p>
+
+      </dd>
+
+      <dt><b>notify-blackboard</b></dt>
+
+      <dd>This attribute specifies whether or not a change should be
+	published on the Blackboard when the slot value changes.  The
+	default is "true".  <p>
+
+      </dd>
+
+      <dt><b>notify-listeners</b></dt>
+
+      <dd>This attribute specifies whether or not PropertyChange
+	listeners should be notified when the slot value changes.  The
+	default is "true".  <p>
+
+      </dd>
+      
       <dt><b>path</b></dt>
 
-    <dd>A <code>path</code> entity defines a <a
-      href="#paths">Path</a>.  It has one required attribute,
-      <b>name</b>.  The entities it contains are any number of
-      <code>forks</code> (order is significant) followed by one
-      <code>slot</code>.  The <code>slot</code> entity in this case is
-      simply a reference by name to a <code>slot</code> defined in a
-      prototype.<p></dd>
+      <dd> The presence of this attribute indicates that the default
+	value for this slot is computed by following a path.  The
+	value of the attribute is the name of path.  If a
+	<code>path</code> attribute is present, the slot cannot be a
+	<code>member</code>.  <p>
 
-    
-    <a name="slot"></a><dt><b>slot</b></dt>
+      </dd>
 
-    <dd> A <code>slot</code> entity is used within
-      <code>prototype</code> entity to define one of the prototype's
-      named fields. It has one required attribute, <b>name</b>, which
-      is the name of the slot, and a range of optional attributes:
+      <dt><b>transient</b></dt>
 
-      <dl>
+      <dd>This boolean valued attribute indicates whether or not the
+	corresponding data member in the generated class will be
+	declared transient.  The default is "false".  Transient
+	slots are always <code>members</code>. <p>
 
-	<dt><b>immutable</b></dt>
+      </dd>
 
-	<dd> This boolean valued attribute indicates whether or not
-	  the value of the slot in any given DataFrame can be chaged
-	  after initialization.  The default is "false" (ie, values
-	  can be changed after initialization).
-	  <p>
-	</dd>
+      <dt><b>type</b></dt>
 
-	<dt><b>member</b></dt>
+      <dd> This attribute is used to specify the Java type of values
+	of this slot.  The default is "String".  Other possible
+	values are "int", "long", "float", "double", "boolean",
+	"Integer", "Long", "Float", "Double" and "Boolean". Slots
+	with simple types must be <code>members</code>. See below
+	for more on slot types.<p>
 
-	<dd>This boolean valued attribute indicates whether or not the
-	  generated code for this slot treats it as a data member or
-	  as a property.  The former is more efficient for slots whose
-	  value is usually frame-specific, the latter is more
-	  efficient for slots whose value is usually defaulted. The
-	  default for this attribute is "true".
-	  
-	  <p>Other slot attributes can render this one irrelevant.  In
-	  particular, if a slot has a <code>path</code>, it will never
-	  be a data member, regardless of the setting of this
-	  attribute.  Conversely, if the slot is declared to have a
-	  simple <code>type</code>, or if it's declared to be
-	  <code>transient</code>, it will always be a data member,
-	  regardless of the setting of this attribute.
+      </dd>
 
-	  <p> </dd>
+      <dt><b>value</b></dt>
 
-	<dt><b>notify-blackboard</b></dt>
+      <dd>This attribute gives a default value of the slot.  The
+	value can be any string.  If a slot has neither a value nor
+	a path attribute, then the slot has no default value.  In
+	this case, the generated accessor code will issue a warning
+	if it has no frame-specific value for this slot.  <p>
+      </dd>
 
-	<dd>This attribute specifies whether or not a change should be
-	published on the Blackboard when the slot value changes.  The
-	default is "true".  <p> </dd>
+      <dt><b>warn</b></dt>
 
-	<dt><b>notify-listeners</b></dt>
+      <dd>This boolean valued attribute indicates whether or not a
+	warning is generated at runtime if the slot has no
+	value. The default for this attribute is "true".  <p>
 
-	<dd>This attribute specifies whether or not PropertyChange
-	listeners should be notified when the slot value changes.  The
-	default is "true".  <p> </dd>
-	
-	<dt><b>path</b></dt>
-
-	<dd> The presence of this attribute indicates that the default
-	  value for this slot is computed by following a path.  The
-	  value of the attribute is the name of path.  If a
-	  <code>path</code> attribute is present, the slot cannot be a
-	  <code>member</code>.  <p> </dd>
-
-	<dt><b>transient</b></dt>
-
-	<dd>This boolean valued attribute indicates whether or not the
-	  corresponding data member in the generated class will be
-	  declared transient.  The default is "false".  Transient
-	  slots are always <code>members</code>. <p> </dd>
-
-	<dt><b>type</b></dt>
-
-	<dd> This attribute is used to specify the Java type of values
-	  of this slot.  The default is "String".  Other possible
-	  values are "int", "long", "float", "double", "boolean",
-	  "Integer", "Long", "Float", "Double" and "Boolean". Slots
-	  with simple types must be <code>members</code>. See below
-	  for more on slot types.<p> </dd>
-
-	<dt><b>value</b></dt>
-
-	<dd>This attribute gives a default value of the slot.  The
-	  value can be any string.  If a slot has neither a value nor
-	  a path attribute, then the slot has no default value.  In
-	  this case, the generated accessor code will issue a warning
-	  if it has no frame-specific value for this slot.  <p>
-	  </dd>
-
-	<dt><b>warn</b></dt>
-
-	<dd>This boolean valued attribute indicates whether or not a
-	  warning is generated at runtime if the slot has no
-	  value. The default for this attribute is "true".  <p> </dd>
+      </dd>
 
 
-      </dl>
+    </dl>
 
-      <p>Slot entities also appear in paths, but as a references
-      rather than definitions: the only relevant attribute in this
-      context is <b>name</b>.  <p></dd>
+    <p>Slot entities also appear in paths, but as a references
+    rather than definitions: the only relevant attribute in this
+    context is <b>name</b>.  <p>
+
+  </dd>
 
 
-    <dt><b>frames</b></dt>
+  <dt><b>frames</b></dt>
 
-    <dd> A <code>frames</code> entity can be used to group
+  <dd> A <code>frames</code> entity can be used to group
     <code>frame</code> entities.  It has no attributes and is not
     required.  Ordinarily a <code>frames</code> entity would be within
     a <code>frameset</code> entity in an XML file. But it can also be
     at the top level if the file is being read in to an existing
-    FrameSet.<p></dd>
-      
-    <dt><b>frame</b></dt>
+    FrameSet.<p>
 
-    <dd>A <code>frame</code> entity describes a DataFrame.  It has one
+  </dd>
+  
+  <dt><b>frame</b></dt>
+
+  <dd>A <code>frame</code> entity describes a DataFrame.  It has one
     required attribute, <b>prototype</b>, which must name a
     PrototypeFrame in the same FrameSet.  The sub-entities are simply
     slot names, the content of which is the frame's initial value for
-    that slot.  <p></dd>
+    that slot.  <p>
+
+  </dd>
 
 
 </dl>
