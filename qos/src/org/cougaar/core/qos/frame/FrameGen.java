@@ -30,9 +30,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,20 +65,37 @@ public class FrameGen
     private static final String NoWarn = "__NoWarn";
     private static final String AsObject = "__AsObject";
 
+    // The FrameSet's package
     private String package_name;
-    private String dir_name;
-    private String path;
-    private HashMap slots;
-    private HashMap proto_attrs;
-    private HashMap proto_slots;
-    private HashSet relation_prototypes;
+
+    // Path to the root of the output tree
+    private String output_root;
+
+    // FrameSet subdirectory of the output_path; derived from the package
+    private String output_directory;
+
+    // The prototype currently being parsed
     private String current_prototype;
+
+    // Temporary storage during prototype parsing
+    private HashMap slots;
+
+    // Prototype name -> prototype attributes
+    private HashMap proto_attrs; 
+
+    // Prototype name -> Map slot name -> alot attributes
+    private HashMap proto_slots; 
+
+    // All defined relations
+    private HashSet relation_prototypes;
+
+    // The FrameSet's container relation
     private String container_relation;
 
 
     public FrameGen(String path)
     {
-	this.path = path;
+	this.output_root = path;
     }
 
     public void parseProtoFile(File xml_file)
@@ -96,9 +115,10 @@ public class FrameGen
 	    return;
 	}
 
-	generateCode(package_name);
-
+	generatePrototypes(package_name);
     }
+
+
 
 
     // SAX
@@ -139,250 +159,6 @@ public class FrameGen
 
 
 
-
-
-    // Utilities
-    private boolean descendsFrom(String child_proto, String parent_proto)
-    {
-	if (child_proto == null || parent_proto == null) {
-	    return false;
-	} else if (child_proto.equals(parent_proto)) {
-	    return true;
-	} else {
-	    Attributes attrs = (Attributes) proto_attrs.get(child_proto);
-	    return descendsFrom(attrs.getValue("prototype"), parent_proto);
-	}
-    }
-
-
-    private boolean inheritsSlot(String proto, String slot)
-    {
-	Attributes attrs = (Attributes) proto_attrs.get(proto);
-	String parent = attrs.getValue("prototype");
-	if (parent == null) return false;
-	HashMap pslots = (HashMap) proto_slots.get(parent);
-	if (pslots != null && pslots.containsKey(slot)) return true;
-	return inheritsSlot(parent, slot);
-    }
-
-    private String ancestorForSlot(String proto, String slot)
-    {
-	if (proto == null) return null;
-
-	HashMap pslots = (HashMap) proto_slots.get(proto);
-	if (pslots != null && pslots.containsKey(slot)) return proto;
-
-	Attributes attrs = (Attributes) proto_attrs.get(proto);
-	String parent = attrs.getValue("prototype");
-	return ancestorForSlot(parent, slot);
-    }
-
-    private HashMap collectSlots(String proto)
-    {
-	HashMap slots = new HashMap();
-	collectSlots(proto, slots);
-	return slots;
-    }
-
-    private void collectSlots(String proto, HashMap slots)
-    {
-	HashMap local_slots = (HashMap) proto_slots.get(proto);
-	Attributes attrs = (Attributes) proto_attrs.get(proto);
-	String parent = attrs.getValue("prototype");
-	String container = attrs.getValue("container");
-	if (local_slots != null) {
-	    slots.putAll(local_slots);
-	}
-	if (parent != null) collectSlots(parent, slots);
-	if (container != null) collectSlots(container, slots);
-    }
-
-    static String fixName(String name, boolean is_class)
-    {
-	return fixName(name, is_class, false);
-    }
-
-    static String fixName(String name, boolean is_class, boolean is_bean)
-    {
-	if (is_class) {
-	    // camelize
-	    StringBuffer buf = new StringBuffer();
-	    char[] name_chars = name.toCharArray();
-	    boolean capitalize_next = !is_bean;
-	    for (int i=0; i<name_chars.length; i++) {
-		char next = name_chars[i];
-		if (next == '-') {
-		    capitalize_next = true;
-		    continue;
-		}
-		if (capitalize_next) {
-		    buf.append(Character.toUpperCase(next));
-		} else {
-		    buf.append(next);
-		}
-		capitalize_next = false;
-	    }
-	    return buf.toString();
-	} else {
-	    return name.replaceAll("-", "_");
-	}
-    }
-
-
-    private boolean getBooleanAttribute(String prototype,
-					String slot,
-					String attr,
-					boolean default_value)
-    {
-	HashMap slots = (HashMap) proto_slots.get(prototype);
-	Attributes attrs = (Attributes) slots.get(slot);
-
-	String attrstr = attrs != null ? attrs.getValue(attr) : null;
-	if (attrstr == null) {
-	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
-	    String parent = p_attrs.getValue("prototype");
-	    if (parent != null) {
-		return getBooleanAttribute(parent, slot, attr, default_value);
-	    } else {
-		return default_value;
-	    }
-	} else {
-	    return attrstr.equalsIgnoreCase("true");
-	}
-    }
-
-    private String getSlotTypeFromPrototypeTree(String prototype, String slot)
-    {
-	HashMap slots = (HashMap) proto_slots.get(prototype);
-	Attributes attrs = (Attributes) slots.get(slot);
-	String attrstr = attrs != null ? attrs.getValue("type") : null;
-	if (attrstr == null) {
-	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
-	    String parent = p_attrs.getValue("prototype");
-	    if (parent != null) {
-		return getSlotTypeFromPrototypeTree(parent, slot);
-	    } else {
-		return null;
-	    }
-	} else {
-	    return attrstr;
-	}
-    }
-
-    private String getSlotType(String prototype, String slot)
-    {
-	String type = getSlotTypeFromPrototypeTree(prototype, slot);
-	if (type != null) return type;
-
-	// Try the containment hierarchy
-	Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
-	String container = p_attrs.getValue("container");
-	if (container != null) {
-	    return getSlotType(container, slot);
-	} else {
-	    return "String";
-	}
-    }
-
-
-    private boolean isTransient(String prototype, String slot)
-    {
-	return getBooleanAttribute(prototype, slot, "transient", false);
-    }
-
-    private boolean isMember(String prototype, String slot)
-    {
-	// Path-valued slots can't be members
-	HashMap slots = (HashMap) proto_slots.get(prototype);
-	Attributes attrs = (Attributes) slots.get(slot);
-	String path = attrs != null ? attrs.getValue("path") : null;
-	if (path != null) return false;
-
-	// Non-Object types must be members
-	String type = getSlotType(prototype, slot);
-	if (!isObjectType(type)) return true;
-
-	// Transient slots must be members
-	if (isTransient(prototype, slot)) return true;
-
-	// Otherwise return the value of member attribute, 
-	// defaulting to true.
-	return getBooleanAttribute(prototype, slot,  "member", true);
-    }
-
-    private boolean isWarn(String prototype, String slot)
-    {
-	return getBooleanAttribute(prototype, slot, "warn", true);
-    }
-
-    private boolean isImmutable(String prototype, String slot)
-    {
-	return getBooleanAttribute(prototype, slot, "immutable", false);
-    }
-
-    private boolean notifyListeners(String prototype, String slot)
-    {
-	return getBooleanAttribute(prototype, slot, "notify-listeners", true);
-    }
-
-    private boolean notifyBlackboard(String prototype, String slot)
-    {
-	return getBooleanAttribute(prototype, slot, "notify-blackboard", true);
-    }
-
-    private boolean isObjectType(String type)
-    {
-	return 
-	    type.equals("String") ||
-	    type.equals("Double") ||
-	    type.equals("Float") ||
-	    type.equals("Long") ||
-	    type.equals("Integer") ||
-	    type.equals("Boolean");
-    }
-
-
-    private String objectToType(String type, String var)
-    {
-	return "force_"+type+"(" +var+ ")";
-    }
-
-
-    private String literalToObject(String type, String var)
-    {
-	if (type.equals("String"))
-	    return "\"" +var+ "\"";
-	else if (type.equalsIgnoreCase("double"))
-	    return "new Double(" +var+ ")";
-	else if (type.equalsIgnoreCase("float"))
-	    return "new Float(" +var+ ")";
-	else if (type.equalsIgnoreCase("long"))
-	    return "new Long(" +var+ ")";
-	else if (type.equals("int") || type.equals("Integer"))
-	    return "new Integer(" +var+ ")";
-	else if (type.equalsIgnoreCase("boolean"))
-	    return "new Boolean(" +var+ ")";
-	else
-	    return null;
-    }
-
-    private String typeToObject(String type, String var)
-    {
-	if (isObjectType(type))
-	    return var;
-	else 
-	    return literalToObject(type, var);
-    }
-
-    private String simpleValue(String type, String value)
-    {
-	if (isObjectType(type))
-	    return literalToObject(type, value);
-	else 
-	    return value;
-    }
-
-
     // Parsing 
 
     private void startFrameset(Attributes attrs)
@@ -395,7 +171,7 @@ public class FrameGen
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	dir_name = path + File.separator+ 
+	output_directory = output_root + File.separator+ 
 	    package_name.replaceAll("\\.", File.separator);
     }
 
@@ -429,11 +205,10 @@ public class FrameGen
 	slots = null;
     }
 
-
     private void slot(Attributes attrs)
     {
+	String slot = attrs.getValue("name");
 	if (slots != null) {
-	    String slot = attrs.getValue("name");
 	    slots.put(slot, new AttributesImpl(attrs));
 	}
     }
@@ -444,9 +219,14 @@ public class FrameGen
 
 
 
+
+
+
+
+
     // Code Generation 
 
-    private void generateCode(String pkg)
+    private void generatePrototypes(String pkg)
     {
 	Iterator itr;
 
@@ -475,22 +255,22 @@ public class FrameGen
 	    }
 
 
-	    generateCode(prototype, pkg, doc,
-			 parent, container, 
-			 local_slots, override_slots);
+	    generatePrototype(prototype, pkg, doc,
+			      parent, container, 
+			      local_slots, override_slots);
 	}
     }
 
-    private void generateCode(String prototype, 
-			      String pkg,
-			      String doc,
-			      String parent, 
-			      String container,
-			      HashMap local_slots,
-			      HashMap override_slots)
+    private void generatePrototype(String prototype, 
+				   String pkg,
+				   String doc,
+				   String parent, 
+				   String container,
+				   HashMap local_slots,
+				   HashMap override_slots)
     {
 	String name = fixName(prototype, true);
-	File out = new File(dir_name, name+".java");
+	File out = new File(output_directory, name+".java");
 	PrintWriter writer = null;
 	try {
 	    FileWriter fw = new FileWriter(out);
@@ -534,7 +314,7 @@ public class FrameGen
 	writer.close();
 	System.out.println("Wrote " +out);
     }
-    
+
     private void writeDecl(PrintWriter writer,
 			   String prototype, 
 			   String doc,
@@ -1426,6 +1206,252 @@ public class FrameGen
 	writer.println("    }");
 
    }
+
+
+
+    // Utilities
+    private boolean descendsFrom(String child_proto, String parent_proto)
+    {
+	if (child_proto == null || parent_proto == null) {
+	    return false;
+	} else if (child_proto.equals(parent_proto)) {
+	    return true;
+	} else {
+	    Attributes attrs = (Attributes) proto_attrs.get(child_proto);
+	    return descendsFrom(attrs.getValue("prototype"), parent_proto);
+	}
+    }
+
+
+    private boolean inheritsSlot(String proto, String slot)
+    {
+	Attributes attrs = (Attributes) proto_attrs.get(proto);
+	String parent = attrs.getValue("prototype");
+	if (parent == null) return false;
+	HashMap pslots = (HashMap) proto_slots.get(parent);
+	if (pslots != null && pslots.containsKey(slot)) return true;
+	return inheritsSlot(parent, slot);
+    }
+
+    private String ancestorForSlot(String proto, String slot)
+    {
+	if (proto == null) return null;
+
+	HashMap pslots = (HashMap) proto_slots.get(proto);
+	if (pslots != null && pslots.containsKey(slot)) return proto;
+
+	Attributes attrs = (Attributes) proto_attrs.get(proto);
+	String parent = attrs.getValue("prototype");
+	return ancestorForSlot(parent, slot);
+    }
+
+    private HashMap collectSlots(String proto)
+    {
+	HashMap slots = new HashMap();
+	collectSlots(proto, slots);
+	return slots;
+    }
+
+    private void collectSlots(String proto, HashMap slots)
+    {
+	HashMap local_slots = (HashMap) proto_slots.get(proto);
+	Attributes attrs = (Attributes) proto_attrs.get(proto);
+	String parent = attrs.getValue("prototype");
+	String container = attrs.getValue("container");
+	if (local_slots != null) {
+	    slots.putAll(local_slots);
+	}
+	if (parent != null) collectSlots(parent, slots);
+	if (container != null) collectSlots(container, slots);
+    }
+
+    static String fixName(String name, boolean is_class)
+    {
+	return fixName(name, is_class, false);
+    }
+
+    static String fixName(String name, boolean is_class, boolean is_bean)
+    {
+	if (is_class) {
+	    // camelize
+	    StringBuffer buf = new StringBuffer();
+	    char[] name_chars = name.toCharArray();
+	    boolean capitalize_next = !is_bean;
+	    for (int i=0; i<name_chars.length; i++) {
+		char next = name_chars[i];
+		if (next == '-') {
+		    capitalize_next = true;
+		    continue;
+		}
+		if (capitalize_next) {
+		    buf.append(Character.toUpperCase(next));
+		} else {
+		    buf.append(next);
+		}
+		capitalize_next = false;
+	    }
+	    return buf.toString();
+	} else {
+	    return name.replaceAll("-", "_");
+	}
+    }
+
+
+    private boolean getBooleanAttribute(String prototype,
+					String slot,
+					String attr,
+					boolean default_value)
+    {
+	HashMap slots = (HashMap) proto_slots.get(prototype);
+	Attributes attrs = (Attributes) slots.get(slot);
+
+	String attrstr = attrs != null ? attrs.getValue(attr) : null;
+	if (attrstr == null) {
+	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+	    String parent = p_attrs.getValue("prototype");
+	    if (parent != null) {
+		return getBooleanAttribute(parent, slot, attr, default_value);
+	    } else {
+		return default_value;
+	    }
+	} else {
+	    return attrstr.equalsIgnoreCase("true");
+	}
+    }
+
+    private String getSlotTypeFromPrototypeTree(String prototype, String slot)
+    {
+	HashMap slots = (HashMap) proto_slots.get(prototype);
+	Attributes attrs = (Attributes) slots.get(slot);
+	String attrstr = attrs != null ? attrs.getValue("type") : null;
+	if (attrstr == null) {
+	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+	    String parent = p_attrs.getValue("prototype");
+	    if (parent != null) {
+		return getSlotTypeFromPrototypeTree(parent, slot);
+	    } else {
+		return null;
+	    }
+	} else {
+	    return attrstr;
+	}
+    }
+
+    private String getSlotType(String prototype, String slot)
+    {
+	String type = getSlotTypeFromPrototypeTree(prototype, slot);
+	if (type != null) return type;
+
+	// Try the containment hierarchy
+	Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+	String container = p_attrs.getValue("container");
+	if (container != null) {
+	    return getSlotType(container, slot);
+	} else {
+	    return "String";
+	}
+    }
+
+
+    private boolean isTransient(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "transient", false);
+    }
+
+    private boolean isMember(String prototype, String slot)
+    {
+	// Path-valued slots can't be members
+	HashMap slots = (HashMap) proto_slots.get(prototype);
+	Attributes attrs = (Attributes) slots.get(slot);
+	String path = attrs != null ? attrs.getValue("path") : null;
+	if (path != null) return false;
+
+	// Non-Object types must be members
+	String type = getSlotType(prototype, slot);
+	if (!isObjectType(type)) return true;
+
+	// Transient slots must be members
+	if (isTransient(prototype, slot)) return true;
+
+	// Otherwise return the value of member attribute, 
+	// defaulting to true.
+	return getBooleanAttribute(prototype, slot,  "member", true);
+    }
+
+    private boolean isWarn(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "warn", true);
+    }
+
+    private boolean isImmutable(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "immutable", false);
+    }
+
+    private boolean notifyListeners(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "notify-listeners", true);
+    }
+
+    private boolean notifyBlackboard(String prototype, String slot)
+    {
+	return getBooleanAttribute(prototype, slot, "notify-blackboard", true);
+    }
+
+    private boolean isObjectType(String type)
+    {
+	return 
+	    type.equals("String") ||
+	    type.equals("Double") ||
+	    type.equals("Float") ||
+	    type.equals("Long") ||
+	    type.equals("Integer") ||
+	    type.equals("Boolean");
+    }
+
+
+    private String objectToType(String type, String var)
+    {
+	return "force_"+type+"(" +var+ ")";
+    }
+
+
+    private String literalToObject(String type, String var)
+    {
+	if (type.equals("String"))
+	    return "\"" +var+ "\"";
+	else if (type.equalsIgnoreCase("double"))
+	    return "new Double(" +var+ ")";
+	else if (type.equalsIgnoreCase("float"))
+	    return "new Float(" +var+ ")";
+	else if (type.equalsIgnoreCase("long"))
+	    return "new Long(" +var+ ")";
+	else if (type.equals("int") || type.equals("Integer"))
+	    return "new Integer(" +var+ ")";
+	else if (type.equalsIgnoreCase("boolean"))
+	    return "new Boolean(" +var+ ")";
+	else
+	    return null;
+    }
+
+    private String typeToObject(String type, String var)
+    {
+	if (isObjectType(type))
+	    return var;
+	else 
+	    return literalToObject(type, var);
+    }
+
+    private String simpleValue(String type, String value)
+    {
+	if (isObjectType(type))
+	    return literalToObject(type, value);
+	else 
+	    return value;
+    }
+
+
+
 
     // Driver
 
