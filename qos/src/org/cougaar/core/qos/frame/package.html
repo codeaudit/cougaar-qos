@@ -6,30 +6,37 @@
 
 <body>
 
-Overview: Frames are a lightweight form of knowledge representation
-supporting multiple inheritance hierarchies and code generation.
+Overview: The Cougaar Frame infrastructure provides a lightweight and
+efficiently distributed form of knowledge representation supporting
+two independent inheritance hierarchies, path following, and code
+generation.  Frames are simultaneously Blackboard objects and Jess
+Shadow Facts and can therefore be used both by Plugins and by Jess
+rules.
 
 <h2>Frames and FrameSets</h2>
 
-<p>A <b>{@link org.cougaar.core.qos.frame.DataFrame}</b>
-is a unit of knowledge, consisting of a type specification (what kind
-of frame it is) and a set of name-value pairs representing its current
-state.  The pairs, also known as <b>slots</b>, can change dynamically
-at runtime.  The type of any given DataFrame is fixed for the lifetime
-of the Frame.  DataFrames can be treated as beans, more or less, with
-the standard form of accessor methods and with support for
-property-change notifications.  This allows DataFrames to be shadowed
-in Jess, which in turn means that rules can use slot values of
-DataFrames</p>
+<p>A <b>{@link org.cougaar.core.qos.frame.DataFrame}</b> is a unit of
+knowledge, consisting of a type specification (what kind of entity or
+relationship itr represents) and a set of name-value pairs
+representing its current state.  The of any given DataFrame is fixed
+for the lifetime of the Frame. The pairs, also known as <b>slots</b>,
+can change dynamically at runtime.  Types are organized as a (single
+inheritance) hierarchy in which each type inherits the slots defined
+by its parent.  A second form of read-only inheritance is described <a
+href="#containment">below</a>.
+
+<p>DataFrames can be treated as beans, more or less, with the standard
+form of accessor methods and with support for property-change
+notifications.  This allows DataFrames to be shadowed in Jess, which
+in turn means that rules can use slot values of DataFrames.</p>
 
 <p> A DataFrame can represent either an entity or a binary
 relationship between other DataFrames.  In the latter case, each of
 two parts of the binary relation are specified by a type/slot/value
 triple which is expected to match at most one DataFrame (i.e., at most
 one frame of the given type should have the given value in the given
-slot).  NB:  In the current release we assume that slots used in
-relationship matching are immutable, but this immutability is not
-enforced.</p>
+slot).  NB: In the current release we assume that slots used in
+relationship matching are immutable.</p>
 
 <p> The meta-data in the Cougaar frame system is derived from
 <b>prototypes</b> described in xml.  These prototypes correspond to
@@ -46,19 +53,16 @@ org.cougaar.core.qos.frame.PrototypeFrame}</b> instances. </p>
 
 
 <p>A <b>{@link org.cougaar.core.qos.frame.FrameSet}</b> is simply an
-organized collection of DataFrames and PrototypeFrames.  The latter
-can come and go dynamically; the former are associated with the
-FrameSet when it's made and are fixed for the life of the FrameSet
-(the structure is fixed -- specific slot values in PrototypeFrames are
-not).  The main job of a FrameSet is to provide a well-defined
-subspace of Frames.  It's also used to cache interesting
-relationships, including the relationship between a DataFrame and its
-Prototype, as well as the <a href="#containment">containment</a>
-relationshops.</p>
+organized collection of PrototypeFrames and
+DataFrames. PrototypeFrames are associated with the FrameSet when it's
+made and are fixed for the life of the FrameSet.  DateFrames, on the
+other hand, come and go dynamically.  The main jobs of a FrameSet are
+to provide a well-defined subspace for a collection of Frames, and to
+cache relationships.</p>
 
 <p>FrameSets can be created and populated via xml using the <b>{@link
-org.cougaar.core.qos.frame.FrameSetService}</b>, and existing
-FrameSets can be found with that service.  [more] </p>
+org.cougaar.core.qos.frame.FrameSetService}</b>, which can also be
+used to find  existing FrameSets.  [more?] </p>
 
 <p> <a name="containment"></a> One of the novel features of the
 Cougaar frame system is that it supports two independent
@@ -73,8 +77,8 @@ href="#paths">below</a> for more on paths).  If this fails as well,
 the containment hierarchy can then be searched.  This allows a
 DataFrame to have virtual access to slots defined by its logical
 container.  The containment relation is defined as part of FrameSet
-and fixed when the FrameSet is created.  This relation is another
-example of caching handled by the FrameSet. </p>
+and fixed when the FrameSet is created.  This relation is an example
+of caching handled by the FrameSet. </p>
 
 
 <a name="paths"></a> <p>Another novel features of the Cougaar frame
@@ -314,6 +318,10 @@ their semantic interpretation.
 
 
 </dl>
+
+<h2>Code Generation</h2>
+<i>TO BE DONE</i>
+
 
 </body>
 </html>
