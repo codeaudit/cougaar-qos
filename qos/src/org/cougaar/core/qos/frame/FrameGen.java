@@ -1199,6 +1199,14 @@ public class FrameGen
 	writer.println("\n\n    protected void fireContainerChanges(" +
 		       "DataFrame __raw_old, DataFrame __raw_new)");
 	writer.println("    {");
+	writer.println("        if (!(__raw_old instanceof " +classname+ ")) {");
+	writer.println("            getLogger().warn(\"Container of \" +this+ \" is not a " +classname+ ": \" + __raw_old);");
+	writer.println("            return;");
+	writer.println("        }");
+	writer.println("        if (!(__raw_new instanceof " +classname+ ")) {");
+	writer.println("            getLogger().warn(\"Container of \" +this+ \" is not a " +classname+ ": \" + __raw_new);");
+	writer.println("            return;");
+	writer.println("        }");
 	writer.println("        " +classname+ " " +old_arg+ " = ("
 		       +classname+ ") __raw_old;");
 	writer.println("        " +classname+ " " +new_arg+ " = ("
@@ -1226,6 +1234,10 @@ public class FrameGen
 	itr = container_slots.iterator();
 	writer.println("\n\n    protected void fireContainerChanges(DataFrame __raw)");
 	writer.println("    {");
+	writer.println("        if (!(__raw instanceof " +classname+ ")) {");
+	writer.println("            getLogger().warn(\"Container of \" +this+ \" is not a " +classname+ ": \" + __raw);");
+	writer.println("            return;");
+	writer.println("        }");
 	writer.println("        " +classname+ " " +new_arg+ " = ("
 		       +classname+ ") __raw;");
 	writer.println("        Object " +new_var+ ";");
@@ -1357,12 +1369,47 @@ public class FrameGen
 	}
     }
 
+    private String getPathType(String path)
+    {
+	List forks = (List) path_forks.get(path);
+	if (forks == null || forks.isEmpty()) return null;
+	String slot = (String) path_slots.get(path);
+	if (slot == null) return null;
+
+	Attributes fork_attrs = (Attributes) forks.get(forks.size()-1);
+	if (fork_attrs == null) return null;
+	String relation = fork_attrs.getValue("relation");
+	String role = fork_attrs.getValue("role");
+	if (relation == null || role == null) return null;
+	Attributes p_attrs = (Attributes) proto_attrs.get(relation);
+	if (p_attrs == null) return null;
+	String attribute = role+"-prototype";
+
+	String prototype = p_attrs.getValue(attribute); 
+	while (prototype == null) {
+	    relation = p_attrs.getValue("prototype");
+	    if (relation == null) return null;
+	    p_attrs = (Attributes) proto_attrs.get(relation);
+	    if (p_attrs == null) return null;
+	    prototype = p_attrs.getValue(attribute); 
+	}
+// 	System.out.println("### Looking for type of " +slot+ " in " +prototype);
+	String type = getSlotType(prototype, slot);
+// 	System.out.println("### Got " + type);
+	return type;
+    }
+
     private String getSlotTypeFromPrototypeTree(String prototype, String slot)
     {
 	HashMap slots = (HashMap) proto_slots.get(prototype);
 	Attributes attrs = (Attributes) slots.get(slot);
 	String attrstr = attrs != null ? attrs.getValue("type") : null;
 	if (attrstr == null) {
+	    String path = attrs != null ? attrs.getValue("path") : null;
+	    if (path != null) {
+		String ptype = getPathType(path);
+		if (ptype != null) return ptype;
+	    }
 	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
 	    String parent = p_attrs.getValue("prototype");
 	    if (parent != null) {
