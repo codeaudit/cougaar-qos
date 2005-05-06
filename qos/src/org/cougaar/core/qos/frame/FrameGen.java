@@ -1396,7 +1396,7 @@ public class FrameGen
 // 	System.out.println("### Looking for type of " +slot+ " in " +prototype);
 	String type = getSlotType(prototype, slot);
 // 	System.out.println("### Got " + type);
-	return type;
+	return coerceToObjectType(type);
     }
 
     private String getSlotTypeFromPrototypeTree(String prototype, String slot)
@@ -1481,6 +1481,22 @@ public class FrameGen
     private boolean notifyBlackboard(String prototype, String slot)
     {
 	return getBooleanAttribute(prototype, slot, "notify-blackboard", true);
+    }
+
+    private String coerceToObjectType(String type)
+    {
+	if (isObjectType(type))
+	    return type;
+	else if (type.equals("int"))
+	    return "Integer";
+	else if (type.equals("long"))
+	    return "Long";
+	else if (type.equals("float"))
+	    return "Float";
+	else if (type.equals("double"))
+	    return "Double";
+	else
+	    return null;
     }
 
     private boolean isObjectType(String type)
