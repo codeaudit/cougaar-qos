@@ -229,66 +229,78 @@ public class FrameSetParser
     public void startElement(String uri, String local, String name, 
 			     Attributes attrs)
     {
-	if (frame_spec != null) {
-	    // inner structures are always slot values
-	    current_slot = name;
-	} else	if (name.equals("frameset")) {
-	    startFrameset(attrs);
-	} else if (name.equals("prototypes")) {
-	    // no-op
-	} else if (name.equals("prototype")) {
-	    startPrototype(attrs);
-	} else if (name.equals("relation-prototype")) {
-	    startPrototype(attrs);
-	} else if (name.equals("slot")) {
-	    slot(attrs);
-	} else if (name.equals("fork")) {
-	    fork(attrs);
-	} else if (name.equals("frames")) {
-	    references = new HashMap();
-	} else if (name.equals("frame")) {
-	    startFrame(attrs);
-	} else if (name.equals("path")) {
-	    startPath(attrs);
-	} 
+	try {
+	    if (frame_spec != null) {
+		// inner structures are always slot values
+		current_slot = name;
+	    } else  if (name.equals("frameset")) {
+		startFrameset(attrs);
+	    } else if (name.equals("prototypes")) {
+		// no-op
+	    } else if (name.equals("prototype")) {
+		startPrototype(attrs);
+	    } else if (name.equals("relation-prototype")) {
+		startPrototype(attrs);
+	    } else if (name.equals("slot")) {
+		slot(attrs);
+	    } else if (name.equals("fork")) {
+		fork(attrs);
+	    } else if (name.equals("frames")) {
+		references = new HashMap();
+	    } else if (name.equals("frame")) {
+		startFrame(attrs);
+	    } else if (name.equals("path")) {
+		startPath(attrs);
+	    } 
+	} catch (Exception ex) {
+	    log.error("startElement " +name, ex);
+	}
     }
 
     public void endElement(String uri, String local, String name)
     {
-	if (name.equals("frameset")) {
-	    endFrameset();
-	} else if (name.equals("prototypes")) {
-	    // no-op
-	} else if (name.equals("prototype")) {
-	    endPrototype();
-	} else if (name.equals("relation-prototype")) {
-	    endPrototype();
-	} else if (name.equals("frames")) {
-	    references = null;
-	} else if (name.equals("frame")) {
-	    endFrame();
-	} else if (name.equals("path")) {
-	    endPath();
-	} 
+	try {
+	    if (name.equals("frameset")) {
+		endFrameset();
+	    } else if (name.equals("prototypes")) {
+		// no-op
+	    } else if (name.equals("prototype")) {
+		endPrototype();
+	    } else if (name.equals("relation-prototype")) {
+		endPrototype();
+	    } else if (name.equals("frames")) {
+		references = null;
+	    } else if (name.equals("frame")) {
+		endFrame();
+	    } else if (name.equals("path")) {
+		endPath();
+	    } 
+	} catch (Exception ex) {
+	    log.error("endElement " +name, ex);
+	}
     }
 
     // Not using this yet
     public void characters(char buf[], int offset, int length)
     {
-	if (current_slot != null) {
-	    String value = new String(buf, offset, length);
-	    if (value.startsWith("?")) {
-		// Better to look up the slot in the prototype to see
-		// if its type is 'reference'.  Do that later.
-		Frame ref;
-		synchronized (references) {
-		    ref = (Frame) references.get(value);
+	try {
+	    if (current_slot != null) {
+		String value = new String(buf, offset, length);
+		if (value.startsWith("?")) {
+		    // Better to look up the slot in the prototype to see
+		    // if its type is 'reference'.  Do that later.
+		    Frame ref;
+		    synchronized (references) {
+			ref = (Frame) references.get(value);
+		    }
+		    log.shout("Resolved " +value+ " to " +ref);
+		    if (ref != null) value = ref.getUID().toString();
 		}
-		log.shout("Resolved " +value+ " to " +ref);
-		if (ref != null) value = ref.getUID().toString();
+		frame_spec.put(current_slot, value);
+		current_slot = null;
 	    }
-	    frame_spec.put(current_slot, value);
-	    current_slot = null;
+	} catch (Exception ex) {
+	    log.error(null, ex);
 	}
     }
 
