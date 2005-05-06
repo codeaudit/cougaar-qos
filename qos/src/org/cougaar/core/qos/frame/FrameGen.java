@@ -86,6 +86,20 @@ public class FrameGen
     // Prototype name -> Map slot name -> alot attributes
     private HashMap proto_slots; 
 
+    // The path currently being parsed
+    private String current_path;
+
+    // Path name -> path attrs (Attributes)
+    private HashMap path_attrs;
+
+    // Path name -> forks (List)
+    private HashMap path_forks;
+
+    // Path name -> slot (String)
+    private HashMap path_slots;
+
+
+
     // All defined relations
     private HashSet relation_prototypes;
 
@@ -102,6 +116,9 @@ public class FrameGen
     {
 	proto_slots = new HashMap();
 	proto_attrs = new HashMap();
+	path_attrs = new HashMap();
+	path_forks = new HashMap();
+	path_slots = new HashMap();
 	relation_prototypes = new HashSet();
 	try {
 	    XMLReader producer = XMLReaderFactory.createXMLReader();
@@ -133,9 +150,14 @@ public class FrameGen
 	    startPrototype(attrs);
 	} else if (name.equals("relation-prototype")) {
 	    startRelationPrototype(attrs);
+	} else if (name.equals("path")) {
+	    startPath(attrs);
+	} else if (name.equals("fork")) {
+	    List forks = (List) path_forks.get(current_path);
+	    forks.add(new AttributesImpl(attrs));
 	} else if (name.equals("slot")) {
 	    slot(attrs);
-	} 
+	}
     }
 
     public void endElement(String uri, String local, String name)
@@ -148,6 +170,8 @@ public class FrameGen
 	    endPrototype();
 	} else if (name.equals("relation-prototype")) {
 	    endRelationPrototype();
+	} else if (name.equals("path")) {
+	    endPath();
 	} 
     }
 
@@ -205,11 +229,25 @@ public class FrameGen
 	slots = null;
     }
 
+    private void startPath(Attributes attrs)
+    {
+	current_path = attrs.getValue("name");
+	path_attrs.put(current_path, attrs);
+	path_forks.put(current_path, new ArrayList());
+    }
+
+    private void endPath()
+    {
+	current_path = null;
+    }
+
     private void slot(Attributes attrs)
     {
 	String slot = attrs.getValue("name");
 	if (slots != null) {
 	    slots.put(slot, new AttributesImpl(attrs));
+	} else if (current_path != null) {
+	    path_slots.put(current_path, slot);
 	}
     }
 
