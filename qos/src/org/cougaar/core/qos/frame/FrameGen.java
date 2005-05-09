@@ -918,8 +918,8 @@ public class FrameGen
 	boolean memberp = isMember(prototype, slot);
 	boolean immutablep = isImmutable(prototype, slot);
 	String type = getSlotType(prototype, slot);
-	writer.println("\n\n");
-	writer.println("public SlotDescription " 
+	writer.print("\n\n");
+	writer.println("    public SlotDescription " 
 		       +slotDescriptionMethod(slot)+
 		       "()");
 	writer.println("    {");
