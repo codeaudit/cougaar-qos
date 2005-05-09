@@ -157,6 +157,8 @@ public class FrameGen
 	    forks.add(new AttributesImpl(attrs));
 	} else if (name.equals("slot")) {
 	    slot(attrs);
+	} else if (name.equals("slot-reference")) {
+	    slot_reference(attrs);
 	}
     }
 
@@ -243,10 +245,16 @@ public class FrameGen
 
     private void slot(Attributes attrs)
     {
-	String slot = attrs.getValue("name");
 	if (slots != null) {
+	    String slot = attrs.getValue("name");
 	    slots.put(slot, new AttributesImpl(attrs));
-	} else if (current_path != null) {
+	}
+    }
+
+    private void slot_reference(Attributes attrs)
+    {
+	if (current_path != null) {
+	    String slot = attrs.getValue("name");
 	    path_slots.put(current_path, slot);
 	}
     }
@@ -1387,12 +1395,12 @@ public class FrameGen
 	}
     }
 
-    private String getPathType(String path)
+    private String getPathType(String path, String slot)
     {
 	List forks = (List) path_forks.get(path);
 	if (forks == null || forks.isEmpty()) return null;
-	String slot = (String) path_slots.get(path);
-	if (slot == null) return null;
+	String override_slot = (String) path_slots.get(path);
+	if (override_slot != null) slot = override_slot;
 
 	Attributes fork_attrs = (Attributes) forks.get(forks.size()-1);
 	if (fork_attrs == null) return null;
@@ -1425,7 +1433,7 @@ public class FrameGen
 	if (attrstr == null) {
 	    String path = attrs != null ? attrs.getValue("path") : null;
 	    if (path != null) {
-		String ptype = getPathType(path);
+		String ptype = getPathType(path, slot);
 		if (ptype != null) return ptype;
 	    }
 	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);

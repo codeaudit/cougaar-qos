@@ -71,13 +71,13 @@ public class Path
     private final UID uid;
     private String name;
     private Fork[] forks;
-    private String slot;
+    private String override_slot;
 
     public Path(UID uid, String name, Fork[] forks, String slot)
     {
 	this.name = name;
 	this.forks = forks;
-	this.slot = slot;
+	this.override_slot = slot;
 	this.uid = uid;
     }
 
@@ -86,12 +86,12 @@ public class Path
 	return name;
     }
 
-    Object getValue(DataFrame root)
+    Object getValue(DataFrame root, String slot)
     {
-	return getNextValue(root, 0);
+	return getNextValue(root, 0, override_slot != null ? override_slot : slot);
     }
 
-    private Object getNextValue(DataFrame frame, int index)
+    private Object getNextValue(DataFrame frame, int index, String slot)
     {
 	if (log.isDebugEnabled())
 	    log.debug("Walking path " +name+
@@ -128,7 +128,7 @@ public class Path
 		log.shout("Null in frames!!! ");
 		return null;
 	    }
-	    Object result = getNextValue(next, ++index);
+	    Object result = getNextValue(next, ++index, slot);
 	    if (result != null) return result;
 	    if (index == forks.length) return null;
 	}
@@ -156,7 +156,8 @@ public class Path
 	    Fork fork = forks[i];
 	    fork.dump(writer, indentation, offset);
 	}
-	writer.println("<slot name=\"" +slot+ "\"/>");
+	if (override_slot != null)
+	    writer.println("<slot-reference name=\"" +override_slot+ "\"/>");
 	indentation -= offset;
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("</path>");

@@ -243,6 +243,8 @@ public class FrameSetParser
 		startPrototype(attrs);
 	    } else if (name.equals("slot")) {
 		slot(attrs);
+	    } else if (name.equals("slot-reference")) {
+		slot_reference(attrs);
 	    } else if (name.equals("fork")) {
 		fork(attrs);
 	    } else if (name.equals("frames")) {
@@ -396,11 +398,22 @@ public class FrameSetParser
 	if (log.isDebugEnabled())
 	    log.debug("slot");
 
-	String slot = attrs.getValue("name");
-	if (path_spec != null) {
-	    path_spec.setSlot(slot);
-	} else if (proto_spec != null) {
+	if (proto_spec != null) {
+	    String slot = attrs.getValue("name");
 	    proto_spec.put(slot, new AttributesImpl(attrs));
+	} else {
+	    // log
+	}
+    }
+
+    private void slot_reference(Attributes attrs)
+    {
+	if (log.isDebugEnabled())
+	    log.debug("slot-reference");
+
+	if (path_spec != null) {
+	    String slot = attrs.getValue("name");
+	    path_spec.setSlot(slot);
 	} else {
 	    // log
 	}

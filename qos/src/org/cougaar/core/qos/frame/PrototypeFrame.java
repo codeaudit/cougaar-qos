@@ -138,7 +138,7 @@ public class PrototypeFrame
 			path_cache.put(path_name, path);
 		    }
 		}
-		result = path.getValue((DataFrame) origin);
+		result = path.getValue((DataFrame) origin, slot_name);
 	    } else  if (warnp == null || warnp.equalsIgnoreCase("true")) {
 		if (log.isWarnEnabled())
 		    log.warn("Slot " +slot_name+ " is required by prototype "
