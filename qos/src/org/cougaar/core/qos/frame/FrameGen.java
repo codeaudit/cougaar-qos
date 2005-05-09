@@ -287,6 +287,8 @@ public class FrameGen
 	    HashMap slots = (HashMap) entry.getValue();
 	    HashMap override_slots = new HashMap();
 	    HashMap local_slots = new HashMap();
+	    HashMap units_override_slots = new HashMap();
+	
 
 	    Iterator itr2 = slots.entrySet().iterator();
 	    while (itr2.hasNext()) {
@@ -295,6 +297,9 @@ public class FrameGen
 		Attributes slot_attrs = (Attributes) entry2.getValue();
 		if (inheritsSlot(prototype, slot)) {
 		    override_slots.put(slot, slot_attrs);
+		    String units = slot_attrs.getValue("units");
+		    if (units != null) 
+			units_override_slots.put(slot, units);
 		} else {
 		    local_slots.put(slot, slot_attrs);
 		}
@@ -303,7 +308,8 @@ public class FrameGen
 
 	    generatePrototype(prototype, pkg, doc,
 			      parent, container, 
-			      local_slots, override_slots);
+			      local_slots, override_slots,
+			      units_override_slots);
 	}
     }
 
@@ -313,7 +319,8 @@ public class FrameGen
 				   String parent, 
 				   String container,
 				   HashMap local_slots,
-				   HashMap override_slots)
+				   HashMap override_slots,
+				   HashMap units_override_slots)
     {
 	String name = fixName(prototype, true);
 	File out = new File(output_directory, name+".java");
@@ -338,6 +345,7 @@ public class FrameGen
 	    }
 	}
 
+
 	writeDecl(writer, prototype, doc, parent);
 	writer.println("{");
 	writeRegisterer(writer, pkg, prototype);
@@ -354,7 +362,9 @@ public class FrameGen
 	}
 	writeDynamicAccessors(writer, prototype, parent,local_slots, container);
 	writeDescriptionGetters(writer, prototype, container,
-				local_slots, container_slots);
+				local_slots, 
+				container_slots, 
+				units_override_slots);
 	writer.println("}");
 
 	writer.close();
@@ -872,7 +882,8 @@ public class FrameGen
 					 String prototype,
 					 String container,
 					 HashMap slots,
-					 HashSet container_slots)
+					 HashSet container_slots,
+					 HashMap units_override_slots)
     {
 	Iterator itr;
 
@@ -883,6 +894,15 @@ public class FrameGen
 	    Attributes attrs = (Attributes) entry.getValue();
 	    writeDescriptionGetter(writer, prototype, slot, attrs);
 	}
+
+	itr = units_override_slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    String units = (String) entry.getValue();
+	    writeUnitsOverrideDescriptionGetter(writer, prototype, slot, units);
+	}
+
 	
 	itr = container_slots.iterator();
 	while (itr.hasNext()) {
@@ -962,6 +982,21 @@ public class FrameGen
 			   +slot+ "\");");
 	}
 	writer.println("        }");
+	writer.println("        return __desc;");
+	writer.println("    }");
+    }
+
+    private void writeUnitsOverrideDescriptionGetter(PrintWriter writer, 
+						     String prototype,
+						     String slot,
+						     String units)
+    {
+	String method = slotDescriptionMethod(slot);
+	writer.print("\n\n");
+	writer.println("    public SlotDescription " +method+ "()");
+	writer.println("    {");
+	writer.println("        SlotDescription __desc = super."+method+"();");
+	writer.println("        __desc.units = \"" +units+ "\";");
 	writer.println("        return __desc;");
 	writer.println("    }");
     }
