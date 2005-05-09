@@ -1095,8 +1095,13 @@ public class FrameGen
 	    first = false;
 	}
 	if (!is_root) {
-	    writer.println("       else");
-	    writer.println("            super.setLocalValue(__slot, __value);");
+	    if (first) {
+		// no settable slots
+		writer.println("       super.setLocalValue(__slot, __value);");
+	    } else {
+		writer.println("       else");
+		writer.println("            super.setLocalValue(__slot, __value);");
+	    }
 	}
 	writer.println("    }");
     }
