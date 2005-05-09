@@ -34,6 +34,8 @@ public class SlotDescription
     public String name;           // static
     public boolean is_writable;   // static
     public String prototype;      // static
-    public boolean is_overridden;  // dynamic
+    public String doc;            // static
+    public String units;          // static
+    public boolean is_overridden; // dynamic
     public Object value;          // dynamic
 }

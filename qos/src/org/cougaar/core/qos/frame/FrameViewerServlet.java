@@ -481,10 +481,14 @@ public class FrameViewerServlet extends ComponentServlet {
           j++;
           out.print(
               "<tr><td>&nbsp;&nbsp;"+j+":&nbsp;</td>"+
-              "<td>"+key+"</td><td>"+val+"</td>"+
+              "<td>"+key+"</td><td>"+
+	      (val == DataFrame.NIL ? "&lt;no-value&gt;" : val)+
+	      "</td>"+
               "<td>"+
               (modified && key.equals(newSlot) ?
-               "<b>(was "+oldValue+")</b>" : "")+
+               "<b>(was "+
+	       (oldValue == DataFrame.NIL ? "&lt;no-value&gt;" : oldValue)+
+	       ")</b>" : "")+
               "</td>"+
               "</tr>\n");
         }

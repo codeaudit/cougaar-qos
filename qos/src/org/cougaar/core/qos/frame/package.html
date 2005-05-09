@@ -191,6 +191,14 @@ their semantic interpretation.
 
     <dl>
 
+      <dt><b>doc</b></dt>
+
+      <dd> This attribute provides optional
+	documentation for the slot and is used as javadoc for the
+	public accessor.  It's included in the slot metadata.
+	<p>
+      </dd>
+
       <dt><b>immutable</b></dt>
 
       <dd> This boolean valued attribute indicates whether or not
@@ -200,7 +208,7 @@ their semantic interpretation.
 	<p>
 	
       </dd>
-
+	  
       <dt><b>member</b></dt>
 
       <dd>This boolean valued attribute indicates whether or not the
@@ -268,7 +276,13 @@ their semantic interpretation.
 
       </dd>
 
-      <dt><b>value</b></dt>
+      <dt><b>units</b></dt>
+
+      <dd> This attribute provides optional units for the slot.  It's
+	included in the slot metadata but currently isn't used for
+	anything else.  <p> </dd>
+	  
+      <dt><b>default-value</b></dt>
 
       <dd>This attribute gives a default value of the slot.  The
 	value can be any string.  If a slot has neither a value nor

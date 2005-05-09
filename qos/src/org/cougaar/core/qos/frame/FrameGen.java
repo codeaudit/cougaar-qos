@@ -403,7 +403,7 @@ public class FrameGen
 			   String  slot, 
 			   Attributes attrs)
     {
-	String value = attrs.getValue("value");
+	String value = attrs.getValue("default-value");
 	String type = getSlotType(prototype, slot);
 	boolean memberp = isMember(prototype, slot);
 	boolean transientp = isTransient(prototype, slot);
@@ -457,7 +457,7 @@ public class FrameGen
 	    String slot = (String) entry.getKey();
 	    if (!isMember(prototype, slot)) continue;
 	    Attributes attrs = (Attributes) entry.getValue();
-	    String value = attrs.getValue("value");
+	    String value = attrs.getValue("default-value");
 	    String type = getSlotType(prototype, slot);
 	    if (value != null) {
 		String method = "initialize" + fixName(slot, true);
@@ -587,12 +587,19 @@ public class FrameGen
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	String default_value = attrs.getValue("value");
+	String default_value = attrs.getValue("default-value");
 	String path = attrs.getValue("path");
 	boolean memberp = isMember(prototype, slot);
 	boolean warnp = isWarn(prototype, slot);
+	String doc = attrs.getValue("doc");
 	if (warn) {
-	    writer.print("\n\n    public "+type+" get" +accessor_name);
+	    writer.print("\n\n");
+	    if (doc != null) {
+		writer.println("    /**");
+		writer.println("      " +doc);
+		writer.println("    **/");
+	    }
+	    writer.print("    public "+type+" get" +accessor_name);
 	} else {
 	    writer.print("\n\n    "+type+" get" +accessor_name+ NoWarn);
 	}
@@ -627,7 +634,7 @@ public class FrameGen
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	String default_value = attrs.getValue("value");
+	String default_value = attrs.getValue("default-value");
 	String path = attrs.getValue("path");
 	boolean memberp = isMember(prototype, slot);
 	boolean warnp = isWarn(prototype, slot);
@@ -664,7 +671,7 @@ public class FrameGen
 				     boolean warn)
     {
 	String accessor_name = fixName(slot, true);
-	String default_value = attrs.getValue("value");
+	String default_value = attrs.getValue("default-value");
 	if (warn) {
 	    writer.print("\n\n    public "+type+" get" +accessor_name);
 	} else {
@@ -691,7 +698,7 @@ public class FrameGen
 					     String type)
     {
 	String accessor_name = fixName(slot, true);
-	String default_value = attrs.getValue("value");
+	String default_value = attrs.getValue("default-value");
 	writer.print("\n\n    Object get" +accessor_name+ AsObject);
 	writer.println("()");
 	writer.println("    {");
@@ -904,18 +911,24 @@ public class FrameGen
     {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
-	String default_value = attrs.getValue("value");
+	String default_value = attrs.getValue("default-value");
 	String path = attrs.getValue("path");
+	String doc = attrs.getValue("doc");
+	String units = attrs.getValue("units");
 	boolean memberp = isMember(prototype, slot);
 	boolean immutablep = isImmutable(prototype, slot);
 	String type = getSlotType(prototype, slot);
-	writer.println("\n\n    public SlotDescription " 
+	writer.println("\n\n");
+	writer.println("public SlotDescription " 
 		       +slotDescriptionMethod(slot)+
 		       "()");
 	writer.println("    {");
 	writer.println("        SlotDescription __desc = new SlotDescription();");
 	writer.println("        __desc.name = \"" +slot+ "\";");
 	writer.println("        __desc.prototype = \"" +prototype+ "\";");
+	if (doc != null) writer.println("        __desc.doc = \"" +doc+ "\";");
+	if (units != null)
+	    writer.println("        __desc.units = \"" +units+ "\";");
 	writer.println("        __desc.is_writable = " 
 		       +!immutablep+ ";");
 	writer.println("        Object __value;");

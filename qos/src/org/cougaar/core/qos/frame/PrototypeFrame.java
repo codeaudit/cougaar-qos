@@ -101,7 +101,7 @@ public class PrototypeFrame
 	    if (slot_value != null) {
 		result.put(slot_name, slot_value);
 	    } else {
-		slot_value = attrs.getValue("value");
+		slot_value = attrs.getValue("default-value");
 		if (slot_value != null) result.put(slot_name, slot_value);
 	    }
 	}
@@ -124,7 +124,7 @@ public class PrototypeFrame
 	    // Declared at this level -- either get a real value or
 	    // complain and return null.
 	    Object result = null;
-	    String value = attrs.getValue("value");
+	    String value = attrs.getValue("default-value");
 	    String path_name = attrs.getValue("path");
 	    if (value != null) {
 		result = value;
@@ -183,7 +183,7 @@ public class PrototypeFrame
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    String slot_name = (String) entry.getKey();
 	    Attributes attrs = (Attributes) entry.getValue();
-	    String slot_value = attrs.getValue("value");
+	    String slot_value = attrs.getValue("default-value");
 	    String path = attrs.getValue("path");
 	    String staticp = attrs.getValue("static");
 	    String memberp = attrs.getValue("member");
