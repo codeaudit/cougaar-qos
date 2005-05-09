@@ -125,6 +125,7 @@ public class PrototypeFrame
 	    // complain and return null.
 	    Object result = null;
 	    String value = attrs.getValue("default-value");
+	    String warnp = attrs.getValue("warn");
 	    String path_name = attrs.getValue("path");
 	    if (value != null) {
 		result = value;
@@ -138,7 +139,7 @@ public class PrototypeFrame
 		    }
 		}
 		result = path.getValue((DataFrame) origin);
-	    } else {
+	    } else  if (warnp == null || warnp.equalsIgnoreCase("true")) {
 		if (log.isWarnEnabled())
 		    log.warn("Slot " +slot_name+ " is required by prototype "
 			     +prototype_name+ 
