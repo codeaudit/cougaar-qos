@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
@@ -258,6 +259,7 @@ abstract public class DataFrame
 			  t);
 	    }
 	}
+	postInitialize();
     }
 
     public String getContainerKind()
@@ -342,6 +344,11 @@ abstract public class DataFrame
 	// nothing to be done at the moment
     }
 
+    protected void postInitialize()
+    {
+	// Nothing at this level.  Frame types with Metric-value slots
+	// should subscribe to the MetricsService here
+    }
 
     //  Converters used in generated code
     protected String force_String(Object x)
@@ -350,6 +357,14 @@ abstract public class DataFrame
 	    return ((String) x);
 	else
 	    return x.toString(); // hmm
+    }
+
+    protected Metric force_Metric(Object x)
+    {
+	if (x instanceof Metric)
+	    return ((Metric) x);
+	else
+	    throw new RuntimeException(x + " cannot be coerced to a Metric");
     }
 
     protected double force_double(Object x)
@@ -555,6 +570,7 @@ abstract public class DataFrame
 	} else {
 	    this.frameSet = frameSet;
 	    frameSet.makeFrame(this);
+	    postInitialize();
 	}
     }
 

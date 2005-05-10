@@ -64,6 +64,7 @@ public class FrameGen
 
     private static final String NoWarn = "__NoWarn";
     private static final String AsObject = "__AsObject";
+    private static final String Metric_Type = "Metric";
 
     // The FrameSet's package
     private String package_name;
@@ -332,11 +333,13 @@ public class FrameGen
 	    iox.printStackTrace();
 	    System.exit(-1);
 	}
+	
+	Iterator itr;
 
 	HashSet container_slots = new HashSet();
 	if (container != null) {
 	    Map container_accessors = collectSlots(container);
-	    Iterator itr = container_accessors.entrySet().iterator();
+	    itr = container_accessors.entrySet().iterator();
 	    while (itr.hasNext()) {
 		Map.Entry entry = (Map.Entry) itr.next();
 		String slot = (String) entry.getKey();
@@ -344,8 +347,6 @@ public class FrameGen
 		    container_slots.add(slot);
 	    }
 	}
-
-
 	writeDecl(writer, prototype, doc, parent);
 	writer.println("{");
 	writeRegisterer(writer, pkg, prototype);
@@ -361,6 +362,7 @@ public class FrameGen
 	    writeUpdaters(writer, prototype, container_slots, container);
 	}
 	writeDynamicAccessors(writer, prototype, parent,local_slots, container);
+	writePostInitializer(writer, prototype, local_slots);
 	writeDescriptionGetters(writer, prototype, container,
 				local_slots, 
 				container_slots, 
@@ -386,6 +388,7 @@ public class FrameGen
 	    writer.println("import org.cougaar.core.qos.frame.RelationFrame;");
 	}
 	writer.println("import org.cougaar.core.qos.frame.SlotDescription;");
+	writer.println("import org.cougaar.core.qos.metrics.Metric;");
 	writer.println("import org.cougaar.core.util.UID;");
 	if (doc != null) {
 	    writer.println("\n/**");
@@ -738,7 +741,7 @@ public class FrameGen
 			     Attributes attrs,
 			     String type)
     {
-	if (isImmutable(prototype, slot)) return;
+	if (isReadOnly(prototype, slot)) return;
 
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
@@ -771,7 +774,7 @@ public class FrameGen
 				     Attributes attrs,
 				     String type)
     {
-	if (isImmutable(prototype, slot)) return;
+	if (isReadOnly(prototype, slot)) return;
 
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
@@ -805,7 +808,7 @@ public class FrameGen
 			      Attributes attrs,
 			      String type)
     {
-	if (isImmutable(prototype, slot)) return;
+	if (isReadOnly(prototype, slot)) return;
 	boolean memberp = isMember(prototype, slot);
 	if (memberp) return;
 
@@ -944,7 +947,7 @@ public class FrameGen
 	String doc = attrs.getValue("doc");
 	String units = attrs.getValue("units");
 	boolean memberp = isMember(prototype, slot);
-	boolean immutablep = isImmutable(prototype, slot);
+	boolean immutablep = isReadOnly(prototype, slot);
 	String type = getSlotType(prototype, slot);
 	writer.print("\n\n");
 	writer.println("    public SlotDescription " 
@@ -1127,7 +1130,7 @@ public class FrameGen
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    Attributes attrs = (Attributes) entry.getValue();
 	    String slot = (String) entry.getKey();
-	    if (isImmutable(prototype, slot)) continue;
+	    if (isReadOnly(prototype, slot)) continue;
 	    String type = getSlotType(prototype, slot);
 	    String slot_hash_var = slotHashVar(slot);
 	    String method = "set" + fixName(slot, true) + AsObject;
@@ -1318,6 +1321,59 @@ public class FrameGen
 
    }
 
+    private void writePostInitializer(PrintWriter writer,
+				       String prototype,
+				       HashMap local_slots)
+    {
+	boolean has_metrics = false;
+	Iterator itr = local_slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    String path = attrs.getValue("metric-path");
+	    if (path != null) {
+		has_metrics = true;
+		break;
+	    }
+	}
+	if (!has_metrics) return;
+
+	writer.println("\n\n    protected void postInitialze()");
+	writer.println("    {");
+	writer.println("        super.postInitialize();");
+	String obs = "__observer";
+	writer.println("        java.util.Observer " +obs+ ";");
+	String old_value = "__old";
+	String new_value = "__new";
+	itr = local_slots.entrySet().iterator();
+	while (itr.hasNext()) {
+	    Map.Entry entry = (Map.Entry) itr.next();
+	    String slot = (String) entry.getKey();
+	    Attributes attrs = (Attributes) entry.getValue();
+	    String sname = fixName(slot, false);
+	    boolean notify_listeners_p = notifyListeners(prototype, slot);
+	    boolean notify_blackboard_p = notifyBlackboard(prototype, slot);
+	    String path = attrs.getValue("metric-path");
+	    if (path != null) {
+		writer.println("        " +obs+" = new java.util.Observer() {");
+		writer.println("            public void update(java.util.Observable __xxx, Object "+new_value+ ") {");
+		writer.println("                Object "+old_value+" = " +sname+ ";");
+		writer.println("                " +sname+ " = (Metric) "
+			       +new_value+ ";");
+
+		writer.println("                slotModified(\"" +slot+ "\", "
+			       +old_value+ ", "+new_value+", "
+			       +notify_listeners_p+ ", " +notify_blackboard_p
+			       + ");");
+		writer.println("            }");
+		writer.println("        };");
+		writer.println("        getFrameSet().subscribeToMetric(this, "
+			       +obs+ ", \""  +path+ "\");");
+	    }
+	}
+	writer.println("    }");
+    }
 
 
     // Utilities
@@ -1464,6 +1520,8 @@ public class FrameGen
     {
 	HashMap slots = (HashMap) proto_slots.get(prototype);
 	Attributes attrs = (Attributes) slots.get(slot);
+	String metric = attrs != null ? attrs.getValue("metric-path") : null;
+	if (metric != null) return Metric_Type;
 	String attrstr = attrs != null ? attrs.getValue("type") : null;
 	if (attrstr == null) {
 	    String path = attrs != null ? attrs.getValue("path") : null;
@@ -1498,10 +1556,18 @@ public class FrameGen
 	}
     }
 
+    private boolean isMetric(String prototype, String slot)
+    {
+	return getSlotType(prototype, slot).equals(Metric_Type);
+    }
 
     private boolean isTransient(String prototype, String slot)
     {
-	return getBooleanAttribute(prototype, slot, "transient", false);
+	// Metric slots are always members
+	if (isMetric(prototype, slot)) 
+	    return true;
+	else
+	    return getBooleanAttribute(prototype, slot, "transient", false);
     }
 
     private boolean isMember(String prototype, String slot)
@@ -1529,9 +1595,10 @@ public class FrameGen
 	return getBooleanAttribute(prototype, slot, "warn", true);
     }
 
-    private boolean isImmutable(String prototype, String slot)
+    private boolean isReadOnly(String prototype, String slot)
     {
-	return getBooleanAttribute(prototype, slot, "immutable", false);
+	return isMetric(prototype, slot) ||
+	    getBooleanAttribute(prototype, slot, "immutable", false);
     }
 
     private boolean notifyListeners(String prototype, String slot)

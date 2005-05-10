@@ -28,6 +28,7 @@ package org.cougaar.core.qos.frame;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
 
@@ -202,5 +203,12 @@ public interface FrameSet
      */
     public void dump(File proto_file, File data_file)
 	throws java.io.IOException;
+
+    /**
+     * Subscribes a DataFrame to a value in the MetricsService
+     */
+    public void subscribeToMetric(DataFrame frame, 
+				  Observer observer, 
+				  String path);
 
 }

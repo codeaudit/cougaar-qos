@@ -35,10 +35,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
@@ -59,6 +61,7 @@ public class SingleInheritanceFrameSet
     private final LoggingService log;
     private final UIDService uids;
     private final BlackboardService bbs;
+    private final MetricsService metrics;
     private final Object change_queue_lock, relation_lock;
     private ArrayList change_queue;
     private HashMap kb; // UID -> object
@@ -95,6 +98,8 @@ public class SingleInheritanceFrameSet
 	    sb.getService(this, LoggingService.class, null);
 	uids = (UIDService)
 	    sb.getService(this, UIDService.class, null);
+	metrics = (MetricsService)
+	    sb.getService(this, MetricsService.class, null);
 
  	this.kb = new HashMap();
 	this.prototypes = new HashMap();
@@ -471,6 +476,13 @@ public class SingleInheritanceFrameSet
 
 
 
+    // Metrics
+    public void subscribeToMetric(DataFrame frame, 
+				  Observer observer, 
+				  String path)
+    {
+	metrics.subscribeToValue(path, observer, frame);
+    }
 
 
 

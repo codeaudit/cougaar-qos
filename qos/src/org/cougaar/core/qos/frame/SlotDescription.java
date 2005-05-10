@@ -27,15 +27,17 @@
 package org.cougaar.core.qos.frame;
 
 /**
- * Simple struct describing various attributes of a DataFrame slot
+ * Simple struct describing various attributes of a DataFrame slot.
+ * With the exception of value, all these fields are statically
+ * derived from prototype specs.
  */
 public class SlotDescription
 {
-    public String name;           // static
-    public boolean is_writable;   // static
-    public String prototype;      // static
-    public String doc;            // static
-    public String units;          // static
-    public boolean is_overridden; // dynamic
+    public String name;
+    public boolean is_writable;
+    public String prototype;
+    public String doc;
+    public String units;
+    public boolean is_overridden;
     public Object value;          // dynamic
 }
