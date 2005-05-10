@@ -73,8 +73,10 @@ public class FrameTableModel extends TBLModel {
         if (sdefs != null) {
              for (Enumeration ee=sdefs.propertyNames(); ee.hasMoreElements();) {
                  name = (String) ee.nextElement();
-                 if (frameSlots.get(name) == null)
-                     frameSlots.put(name, f.getValue(name));//sdefs.getProperty(name));
+                 if (frameSlots.get(name) == null)  {
+                     Object v = f.getValue(name);
+                     frameSlots.put(name, (v != null ? v : ""));//sdefs.getProperty(name));
+                 }
                  slotDefs.put(name, "");//sdefs.getProperty(name));
              }
         }
