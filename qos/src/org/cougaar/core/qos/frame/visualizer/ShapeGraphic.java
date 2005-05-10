@@ -145,10 +145,11 @@ public class ShapeGraphic implements Cloneable {
         }
     }
 
-    public void setFrameHelper(FrameHelper helper) {
+    public void setFrameHelper(FrameHelper helper, Display display) {
         frameHelper = helper;
         if (frame == null && predicate != null) {
             setFrame(frameHelper.findFrame(predicate));
+            display.registerGraphic(frame, this);
         }
     }
 

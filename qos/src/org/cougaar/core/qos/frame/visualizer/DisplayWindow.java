@@ -121,7 +121,7 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
     }
 
     public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
-	return display.findShape(f);
+	    return display.findShape(f);
     }
 
     public void tickEventOccured(TickEvent tick) {

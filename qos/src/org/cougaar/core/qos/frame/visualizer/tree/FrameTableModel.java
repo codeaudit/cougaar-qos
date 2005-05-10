@@ -73,8 +73,8 @@ public class FrameTableModel extends TBLModel {
         if (sdefs != null) {
              for (Enumeration ee=sdefs.propertyNames(); ee.hasMoreElements();) {
                  name = (String) ee.nextElement();
-                 if (frameSlots.getProperty(name) == null)
-                     frameSlots.put(name, "");//sdefs.getProperty(name));
+                 if (frameSlots.get(name) == null)
+                     frameSlots.put(name, f.getValue(name));//sdefs.getProperty(name));
                  slotDefs.put(name, "");//sdefs.getProperty(name));
              }
         }
@@ -88,10 +88,10 @@ public class FrameTableModel extends TBLModel {
     for (Enumeration ee= frameSlots.propertyNames(); ee.hasMoreElements();)  {
         name = (String) ee.nextElement();
         frameSlotNames.add(name);
-        if (locSlots.getProperty(name) == null && inheritedSlots.get(name)==null)
-            inheritedSlots.put(name, frameSlots.getProperty(name));
-        else if (locSlots.getProperty(name) != null && localSlots.get(name)==null)
-            localSlots.put(name, frameSlots.getProperty(name));
+        if (locSlots.get(name) == null && inheritedSlots.get(name)==null)
+            inheritedSlots.put(name, frameSlots.get(name));
+        else if (locSlots.get(name) != null && localSlots.get(name)==null)
+            localSlots.put(name, frameSlots.get(name));
 
     }
     if (frame instanceof DataFrame) {
@@ -143,7 +143,7 @@ public class FrameTableModel extends TBLModel {
 
   public Object getValueAt(int row, int col) {
       if (row >-1 && row < frameSlotNames.size()) {
-        Object val= (Object) ( col == 0 ? frameSlotNames.get(row) : frameSlots.getProperty((String) frameSlotNames.get(row)));
+        Object val= (Object) ( col == 0 ? frameSlotNames.get(row) : frameSlots.get((String) frameSlotNames.get(row)));
 	if (val == null || val.equals(DataFrame.NIL))
 	    return "";
 	return val;
@@ -152,7 +152,7 @@ public class FrameTableModel extends TBLModel {
   }
 
   public Class getColumnClass(int col) {
-      return String.class;
+      return Object.class;
   }
 
   public boolean isCellEditable(int row, int col) {

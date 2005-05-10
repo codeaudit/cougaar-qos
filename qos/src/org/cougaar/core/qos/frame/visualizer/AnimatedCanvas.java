@@ -3,7 +3,6 @@ package org.cougaar.core.qos.frame.visualizer;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
-
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;

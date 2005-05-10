@@ -53,9 +53,15 @@ public class Display extends AnimatedCanvas {
     // changes
     ChangeModel changes;
     ChangeEvent change;
+    Object lock;
+
+    // keep track of all shape graphic objects
+    HashMap graphics;
 
 
      public Display(File xmlFile) {
+         lock = new Object();
+         graphics = new HashMap();
          transitions = new ArrayList();
          tickEventQueue = new ArrayList();
          frameContainerMap = new HashMap();
@@ -72,6 +78,20 @@ public class Display extends AnimatedCanvas {
             if (animating != null)
                 animating.start();
          }
+    }
+
+    public void registerGraphic(org.cougaar.core.qos.frame.Frame f, ShapeGraphic graphic) {
+        if (f == null || graphic == null)
+            return;
+        //if (graphics.get(f) != null)
+        //  throw new IllegalArgumentException("Error: "+graphic+" is already registered for frame "+f);
+        if (graphics.get(f) == null)
+            graphics.remove(f);
+        graphics.put(f, graphic);
+    }
+
+    public ShapeGraphic getGraphic(org.cougaar.core.qos.frame.Frame f) {
+        return (ShapeGraphic) graphics.get(f);
     }
 
     public void addChangeListener(ChangeListener l) {
@@ -125,17 +145,19 @@ public class Display extends AnimatedCanvas {
     public void render(int w, int h, Graphics2D g2) {
         if (!initialized)
             return;
-        super.render(w,h,g2);
-        root.draw(g2);
+        synchronized (lock) {
+            super.render(w,h,g2);
+            root.draw(g2);
 
-        Transition t;
-        for (Iterator ii=transitions.iterator(); ii.hasNext();) {
-           t = (Transition) ii.next();
-           t.draw(g2);
+            Transition t;
+            for (Iterator ii=transitions.iterator(); ii.hasNext();) {
+               t = (Transition) ii.next();
+               t.draw(g2);
+            }
+
+            if (!processingTickEvent)
+                processNextTickEvent();
         }
-
-        if (!processingTickEvent)
-            processNextTickEvent();
     }
 
 
@@ -148,20 +170,22 @@ public class Display extends AnimatedCanvas {
     }
 
     public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
-	    return root.find(f);
+        ShapeGraphic g = getGraphic(f);
+        return (g == null ? root.find(f) : g);
+	    //return root.find(f);
     }
 
 
     
     public void tickEventOccured(TickEvent tick) {
-        synchronized (tickEventQueue) {
+        synchronized (lock) {
             tickEventQueue.add(tick); 
         } 
     } 
 
     public void processNextTickEvent() {
         TickEvent tickEvent=null;
-        synchronized (tickEventQueue) {
+        synchronized (lock) {
             if (tickEventQueue.size() > 0) {
                 tickEvent = (TickEvent)tickEventQueue.get(0);
                 tickEventQueue.remove(0);
@@ -178,8 +202,11 @@ public class Display extends AnimatedCanvas {
 
 
     public void setFrameHelper(FrameHelper h) {
+        this.graphics = new HashMap();
         this.frameHelper = h;
-        root.setFrameHelper(frameHelper);
+        synchronized (lock) {
+            root.setFrameHelper(frameHelper, this);
+        }
     }
 
 
@@ -192,7 +219,7 @@ public class Display extends AnimatedCanvas {
 
         public ControlPanel() {
             super(BoxLayout.X_AXIS);
-            animationDelaySlider = new JSlider(0, 1000, (int) sleepAmount);
+            animationDelaySlider = new JSlider(0, 100, (int) sleepAmount);
             animationDelaySlider.addChangeListener(this);
             //animationDelaySlider.setPaintLabels(true);
             animationOn = new JCheckBox("Animation On");

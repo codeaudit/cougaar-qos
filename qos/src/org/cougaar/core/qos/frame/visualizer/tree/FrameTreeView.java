@@ -10,6 +10,7 @@ import org.cougaar.core.qos.frame.RelationFrame;
 import org.cougaar.core.qos.frame.PrototypeFrame;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import javax.swing.tree.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -62,8 +63,8 @@ public class FrameTreeView extends TreeView {
         selectedLabel = new JLabel("selected:");
         selectedFrameLabel = new JLabel("");
         JLabel slotDef = newLegendLabel("Slot Definition", ColorDefs.slotDefinitionColor, true);
-        JLabel inheritedSlot = newLegendLabel("Inherited Slot", ColorDefs.inheritedSlotColor, true);
-        JLabel localSlot = newLegendLabel("Local Slot", ColorDefs.localSlotColor, true);
+        JLabel inheritedSlot = newLegendLabel("Container Slot", ColorDefs.inheritedSlotColor, true);
+        JLabel localSlot = newLegendLabel("Prototype Slot", ColorDefs.localSlotColor, true);
         Box legend = Box.createHorizontalBox();
         legend.add(slotDef);
         legend.add(inheritedSlot);
@@ -84,8 +85,10 @@ public class FrameTreeView extends TreeView {
         JLabel lbl = new JLabel(label);
         lbl.setOpaque(true);
         lbl.setBackground(color);
-        if (hasBorder)
-            lbl.setBorder(BorderFactory.createEtchedBorder());
+        if (hasBorder) {
+            CompoundBorder cb = new CompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0,5,0,5));
+            lbl.setBorder(cb);//BorderFactory.createEtchedBorder());
+        }
         return lbl;
     }
 

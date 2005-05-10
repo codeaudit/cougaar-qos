@@ -223,8 +223,8 @@ public class ShapeContainer extends ShapeGraphic {
 
 
 
-    public void setFrameHelper(FrameHelper helper) {
-        super.setFrameHelper(helper);
+    public void setFrameHelper(FrameHelper helper, Display display) {
+        super.setFrameHelper(helper, display);
         if (log.isDebugEnabled())
             log.debug("setFrameHelper:" +toString());
 
@@ -235,30 +235,35 @@ public class ShapeContainer extends ShapeGraphic {
             String frameName = (String) f.getValue("name");
             Collection childFrames = frameHelper.getAllChildren(f, (fp!=null?fp.getParentRelationship():"contains"));
 
-
+            org.cougaar.core.qos.frame.Frame fr;
             for (Iterator ii=childFrames.iterator(); ii.hasNext(); ) {
-            // add if the frame matches any of the prototypes
-            add((org.cougaar.core.qos.frame.Frame) ii.next());
-
+                fr = (org.cougaar.core.qos.frame.Frame) ii.next();
+                // add if the frame matches any of the prototypes
+                if (display.getGraphic(fr) == null)
+                    add(fr);
             }
 
-        } /*else {
+        } else {
             ShapeGraphic shg;
             Collection frames;
+            org.cougaar.core.qos.frame.Frame fr;
             for (Iterator ii=prototypes.values().iterator(); ii.hasNext();) {
                 shg = (ShapeGraphic) ii.next();
                 FramePredicate pfp = shg.getFramePredicate();
                 frames = frameHelper.findFrames(pfp);
                 if (frames != null) {
-                    for (Iterator jj=frames.iterator(); jj.hasNext();)
-                        add((org.cougaar.core.qos.frame.Frame) jj.next());
+                    for (Iterator jj=frames.iterator(); jj.hasNext();)  {
+                        fr = (org.cougaar.core.qos.frame.Frame) jj.next();
+                        if (display.getGraphic(fr) == null)
+                            add(fr);
+                    }
                 }
             }
-        }   */
+        }
         ShapeGraphic ch;
         for (Iterator ii=children.iterator(); ii.hasNext();) {
             ch=(ShapeGraphic) ii.next();
-            ch.setFrameHelper(frameHelper);
+            ch.setFrameHelper(frameHelper, display);
         }
     }
 
