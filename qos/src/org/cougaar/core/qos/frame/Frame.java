@@ -32,6 +32,7 @@ import java.util.Properties;
 
 
 import org.cougaar.core.blackboard.ChangeReport;
+import org.cougaar.core.qos.metrics.VariableEvaluator;
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
 import org.cougaar.util.log.Logger;
@@ -42,7 +43,7 @@ import org.cougaar.util.log.Logging;
  * includes almost all of the generic implementation.
  */
 abstract public class Frame
-    implements UniqueObject, Cloneable
+    implements UniqueObject, Cloneable, VariableEvaluator
 {
     private final UID uid;
     protected transient FrameSet frameSet;
@@ -60,6 +61,8 @@ abstract public class Frame
     abstract public void setValue(String slot, Object value);
     abstract public boolean isa(String kind);
     abstract Object getValue(Frame origin, String slot);
+
+
 
     public Frame copy()
     {
@@ -111,6 +114,12 @@ abstract public class Frame
     }
 
 
+
+    // org.cougaar.core.qos.metrics.VariableEvaluator
+    public String evaluateVariable(String var)
+    {
+	return getValue(var).toString();
+    }
 
     public Object getValue(String slot)
     {
