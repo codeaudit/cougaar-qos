@@ -1339,7 +1339,7 @@ public class FrameGen
 	}
 	if (!has_metrics) return;
 
-	writer.println("\n\n    protected void postInitialze()");
+	writer.println("\n\n    protected void postInitialize()");
 	writer.println("    {");
 	writer.println("        super.postInitialize();");
 	String obs = "__observer";
