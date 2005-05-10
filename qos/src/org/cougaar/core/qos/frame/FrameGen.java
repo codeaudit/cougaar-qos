@@ -1635,7 +1635,8 @@ public class FrameGen
 	    type.equals("Float") ||
 	    type.equals("Long") ||
 	    type.equals("Integer") ||
-	    type.equals("Boolean");
+	    type.equals("Boolean") ||
+	    type.equals(Metric_Type);
     }
 
 
