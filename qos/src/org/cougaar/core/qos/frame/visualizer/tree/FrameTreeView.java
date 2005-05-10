@@ -157,14 +157,14 @@ public class FrameTreeView extends TreeView {
             relationship = (String) f.getKind();
             parent = (FrameNode) frameMap.get(parentName);
             child  = (FrameNode) frameMap.get(childName);
-            if (child.getParent() != null) {
-                FrameNode tmp = child;
-                child = new FrameNodeProxy(child);
-                tmp.addProxy((FrameNodeProxy)child);
-		if (log.isDebugEnabled())
-		    log.debug("creating *FrameNodeProxy for frame '"+childName+"'  relation="+relationship);
-            }
             if (parent != null && child != null) {
+		if (child.getParent() != null) {
+		    FrameNode tmp = child;
+		    child = new FrameNodeProxy(child);
+		    tmp.addProxy((FrameNodeProxy)child);
+		    if (log.isDebugEnabled())
+			log.debug("creating *FrameNodeProxy for frame '"+childName+"'  relation="+relationship);
+		}
                 FrameNode relationNode = parent.getRelationshipNode(relationship);
                 if (relationNode == null) {
 		    if (log.isDebugEnabled())
