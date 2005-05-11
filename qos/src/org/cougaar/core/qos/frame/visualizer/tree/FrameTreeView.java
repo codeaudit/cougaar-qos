@@ -123,6 +123,11 @@ public class FrameTreeView extends TreeView {
 	tree.setModel(new DefaultTreeModel(root));
     }
 
+    private String makeNodeKey(String name, String proto)
+    {
+	return name +"__"+proto;
+    }
+
     protected Collection process(Collection frames) {
         ArrayList relationships = new ArrayList();
         org.cougaar.core.qos.frame.Frame f;
@@ -135,12 +140,14 @@ public class FrameTreeView extends TreeView {
                 continue;
             }
             name = (String) f.getValue("name");
-            if (frameMap.get(name) != null)
+	    String proto = f.getKind();
+	    String key = makeNodeKey(name, proto);
+            if (frameMap.get(key) != null)
                 continue;
             else {
 		if (log.isDebugEnabled())
 		    log.debug("creating FrameNode for frame '"+name+"'");
-                frameMap.put(name, new FrameNode(f));
+                frameMap.put(key, new FrameNode(f));
 	    }
         }
 	if (log.isDebugEnabled())
@@ -152,14 +159,16 @@ public class FrameTreeView extends TreeView {
     protected void processRelationships(Collection relationshipFrames) {
         org.cougaar.core.qos.frame.RelationFrame f;
         FrameNode parent, child;
-        String relationship, parentName, childName;
+        String relationship, parentName, childName, parentProto, childProto;
         for (Iterator ii=relationshipFrames.iterator(); ii.hasNext();) {
             f = (org.cougaar.core.qos.frame.RelationFrame) ii.next();
-            parentName = (String) f.getValue("parent-value");
-            childName  = (String) f.getValue("child-value");
+            parentName = (String) f.getParentValue();
+            childName  = (String) f.getChildValue();
+            parentProto = (String) f.getParentPrototype();
+            childProto  = (String) f.getChildPrototype();
             relationship = (String) f.getKind();
-            parent = (FrameNode) frameMap.get(parentName);
-            child  = (FrameNode) frameMap.get(childName);
+            parent = (FrameNode) frameMap.get(makeNodeKey(parentName, parentProto));
+            child  = (FrameNode) frameMap.get(makeNodeKey(childName, childProto));
             if (parent != null && child != null) {
 		if (child.getParent() != null) {
 		    FrameNode tmp = child;
