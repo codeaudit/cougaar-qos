@@ -106,12 +106,12 @@ public class FrameTreeView extends TreeView {
 
 
     public void buildFrameTree(FrameHelper frameHelper) {
-	this.frameHelper = frameHelper;
+	    this.frameHelper = frameHelper;
         root = new DefaultMutableTreeNode("frameset '"+frameHelper.getFrameSetName()+"'");
         frameMap.clear();
 	
-	if (log.isDebugEnabled())
-	    log.debug("buildFrameTree frameHelper="+frameHelper); 
+	    if (log.isDebugEnabled())
+	        log.debug("buildFrameTree frameHelper="+frameHelper);
 
         Collection relationshipFrames = process(frameHelper.getAllFrames());
         processRelationships(relationshipFrames);
@@ -120,13 +120,13 @@ public class FrameTreeView extends TreeView {
         for (Iterator ii=rootNodes.iterator(); ii.hasNext();) {
             root.add((DefaultMutableTreeNode) ii.next());
         }
-	tree.setModel(new DefaultTreeModel(root));
+	    tree.setModel(new DefaultTreeModel(root));
     }
 
-    private String makeNodeKey(String name, String proto)
+    /*private String makeNodeKey(String name, String proto)
     {
 	return name +"__"+proto;
-    }
+    } */
 
     protected Collection process(Collection frames) {
         ArrayList relationships = new ArrayList();
@@ -139,57 +139,57 @@ public class FrameTreeView extends TreeView {
                 relationships.add(f);
                 continue;
             }
-            name = (String) f.getValue("name");
-	    String proto = f.getKind();
-	    String key = makeNodeKey(name, proto);
-            if (frameMap.get(key) != null)
+            if (frameMap.get(f) != null)
                 continue;
             else {
-		if (log.isDebugEnabled())
-		    log.debug("creating FrameNode for frame '"+name+"'");
-                frameMap.put(key, new FrameNode(f));
-	    }
+                if (log.isDebugEnabled())
+                    log.debug("creating FrameNode for frame '"+f.getValue("name")+"'");
+                frameMap.put(f, new FrameNode(f));
+            }
         }
-	if (log.isDebugEnabled())
-	    log.debug("FrameTreeView: found "+ relationships.size() + " relation frames and "+frameMap.values().size()+" framenodes");
+	    if (log.isDebugEnabled())
+	        log.debug("FrameTreeView: found "+ relationships.size() + " relation frames and "+frameMap.values().size()+" framenodes");
         return relationships;
     }
 
 
     protected void processRelationships(Collection relationshipFrames) {
         org.cougaar.core.qos.frame.RelationFrame f;
+        org.cougaar.core.qos.frame.Frame pf, cf;
         FrameNode parent, child;
         String relationship, parentName, childName, parentProto, childProto;
         for (Iterator ii=relationshipFrames.iterator(); ii.hasNext();) {
             f = (org.cougaar.core.qos.frame.RelationFrame) ii.next();
-            parentName = (String) f.getParentValue();
-            childName  = (String) f.getChildValue();
-            parentProto = (String) f.getParentPrototype();
-            childProto  = (String) f.getChildPrototype();
+            //parentName = (String) f.getParentValue();
+            //childName  = (String) f.getChildValue();
+            //parentProto = (String) f.getParentPrototype();
+            //childProto  = (String) f.getChildPrototype();
+            pf = f.relationshipParent();
+            cf = f.relationshipChild();
             relationship = (String) f.getKind();
-            parent = (FrameNode) frameMap.get(makeNodeKey(parentName, parentProto));
-            child  = (FrameNode) frameMap.get(makeNodeKey(childName, childProto));
+            parent = (FrameNode) frameMap.get(pf);
+            child  = (FrameNode) frameMap.get(cf);
             if (parent != null && child != null) {
-		if (child.getParent() != null) {
-		    FrameNode tmp = child;
-		    child = new FrameNodeProxy(child);
-		    tmp.addProxy((FrameNodeProxy)child);
-		    if (log.isDebugEnabled())
-			log.debug("creating *FrameNodeProxy for frame '"+childName+"'  relation="+relationship);
-		}
+                if (child.getParent() != null) {
+                    FrameNode tmp = child;
+                    child = new FrameNodeProxy(child);
+                    tmp.addProxy((FrameNodeProxy)child);
+                    if (log.isDebugEnabled())
+                        log.debug("creating *FrameNodeProxy for frame '"+f.getChildValue()+"'  relation="+relationship);
+                }
                 FrameNode relationNode = parent.getRelationshipNode(relationship);
                 if (relationNode == null) {
-		    if (log.isDebugEnabled())
-			log.debug("creating RelationFrameNode:  "+parentName+"=>"+relationship+"==>"+childName);
+                    if (log.isDebugEnabled())
+                            log.debug("creating RelationFrameNode:  "+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
                     relationNode = new FrameNode(relationship);
                     parent.addRelationshipNode(relationNode);
                 }
                 relationNode.add(child);
-            } else {
-		if (log.isDebugEnabled())
-		    log.debug("can't create node: parent='"+parentName+"'("+(parent!=null?"found":"not found")+") childName='"+childName+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
-                ;// print something here
-            }
+             } else {
+                if (log.isDebugEnabled())
+                    log.debug("can't create node: parent='"+f.getParentValue()+"'("+(parent!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
+                        ;// print something here
+                    }
        }
     }
 
