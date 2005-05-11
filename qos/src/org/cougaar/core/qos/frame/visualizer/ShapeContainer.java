@@ -24,7 +24,7 @@ public class ShapeContainer extends ShapeGraphic {
     protected HashMap prototypes;//, insertContainers;
     protected HashSet frameChildren;
     protected ShapeLayout shapeLayout;
-    
+
     //private transient Logger log = Logging.getLogger(getClass().getName());
 
     public ShapeContainer() {
@@ -38,7 +38,7 @@ public class ShapeContainer extends ShapeGraphic {
     public ShapeContainer(String id, String label) {
         super(id,label);
         children = new ArrayList();
-	    frameChildren = new HashSet();
+        frameChildren = new HashSet();
         prototypes = new HashMap();
         //insertContainers = new HashMap();
     }
@@ -47,7 +47,7 @@ public class ShapeContainer extends ShapeGraphic {
         super.reshape(tx,ty,w,h);
         layoutChildren();
     }
-    
+
     public void setLayout(ShapeLayout layout) {
         shapeLayout = layout;
         if (shapeLayout != null) {
@@ -116,9 +116,9 @@ public class ShapeContainer extends ShapeGraphic {
         }
     }
 
-    //public boolean hasPrototype(String kind) {
-    //  return  (prototypes.get(kind) != null);
-    // }
+    public boolean hasPrototype(String kind) {
+      return  (prototypes.get(kind) != null);
+    }
 
     public Collection getPrototypes() {
         return prototypes.values();
@@ -127,40 +127,42 @@ public class ShapeContainer extends ShapeGraphic {
     public boolean hasChild(ShapeGraphic g) {
         ShapeGraphic sh;
         for (Iterator ii=children.iterator(); ii.hasNext();) {
-                sh=(ShapeGraphic) ii.next();
-                if (sh == g)
-                    return true;
-            }
+            sh=(ShapeGraphic) ii.next();
+            if (sh == g)
+                return true;
+        }
         return false;
     }
 
     public void add(ShapeGraphic sh) {
         if (log.isDebugEnabled())
-            log.debug("====>add: "+toString()+"\n\t  adding  "+sh);
-            sh.setParent(this);
-            if (sh.isPrototype())
-                prototypes.put(sh.getFramePredicate().getKind(), sh);
-            else {
+            log.debug("====>"+id+".add(ShapeGraphic): "+toString()+"\n\t  adding  "+sh);
+        sh.setParent(this);
+        if (sh.isPrototype())
+            prototypes.put(sh.getFramePredicate().getKind(), sh);
+        else {
             if (!hasChild(sh)) {
                 children.add(sh);
+                if (sh.frame != null && !frameChildren.contains(sh.frame))
+                    frameChildren.add(sh.frame);
                 layoutChildren();
             }
         }
     }
 
-    
+
     public void add(org.cougaar.core.qos.frame.Frame frame) {
         String kind = frame.getKind();
         ShapeGraphic shg;
         FramePredicate fp;
 
-        if (log.isDebugEnabled())
-                log.debug("====>maybe-add: "+toString()+"\n\t  adding  frame(kind="+kind+", name="+frame.getValue("name")+")");
+        //if (log.isDebugEnabled())
+          //  log.debug("====>maybe-add: "+toString()+"\n\t  adding  frame(kind="+kind+", name="+frame.getValue("name")+")");
 
         String frameName = (String) frame.getValue("name");
         if (frameChildren.contains(frame)) {
             if (log.isDebugEnabled())
-            log.debug("====>rejected: already have a child with name "+frameName);
+                log.debug("====>rejected: already have a child with name "+frameName);
             return;
         }
 
@@ -168,16 +170,16 @@ public class ShapeContainer extends ShapeGraphic {
         for (Iterator ii=prototypes.values().iterator(); ii.hasNext();) {
             shg = (ShapeGraphic) ii.next();
             fp = shg.getFramePredicate();
-                if (fp!=null && frame.isa(fp.getKind())) {
-            if (log.isDebugEnabled())
-                log.debug("****>add: "+toString()+"\n\t  adding clone (kind="+kind+", name="+frame.getValue("name")+")");
+            if (fp!=null && frame.isa(fp.getKind())) {
+                if (log.isDebugEnabled())
+                    log.debug("****>add: "+toString()+"\n\t  adding clone (kind="+kind+", name="+frame.getValue("name")+")");
                 add(shg.createInstance(frame));
-                frameChildren.add(frame);
-           } else {
+                //frameChildren.add(frame);
+            } else {
                 if (log.isDebugEnabled())
                     log.debug("****>add: "+toString()+"\n\t  did not find a prototype match for kind="+kind+", discarding");
-                }
-           }
+            }
+        }
     }
 
 
@@ -213,7 +215,7 @@ public class ShapeContainer extends ShapeGraphic {
     protected void buildChildren(FrameHelper helper, Display display) {
         // this can be either a container with no associated frame (used for grouping)
         // of a container with a frame and a frame predicate
-        FramePredicate fp = getFramePredicate();
+        //FramePredicate fp = getFramePredicate();
         org.cougaar.core.qos.frame.Frame  f2, f = getFrame();
 
         ShapeGraphic shg;
@@ -223,19 +225,42 @@ public class ShapeContainer extends ShapeGraphic {
             shg = (ShapeGraphic) ii.next();
             FramePredicate pfp = shg.getFramePredicate();
             frames = (f != null ? frameHelper.getAllChildren(f, pfp.getParentRelationship()) : frameHelper.findFrames(pfp));
-            if (frames != null) {
+            if (frames != null && frames.size() > 0) {
                 for (Iterator jj=frames.iterator(); jj.hasNext();)  {
                     fr = (org.cougaar.core.qos.frame.Frame) jj.next();
-                    if (display.getGraphic(fr) == null)
+                    if (display.getGraphic(fr) == null && !frameChildren.contains(frame))
                         add(fr);
                 }
             }
         }
     }
+    /*
+    protected void buildChildren(Collection newframes, Display display) {
+        org.cougaar.core.qos.frame.Frame  f2, f = getFrame();
+        if (f == null)
+            return;
+        ShapeGraphic shg;
+        Collection frames;
+        org.cougaar.core.qos.frame.Frame fr;
+        for (Iterator ii=prototypes.values().iterator(); ii.hasNext();) {
+            shg = (ShapeGraphic) ii.next();
+            FramePredicate pfp = shg.getFramePredicate();
+            frames = frameHelper.getAllChildren(f, pfp.getParentRelationship(), newframes);
+            if (frames != null && frames.size() > 0) {
+                for (Iterator jj=frames.iterator(); jj.hasNext();)  {
+                    fr = (org.cougaar.core.qos.frame.Frame) jj.next();
+                    if (display.getGraphic(fr) == null && !frameChildren.contains(frame))
+                        add(fr);
+                }
+            }
+        }
+    }
+    */
 
 
     public void setFrameHelper(FrameHelper helper, Display display) {
-        super.setFrameHelper(helper, display);
+        if (frameHelper == null)
+            super.setFrameHelper(helper, display);
         if (log.isDebugEnabled())
             log.debug("setFrameHelper:" +toString());
 
@@ -246,8 +271,23 @@ public class ShapeContainer extends ShapeGraphic {
             ch.setFrameHelper(frameHelper, display);
         }
     }
+   /*
+    public void addedFrames(Collection newFrames, Display display) {
+        if (frame == null && predicate != null)
+            super.addedFrames(newFrames, display);
+        buildChildren(newFrames, display);
 
-    
+        ShapeGraphic ch;
+        for (Iterator ii=children.iterator(); ii.hasNext();) {
+            ch=(ShapeGraphic) ii.next();
+            ch.addedFrames(newFrames, display);
+        }
+    }
+
+    public void removedFrames(Collection removedFrames, Display display) {
+
+    }*/
+
 
     // clone thyself and assign the given frame
     // make a deep copy
@@ -261,7 +301,7 @@ public class ShapeContainer extends ShapeGraphic {
             cloned.shape = cloned.createShape();
             org.cougaar.core.qos.frame.Frame parent = getFrame();
             if (cloned.predicate != null && parent != null)
-            cloned.predicate = new FramePredicate(cloned.predicate, (String) parent.getValue("name"));
+                cloned.predicate = new FramePredicate(cloned.predicate, (String) parent.getValue("name"));
 
             cloned.frameChildren = new HashSet();
             cloned.shapeLayout = (shapeLayout != null ? shapeLayout.cloneSelf() : null);
@@ -286,23 +326,23 @@ public class ShapeContainer extends ShapeGraphic {
                 clonedChild.setPrototype(true);
                 clonedChild.setParent(cloned);
                 cloned.prototypes.put(key, clonedChild);
-	        }
+            }
 
             // clone slot change listeners
-             if (slotListeners.size() > 0) {
+            if (slotListeners.size() > 0) {
                 cloned.slotListeners = new ArrayList();
                 for (Iterator ii=slotListeners.iterator(); ii.hasNext();) {
                     cloned.addSlotListener(((SlotChangeListener)ii.next()).cloneInstance());
                 }
             }
             cloned.validateListeners();
-	        return cloned;
+            return cloned;
         } catch (CloneNotSupportedException ee) {
             ee.printStackTrace();
         }
         return null;
     }
-    
+
 
 
 

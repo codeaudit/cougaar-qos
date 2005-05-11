@@ -14,10 +14,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.event.WindowAdapter;
@@ -37,15 +34,15 @@ import org.xml.sax.Attributes;
 public class Display extends AnimatedCanvas {
     public static boolean ENABLE_ANIMATION = false;//true;
 
-     ShapeContainer root;
-     boolean initialized, processingTickEvent;
-     ArrayList transitions, tickEventQueue;
+    ShapeContainer root;
+    boolean initialized, processingTickEvent;
+    ArrayList transitions, tickEventQueue;
 
-     // debug
-     Collection frames;
-     HashMap frameContainerMap, prototypeMap;
-     FrameHelper frameHelper;
-     private transient Logger log = Logging.getLogger(getClass().getName());
+    // debug
+    Collection frames;
+    HashMap frameContainerMap, prototypeMap;
+    FrameHelper frameHelper;
+    private transient Logger log = Logging.getLogger(getClass().getName());
 
     ViewConfigParser.WindowSpec wSpec;
     ControlPanel cPanel;
@@ -59,43 +56,46 @@ public class Display extends AnimatedCanvas {
     HashMap graphics;
 
 
-     public Display(File xmlFile) {
-         lock = new Object();
-         graphics = new HashMap();
-         transitions = new ArrayList();
-         tickEventQueue = new ArrayList();
-         frameContainerMap = new HashMap();
-         prototypeMap = new HashMap();
-         processingTickEvent = initialized = false;
-         changes = new ChangeModel();
-         change = new ChangeEvent(this);
-         ViewConfigParser parser = new ViewConfigParser();
-         parser.parse(xmlFile);
-         wSpec = parser.windowSpec;
-         root = parser.root;
-         initialized = (root != null);
-         if (initialized) {
+    public Display(File xmlFile) {
+        lock = new Object();
+        graphics = new HashMap();
+        transitions = new ArrayList();
+        tickEventQueue = new ArrayList();
+        frameContainerMap = new HashMap();
+        prototypeMap = new HashMap();
+        processingTickEvent = initialized = false;
+        changes = new ChangeModel();
+        change = new ChangeEvent(this);
+        ViewConfigParser parser = new ViewConfigParser();
+        parser.parse(xmlFile);
+        wSpec = parser.windowSpec;
+        root = parser.root;
+        initialized = (root != null);
+        if (initialized) {
             if (animating != null)
                 animating.start();
-         }
+        }
     }
 
     public void registerGraphic(org.cougaar.core.qos.frame.Frame f, ShapeGraphic graphic) {
         if (f == null || graphic == null)
             return;
-        synchronized (lock) {
-            if (graphics.get(f) != null)
-               throw new IllegalArgumentException("Error: "+graphic+" is already registered for frame "+f);
+        //synchronized (lock) {
+            ShapeGraphic sg;
+            if ((sg=(ShapeGraphic)graphics.get(f)) != null) {
+                if (sg != graphic)
+                    throw new IllegalArgumentException("Error: "+graphic+" is already registered for frame "+f);
+            }
             //if (graphics.get(f) == null) {
-                graphics.put(f, graphic);
+            graphics.put(f, graphic);
             //}
-        }
+        //}
     }
 
     public ShapeGraphic getGraphic(org.cougaar.core.qos.frame.Frame f) {
-        synchronized (lock) {
+        //synchronized (lock) {
             return (ShapeGraphic) graphics.get(f);
-        }
+        //}
     }
 
     public void addChangeListener(ChangeListener l) {
@@ -103,9 +103,9 @@ public class Display extends AnimatedCanvas {
     }
 
     public Component getControlPanel() {
-	if (cPanel == null) 
-	    cPanel = new ControlPanel();
-	    return cPanel;
+        if (cPanel == null)
+            cPanel = new ControlPanel();
+        return cPanel;
     }
 
 
@@ -117,6 +117,7 @@ public class Display extends AnimatedCanvas {
         Dimension d = getSize();
         reset(d.width, d.height);
     }
+
     public void reset(int w, int h) {
         super.reset(w,h);
         if (!initialized)
@@ -133,10 +134,10 @@ public class Display extends AnimatedCanvas {
             Transition t;
             boolean finished;
             for (Iterator ii=transitions.iterator(); ii.hasNext();) {
-               t = (Transition) ii.next();
-               finished = t.step();
-               if (finished)
-                   remove.add(t);
+                t = (Transition) ii.next();
+                finished = t.step();
+                if (finished)
+                    remove.add(t);
             }
             for (Iterator rr=remove.iterator(); rr.hasNext();)
                 transitions.remove(rr.next());
@@ -156,8 +157,8 @@ public class Display extends AnimatedCanvas {
 
             Transition t;
             for (Iterator ii=transitions.iterator(); ii.hasNext();) {
-               t = (Transition) ii.next();
-               t.draw(g2);
+                t = (Transition) ii.next();
+                t.draw(g2);
             }
 
             if (!processingTickEvent)
@@ -177,16 +178,16 @@ public class Display extends AnimatedCanvas {
     public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
         ShapeGraphic g = getGraphic(f);
         return (g == null ? root.find(f) : g);
-	    //return root.find(f);
+        //return root.find(f);
     }
 
 
-    
+
     public void tickEventOccured(TickEvent tick) {
         synchronized (lock) {
             tickEventQueue.add(tick); 
         } 
-    } 
+    }
 
     public void processNextTickEvent() {
         TickEvent tickEvent=null;
@@ -208,9 +209,21 @@ public class Display extends AnimatedCanvas {
 
     public void setFrameHelper(FrameHelper h) {
         synchronized (lock) {
-            this.graphics = new HashMap();
+            //this.graphics = new HashMap();
             this.frameHelper = h;
             root.setFrameHelper(frameHelper, this);
+        }
+    }
+
+    public void addFrames(Collection newFrames) {
+        synchronized (lock) {
+            //root.addedFrames(newFrames, this);
+        }
+    }
+
+    public void removeFrames(Collection removedFrames) {
+        synchronized (lock) {
+            //root.removedFrames(removedFrames, this);
         }
     }
 
@@ -249,27 +262,27 @@ public class Display extends AnimatedCanvas {
 
     /*
     public void p(String msg) {
-        System.out.println(msg);
+    System.out.println(msg);
     }
 
     public void mousePressed(MouseEvent evt) {
-        //super.mousePressed(evt);
-        p("Display.mousePressed count="+count);
-        if(mouseMoveFlag==false) {
-          mousePoint=evt.getPoint();
-          count = (++count)%2;
-          if (count == 0) {
-              lastPoint = mousePoint;
-          } else if (count == 1 && lastPoint != null) {
-              p("creating a transition from  "+lastPoint.x+","+lastPoint.y+"  to "+mousePoint.x+", "+mousePoint.y);
-              transitions.add(new TestTransition(new Point2D.Double((double)lastPoint.x, (double)lastPoint.y),
-                                 new Point2D.Double((double)mousePoint.x, (double)mousePoint.y)));
-              lastPoint = null;
-          }
-
-        }
-        super.mousePressed(evt);
+    //super.mousePressed(evt);
+    p("Display.mousePressed count="+count);
+    if(mouseMoveFlag==false) {
+    mousePoint=evt.getPoint();
+    count = (++count)%2;
+    if (count == 0) {
+    lastPoint = mousePoint;
+    } else if (count == 1 && lastPoint != null) {
+    p("creating a transition from  "+lastPoint.x+","+lastPoint.y+"  to "+mousePoint.x+", "+mousePoint.y);
+    transitions.add(new TestTransition(new Point2D.Double((double)lastPoint.x, (double)lastPoint.y),
+    new Point2D.Double((double)mousePoint.x, (double)mousePoint.y)));
+    lastPoint = null;
     }
-   */
+
+    }
+    super.mousePressed(evt);
+    }
+    */
 }
 

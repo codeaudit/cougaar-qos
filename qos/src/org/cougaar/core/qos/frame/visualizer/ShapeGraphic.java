@@ -138,7 +138,7 @@ public class ShapeGraphic implements Cloneable {
             this.id = (String) frame.getValue("name"); //frameidSlotName);
             this.label = id;
             if (log.isDebugEnabled())
-            log.debug(label+".setFrame():  id="+this.id+":  "+this.toString());
+                log.debug(label+".setFrame():  id="+this.id+":  "+this.toString());
         } else {
             this.id = "";
             this.label = "";
@@ -152,6 +152,14 @@ public class ShapeGraphic implements Cloneable {
         }
         if (frame != null)
             display.registerGraphic(frame, this);
+    }
+    
+    public void addedFrames(Collection newFrames, Display display) {
+        if (frame == null && predicate != null) {
+            setFrame(frameHelper.findFrame(newFrames, predicate));
+            if (frame != null)
+              display.registerGraphic(frame, this);
+        }
     }
 
     public boolean hasFrame() {
@@ -248,9 +256,9 @@ public class ShapeGraphic implements Cloneable {
     }
 
     public ShapeGraphic find(org.cougaar.core.qos.frame.Frame f) {
-	if (frame != null && frame == f) //id != null && id.equals((String) f.getValue("name")))
-	    return this;
-	return null;
+        if (frame != null && frame == f) //id != null && id.equals((String) f.getValue("name")))
+            return this;
+        return null;
     }
 
     public void reshape(double x, double y, double width, double height) {
@@ -290,23 +298,23 @@ public class ShapeGraphic implements Cloneable {
     public ShapeGraphic createInstance(org.cougaar.core.qos.frame.Frame frame) {
         try {
             ShapeGraphic cloned = (ShapeGraphic) this.clone();
-	    if (frame != null)
-		cloned.setFrame(frame);
-        cloned.setPrototype(false);
-        cloned.shapePrototype = (shapePrototype != null ? ((RectangularShape) shapePrototype.clone()) : null);
-	    cloned.shape = cloned.createShape();
-	    org.cougaar.core.qos.frame.Frame parent = getFrame();
-	    if (cloned.predicate != null && parent != null) 
-		cloned.predicate = new FramePredicate(cloned.predicate, (String) parent.getValue("name"));
+            if (frame != null)
+                cloned.setFrame(frame);
+            cloned.setPrototype(false);
+            cloned.shapePrototype = (shapePrototype != null ? ((RectangularShape) shapePrototype.clone()) : null);
+            cloned.shape = cloned.createShape();
+            org.cougaar.core.qos.frame.Frame parent = getFrame();
+            if (cloned.predicate != null && parent != null)
+                cloned.predicate = new FramePredicate(cloned.predicate, (String) parent.getValue("name"));
 
-        if (slotListeners.size() > 0) {
-            cloned.slotListeners = new ArrayList();
-            for (Iterator ii=slotListeners.iterator(); ii.hasNext();) {
-                cloned.addSlotListener(((SlotChangeListener)ii.next()).cloneInstance());
+            if (slotListeners.size() > 0) {
+                cloned.slotListeners = new ArrayList();
+                for (Iterator ii=slotListeners.iterator(); ii.hasNext();) {
+                    cloned.addSlotListener(((SlotChangeListener)ii.next()).cloneInstance());
+                }
             }
-        }
-        cloned.validateListeners();
-	    return cloned;
+            cloned.validateListeners();
+            return cloned;
         } catch (CloneNotSupportedException ee) {
             ee.printStackTrace();
         }

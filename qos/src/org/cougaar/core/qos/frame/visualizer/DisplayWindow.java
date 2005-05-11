@@ -13,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Collection;
+import java.util.Enumeration;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,7 +33,7 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
         super("");
         tabbedPane = new JTabbedPane();
         display = new Display(xmlFile);
-	    Component controlPanel = display.getControlPanel();
+        Component controlPanel = display.getControlPanel();
         JPanel displPanel = new JPanel(new BorderLayout());
         displPanel.add(display, BorderLayout.CENTER);
         displPanel.add(controlPanel, BorderLayout.SOUTH);
@@ -50,15 +51,15 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
             public void windowClosing(WindowEvent e) {System.exit(0);}
             public void windowDeiconified(WindowEvent e) {  /*display.startClock(); display.animating.start();*/ }
             public void windowIconified(WindowEvent e) {
-               /* if (display.animating != null) {
-                    display.animating.stop();
+                /* if (display.animating != null) {
+                display.animating.stop();
                 }
                 display.bimg = null;; */
             }
         });
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
-	    //getContentPane().add(controlPanel, BorderLayout.SOUTH);
+        //getContentPane().add(controlPanel, BorderLayout.SOUTH);
         pack();
         setSize(d);
         setVisible(true);
@@ -68,36 +69,33 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
 
     class SetFrameHelper implements Runnable {
         FrameHelper h;
-        public SetFrameHelper(FrameHelper helper) {
-           h = helper;
-        }
-        public void run() {
-            setFrameHelper(h);
-        }
+        public SetFrameHelper(FrameHelper helper) {h = helper;}
+        public void run() {  setFrameHelper(h); }
     }
+    /*
+    class AddedFrames implements Runnable {
+        Collection addedFramesEn;
+        public AddedFrames(Collection e) { addedFramesEn = e; }
+        public void run() { addFrames(addedFramesEn);}
+    }
+    class RemovedFrames implements Runnable {
+        Collection removedFramesEn;
+        public RemovedFrames(Collection e) { removedFramesEn = e; }
+        public void run() { removeFrames(removedFramesEn);}
+    } */
     class UpdateFrameView implements Runnable {
         public  UpdateFrameView(){}
-        public void run() {
-             updateFrameView();
-        }
+        public void run() { updateFrameView();}
     }
     class TickOccured implements Runnable {
         TickEvent t;
-        public TickOccured(TickEvent te) {
-            t=te;
-        }
-        public void run() {
-            tickEventOccured(t);
-        }
+        public TickOccured(TickEvent te) { t=te; }
+        public void run() {  tickEventOccured(t); }
     }
     class StateChanged implements Runnable {
         ChangeEvent ev;
-        public StateChanged(ChangeEvent e) {
-            ev = e;
-        }
-        public void run() {
-            stateChanged(ev);
-        }
+        public StateChanged(ChangeEvent e) {   ev = e; }
+        public void run() { stateChanged(ev);}
     }
 
 
@@ -105,12 +103,29 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new SetFrameHelper(helper));
             return;
-        } 
+        }
         this.frameHelper = helper;
-	    display.setFrameHelper(helper);
-	    //containerView.buildContainerTree(display.getRootContainer());
+        display.setFrameHelper(helper);
+        //containerView.buildContainerTree(display.getRootContainer());
         frameView.buildFrameTree(helper);
     }
+    /*
+    public void addFrames(Collection newFrames) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new AddedFrames(newFrames));
+            return;
+        }
+        display.addedFrames(newFrames);
+    }
+
+    public void removeFrames(Collection removedFrames) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new RemovedFrames(removedFrames));
+            return;
+        }
+        display.removedFrames(removedFrames);
+    }
+    */
 
     public void updateFrameView() {
         if (!SwingUtilities.isEventDispatchThread()) {
@@ -121,15 +136,15 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
     }
 
     public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
-	    return display.findShape(f);
+        return display.findShape(f);
     }
 
     public void tickEventOccured(TickEvent tick) {
-       if (!SwingUtilities.isEventDispatchThread()) {
+        if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new TickOccured(tick));
             return;
         }
-	    display.tickEventOccured(tick);
+        display.tickEventOccured(tick);
     }
 
 
@@ -145,9 +160,9 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
 
     /*
     public void setFrames(Collection frames) {
-        //display.setFrames(frames);
-        //containerView.buildContainerTree(display.getRootContainer());
-        //frameView.buildFrameTree(frames, "simulator");// TODO fix the name
-	}*/
+    //display.setFrames(frames);
+    //containerView.buildContainerTree(display.getRootContainer());
+    //frameView.buildFrameTree(frames, "simulator");// TODO fix the name
+    }*/
 
 }

@@ -106,26 +106,26 @@ public class FrameTreeView extends TreeView {
 
 
     public void buildFrameTree(FrameHelper frameHelper) {
-	    this.frameHelper = frameHelper;
+        this.frameHelper = frameHelper;
         root = new DefaultMutableTreeNode("frameset '"+frameHelper.getFrameSetName()+"'");
         frameMap.clear();
-	
-	    if (log.isDebugEnabled())
-	        log.debug("buildFrameTree frameHelper="+frameHelper);
+
+        if (log.isDebugEnabled())
+            log.debug("buildFrameTree frameHelper="+frameHelper);
 
         Collection relationshipFrames = process(frameHelper.getAllFrames());
         processRelationships(relationshipFrames);
         Collection rootNodes = findRootLevelNodes();
-	
+
         for (Iterator ii=rootNodes.iterator(); ii.hasNext();) {
             root.add((DefaultMutableTreeNode) ii.next());
         }
-	    tree.setModel(new DefaultTreeModel(root));
+        tree.setModel(new DefaultTreeModel(root));
     }
 
     /*private String makeNodeKey(String name, String proto)
     {
-	return name +"__"+proto;
+    return name +"__"+proto;
     } */
 
     protected Collection process(Collection frames) {
@@ -147,8 +147,8 @@ public class FrameTreeView extends TreeView {
                 frameMap.put(f, new FrameNode(f));
             }
         }
-	    if (log.isDebugEnabled())
-	        log.debug("FrameTreeView: found "+ relationships.size() + " relation frames and "+frameMap.values().size()+" framenodes");
+        if (log.isDebugEnabled())
+            log.debug("FrameTreeView: found "+ relationships.size() + " relation frames and "+frameMap.values().size()+" framenodes");
         return relationships;
     }
 
@@ -180,17 +180,17 @@ public class FrameTreeView extends TreeView {
                 FrameNode relationNode = parent.getRelationshipNode(relationship);
                 if (relationNode == null) {
                     if (log.isDebugEnabled())
-                            log.debug("creating RelationFrameNode:  "+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
+                        log.debug("creating RelationFrameNode:  "+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
                     relationNode = new FrameNode(relationship);
                     parent.addRelationshipNode(relationNode);
                 }
                 relationNode.add(child);
-             } else {
+            } else {
                 if (log.isDebugEnabled())
                     log.debug("can't create node: parent='"+f.getParentValue()+"'("+(parent!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
-                        ;// print something here
-                    }
-       }
+                ;// print something here
+            }
+        }
     }
 
     protected Collection findRootLevelNodes() {
@@ -205,15 +205,15 @@ public class FrameTreeView extends TreeView {
     }
 
     protected Collection findFrames(Collection frames, FramePredicate predicate) {
-       org.cougaar.core.qos.frame.Frame f;
-       ArrayList flist = new ArrayList();
-       for (Iterator ii=frames.iterator(); ii.hasNext();) {
-           f = (org.cougaar.core.qos.frame.Frame) ii.next();
-           if (predicate.execute(f))
-               flist.add(f);
-       }
-       return flist;
-   }
+        org.cougaar.core.qos.frame.Frame f;
+        ArrayList flist = new ArrayList();
+        for (Iterator ii=frames.iterator(); ii.hasNext();) {
+            f = (org.cougaar.core.qos.frame.Frame) ii.next();
+            if (predicate.execute(f))
+                flist.add(f);
+        }
+        return flist;
+    }
 
 
     private class FrameRenderer extends DefaultTreeCellRenderer {
@@ -227,17 +227,17 @@ public class FrameTreeView extends TreeView {
         }
 
         public Component getTreeCellRendererComponent(
-                                                    JTree tree,
-                                                    Object value,
-                                                    boolean sel,
-                                                    boolean expanded,
-                                                    boolean leaf,
-                                                    int row,
-                                                    boolean hasFocus) {
+                JTree tree,
+                Object value,
+                boolean sel,
+                boolean expanded,
+                boolean leaf,
+                int row,
+                boolean hasFocus) {
 
             super.getTreeCellRendererComponent(tree, value, sel,
-                                               expanded, leaf, row,
-                                               hasFocus);
+                    expanded, leaf, row,
+                    hasFocus);
 
             //System.out.println(value.getClass().getName());
             if (value instanceof FrameNode) {
