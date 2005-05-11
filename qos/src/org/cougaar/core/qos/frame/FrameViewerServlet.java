@@ -35,6 +35,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.servlet.http.HttpServlet;
@@ -44,6 +45,7 @@ import org.cougaar.core.servlet.ComponentServlet;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.util.UID;
 import org.cougaar.util.Sortings;
+import org.xml.sax.Attributes;
 
 /**
  * This servlet displays {@link FrameSet}s and allows the user
@@ -449,15 +451,16 @@ public class FrameViewerServlet extends ComponentServlet {
           "<tr><td>FrameSet Name: &nbsp;</td><td colspan=3>"+
           fs.getName()+"</td></tr>\n"+
           "<tr><td>Kind: &nbsp;</td><td colspan=3>"+
-          f.getKind()+"</td></tr>\n"+
+          (f instanceof PrototypeFrame ? ((PrototypeFrame) f).getName() : f.getKind())+
+	   "</td></tr>\n"+
           "<tr><td>UID: &nbsp;</td><td colspan=3>"+
           linkToUID(f.getUID())+
           "</td></tr>\n");
-      Frame proto = f.getPrototype();
+      PrototypeFrame proto = f.getPrototype();
       out.print(
           "<tr><td>Prototype: &nbsp;</td><td colspan=3>"+
           (proto == null ? "<i>null</i>" :
-           proto.getKind()+" ("+linkToUID(proto.getUID())+")")+
+           proto.getName()+" ("+linkToUID(proto.getUID())+")")+
           "</td></tr>\n");
       if (f instanceof DataFrame) {
 	  DataFrame container = ((DataFrame) f).containerFrame();
@@ -467,31 +470,43 @@ public class FrameViewerServlet extends ComponentServlet {
 		     container.getKind()+" ("+linkToUID(container.getUID())+")")+
 		    "</td></tr>\n");
       }
-      Properties vp = f.getLocalSlots();
+      Map vp = null;
+      String description = null;
+      if (f instanceof DataFrame) {
+	  vp = ((DataFrame) f).slotDescriptions();
+	  description = "All Slots";
+      } else if (f instanceof PrototypeFrame) {
+	  vp = ((PrototypeFrame) f).getSlotDefinitions();
+	  description = "Declared Slots";
+      }
       int nvp = (vp == null ? 0 : vp.size());
       out.print(
-          "<tr><td colspan=4>Properties["+nvp+"]:</td></tr>\n");
+		"<tr><td colspan=4>"+description+"["+nvp+"]:</td></tr>\n");
       if (nvp > 0) {
-        int j = 0;
-        for (Enumeration en = vp.propertyNames();
-            en.hasMoreElements();
-            ) {
-          String key = (String) en.nextElement();
-          Object val = vp.get(key);
-          j++;
-          out.print(
-              "<tr><td>&nbsp;&nbsp;"+j+":&nbsp;</td>"+
-              "<td>"+key+"</td><td>"+
-	      (val == DataFrame.NIL ? "&lt;no-value&gt;" : val)+
-	      "</td>"+
-              "<td>"+
-              (modified && key.equals(newSlot) ?
-               "<b>(was "+
-	       (oldValue == DataFrame.NIL ? "&lt;no-value&gt;" : oldValue)+
-	       ")</b>" : "")+
-              "</td>"+
-              "</tr>\n");
-        }
+	  int j = 0;
+	  Iterator itr = vp.entrySet().iterator();
+	  while (itr.hasNext()) {
+	      Map.Entry entry = (Map.Entry) itr.next();
+	      String key = (String) entry.getKey();
+	      Object val = entry.getValue();
+	      if (val instanceof SlotDescription) 
+		  val = ((SlotDescription)val).value;
+	      else if (val instanceof Attributes)
+		  val = ((Attributes) val).getValue("default-value");
+	      j++;
+	      out.print(
+			"<tr><td>&nbsp;&nbsp;"+j+":&nbsp;</td>"+
+			"<td>"+key+"</td><td>"+
+			(val == DataFrame.NIL || val == null ? "&lt;no-value&gt;" : val)+
+			"</td>"+
+			"<td>"+
+			(modified && key.equals(newSlot) ?
+			 "<b>(was "+
+			 (oldValue == DataFrame.NIL ? "&lt;no-value&gt;" : oldValue)+
+			 ")</b>" : "")+
+			"</td>"+
+			"</tr>\n");
+	  }
       }
       out.print(
           "<tr>"+
