@@ -11,20 +11,25 @@ import org.cougaar.core.qos.frame.Frame;
  * To change this template use File | Settings | File Templates.
  */
 public class FramePredicate {
-    String kind, name, frameset, parentRelationship;
+    String kind, name, parentRelationship;
+    String frameset;
 
-    public FramePredicate(String kind, String name, String frameset, String parentRelationship) {
+    public FramePredicate(String kind, String name, String parentRelationship) {
         this.kind = kind;
         this.name = name;
-        this.frameset = frameset;
+        this.frameset = null;
         this.parentRelationship = parentRelationship;
     }
 
     public FramePredicate(FramePredicate p, String name) {
 	this.name = name;
 	this.kind = p.kind;
-	this.frameset = p.frameset;
+	this.frameset = null;
 	this.parentRelationship = p.parentRelationship;
+    }
+
+    public void setFrameSetName(String frameSetName) {
+        this.frameset = frameSetName;   
     }
 
     public String getKind() {

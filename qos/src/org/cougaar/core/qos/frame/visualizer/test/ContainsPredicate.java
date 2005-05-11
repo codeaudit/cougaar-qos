@@ -14,10 +14,7 @@ public class ContainsPredicate extends FramePredicate {
     String parent;
 
     public ContainsPredicate(String relationship, String parent) {
-        this(relationship, parent, null);
-    }
-    public ContainsPredicate(String relationship, String parent, String frameset) {
-        super(relationship, null, frameset, relationship);
+        super(relationship, null, relationship);
         this.parent = parent;
     }
 

@@ -112,6 +112,8 @@ public class Transition {
         }
         if (lastStep)  {
             toContainer.add(shape);
+            // temp hack to get the slot listeners to update the values
+            //shape.validateListeners();
             return true;
         }
 

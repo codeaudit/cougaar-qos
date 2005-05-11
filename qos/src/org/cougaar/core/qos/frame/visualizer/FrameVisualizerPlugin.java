@@ -105,6 +105,16 @@ public class FrameVisualizerPlugin
         }
     }
 
+   /* class SetFrameHelper implements Runnable {
+        FrameHelper fh;
+        public SetFrameHelper(FrameHelper helper){
+            fh = helper;
+        }
+        public void run() {
+            pluginDisplay.setFrameHelper(fh);
+        }
+    }*/
+
     private void do_execute(BlackboardService bbs)
     {
 	if (!sub.hasChanged()) {

@@ -83,15 +83,19 @@ public class Display extends AnimatedCanvas {
     public void registerGraphic(org.cougaar.core.qos.frame.Frame f, ShapeGraphic graphic) {
         if (f == null || graphic == null)
             return;
-        //if (graphics.get(f) != null)
-        //  throw new IllegalArgumentException("Error: "+graphic+" is already registered for frame "+f);
-        if (graphics.get(f) == null)
-            graphics.remove(f);
-        graphics.put(f, graphic);
+        synchronized (lock) {
+            if (graphics.get(f) != null)
+               throw new IllegalArgumentException("Error: "+graphic+" is already registered for frame "+f);
+            //if (graphics.get(f) == null) {
+                graphics.put(f, graphic);
+            //}
+        }
     }
 
     public ShapeGraphic getGraphic(org.cougaar.core.qos.frame.Frame f) {
-        return (ShapeGraphic) graphics.get(f);
+        synchronized (lock) {
+            return (ShapeGraphic) graphics.get(f);
+        }
     }
 
     public void addChangeListener(ChangeListener l) {
@@ -124,22 +128,23 @@ public class Display extends AnimatedCanvas {
     public void step(int w, int h) {
         if (!initialized)
             return;
-        ArrayList remove = new ArrayList();
-        Transition t;
-        boolean finished;
-        for (Iterator ii=transitions.iterator(); ii.hasNext();) {
-           t = (Transition) ii.next();
-           finished = t.step();
-           if (finished)
-               remove.add(t);
+        synchronized (lock) {
+            ArrayList remove = new ArrayList();
+            Transition t;
+            boolean finished;
+            for (Iterator ii=transitions.iterator(); ii.hasNext();) {
+               t = (Transition) ii.next();
+               finished = t.step();
+               if (finished)
+                   remove.add(t);
+            }
+            for (Iterator rr=remove.iterator(); rr.hasNext();)
+                transitions.remove(rr.next());
+            if (transitions.size() == 0) {
+                processingTickEvent = false;
+                changes.notifyListeners(change);
+            }
         }
-        for (Iterator rr=remove.iterator(); rr.hasNext();)
-            transitions.remove(rr.next());
-        if (transitions.size() == 0) {
-            processingTickEvent = false;
-            changes.notifyListeners(change);
-        }
-
     }
 
     public void render(int w, int h, Graphics2D g2) {
@@ -202,9 +207,9 @@ public class Display extends AnimatedCanvas {
 
 
     public void setFrameHelper(FrameHelper h) {
-        this.graphics = new HashMap();
-        this.frameHelper = h;
         synchronized (lock) {
+            this.graphics = new HashMap();
+            this.frameHelper = h;
             root.setFrameHelper(frameHelper, this);
         }
     }

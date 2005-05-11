@@ -447,9 +447,8 @@ public class ViewConfigParser extends XMLParser  {
             return null;
         String kind = attrs.getValue("isa");
         String name = attrs.getValue("name");
-        String frameset= attrs.getValue("frameset");
         String parentRelationship=attrs.getValue("parentRelationship");
-        return new FramePredicate(kind, name, frameset, parentRelationship);
+        return new FramePredicate(kind, name, parentRelationship);
     }
 
     protected static ShapeGraphic createComponent(Attributes attrs) {

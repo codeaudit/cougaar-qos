@@ -10,11 +10,7 @@ import org.cougaar.util.log.Logging;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +22,7 @@ import java.util.Set;
 public class ShapeContainer extends ShapeGraphic {
     protected ArrayList children;
     protected HashMap prototypes;//, insertContainers;
-    protected HashMap frameChildren;
+    protected HashSet frameChildren;
     protected ShapeLayout shapeLayout;
     
     //private transient Logger log = Logging.getLogger(getClass().getName());
@@ -42,7 +38,7 @@ public class ShapeContainer extends ShapeGraphic {
     public ShapeContainer(String id, String label) {
         super(id,label);
         children = new ArrayList();
-	    frameChildren = new HashMap();
+	    frameChildren = new HashSet();
         prototypes = new HashMap();
         //insertContainers = new HashMap();
     }
@@ -161,16 +157,8 @@ public class ShapeContainer extends ShapeGraphic {
         if (log.isDebugEnabled())
                 log.debug("====>maybe-add: "+toString()+"\n\t  adding  frame(kind="+kind+", name="+frame.getValue("name")+")");
 
-
-        //for (Iterator ii=children.iterator(); ii.hasNext();) {
-        //  shg = (ShapeGraphic) ii.next();
-            // we already have a child of with this name so return
-            //if (shg.frame != null && ((String)shg.frame.getValue("name")).equals((String)frame.getValue("name")))
-            //return;
-        //}
-
         String frameName = (String) frame.getValue("name");
-        if (frameChildren.get(frameName) != null) {
+        if (frameChildren.contains(frame)) {
             if (log.isDebugEnabled())
             log.debug("====>rejected: already have a child with name "+frameName);
             return;
@@ -183,8 +171,8 @@ public class ShapeContainer extends ShapeGraphic {
                 if (fp!=null && frame.isa(fp.getKind())) {
             if (log.isDebugEnabled())
                 log.debug("****>add: "+toString()+"\n\t  adding clone (kind="+kind+", name="+frame.getValue("name")+")");
-                    add(shg.createInstance(frame));
-                frameChildren.put(frameName, frame);
+                add(shg.createInstance(frame));
+                frameChildren.add(frame);
            } else {
                 if (log.isDebugEnabled())
                     log.debug("****>add: "+toString()+"\n\t  did not find a prototype match for kind="+kind+", discarding");
@@ -197,7 +185,7 @@ public class ShapeContainer extends ShapeGraphic {
         children.remove(sh);
         sh.setParent(null);
         if (sh.frame != null)
-            frameChildren.remove((String)sh.frame.getValue("name"));
+            frameChildren.remove(sh.frame);
         layoutChildren();
     }
 
@@ -222,44 +210,36 @@ public class ShapeContainer extends ShapeGraphic {
     }
 
 
+    protected void buildChildren(FrameHelper helper, Display display) {
+        // this can be either a container with no associated frame (used for grouping)
+        // of a container with a frame and a frame predicate
+        FramePredicate fp = getFramePredicate();
+        org.cougaar.core.qos.frame.Frame  f2, f = getFrame();
+
+        ShapeGraphic shg;
+        Collection frames;
+        org.cougaar.core.qos.frame.Frame fr;
+        for (Iterator ii=prototypes.values().iterator(); ii.hasNext();) {
+            shg = (ShapeGraphic) ii.next();
+            FramePredicate pfp = shg.getFramePredicate();
+            frames = (f != null ? frameHelper.getAllChildren(f, pfp.getParentRelationship()) : frameHelper.findFrames(pfp));
+            if (frames != null) {
+                for (Iterator jj=frames.iterator(); jj.hasNext();)  {
+                    fr = (org.cougaar.core.qos.frame.Frame) jj.next();
+                    if (display.getGraphic(fr) == null)
+                        add(fr);
+                }
+            }
+        }
+    }
+
 
     public void setFrameHelper(FrameHelper helper, Display display) {
         super.setFrameHelper(helper, display);
         if (log.isDebugEnabled())
             log.debug("setFrameHelper:" +toString());
 
-        FramePredicate fp = getFramePredicate();
-
-        org.cougaar.core.qos.frame.Frame  f2, f = getFrame();
-        if (f != null) {
-            String frameName = (String) f.getValue("name");
-            Collection childFrames = frameHelper.getAllChildren(f, (fp!=null?fp.getParentRelationship():"contains"));
-
-            org.cougaar.core.qos.frame.Frame fr;
-            for (Iterator ii=childFrames.iterator(); ii.hasNext(); ) {
-                fr = (org.cougaar.core.qos.frame.Frame) ii.next();
-                // add if the frame matches any of the prototypes
-                if (display.getGraphic(fr) == null)
-                    add(fr);
-            }
-
-        } else {
-            ShapeGraphic shg;
-            Collection frames;
-            org.cougaar.core.qos.frame.Frame fr;
-            for (Iterator ii=prototypes.values().iterator(); ii.hasNext();) {
-                shg = (ShapeGraphic) ii.next();
-                FramePredicate pfp = shg.getFramePredicate();
-                frames = frameHelper.findFrames(pfp);
-                if (frames != null) {
-                    for (Iterator jj=frames.iterator(); jj.hasNext();)  {
-                        fr = (org.cougaar.core.qos.frame.Frame) jj.next();
-                        if (display.getGraphic(fr) == null)
-                            add(fr);
-                    }
-                }
-            }
-        }
+        buildChildren(helper, display);
         ShapeGraphic ch;
         for (Iterator ii=children.iterator(); ii.hasNext();) {
             ch=(ShapeGraphic) ii.next();
@@ -283,7 +263,7 @@ public class ShapeContainer extends ShapeGraphic {
             if (cloned.predicate != null && parent != null)
             cloned.predicate = new FramePredicate(cloned.predicate, (String) parent.getValue("name"));
 
-            cloned.frameChildren = new HashMap();
+            cloned.frameChildren = new HashSet();
             cloned.shapeLayout = (shapeLayout != null ? shapeLayout.cloneSelf() : null);
             cloned.children = new ArrayList();
 

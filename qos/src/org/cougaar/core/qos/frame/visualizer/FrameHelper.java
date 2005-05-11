@@ -48,6 +48,8 @@ import org.cougaar.util.log.Logging;
 
 
 public class FrameHelper {
+    protected static int sid=0;
+    protected int internalid = sid++;
     protected FrameSet frameSet;
     protected Collection allFrames;
     protected HashSet dataFrames;
@@ -66,7 +68,7 @@ public class FrameHelper {
         this.frameSet = frameSet;
         process(allFrames);
         if (log.isDebugEnabled())
-                log.debug("FrameHelper(): initialized with "+allFrames.size()+" frames and frameset="+frameSet.getName());
+                log.debug("FrameHelper("+internalid+"): initialized with "+allFrames.size()+" frames and frameset="+frameSet.getName());
     }
 
     public String getFrameSetName() {
@@ -74,7 +76,7 @@ public class FrameHelper {
     }
 
     public String toString() {
-	return "FrameHelper:  frameset='"+getFrameSetName()+"' has "+allFrames.size()+" frames, "+dataFrames.size()+" data frames"; 
+	return "FrameHelper("+internalid+"):  frameset='"+getFrameSetName()+"' has "+allFrames.size()+" frames, "+dataFrames.size()+" data frames";
     }
 
     public synchronized Collection getAllFrames() {
@@ -90,14 +92,16 @@ public class FrameHelper {
     }
 
     public synchronized org.cougaar.core.qos.frame.Frame findFrame(Collection frames, FramePredicate predicate) {
+        if (predicate != null)
+            predicate.setFrameSetName((frameSet != null ? frameSet.getName() : null));
         if (log.isDebugEnabled())
-                log.debug("findFrame(frames["+frames.size()+"], predicate="+predicate+")");
+                log.debug("findFrame(:"+internalid+"  frames["+frames.size()+"], predicate="+predicate+")");
         org.cougaar.core.qos.frame.Frame f;
         for (Iterator ii = frames.iterator(); ii.hasNext(); ) {
             f = (org.cougaar.core.qos.frame.Frame) ii.next();
             if (predicate.execute(f)) {
             if (log.isDebugEnabled())
-                log.debug("found frame=  "+f);
+                log.debug(":"+internalid+" found frame=  "+f);
             return f;
             }
         }
@@ -109,8 +113,10 @@ public class FrameHelper {
     }
 
     public synchronized Collection findFrames(Collection frames, FramePredicate predicate) {
+        if (predicate != null)
+            predicate.setFrameSetName((frameSet != null ? frameSet.getName() : null));
         if (log.isDebugEnabled())
-                log.debug("findFrames(frames["+frames.size()+"], predicate="+predicate+")");
+                log.debug("findFrames(:"+internalid+" frames["+frames.size()+"], predicate="+predicate+")");
 
         ArrayList result = new ArrayList();
         org.cougaar.core.qos.frame.Frame f;
@@ -136,53 +142,18 @@ public class FrameHelper {
         } else if (log.isDebugEnabled() && result.size()==0)
             log.debug("found no matches");
     }
-
+   /*
     public synchronized org.cougaar.core.qos.frame.Frame[] getParentAndChild(RelationFrame relationshipFrame) {
         org.cougaar.core.qos.frame.Frame f[] = new org.cougaar.core.qos.frame.Frame[2];
-        //String parentName, childName;
-        //parentName = (String) relationshipFrame.getValue("parent-value");
-        //childName  = (String) relationshipFrame.getValue("child-value");
-        //f[0] = (org.cougaar.core.qos.frame.Frame) frameMap.get(parentName);
-        //f[1] = (org.cougaar.core.qos.frame.Frame) frameMap.get(childName);
         f[0] = relationshipFrame.relationshipParent();
         f[1] = relationshipFrame.relationshipChild();
         return f;
-    }
-
-
-    //class ChildrenPredicate extends FramePredicate {
-	
-	
-    //    }
+    }*/
 
     public synchronized Collection getAllChildren(org.cougaar.core.qos.frame.Frame parent, String relationship) {
         if (log.isDebugEnabled())
-            log.debug("getAllChildren(parent="+parent+" relationship="+relationship+")");
-
-        Collection childrenRelationships = findFrames(new ContainsPredicate(relationship, (String)parent.getValue("name")));
-        //System.out.println("getAllChildren of "+parent+"   relation="+relationship);
-        //Set childrenRelationships = frameSet.findRelations(parent, "child", relationship);
-        org.cougaar.core.qos.frame.Frame f;
-         org.cougaar.core.qos.frame.RelationFrame rf;
-        org.cougaar.core.qos.frame.Frame ch;
-        String name;
-        ArrayList result = new ArrayList();
-
-        for (Iterator ii=childrenRelationships.iterator(); ii.hasNext(); ) {
-            f = (org.cougaar.core.qos.frame.RelationFrame) ii.next();
-            //if (f instanceof RelationFrame) {
-                ch = ((RelationFrame)f).relationshipChild();
-                //System.out.println((String) f.getValue("child-value"));
-                //name = (String) f.getValue("child-value");
-                //ch = (org.cougaar.core.qos.frame.Frame) frameMap.get(name);
-                if (ch == null)
-                    continue;
-                result.add(ch);
-            //}   else System.out.println(f.getClass().getName());
-        }
-        if (log.isDebugEnabled())
-            printResult(result);
-        return result;
+            log.debug("getAllChildren(:"+internalid+" parent="+parent+" relationship="+relationship+")");
+        return  frameSet.findRelations(parent, "child", relationship);
     }
 
     protected void process(Collection frames) {

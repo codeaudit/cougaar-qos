@@ -149,8 +149,9 @@ public class ShapeGraphic implements Cloneable {
         frameHelper = helper;
         if (frame == null && predicate != null) {
             setFrame(frameHelper.findFrame(predicate));
-            display.registerGraphic(frame, this);
         }
+        if (frame != null)
+            display.registerGraphic(frame, this);
     }
 
     public boolean hasFrame() {
@@ -232,7 +233,7 @@ public class ShapeGraphic implements Cloneable {
             RectangularShape tmp = shape;
             shape = (RectangularShape) shapePrototype.clone();
             if (tmp != null)
-                shape.setFrame(tmp.getFrame());
+                shape.setFrame(tmp.getFrame()); // this is a Java2D frame
         }
         return shape;
     }
@@ -247,7 +248,7 @@ public class ShapeGraphic implements Cloneable {
     }
 
     public ShapeGraphic find(org.cougaar.core.qos.frame.Frame f) {
-	if (frame != null && id != null && id.equals((String) f.getValue("name")))
+	if (frame != null && frame == f) //id != null && id.equals((String) f.getValue("name")))
 	    return this;
 	return null;
     }

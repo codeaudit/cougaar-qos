@@ -48,12 +48,12 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
         Dimension d = w.getSize();
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {System.exit(0);}
-            public void windowDeiconified(WindowEvent e) {  display.startClock(); display.animating.start(); }
+            public void windowDeiconified(WindowEvent e) {  /*display.startClock(); display.animating.start();*/ }
             public void windowIconified(WindowEvent e) {
-                if (display.animating != null) {
+               /* if (display.animating != null) {
                     display.animating.stop();
                 }
-                display.bimg = null;;
+                display.bimg = null;; */
             }
         });
         getContentPane().setLayout(new BorderLayout());
@@ -105,7 +105,7 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new SetFrameHelper(helper));
             return;
-        }
+        } 
         this.frameHelper = helper;
 	    display.setFrameHelper(helper);
 	    //containerView.buildContainerTree(display.getRootContainer());
