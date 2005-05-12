@@ -28,6 +28,7 @@ package org.cougaar.core.qos.frame;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
@@ -95,11 +96,23 @@ public interface FrameSet
     public Set findFrames(String kind, Properties slot_value_pairs);
 
     /**
-     * Returns a collection of {@link DataFrame}s representing
+     * Returns a collection of {@link DataFrame}s representing frames
+     * related to the given one via a relationship matching the given
+     * prototype, and in which the given frame plays the given role
+     * ("parent" or "child").
+     */
+    public Set findRelations(Frame frame, // should be DataFrame
+			     String role,
+			     String relation_proto);
+
+    /**
+     * Returns a collection of {@link RelationFrame}s representing
      * relationships of the given prototype in which the given frame
      * plays the given role ("parent" or "child").
      */
-    public Set findRelations(Frame root, String role, String relation);
+    public Map findRelationshipFrames(DataFrame frame,
+				      String role, 
+				      String relation_proto);
 
     /**
      * Adds a previously constucted DataFrame to this FrameSet.  The

@@ -201,6 +201,23 @@ abstract public class DataFrame
 	pcs.firePropertyChange(event);
     }
 
+    // Path dependencies.  TBD
+    void clearRelationDependencies(String slot)
+    {
+    }
+
+    void addRelationSlotDependency(DataFrame frame, String slot)
+    {
+    }
+
+    void addRelationDependency(RelationFrame rframe, String slot)
+    {
+    }
+
+    void removeRelationDependency(RelationFrame rframe, String slot)
+    {
+    }
+
 
     // Jess ShadowFact
     public void addPropertyChangeListener(PropertyChangeListener pcl)
@@ -283,6 +300,12 @@ abstract public class DataFrame
     {
 	if (frameSet == null) return null;
 	return frameSet.findRelations(this, role, relation);
+    }
+
+    public Map findRelationshipFrames(String role, String relation)
+    {
+	if (frameSet == null) return null;
+	return frameSet.findRelationshipFrames(this, role, relation);
     }
 
     public boolean isa(String kind)

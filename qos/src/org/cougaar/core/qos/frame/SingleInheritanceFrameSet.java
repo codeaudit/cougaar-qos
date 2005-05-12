@@ -541,11 +541,13 @@ public class SingleInheritanceFrameSet
 	return results;
       }
 
-    Set findChildren(Frame parent, String relation_prototype)
+    Set findChildren(DataFrame parent, 
+		     String relation_prototype,
+		     Map map)
     {
 	Class klass = classForPrototype(relation_prototype);
 	if (klass == null) return null;
-	HashSet results = new HashSet();
+	HashSet results = map != null ? null : new HashSet();
 	synchronized (relation_lock) {
 	    Iterator itr = parent_cache.entrySet().iterator();
 	    while (itr.hasNext()) {
@@ -554,20 +556,26 @@ public class SingleInheritanceFrameSet
 		    RelationFrame relation = (RelationFrame) entry.getKey();
 		    Object child = child_cache.get(relation);
 		    if (child != null &&
-			descendsFrom(relation, klass, relation_prototype))
-			results.add(child);
+			descendsFrom(relation, klass, relation_prototype)) {
+			if (map != null)
+			    map.put(relation, child);
+			else
+			    results.add(child);
+		    }
 		}
 	    }
 	}
 	return results;
     }
 
-    Set findParents(Frame child, String relation_prototype)
+    Set findParents(DataFrame child, 
+		    String relation_prototype,
+		    Map map)
     {
 	Class klass = classForPrototype(relation_prototype);
 	if (klass == null) return null;
 
-	HashSet results = new HashSet();
+	HashSet results = map != null ? null : new HashSet();
 	synchronized (relation_lock) {
 	    Iterator itr = child_cache.entrySet().iterator();
 	    while (itr.hasNext()) {
@@ -576,25 +584,48 @@ public class SingleInheritanceFrameSet
 		    RelationFrame relation = (RelationFrame) entry.getKey();
 		    Object parent = parent_cache.get(relation);
 		    if (parent != null &&
-			descendsFrom(relation, klass, relation_prototype))
-			results.add(parent);
+			descendsFrom(relation, klass, relation_prototype)) {
+			if (map != null)
+			    map.put(relation, parent);
+			else
+			    results.add(parent);
+		    }
 		}
 	    }
 	}
 	return results;
     }
 
-    public Set findRelations(Frame root, String role, String relation)
+    public Set findRelations(Frame frame, // should be DataFrame
+			     String role,
+			     String relation_proto)
     {
 	if (role.equals("parent")) {
-	    return findParents(root, relation);
+	    return findParents((DataFrame) frame, relation_proto, null);
 	} else if (role.equals("child")) {
-	    return findChildren(root, relation);
+	    return findChildren((DataFrame) frame, relation_proto, null);
 	} else {
 	    if (log.isWarnEnabled())
 		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
 	    return null;
 	}
+				
+    }
+
+    public Map findRelationshipFrames(DataFrame frame, 
+				      String role, 
+				      String relation_proto)
+    {
+	Map map = new HashMap();
+	if (role.equals("parent")) {
+	    findParents(frame, relation_proto, map);
+	} else if (role.equals("child")) {
+	    findChildren(frame, relation_proto, map);
+	} else {
+	    if (log.isWarnEnabled())
+		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+	}
+	return map;
 				
     }
 

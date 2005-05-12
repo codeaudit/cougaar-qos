@@ -28,6 +28,7 @@ package org.cougaar.core.qos.frame;
 
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.cougaar.core.util.UID;
@@ -88,10 +89,16 @@ public class Path
 
     Object getValue(DataFrame root, String slot)
     {
-	return getNextValue(root, 0, override_slot != null ? override_slot : slot);
+	root.clearRelationDependencies(slot);
+	return
+	    getNextValue(root, root, 0, 
+			 override_slot != null ? override_slot : slot);
     }
 
-    private Object getNextValue(DataFrame frame, int index, String slot)
+    private Object getNextValue(DataFrame root, 
+				DataFrame frame, 
+				int index, 
+				String slot)
     {
 	if (log.isDebugEnabled())
 	    log.debug("Walking path " +name+
@@ -109,7 +116,7 @@ public class Path
 	}
 
 	Fork entry = forks[index];
-	Set frames = frame.findRelations(entry.role, entry.relation);
+	Map frames = frame.findRelationshipFrames(entry.role, entry.relation);
 	if (frames == null) {
 	    if (log.isDebugEnabled())
 		log.debug(frame+ " has no relations of type "
@@ -121,15 +128,23 @@ public class Path
 	    log.debug(frames.size() + " matches for relation "
 		      +entry.relation+ " role=" +entry.role);
 
-	Iterator itr = frames.iterator();
+	Iterator itr = frames.entrySet().iterator();
 	while (itr.hasNext()) {
-	    DataFrame next = (DataFrame) itr.next();
-	    if (next == null) {
-		log.shout("Null in frames!!! ");
-		return null;
+	    Map.Entry e = (Map.Entry) itr.next();
+	    RelationFrame rframe = (RelationFrame) e.getKey();
+	    synchronized (rframe) {
+		// Don't allow relationship changes during the lookup.
+		root.addRelationDependency(rframe, slot);
+		DataFrame next = (DataFrame) e.getValue();
+		Object result = getNextValue(root, next, ++index, slot);
+		if (result != null) {
+		    root.addRelationSlotDependency(next, slot);
+		    return result;
+		}
+
+		// This tree failed
+		root.removeRelationDependency(rframe, slot);
 	    }
-	    Object result = getNextValue(next, ++index, slot);
-	    if (result != null) return result;
 	    if (index == forks.length) return null;
 	}
 	return null;
