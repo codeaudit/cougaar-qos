@@ -164,6 +164,10 @@ abstract public class DataFrame
 
 
     private Properties props;
+    private transient HashMap ddeps = new HashMap();
+    private transient HashMap rdeps = new HashMap();
+    private transient HashMap path_dependents = new HashMap();
+    private transient Object rlock = new Object();
     private transient PropertyChangeSupport pcs;
 
     protected DataFrame(FrameSet frameSet, UID uid)
@@ -201,22 +205,138 @@ abstract public class DataFrame
 	pcs.firePropertyChange(event);
     }
 
-    // Path dependencies.  TBD
+    // Path dependencies.
+
+
+    Object get_rlock()
+    {
+	return 	rlock;
+    }
+
+
+    // Caller should lock rlock
     void clearRelationDependencies(String slot)
     {
+	if (log.isInfoEnabled())
+	    log.info("Clearing relation dependencies of " +this+
+		     " slot " +slot);
+	List rframes = (List) rdeps.get(slot);
+	if (rframes == null) return;
+	int count = rframes.size();
+	for (int i=0; i<count; i++) {
+	    RelationFrame rframe = (RelationFrame) rframes.get(i);
+	    rframe.removePathDependent(this, slot);
+	}
+	rdeps.remove(slot);
+	DataFrame dframe = (DataFrame) ddeps.get(slot);
+	dframe.removePathDependent(this, slot);
+	ddeps.remove(slot);
     }
 
+    // Caller should lock rlock
     void addRelationSlotDependency(DataFrame frame, String slot)
     {
+	if (log.isInfoEnabled())
+	    log.info("Clearing relation dependencies of " +this+
+		     " for slot " +slot);
+	ddeps.put(slot, frame);
+	frame.addPathDependent(this, slot);
     }
 
+    // Caller should lock rlock
     void addRelationDependency(RelationFrame rframe, String slot)
     {
+	if (log.isInfoEnabled())
+	    log.info("Adding relation dependency " +rframe+ " on " +this+
+		     " slot " +slot);
+	List rframes = (List) rdeps.get(slot);
+	if (rframes == null) {
+	    rframes = new ArrayList();
+	    rdeps.put(slot, rframes);
+	}
+	rframes.add(rframe);
+	rframe.addPathDependent(this, slot);
     }
 
+    // Caller should lock rlock
     void removeRelationDependency(RelationFrame rframe, String slot)
     {
+	if (log.isInfoEnabled())
+	    log.info("Removing relation dependency " +rframe+ " on " +this+
+		     " for slot " +slot);
+	List rframes = (List) rdeps.get(slot);
+	if (rframes != null) rframes.remove(rframe);
+	rframe.removePathDependent(this, slot);
     }
+
+    void pathDependencyChange(String slot)
+    {
+	if (log.isInfoEnabled())
+	    log.info("Path dependency has changed for frame " +this+
+		      " and for slot " +slot);
+	Object new_value = getValue(slot);
+	slotModified(slot, null, new_value, true, true);
+    }
+
+    void addPathDependent(DataFrame dependent, String slot)
+    {
+	if (log.isInfoEnabled())
+	    log.info(this + " is adding dependent " +dependent+
+		     " for slot " +slot);
+	synchronized (path_dependents) {
+	    Set dependents = (Set)  path_dependents.get(slot);
+	    if (dependents == null) {
+		dependents = new HashSet();
+		path_dependents.put(slot, dependents);
+	    }
+	    dependents.add(dependent);
+	}
+    }
+
+    void removePathDependent(DataFrame dependent, String slot)
+    {
+	if (log.isInfoEnabled())
+	    log.info(this + " is removing dependent " +dependent+
+		     " for slot " +slot);
+	synchronized (path_dependents) {
+	    Set dependents = (Set) path_dependents.get(slot);
+	    if (dependents != null) {
+		dependents.remove(dependent);
+	    }
+	}
+    }
+
+    void notifyPathDependents(String slot)
+    {
+	synchronized (path_dependents) {
+	    Set dependents = (Set) path_dependents.get(slot);
+	    if (dependents != null) {
+		Iterator itr = dependents.iterator();
+		while (itr.hasNext()) {
+		    DataFrame frame = (DataFrame) itr.next();
+		    frame.pathDependencyChange(slot);
+		}
+	    }
+	}
+    }
+
+    void notifyAllPathDependents()
+    {
+	synchronized (path_dependents) {
+	    Iterator itr = path_dependents.entrySet().iterator();
+	    while (itr.hasNext()) {
+		Map.Entry entry = (Map.Entry) itr.next();
+		String slot = (String) entry.getKey();
+		Set dependents = (Set) entry.getValue();
+		Iterator itr2 = dependents.iterator();
+		while (itr.hasNext()) {
+		    DataFrame frame = (DataFrame) itr.next();
+		    frame.pathDependencyChange(slot);
+		}
+	    }
+	}
+    }
+    
 
 
     // Jess ShadowFact
@@ -358,6 +478,7 @@ abstract public class DataFrame
 	if (notify_listeners) {
 	    String fixed_name = FrameGen.fixName(slot, true, true);
 	    fireChange(fixed_name, old_value, new_value);
+	    notifyPathDependents(slot);
 	}
     }
 

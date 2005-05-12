@@ -26,7 +26,9 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.cougaar.core.util.UID;
 
@@ -49,6 +51,14 @@ abstract public class RelationFrame
     abstract public String getChildPrototype();
     abstract public String getChildSlot();
     abstract public String getChildValue();
+
+    // Path dependencies.
+
+    void notifyPathDependents(String changed_slot)
+    {
+	notifyAllPathDependents();
+    }
+
 
     public DataFrame relationshipParent()
     {

@@ -89,10 +89,12 @@ public class Path
 
     Object getValue(DataFrame root, String slot)
     {
-	root.clearRelationDependencies(slot);
-	return
-	    getNextValue(root, root, 0, 
-			 override_slot != null ? override_slot : slot);
+	synchronized (root.get_rlock()) {
+	    root.clearRelationDependencies(slot);
+	    return
+		getNextValue(root, root, 0, 
+			     override_slot != null ? override_slot : slot);
+	}
     }
 
     private Object getNextValue(DataFrame root, 
