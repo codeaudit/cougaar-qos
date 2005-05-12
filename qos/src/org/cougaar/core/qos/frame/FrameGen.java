@@ -1401,6 +1401,19 @@ public class FrameGen
 	return inheritsSlot(parent, slot);
     }
 
+    private Attributes slotDefinition(String proto, String slot)
+    {
+	Attributes definition = null;
+	while (proto != null) {
+	    HashMap slots = (HashMap) proto_slots.get(proto);
+	    Attributes def = (Attributes) slots.get(slot);
+	    if (def != null) definition = def;
+	    Attributes attrs = (Attributes) proto_attrs.get(proto);
+	    proto = attrs.getValue("prototype");
+	}
+	return definition;
+    }
+
     private String ancestorForSlot(String proto, String slot)
     {
 	if (proto == null) return null;
@@ -1465,26 +1478,35 @@ public class FrameGen
     }
 
 
+    // The boolean slot attributes (member, warn, immutable,
+    // transient, notify-blackboard, notify-listeners) MUST be
+    // specified in the definition. 
     private boolean getBooleanAttribute(String prototype,
 					String slot,
 					String attr,
 					boolean default_value)
     {
-	HashMap slots = (HashMap) proto_slots.get(prototype);
-	Attributes attrs = (Attributes) slots.get(slot);
+	Attributes attrs = slotDefinition(prototype, slot);
+	if (attrs == null) return default_value;
+	String attrstr = attrs.getValue(attr);
+	if (attrstr == null) return default_value;
+	return attrstr.equalsIgnoreCase("true");
 
-	String attrstr = attrs != null ? attrs.getValue(attr) : null;
-	if (attrstr == null) {
-	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
-	    String parent = p_attrs.getValue("prototype");
-	    if (parent != null) {
-		return getBooleanAttribute(parent, slot, attr, default_value);
-	    } else {
-		return default_value;
-	    }
-	} else {
-	    return attrstr.equalsIgnoreCase("true");
-	}
+// 	HashMap slots = (HashMap) proto_slots.get(prototype);
+// 	Attributes attrs = (Attributes) slots.get(slot);
+
+// 	String attrstr = attrs != null ? attrs.getValue(attr) : null;
+// 	if (attrstr == null) {
+// 	    Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+// 	    String parent = p_attrs.getValue("prototype");
+// 	    if (parent != null) {
+// 		return getBooleanAttribute(parent, slot, attr, default_value);
+// 	    } else {
+// 		return default_value;
+// 	    }
+// 	} else {
+// 	    return attrstr.equalsIgnoreCase("true");
+// 	}
     }
 
     private String getPathType(String path, String slot)
@@ -1515,6 +1537,21 @@ public class FrameGen
 	String type = getSlotType(prototype, slot);
 // 	System.out.println("### Got " + type);
 	return coerceToObjectType(type);
+    }
+
+    private String getPath(String prototype, String slot)
+    {
+	HashMap slots = (HashMap) proto_slots.get(prototype);
+	Attributes attrs = (Attributes) slots.get(slot);
+	String path = attrs != null ? attrs.getValue("path") : null;
+	if (path != null) return path;
+	Attributes p_attrs = (Attributes) proto_attrs.get(prototype);
+	String parent = p_attrs.getValue("prototype");
+	if (parent != null) {
+	    return getPath(parent, slot);
+	} else {
+	    return null;
+	}
     }
 
     private String getSlotTypeFromPrototypeTree(String prototype, String slot)
@@ -1576,7 +1613,7 @@ public class FrameGen
 	// Path-valued slots can't be members
 	HashMap slots = (HashMap) proto_slots.get(prototype);
 	Attributes attrs = (Attributes) slots.get(slot);
-	String path = attrs != null ? attrs.getValue("path") : null;
+	String path = getPath(prototype, slot);
 	if (path != null) return false;
 
 	// Non-Object types must be members
