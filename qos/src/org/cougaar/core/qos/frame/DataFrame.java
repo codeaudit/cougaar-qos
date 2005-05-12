@@ -308,6 +308,9 @@ abstract public class DataFrame
 
     void notifyPathDependents(String slot)
     {
+	if (log.isInfoEnabled())
+	    log.info(" Notify dependents of " +this+
+		     " for slot " +slot);
 	synchronized (path_dependents) {
 	    Set dependents = (Set) path_dependents.get(slot);
 	    if (dependents != null) {
@@ -322,6 +325,8 @@ abstract public class DataFrame
 
     void notifyAllPathDependents()
     {
+	if (log.isInfoEnabled())
+	    log.info(" Notify all dependents of " +this);
 	synchronized (path_dependents) {
 	    Iterator itr = path_dependents.entrySet().iterator();
 	    while (itr.hasNext()) {
