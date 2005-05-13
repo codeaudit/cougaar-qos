@@ -23,9 +23,15 @@ public class ShapeGraphicNode extends DefaultMutableTreeNode {
         super(graphic);
         this.graphic = graphic;
     }
-    
+
+    public ShapeGraphicNode(ShapeGraphic graphic, ShapeGraphicNode parent) {
+        super(graphic);
+        this.graphic = graphic;
+        parent.add(this);
+    }
+
     public String toString() {
-	    return (graphic != null ? graphic.getId() : "null");
+	    return (graphic != null ? graphic.getId() : "");
     }
 
     public ShapeGraphic getShapeGraphic() {

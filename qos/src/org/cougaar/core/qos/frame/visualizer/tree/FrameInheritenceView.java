@@ -1,6 +1,6 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import org.cougaar.core.qos.frame.visualizer.FrameHelper;
+import org.cougaar.core.qos.frame.visualizer.FrameModel;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
@@ -25,7 +25,7 @@ import java.awt.*;
  */
 public class FrameInheritenceView extends ExplorerView {
     FrameTableModel frameModel;
-    FrameHelper frameHelper;
+    FrameModel frameAppModel;
 
     public FrameInheritenceView() {
         super();

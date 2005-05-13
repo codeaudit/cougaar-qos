@@ -27,12 +27,14 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
     ContainerTreeView containerView;
     FrameTreeView frameView;
     JTabbedPane tabbedPane;
-    FrameHelper frameHelper;
+    FrameModel frameModel;
 
-    public DisplayWindow(File xmlFile) {
+    public DisplayWindow(FrameModel frameModel, File xmlFile) {
         super("");
+        this.frameModel = frameModel;
+        frameModel.setDisplayWindow(this);
         tabbedPane = new JTabbedPane();
-        display = new Display(xmlFile);
+        display = new Display(frameModel, xmlFile);
         Component controlPanel = display.getControlPanel();
         JPanel displPanel = new JPanel(new BorderLayout());
         displPanel.add(display, BorderLayout.CENTER);
@@ -68,8 +70,8 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
     }
 
     class SetFrameHelper implements Runnable {
-        FrameHelper h;
-        public SetFrameHelper(FrameHelper helper) {h = helper;}
+        FrameModel h;
+        public SetFrameHelper(FrameModel frameModel) {h = frameModel;}
         public void run() {  setFrameHelper(h); }
     }
     /*
@@ -99,15 +101,15 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
     }
 
 
-    public void setFrameHelper(FrameHelper helper) {
+    public void setFrameHelper(FrameModel frameModel) {
         if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new SetFrameHelper(helper));
+            SwingUtilities.invokeLater(new SetFrameHelper(frameModel));
             return;
         }
-        this.frameHelper = helper;
-        display.setFrameHelper(helper);
+        //this.frameModel = frameModel;
+        //display.setFrameHelper(frameModel);
         //containerView.buildContainerTree(display.getRootContainer());
-        frameView.buildFrameTree(helper);
+        frameView.buildFrameTree(frameModel);
     }
     /*
     public void addFrames(Collection newFrames) {
@@ -127,16 +129,20 @@ public class DisplayWindow extends JFrame implements ChangeListener  {
     }
     */
 
+    public Display getDisplay() {
+        return display;
+    }
+
     public void updateFrameView() {
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new UpdateFrameView());
             return;
         }
-        frameView.buildFrameTree(frameHelper);
+        frameView.buildFrameTree(frameModel);
     }
 
     public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
-        return display.findShape(f);
+        return frameModel.getGraphic(f); //display.findShape(f);
     }
 
     public void tickEventOccured(TickEvent tick) {

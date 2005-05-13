@@ -1,6 +1,6 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import org.cougaar.core.qos.frame.visualizer.FrameHelper;
+import org.cougaar.core.qos.frame.visualizer.FrameModel;
 import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
  */
 public class FrameTreeView extends TreeView {
     HashMap frameMap;
-    FrameHelper frameHelper;
+    FrameModel frameModel;
     FrameInheritenceView frameInheritenceView;
     JLabel selectedLabel, selectedFrameLabel;
 
@@ -105,15 +105,15 @@ public class FrameTreeView extends TreeView {
     }
 
 
-    public void buildFrameTree(FrameHelper frameHelper) {
-        this.frameHelper = frameHelper;
-        root = new DefaultMutableTreeNode("frameset '"+frameHelper.getFrameSetName()+"'");
+    public void buildFrameTree(FrameModel frameModel) {
+        this.frameModel = frameModel;
+        root = new DefaultMutableTreeNode("frameset '"+frameModel.getFrameSetName()+"'");
         frameMap.clear();
 
         if (log.isDebugEnabled())
-            log.debug("buildFrameTree frameHelper="+frameHelper);
+            log.debug("buildFrameTree frameModel"+frameModel);
 
-        Collection relationshipFrames = process(frameHelper.getAllFrames());
+        Collection relationshipFrames = process(frameModel.getAllFrames());
         processRelationships(relationshipFrames);
         Collection rootNodes = findRootLevelNodes();
 

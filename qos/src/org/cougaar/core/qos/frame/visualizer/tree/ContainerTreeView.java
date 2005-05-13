@@ -34,6 +34,7 @@ public class ContainerTreeView extends ExplorerView {
     ShapeTableCellRenderer cellRenderer;
     FrameTableCellRenderer frameCellRenderer;
 
+
     public ContainerTreeView() {
         super();
         frameModel = new FrameTableModel();
@@ -62,12 +63,12 @@ public class ContainerTreeView extends ExplorerView {
         editTable.setModel(frameModel);
     }
 
-     public void buildContainerTree(ShapeContainer rootContainer) {
+    public void buildContainerTree(ShapeContainer rootContainer) {
         root = buildTree(null, rootContainer);
-	    tree.setModel(new DefaultTreeModel(root));
-     }
+        tree.setModel(new DefaultTreeModel(root));
+    }
 
-     public DefaultMutableTreeNode buildTree(DefaultMutableTreeNode parent, Object userObject) {
+    public DefaultMutableTreeNode buildTree(DefaultMutableTreeNode parent, Object userObject) {
         DefaultMutableTreeNode newNode = null;
 
         if (userObject instanceof ShapeGraphic) {
@@ -83,11 +84,11 @@ public class ContainerTreeView extends ExplorerView {
                     g = (ShapeGraphic) ii.next();
                     buildTree(newNode, g);
                 }
-		for (Iterator ii=sc.getChildren().iterator(); ii.hasNext();) {
+                for (Iterator ii=sc.getChildren().iterator(); ii.hasNext();) {
                     g = (ShapeGraphic) ii.next();
                     buildTree(newNode, g);
                 }
-		
+
             }
 
         }  else if (userObject instanceof org.cougaar.core.qos.frame.Frame) {
@@ -96,12 +97,12 @@ public class ContainerTreeView extends ExplorerView {
         }
         if (parent != null && newNode != null)
             parent.add(newNode);
-         return newNode;
-     }
+        return newNode;
+    }
 
 
 
-       private class ContainerRenderer extends DefaultTreeCellRenderer {
+    private class ContainerRenderer extends DefaultTreeCellRenderer {
         Icon containerIcon;
         Icon componentIcon;
         Icon prototypeIcon;
@@ -117,17 +118,17 @@ public class ContainerTreeView extends ExplorerView {
         }
 
         public Component getTreeCellRendererComponent(
-                                                    JTree tree,
-                                                    Object value,
-                                                    boolean sel,
-                                                    boolean expanded,
-                                                    boolean leaf,
-                                                    int row,
-                                                    boolean hasFocus) {
+                JTree tree,
+                Object value,
+                boolean sel,
+                boolean expanded,
+                boolean leaf,
+                int row,
+                boolean hasFocus) {
 
             super.getTreeCellRendererComponent(tree, value, sel,
-                                               expanded, leaf, row,
-                                               hasFocus);
+                    expanded, leaf, row,
+                    hasFocus);
 
             if (value instanceof FrameNode) {
                 setIcon(frameIcon);
@@ -160,22 +161,22 @@ public class ContainerTreeView extends ExplorerView {
         }
 
         public Component getTableCellRendererComponent(
-                                JTable table, Object value,
-                                boolean isSelected, boolean hasFocus,
-                                int row, int column) {
+                JTable table, Object value,
+                boolean isSelected, boolean hasFocus,
+                int row, int column) {
 
             setText(value.toString());
             if (isBordered) {
                 if (isSelected) {
                     if (selectedBorder == null) {
                         selectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
-                                                  table.getSelectionBackground());
+                                table.getSelectionBackground());
                     }
                     setBorder(selectedBorder);
                 } else {
                     if (unselectedBorder == null) {
                         unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
-                                                  table.getBackground());
+                                table.getBackground());
                     }
                     setBorder(unselectedBorder);
                 }

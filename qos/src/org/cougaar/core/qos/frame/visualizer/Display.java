@@ -41,7 +41,7 @@ public class Display extends AnimatedCanvas {
     // debug
     Collection frames;
     HashMap frameContainerMap, prototypeMap;
-    FrameHelper frameHelper;
+    FrameModel frameModel;
     private transient Logger log = Logging.getLogger(getClass().getName());
 
     ViewConfigParser.WindowSpec wSpec;
@@ -52,13 +52,13 @@ public class Display extends AnimatedCanvas {
     ChangeEvent change;
     Object lock;
 
-    // keep track of all shape graphic objects
-    HashMap graphics;
 
 
-    public Display(File xmlFile) {
+
+    public Display(FrameModel frameModel, File xmlFile) {
         lock = new Object();
-        graphics = new HashMap();
+        this.frameModel = frameModel;
+        //graphics = new HashMap();
         transitions = new ArrayList();
         tickEventQueue = new ArrayList();
         frameContainerMap = new HashMap();
@@ -77,26 +77,7 @@ public class Display extends AnimatedCanvas {
         }
     }
 
-    public void registerGraphic(org.cougaar.core.qos.frame.Frame f, ShapeGraphic graphic) {
-        if (f == null || graphic == null)
-            return;
-        //synchronized (lock) {
-            ShapeGraphic sg;
-            if ((sg=(ShapeGraphic)graphics.get(f)) != null) {
-                if (sg != graphic)
-                    throw new IllegalArgumentException("Error: "+graphic+" is already registered for frame "+f);
-            }
-            //if (graphics.get(f) == null) {
-            graphics.put(f, graphic);
-            //}
-        //}
-    }
 
-    public ShapeGraphic getGraphic(org.cougaar.core.qos.frame.Frame f) {
-        //synchronized (lock) {
-            return (ShapeGraphic) graphics.get(f);
-        //}
-    }
 
     public void addChangeListener(ChangeListener l) {
         changes.addListener(l);
@@ -174,14 +155,12 @@ public class Display extends AnimatedCanvas {
     public ShapeGraphic findShape(double x, double y) {
         return root.find(x,y);
     }
-
+   /*
     public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
-        ShapeGraphic g = getGraphic(f);
+        ShapeGraphic g = null; //getGraphic(f);
         return (g == null ? root.find(f) : g);
         //return root.find(f);
-    }
-
-
+    }*/
 
     public void tickEventOccured(TickEvent tick) {
         synchronized (lock) {
@@ -206,15 +185,16 @@ public class Display extends AnimatedCanvas {
         transitions.addAll(tickEvent.getTransitions());
     }
 
-
-    public void setFrameHelper(FrameHelper h) {
+  /*
+    public void setFrameHelper(FrameModel h) {
         synchronized (lock) {
             //this.graphics = new HashMap();
-            this.frameHelper = h;
-            root.setFrameHelper(frameHelper, this);
+            this.frameModel = h;
+            root.setFrameHelper(frameModel);
         }
-    }
-
+    }*/
+    
+   /*
     public void addFrames(Collection newFrames) {
         synchronized (lock) {
             //root.addedFrames(newFrames, this);
@@ -225,7 +205,7 @@ public class Display extends AnimatedCanvas {
         synchronized (lock) {
             //root.removedFrames(removedFrames, this);
         }
-    }
+    }*/
 
 
 

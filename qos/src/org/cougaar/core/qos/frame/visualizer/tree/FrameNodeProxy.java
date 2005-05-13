@@ -29,8 +29,8 @@ public class FrameNodeProxy extends FrameNode {
             return node.isRelationNode();
         }
 
-        public String getRelationshioName() {
-            return node.getRelationshioName();
+        public String getRelationshipName() {
+            return node.getRelationshipName();
         }
 
         public String toString() {

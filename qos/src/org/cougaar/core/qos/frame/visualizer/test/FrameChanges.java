@@ -13,11 +13,11 @@ import java.util.Collection;
  * Time: 9:23:21 AM
  * To change this template use File | Settings | File Templates.
  */
-public class ChangeKeeper {
+public class FrameChanges {
     Frame frame;
     ArrayList changeReports;
 
-    public ChangeKeeper(Frame frame) {
+    public FrameChanges(Frame frame) {
         this.frame = frame;
         changeReports = new ArrayList();
     }
@@ -25,6 +25,10 @@ public class ChangeKeeper {
     public void addChange(Frame.Change ch) {
         changeReports.add(ch);
     }
+    public void addChanges(Collection changes) {
+        changeReports.addAll(changes);    
+    }
+
     public Frame getFrame() {
         return frame;
     }

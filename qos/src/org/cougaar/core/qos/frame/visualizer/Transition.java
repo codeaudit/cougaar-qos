@@ -46,12 +46,12 @@ public class Transition {
 
     // radians to degrees
     public static float r2d(float radians) {
-	return ((radians /(float)(2.0 * Math.PI))* 360.0f)%360 ;
+        return ((radians /(float)(2.0 * Math.PI))* 360.0f)%360 ;
     }
-    
+
     // degree to radians
     public static float d2r(float angle)  {
-	return ((float)(angle * 2.0 * Math.PI)) / 360.0f ;
+        return ((float)(angle * 2.0 * Math.PI)) / 360.0f ;
     }
 
     public boolean step() {
@@ -59,13 +59,14 @@ public class Transition {
         double tx=r.getX(),ty=r.getY();
         this.fromPos = fromContainer.getNextInsertPosition();
         this.toPos   = toContainer.getNextInsertPosition();
-	
-	//double xoff=0d, yoff=0d;
-     
-	if (firstStep) {
-            fromContainer.remove(shape);
 
-            if (!Display.ENABLE_ANIMATION) {
+        //double xoff=0d, yoff=0d;
+
+        if (firstStep) {
+            if (fromContainer != null)
+                fromContainer.remove(shape);
+
+            if (!Display.ENABLE_ANIMATION || fromPos == null) {
                 lastStep = true;
                 toContainer.add(shape);
                 return true;
@@ -75,40 +76,36 @@ public class Transition {
             firstStep = false;
             shape.reshape(fromPos.x, fromPos.y, r.getWidth(), r.getHeight());
 
-	    startVec = new Vec2d(fromPos.x, fromPos.y);
-	    endVec   = new Vec2d(toPos.x, toPos.y);
+            startVec = new Vec2d(fromPos.x, fromPos.y);
+            endVec   = new Vec2d(toPos.x, toPos.y);
 
-	    transVec = endVec.minus(startVec);
-	    tLength = transVec.length();
+            transVec = endVec.minus(startVec);
+            tLength = transVec.length();
 
-	    startVec.normalize();
-	    endVec.normalize();
-	    transVec.normalize();
-	    
-	    double d= (transVec.getY() / (transVec.getX() == 0d ? 0.01 : transVec.getX()));
-	    angle = Math.atan(d);
-	    xoff = (transVec.getX() < 0 ? -1d : 1d) * speed*Math.cos(angle);
-        yoff = (transVec.getX() < 0 ? -1d : 1d) * speed*Math.sin(angle);
+            startVec.normalize();
+            endVec.normalize();
+            transVec.normalize();
 
-	    if (log.isDebugEnabled())
-		    log.debug("starting transition, shape='"+shape.getId()+"' from '"+fromContainer.getId()+"' to '"+toContainer.getId()+"'start x="+fromPos.x+" y="+fromPos.y+"  end x="+toPos.x+" y="+toPos.y+"  length="+tLength+" angle = "+angle);
-	    
+            double d= (transVec.getY() / (transVec.getX() == 0d ? 0.01 : transVec.getX()));
+            angle = Math.atan(d);
+            xoff = (transVec.getX() < 0 ? -1d : 1d) * speed*Math.cos(angle);
+            yoff = (transVec.getX() < 0 ? -1d : 1d) * speed*Math.sin(angle);
+
+            if (log.isDebugEnabled())
+                log.debug("starting transition, shape='"+shape.getId()+"' from '"+fromContainer.getId()+"' to '"+toContainer.getId()+"'start x="+fromPos.x+" y="+fromPos.y+"  end x="+toPos.x+" y="+toPos.y+"  length="+tLength+" angle = "+angle);
         }
-	
-	
 
         //Rectangle2D bounds = shape.getShape().getBounds2D();
         if (((int)tx == (int)toPos.x && (int)ty == (int)toPos.y) || toContainer.contains(tx,ty))  {
             lastStep = true;
-        }
-        else {
-	    Vec2d t = new Vec2d((tx-fromPos.x), (ty-fromPos.y));
-	    double length = t.length();
+        } else {
+            Vec2d t = new Vec2d((tx-fromPos.x), (ty-fromPos.y));
+            double length = t.length();
             if (log.isDebugEnabled())
-		log.debug("current vector length="+length+" target length="+tLength);
-	    
-	    if (length >= tLength)
-		lastStep = true;
+                log.debug("current vector length="+length+" target length="+tLength);
+
+            if (length >= tLength)
+                lastStep = true;
         }
         if (lastStep)  {
             toContainer.add(shape);
@@ -117,14 +114,14 @@ public class Transition {
             return true;
         }
 
-	tx += xoff;
-	ty += yoff;
+        tx += xoff;
+        ty += yoff;
 
-	
-	//if (log.isDebugEnabled())
-	//  log.debug("transition= tx"+tx+" ty="+ty);
-	
-	/*
+
+        //if (log.isDebugEnabled())
+        //  log.debug("transition= tx"+tx+" ty="+ty);
+
+        /*
         if ((int) tx < (int) toPos.x) tx+=increment;//tx++;
         else if ((int) tx > (int) toPos.x) tx-=increment;//tx--;
         else if ((int) tx == (int) toPos.x || toContainer.contains(tx,ty)) tx = toPos.x;
@@ -132,7 +129,7 @@ public class Transition {
         if ((int) ty < (int) toPos.y) ty+=increment;//ty++;
         else if ((int) ty > (int) toPos.y) ty-=increment;//ty--;
         else if ((int) ty == (int) toPos.y || toContainer.contains(tx,ty)) ty = toPos.y;
-	*/
+        */
         shape.reshape(tx, ty, r.getWidth(), r.getHeight());
         return false;
     }

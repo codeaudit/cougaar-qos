@@ -33,7 +33,7 @@ public class ContainsPredicate extends FramePredicate {
     }
 
     public String toString() {
-        return "<ContainsPredicate: kind="+kind+" name="+name+" frameset="+frameset+">";
+        return "<ContainsPredicate: kind='"+kind+"' name='"+name+"'>";// frameset="+frameset+">";
     }
 }
 

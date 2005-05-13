@@ -28,11 +28,7 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
@@ -44,6 +40,7 @@ import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.UnaryPredicate;
 
 import org.cougaar.core.qos.frame.visualizer.test.TickEvent;
+import org.cougaar.core.qos.frame.visualizer.test.FrameChanges;
 
 import javax.swing.*;
 
@@ -64,59 +61,55 @@ public class FrameVisualizerPlugin
     private ArrayList frameCache;
 
 
-    FrameHelper helper;
+    FrameModel frameModel;
     boolean newFramesPresent;
-    static String TICK_EVENT_LABEL = "TICK";
-    int tickNumber = 0;
+
+    //static String TICK_EVENT_LABEL = "TICK";
+    //protected int tickNumber;
 
 
 
-    public void load()
-    {
+    public void load() {
         super.load();
-
         ServiceBroker sb = getServiceBroker();
-
         log = (LoggingService)
                 sb.getService(this, LoggingService.class, null);
     }
 
-    public void start()
-    {
-        frameSetName = (String) getParameter("frame-set");
+    protected void setupSubscriptions()  {
+        BlackboardService bbs = getBlackboardService();
+        if (log.isDebugEnabled())
+            log.debug("FrameSet name is " + frameSetName);
 
+        sub = (IncrementalSubscription)
+                bbs.subscribe(framePred);
+
+        if (!sub.getAddedCollection().isEmpty() && log.isDebugEnabled())
+            log.debug("Subscription has initial contents");
+        do_execute(bbs);
+    }
+
+    public void start() {
+        frameSetName = (String) getParameter("frame-set");
         frameCache = new ArrayList();
         newFramesPresent = false;
 
         String specFileName = (String) getParameter("spec-file");
         File xml_file = ConfigFinder.getInstance().locateFile(specFileName);
-        pluginDisplay = new DisplayWindow(xml_file);
+        frameModel = new FrameModel();
+        pluginDisplay = new DisplayWindow(frameModel, xml_file);
+
         //SwingUtilities.invokeLater(new CreateWindowHelper(xml_file));
         super.start();
     }
 
-    class CreateWindowHelper implements Runnable {
-        File xmlFile;
-        public CreateWindowHelper(File xmlFile){
-            CreateWindowHelper.this.xmlFile = xmlFile;
-        }
-        public void run() {
-            pluginDisplay = new DisplayWindow(xmlFile);
-        }
+
+    protected void execute() {
+        BlackboardService bbs = getBlackboardService();
+        do_execute(bbs);
     }
 
-    /* class SetFrameHelper implements Runnable {
-    FrameHelper fh;
-    public SetFrameHelper(FrameHelper helper){
-    fh = helper;
-    }
-    public void run() {
-    pluginDisplay.setFrameHelper(fh);
-    }
-    }*/
-
-    private void do_execute(BlackboardService bbs)
-    {
+    private void do_execute(BlackboardService bbs) {
         if (!sub.hasChanged()) {
             if (log.isDebugEnabled())
                 log.debug("No Frame changes");
@@ -128,6 +121,30 @@ public class FrameVisualizerPlugin
 
         // New Frames
         en = sub.getAddedList();
+        if (en.hasMoreElements()) {
+            if (log.isDebugEnabled())
+                log.debug("There are new frames.");
+            processNewFrames(en);
+        }
+
+        // Changed Frames
+        en = sub.getChangedList();
+        if (en.hasMoreElements()) {
+            if (log.isDebugEnabled())
+                log.debug("There are changed frames.");
+            processChangedFrames(en, sub);
+        }
+        // Remove Frames.  Won't happen.
+        en = sub.getRemovedList();
+        if (en.hasMoreElements()) {
+            if (log.isDebugEnabled())
+                log.debug("There are removed frames (ignored).");
+            processRemovedFrames(en);
+        }
+    }
+
+
+    private void processNewFrames(Enumeration en) {
         FrameSet frameSet = null;
         ArrayList added = new ArrayList();
         while (en.hasMoreElements()) {
@@ -143,52 +160,38 @@ public class FrameVisualizerPlugin
             newFramesPresent = true;
         }
 
-        if (helper == null || newFramesPresent) {
-            if (log.isDebugEnabled())
-                log.debug("setting frames on the display");
-            if (helper == null) {
-                helper = new FrameHelper(frameCache, frameSet);
-            } else {
-                helper.setFrames(frameCache, frameSet);
-                //pluginDisplay.addFrames(added);
-            }
-            pluginDisplay.setFrameHelper(helper);
+        if (newFramesPresent) {
+            if (!frameModel.hasFrameSet())
+                frameModel.setFrameSet(frameSet);
+
+             frameModel.framesAdded(added);
+            //pluginDisplay.setFrameHelper(frameModel);
             newFramesPresent = false;
         }
+    }
 
 
-        // Changed Frames
-        en = sub.getChangedList();
-        ArrayList transitions = new ArrayList();
+    private void processChangedFrames(Enumeration en, IncrementalSubscription sub) {
+        HashMap changes = new HashMap();
+        Collection ch;
         while (en.hasMoreElements()) {
             Frame frame = (Frame) en.nextElement();
             if (log.isDebugEnabled()) {
                 log.debug("Observed changed "+frame);
             }
-            Collection changes = sub.getChangeReports(frame);
-            // A collection of Frame.Change instances.
-            if (changes != null) {
-                if (frame instanceof RelationFrame) //frame.isa("relationship"))
-                    transitions.addAll(processRelationshipChanges((RelationFrame)frame, changes.iterator()));
-            } else {
-                ShapeGraphic sh = pluginDisplay.findShape(frame);
-                if (log.isDebugEnabled())
-                    log.debug("Observed changed "+frame+ "  container="+sh);
 
-                if (sh != null) {
-                    for (Iterator ii=changes.iterator(); ii.hasNext();)
-                        sh.processFrameChange(frame, (Frame.Change) ii.next());
-                }
-            }
+            ch = sub.getChangeReports(frame);
+            if (changes.get(frame) != null)
+                throw new IllegalArgumentException("already created a change for this frame: "+frame);
+            changes.put(frame, ch);
         }
-        if (transitions.size() > 0) {
-            //pluginDisplay.updateFrameView();
-            pluginDisplay.tickEventOccured(new TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
-        }
+        if (log.isDebugEnabled())
+                log.debug("Calling frameModel.framesChanged");
+        frameModel.framesChanged(changes);
+    }
 
 
-        // Remove Frames.  Won't happen.
-        en = sub.getRemovedList();
+    private void processRemovedFrames(Enumeration en) {
         while (en.hasMoreElements()) {
             Frame frame = (Frame) en.nextElement();
             if (log.isDebugEnabled()) {
@@ -196,73 +199,6 @@ public class FrameVisualizerPlugin
             }
         }
     }
-
-
-
-
-    protected Collection processRelationshipChanges(RelationFrame frame, Iterator changes) {
-        String slotName;
-        Object value;
-        ShapeGraphic child, parent;
-        Frame fch, fp;
-        ArrayList transitions = new ArrayList();
-
-        while (changes.hasNext()) {
-            Frame.Change change = (Frame.Change) changes.next();
-            // Handle change to existing frame
-            slotName = change.getSlotName();
-            value    = change.getValue();
-
-            if (log.isDebugEnabled())
-                log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
-
-            fp = frame.relationshipParent();
-            fch  = frame.relationshipChild();
-
-            if (log.isDebugEnabled())
-                log.debug("processRelationshipChanges parentFrame="+fp+"  childFrame="+fch);
-
-            parent = pluginDisplay.findShape(fp);
-            child  = pluginDisplay.findShape(fch);
-            if (parent == null || child == null) {
-                if (log.isDebugEnabled())
-                    log.debug("did not find shapes");
-                continue;
-            }
-            if (child.getParent() == null || child.getParent().getId().equals(parent.getId())) {
-                if (log.isDebugEnabled())
-                    log.debug("error: old parent = "+child.getParent()+" new parent="+parent+", ignoring...");
-                continue;
-            }
-            //log.debug("parent="+parent.getClass().getName());
-            //log.debug("child ="+child.getClass().getName());
-            transitions.add(new Transition(child, child.getParent(), (ShapeContainer)parent));
-        }
-        return transitions;
-    }
-
-
-    protected void execute()
-    {
-        BlackboardService bbs = getBlackboardService();
-        do_execute(bbs);
-    }
-
-    protected void setupSubscriptions()
-    {
-        BlackboardService bbs = getBlackboardService();
-        if (log.isDebugEnabled())
-            log.debug("FrameSet name is " + frameSetName);
-
-        sub = (IncrementalSubscription)
-                bbs.subscribe(framePred);
-
-        if (!sub.getAddedCollection().isEmpty() && log.isDebugEnabled())
-            log.debug("Subscription has initial contents");
-        do_execute(bbs);
-
-    }
-
 
 
 }

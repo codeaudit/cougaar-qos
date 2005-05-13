@@ -19,7 +19,8 @@ public class FrameNode extends DefaultMutableTreeNode {
         HashMap relationshipNodes;
         String relationship;
         String label;
-        //this is a little weird, but this is a list of Proxy nodes that reference this node
+        //a little hack -- this is a list of Proxy nodes that reference this node  (to allow multiple occurances of a
+        // frame in the tree
         ArrayList proxies;
 
         public FrameNode() {
@@ -34,6 +35,7 @@ public class FrameNode extends DefaultMutableTreeNode {
             this.frame = null;
             this.label = relationship;
         }
+
         public FrameNode(org.cougaar.core.qos.frame.Frame frame) {
             super(frame);
             this.frame = frame;
@@ -56,7 +58,7 @@ public class FrameNode extends DefaultMutableTreeNode {
             return relationship != null;
         }
 
-        public String getRelationshioName() {
+        public String getRelationshipName() {
             return relationship;
         }
 

@@ -2,6 +2,7 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
 import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListener;
+import org.cougaar.core.qos.frame.visualizer.tree.ShapeGraphicNode;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
@@ -12,6 +13,7 @@ import java.awt.geom.RectangularShape;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class ShapeGraphic implements Cloneable {
     protected String id, label;
@@ -26,14 +28,14 @@ public class ShapeGraphic implements Cloneable {
     protected org.cougaar.core.qos.frame.Frame frame;
     protected String frameidSlotName = "";
     protected FramePredicate predicate;
-    protected FrameHelper frameHelper;
+    protected FrameModel frameModel;
 
     // slot value triggers
     protected ArrayList slotListeners;
     // logging
     protected Logger log = Logging.getLogger(getClass().getName());
-
-
+    // for the container tree display
+    protected ShapeGraphicNode treeNode;
 
 
     public ShapeGraphic() {
@@ -55,6 +57,14 @@ public class ShapeGraphic implements Cloneable {
         visible = true;
         selected = mouseOver =false;
         slotListeners = new ArrayList();
+        treeNode = null;
+    }
+
+
+    public ShapeGraphicNode getTreeNode() {
+        if (treeNode == null)
+            treeNode = new ShapeGraphicNode(this, (parent != null ? parent.getTreeNode() : null));
+        return treeNode;
     }
 
     public void setMouseOver(boolean mouseOver) {
@@ -139,28 +149,35 @@ public class ShapeGraphic implements Cloneable {
             this.label = id;
             if (log.isDebugEnabled())
                 log.debug(label+".setFrame():  id="+this.id+":  "+this.toString());
+            frameModel.registerGraphic(frame, this);
         } else {
             this.id = "";
             this.label = "";
         }
     }
 
-    public void setFrameHelper(FrameHelper helper, Display display) {
-        frameHelper = helper;
-        if (frame == null && predicate != null) {
-            setFrame(frameHelper.findFrame(predicate));
-        }
-        if (frame != null)
-            display.registerGraphic(frame, this);
-    }
-    
-    public void addedFrames(Collection newFrames, Display display) {
-        if (frame == null && predicate != null) {
-            setFrame(frameHelper.findFrame(newFrames, predicate));
-            if (frame != null)
-              display.registerGraphic(frame, this);
+    public void unregister() {
+        if (frame != null && frameModel != null) {
+            frameModel.unregisterGraphic(frame, this);
         }
     }
+
+    public void update(FrameModel frameModel,
+                        HashSet addedDataFrames, HashSet removedDataFrames,
+                        HashSet addedRelations) {
+        this.frameModel = frameModel;
+        if (frame == null && predicate != null) {
+            if (log.isDebugEnabled())
+                log.debug("ShapeGraphic.update");
+            setFrame(frameModel.findFrame(predicate)); //(addedDataFrames!=null ? frameModel.findFrame(addedDataFrames, predicate) : frameModel.findFrame(predicate)));
+        }
+    }
+   /*
+    public void addedFrames(Collection newFrames) {
+        if (frame == null && predicate != null) {
+            setFrame(frameModel.findFrame(newFrames, predicate));
+        }
+    }*/
 
     public boolean hasFrame() {
         return frame != null;
@@ -182,6 +199,11 @@ public class ShapeGraphic implements Cloneable {
 
     public void setParent(ShapeContainer container) {
         this.parent = container;
+        /*if (treeNode != null) {
+            ShapeGraphicNode n = (ShapeGraphicNode) treeNode.getParent();
+            if (n != null && n != parent.getTreeNode())
+                parent.getTreeNode().add(treeNode);
+        } */
     }
 
     public ShapeContainer getParent() {
@@ -295,9 +317,10 @@ public class ShapeGraphic implements Cloneable {
     }
 
     // clone thyself and assign the given frame
-    public ShapeGraphic createInstance(org.cougaar.core.qos.frame.Frame frame) {
+    public ShapeGraphic createInstance(org.cougaar.core.qos.frame.Frame frame, FrameModel fmodel) {
         try {
             ShapeGraphic cloned = (ShapeGraphic) this.clone();
+            cloned.frameModel = fmodel;
             if (frame != null)
                 cloned.setFrame(frame);
             cloned.setPrototype(false);
