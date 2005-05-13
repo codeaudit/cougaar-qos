@@ -275,7 +275,8 @@ abstract public class DataFrame
 	    log.info("Path dependency has changed for frame " +this+
 		      " and for slot " +slot);
 	Object new_value = getValue(slot);
-	slotModified(slot, null, new_value, true, true);
+	pcs.firePropertyChange(slot, null, new_value);
+	// slotModified(slot, null, new_value, true, true);
     }
 
     void addPathDependent(DataFrame dependent, String slot)

@@ -743,12 +743,15 @@ public class FrameGen
     {
 	if (isReadOnly(prototype, slot)) return;
 
+	boolean synchronize = relation_prototypes.contains(prototype);
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot);
 	boolean notify_listeners_p = notifyListeners(prototype, slot);
 	boolean notify_blackboard_p = notifyBlackboard(prototype, slot);
-	writer.println("\n\n    public void set" +accessor_name+
+	writer.print("\n\n    public ");
+	if (synchronize) writer.print("synchronized ");
+	writer.println("void set" +accessor_name+
 		       "("+type+" __new_value)");
 	writer.println("    {");
 	if (memberp) {
@@ -776,12 +779,15 @@ public class FrameGen
     {
 	if (isReadOnly(prototype, slot)) return;
 
+	boolean synchronize = relation_prototypes.contains(prototype);
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot);
 	boolean notify_listeners_p = notifyListeners(prototype, slot);
 	boolean notify_blackboard_p = notifyBlackboard(prototype, slot);
-	writer.println("\n\n    public void set" +accessor_name+ AsObject+
+	writer.print("\n\n    public ");
+	if (synchronize) writer.print("synchronized ");
+	writer.println("void set" +accessor_name+ AsObject+
 		       "(Object __new_value)");
 	writer.println("    {");
 	if (memberp) {
