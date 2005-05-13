@@ -87,21 +87,21 @@ public class Path
 	return name;
     }
 
-    Object getValue(DataFrame root, String slot)
+    Object getValue(DataFrame root, String requestor_slot)
     {
 	synchronized (root.get_rlock()) {
-	    root.clearRelationDependencies(slot);
+	    root.clearRelationDependencies(requestor_slot);
 	    return
-		getNextValue(root, root, 0, 
-			     override_slot != null ? override_slot : slot);
+		getNextValue(root, root, 0, requestor_slot);
 	}
     }
 
     private Object getNextValue(DataFrame root, 
 				DataFrame frame, 
 				int index, 
-				String slot)
+				String requestor_slot)
     {
+	String slot = override_slot != null ? override_slot : requestor_slot;
 	if (log.isDebugEnabled())
 	    log.debug("Walking path " +name+
 		      " index=" +index+
@@ -136,16 +136,16 @@ public class Path
 	    RelationFrame rframe = (RelationFrame) e.getKey();
 	    synchronized (rframe) {
 		// Don't allow relationship changes during the lookup.
-		root.addRelationDependency(rframe, slot);
+		root.addRelationDependency(rframe, requestor_slot);
 		DataFrame next = (DataFrame) e.getValue();
 		Object result = getNextValue(root, next, ++index, slot);
 		if (result != null) {
-		    root.addRelationSlotDependency(next, slot);
+		    root.addRelationSlotDependency(next, requestor_slot, slot);
 		    return result;
 		}
 
 		// This tree failed
-		root.removeRelationDependency(rframe, slot);
+		root.removeRelationDependency(rframe, requestor_slot);
 	    }
 	    if (index == forks.length) return null;
 	}

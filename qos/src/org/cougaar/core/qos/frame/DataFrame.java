@@ -150,8 +150,8 @@ abstract public class DataFrame
 	try {
 	    java.lang.reflect.Constructor cons = klass.getConstructor(CTYPES);
 	    frame = (DataFrame) cons.newInstance(args);
-	    if (log.isInfoEnabled())
-		log.info("Made frame " +frame);
+	    if (log.isDebugEnabled())
+		log.debug("Made frame " +frame);
 	} catch (Exception ex) {
 	    log.error("Error making frame", ex);
 	    return null;
@@ -166,6 +166,7 @@ abstract public class DataFrame
     private Properties props;
     private transient HashMap ddeps = new HashMap();
     private transient HashMap rdeps = new HashMap();
+    private transient HashMap slot_map = new HashMap();
     private transient HashMap path_dependents = new HashMap();
     private transient Object rlock = new Object();
     private transient PropertyChangeSupport pcs;
@@ -198,8 +199,8 @@ abstract public class DataFrame
     {
 	// Some frame I depend on has changed (container only, for now).
 	// Resignal to my listeners.
-	if (log.isInfoEnabled())
-	    log.info("Propagate PropertyChange " +event.getPropertyName()+
+	if (log.isDebugEnabled())
+	    log.debug("Propagate PropertyChange " +event.getPropertyName()+
 		      " old value = " +event.getOldValue()+
 		      " new value = " +event.getNewValue());
 	pcs.firePropertyChange(event);
@@ -217,9 +218,6 @@ abstract public class DataFrame
     // Caller should lock rlock
     void clearRelationDependencies(String slot)
     {
-	if (log.isInfoEnabled())
-	    log.info("Clearing relation dependencies of " +this+
-		     " slot " +slot);
 	List rframes = (List) rdeps.get(slot);
 	if (rframes == null) return;
 	int count = rframes.size();
@@ -234,21 +232,20 @@ abstract public class DataFrame
     }
 
     // Caller should lock rlock
-    void addRelationSlotDependency(DataFrame frame, String slot)
+    void addRelationSlotDependency(DataFrame frame, 
+				   String my_slot, 
+				   String owner_slot)
     {
-	if (log.isInfoEnabled())
-	    log.info("Clearing relation dependencies of " +this+
-		     " for slot " +slot);
-	ddeps.put(slot, frame);
-	frame.addPathDependent(this, slot);
+	ddeps.put(my_slot, frame);
+	synchronized (slot_map) {
+	    slot_map.put(owner_slot, my_slot);
+	}
+	frame.addPathDependent(this, owner_slot);
     }
 
     // Caller should lock rlock
     void addRelationDependency(RelationFrame rframe, String slot)
     {
-	if (log.isInfoEnabled())
-	    log.info("Adding relation dependency " +rframe+ " on " +this+
-		     " slot " +slot);
 	List rframes = (List) rdeps.get(slot);
 	if (rframes == null) {
 	    rframes = new ArrayList();
@@ -261,31 +258,22 @@ abstract public class DataFrame
     // Caller should lock rlock
     void removeRelationDependency(RelationFrame rframe, String slot)
     {
-	if (log.isInfoEnabled())
-	    log.info("Removing relation dependency " +rframe+ " on " +this+
+	if (log.isDebugEnabled())
+	    log.debug("Removing relation dependency " +rframe+ " on " +this+
 		     " for slot " +slot);
 	List rframes = (List) rdeps.get(slot);
 	if (rframes != null) rframes.remove(rframe);
 	rframe.removePathDependent(this, slot);
     }
 
-    void pathDependencyChange(String slot)
-    {
-	if (log.isInfoEnabled())
-	    log.info("Path dependency has changed for frame " +this+
-		      " and for slot " +slot);
-	Object new_value = getValue(slot);
-	pcs.firePropertyChange(slot, null, new_value);
-	// slotModified(slot, null, new_value, true, true);
-    }
 
     void addPathDependent(DataFrame dependent, String slot)
     {
-	if (log.isInfoEnabled())
-	    log.info(this + " is adding dependent " +dependent+
-		     " for slot " +slot);
+	if (log.isDebugEnabled())
+	    log.debug(this + " is adding dependent " +dependent+
+		      " for slot " +slot);
 	synchronized (path_dependents) {
-	    Set dependents = (Set)  path_dependents.get(slot);
+	    Set dependents = (Set) path_dependents.get(slot);
 	    if (dependents == null) {
 		dependents = new HashSet();
 		path_dependents.put(slot, dependents);
@@ -296,53 +284,66 @@ abstract public class DataFrame
 
     void removePathDependent(DataFrame dependent, String slot)
     {
-	if (log.isInfoEnabled())
-	    log.info(this + " is removing dependent " +dependent+
-		     " for slot " +slot);
+	if (log.isDebugEnabled())
+	    log.debug(this + " is removing dependent " +dependent+
+		      " for slot " +slot);
 	synchronized (path_dependents) {
 	    Set dependents = (Set) path_dependents.get(slot);
-	    if (dependents != null) {
-		dependents.remove(dependent);
-	    }
+	    if (dependents != null) dependents.remove(dependent);
 	}
     }
 
-    void notifyPathDependents(String slot)
+
+
+    void pathDependencyChange(String slot)
     {
 	if (log.isInfoEnabled())
-	    log.info(" Notify dependents of " +this+
-		     " for slot " +slot);
+	    log.info("Path dependency has changed for frame " +this+
+		      " and for slot " +slot);
+	Object new_value = getValue(slot);
+	pcs.firePropertyChange(FrameGen.fixName(slot, true, true),
+			       null, new_value);
+	notifyPathDependents(slot);
+	// slotModified(slot, null, new_value, true, true);
+    }
+
+
+    private void notifyPathDependents(String slot, Set dependents)
+    {
+	Iterator itr = dependents.iterator();
+	while (itr.hasNext()) {
+	    DataFrame frame = (DataFrame) itr.next();
+	    frame.pathDependencyChange(slot);
+	}
+    }
+
+    void notifyPathDependents(String owner_slot)
+    {
+	String slot = null;
+	synchronized (slot_map) {
+	    slot = (String) slot_map.get(owner_slot);
+	}
+	Set copy = null;
 	synchronized (path_dependents) {
 	    Set dependents = (Set) path_dependents.get(slot);
-	    if (dependents != null) {
-		Iterator itr = dependents.iterator();
-		while (itr.hasNext()) {
-		    DataFrame frame = (DataFrame) itr.next();
-		    frame.pathDependencyChange(slot);
-		}
-	    }
+	    if (dependents == null) return;
+	    copy = new HashSet(dependents);
 	}
+	notifyPathDependents(slot, copy);
     }
 
     void notifyAllPathDependents()
     {
-	if (log.isInfoEnabled())
-	    log.info(" Notify all dependents of " +this);
 	synchronized (path_dependents) {
 	    Iterator itr = path_dependents.entrySet().iterator();
 	    while (itr.hasNext()) {
 		Map.Entry entry = (Map.Entry) itr.next();
 		String slot = (String) entry.getKey();
 		Set dependents = (Set) entry.getValue();
-		Iterator itr2 = dependents.iterator();
-		while (itr.hasNext()) {
-		    DataFrame frame = (DataFrame) itr.next();
-		    frame.pathDependencyChange(slot);
-		}
+		notifyPathDependents(slot, new HashSet(dependents));
 	    }
 	}
     }
-    
 
 
     // Jess ShadowFact
@@ -630,8 +631,8 @@ abstract public class DataFrame
 			      Object old_value, 
 			      Object new_value)
     {
-	if (log.isInfoEnabled())
-	    log.info("Fire PropertyChange " +property+
+	if (log.isDebugEnabled())
+	    log.debug("Fire PropertyChange " +property+
 		      " old value = " +old_value+
 		      " new value = " +new_value);
 	// Both null: no change
@@ -752,8 +753,8 @@ abstract public class DataFrame
 
     void containerChange(DataFrame old_container, DataFrame new_container)
     {
-	if (log.isInfoEnabled())
-	    log.info(" Old container = " +old_container+
+	if (log.isDebugEnabled())
+	    log.debug(" Old container = " +old_container+
 		      " New container = " +new_container);
 	if (old_container != null) {
 	    // No longer subscribe to changes on old container
@@ -782,15 +783,15 @@ abstract public class DataFrame
 	try {
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
 	    Object result = meth.invoke(this, ARGS0);
-	    if (log.isInfoEnabled())
-		log.info("Slot " +slot+ " of " +this+ " = " +result);
+	    if (log.isDebugEnabled())
+		log.debug("Slot " +slot+ " of " +this+ " = " +result);
 	    return result;
 	} catch (Exception ex) {
 	    // This is not necessarily an error.  It could mean one of
 	    // our children was supposed to have this value and
 	    // didn't, so it asked us.
-	    if (log.isInfoEnabled())
-		log.info("Couldn't get slot " +slot+ " of " +this+
+	    if (log.isDebugEnabled())
+		log.debug("Couldn't get slot " +slot+ " of " +this+
 			  " via " +mname);
 	    return null;
 	}
@@ -804,8 +805,8 @@ abstract public class DataFrame
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
 	    Object[] args1 = { value };
 	    meth.invoke(this, args1);
-	    if (log.isInfoEnabled())
-		log.info("Set slot " +slot+ " of " +this+ " to " + value);
+	    if (log.isDebugEnabled())
+		log.debug("Set slot " +slot+ " of " +this+ " to " + value);
 	} catch (Exception ex) {
 	    log.error("Error setting slot " +slot+ " of " +this+
 		      " via " +mname);
@@ -820,11 +821,11 @@ abstract public class DataFrame
 	try {
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
 	    meth.invoke(this, ARGS0);
-	    if (log.isInfoEnabled())
-		log.info("Removed value of slot " +slot);
+	    if (log.isDebugEnabled())
+		log.debug("Removed value of slot " +slot);
 	} catch (Exception ex) {
-	    if (log.isInfoEnabled())
-		log.info("Couldn't remove value of slot " +slot+ " of " +this+
+	    if (log.isDebugEnabled())
+		log.debug("Couldn't remove value of slot " +slot+ " of " +this+
 			  " via " +mname);
 	}
     }
@@ -837,8 +838,8 @@ abstract public class DataFrame
 	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
 	    Object[] args1 = { value };
 	    meth.invoke(this, args1);
-	    if (log.isInfoEnabled())
-		log.info("Initializing slot " +slot+ " of " +this+ 
+	    if (log.isDebugEnabled())
+		log.debug("Initializing slot " +slot+ " of " +this+ 
 			 " to " + value);
 	} catch (Exception ex) {
 	    log.error("Error initializing slot " +slot+ " of " +this+

@@ -28,9 +28,10 @@ package org.cougaar.core.qos.frame;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.cougaar.core.util.UID;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 /**
  * This extension to {@link DataFrame} is the basic representation of a
@@ -39,6 +40,9 @@ import org.cougaar.core.util.UID;
 abstract public class RelationFrame
     extends DataFrame 
 {
+    private static Logger log = 
+	Logging.getLogger(org.cougaar.core.qos.frame.RelationFrame.class);
+
     protected RelationFrame(FrameSet frameSet, UID uid)
     {
 	super(frameSet, uid);
@@ -54,10 +58,10 @@ abstract public class RelationFrame
 
     // Path dependencies.
 
-    void notifyPathDependents(String changed_slot)
+    void notifyPathDependents(String slot)
     {
 	notifyAllPathDependents();
-    }
+   }
 
 
     public DataFrame relationshipParent()
