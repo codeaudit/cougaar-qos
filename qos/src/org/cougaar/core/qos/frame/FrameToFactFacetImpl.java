@@ -45,12 +45,6 @@ abstract public class FrameToFactFacetImpl
     extends BeanToFactFacetImpl
 {
 
-    private UnaryPredicate framePred = new UnaryPredicate() {
-	    public boolean execute(Object o) {
-		return (o instanceof DataFrame) &&
-		    ((Frame) o).getFrameSet().getName().equals(frameset_name);
-	    }
-	};
     private String frameset_name;
 
     protected FrameToFactFacetImpl(CoordinationArtifact owner,
@@ -68,7 +62,12 @@ abstract public class FrameToFactFacetImpl
 
     protected UnaryPredicate getPredicate()
     {
-	return framePred;
+	return new UnaryPredicate() {
+	    public boolean execute(Object o) {
+		return (o instanceof DataFrame) &&
+		    ((Frame) o).getFrameSet().getName().equals(frameset_name);
+	    }
+	};
     }
 
 
