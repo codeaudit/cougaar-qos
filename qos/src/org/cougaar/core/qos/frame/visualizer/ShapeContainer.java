@@ -55,7 +55,10 @@ public class ShapeContainer extends ShapeGraphic {
             layoutChildren();
         }
     }
-
+    public ShapeLayout getLayout() {
+        return shapeLayout;
+    }
+    
     public void setMargins(double left, double right, double bottom, double top, double hpadding, double vpadding) {
         if (shapeLayout != null) {
             shapeLayout.setMargins(left,right,bottom,top, hpadding, vpadding);
@@ -151,6 +154,8 @@ public class ShapeContainer extends ShapeGraphic {
                 layoutChildren();
             }
         }
+        if (frameModel != null)
+            frameModel.fireContainerAddedChild(this, sh);
     }
 
 
@@ -192,6 +197,8 @@ public class ShapeContainer extends ShapeGraphic {
         if (sh.frame != null)
             frameChildren.remove(sh.frame);
         layoutChildren();
+        if (frameModel != null)
+            frameModel.fireContainerRemovedChild(this, sh);
     }
 
     public void remove(String shapeId) {
@@ -229,6 +236,9 @@ public class ShapeContainer extends ShapeGraphic {
             FramePredicate pfp = shg.getFramePredicate();
             if (log.isDebugEnabled())
                 log.debug("'"+id+"' looking for children of type '"+pfp.getKind()+"'  relation='"+pfp.getParentRelationship()+"' hasFrame="+(f!=null)+"\n");
+
+            // if this, or one of the ShapeContainer parents has a frame, find all children of that frame - otherwise use the
+            // FramePredicate and try to find the appropriate frame
             frames = (f != null ? this.frameModel.getAllChildren(f, pfp.getParentRelationship()) : this.frameModel.findFrames(pfp));
             if (frames != null && frames.size() > 0) {
                 for (Iterator jj=frames.iterator(); jj.hasNext();)  {

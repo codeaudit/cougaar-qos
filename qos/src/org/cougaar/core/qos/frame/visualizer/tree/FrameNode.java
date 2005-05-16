@@ -3,6 +3,8 @@ package org.cougaar.core.qos.frame.visualizer.tree;
 import org.cougaar.core.qos.frame.PrototypeFrame;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.DefaultTreeModel;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,11 +68,12 @@ public class FrameNode extends DefaultMutableTreeNode {
              return label;
         }
 
-        public void addRelationshipNode(FrameNode rnode) {
+        public void addRelationshipNode(DefaultTreeModel treeModel, FrameNode rnode) {
             String label =rnode.toString();
             if (relationshipNodes.get(label)==null) {
                 relationshipNodes.put(label, rnode);
-                add(rnode);
+                //add(rnode);
+                treeModel.insertNodeInto(rnode, this, 0);//children.size());
             }
         }
 

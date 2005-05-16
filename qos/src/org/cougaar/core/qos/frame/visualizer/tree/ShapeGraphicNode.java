@@ -3,6 +3,11 @@ package org.cougaar.core.qos.frame.visualizer.tree;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import java.util.HashSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,21 +18,24 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class ShapeGraphicNode extends DefaultMutableTreeNode {
     ShapeGraphic graphic;
+    HashSet cachedChildren;
 
     public ShapeGraphicNode() {
         super("");
         graphic = null;
+        cachedChildren = new HashSet();
     }
 
     public ShapeGraphicNode(ShapeGraphic graphic) {
-        super(graphic);
-        this.graphic = graphic;
+        this(graphic, null);
     }
 
     public ShapeGraphicNode(ShapeGraphic graphic, ShapeGraphicNode parent) {
         super(graphic);
         this.graphic = graphic;
-        parent.add(this);
+        cachedChildren = new HashSet();
+        if (parent != null)
+            parent.add(this);
     }
 
     public String toString() {
@@ -37,4 +45,30 @@ public class ShapeGraphicNode extends DefaultMutableTreeNode {
     public ShapeGraphic getShapeGraphic() {
         return graphic;
     }
+
+
+    public boolean hasChild(TreeNode child) {
+        return (cachedChildren.contains(child));
+    }
+
+    public void add(MutableTreeNode newChild) {
+        cachedChildren.add(newChild);
+        super.add(newChild);
+    }
+
+    public void remove(int childIndex) {
+        TreeNode child = getChildAt(childIndex);
+        cachedChildren.remove(child);
+        super.remove(childIndex);
+    }
+    public void remove(MutableTreeNode aChild) {
+        cachedChildren.remove(aChild);
+        super.remove(aChild);
+    }
+
+    public void removeAllChildren() {
+        cachedChildren.clear();
+        super.removeAllChildren();
+    }
+
 }

@@ -3,6 +3,7 @@ package org.cougaar.core.qos.frame.visualizer.tree;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.util.*;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
@@ -37,8 +38,8 @@ public class FrameNodeProxy extends FrameNode {
              return node.toString();
         }
 
-        public void addRelationshipNode(FrameNode rnode) {
-            node.addRelationshipNode(rnode);
+        public void addRelationshipNode(DefaultTreeModel treeModel,FrameNode rnode) {
+            node.addRelationshipNode(treeModel, rnode);
         }
 
         public FrameNode getRelationshipNode(String relationship) {

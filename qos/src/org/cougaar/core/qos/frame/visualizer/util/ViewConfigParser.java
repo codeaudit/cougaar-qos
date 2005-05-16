@@ -131,6 +131,10 @@ public class ViewConfigParser extends XMLParser  {
     protected static HashMap colorNameMap=null;
     protected static SlotChangeListener lastSlotChangeListener = null;
 
+    Shapes shapes;
+    LabelRenderers labelRenderers;
+    ShapeRenderers shapeRenderers;
+    SlotChangeListeners slotListeners;
 
     public static class WindowSpec {
         String title="";
@@ -145,11 +149,27 @@ public class ViewConfigParser extends XMLParser  {
 
     public ViewConfigParser(){
         super();
+        shapes = new Shapes();
+        labelRenderers = new LabelRenderers();
+        shapeRenderers = new ShapeRenderers();
+        slotListeners  = new SlotChangeListeners();
         containerStack = new Vector();
         if (colorNameMap == null)
             initColorNameMap();
     }
 
+    public Shapes getShapes() {
+        return shapes;
+    }
+    public LabelRenderers getLabelRenderers() {
+        return labelRenderers;
+    }
+    public ShapeRenderers getShapeRenderers() {
+        return shapeRenderers;
+    }
+    public SlotChangeListeners getSlotListeners() {
+        return slotListeners;
+    }
 
     protected void initColorNameMap() {
         colorNameMap = new HashMap();
@@ -213,7 +233,7 @@ public class ViewConfigParser extends XMLParser  {
         } else if (name.equals("slotlistener")) {
             ShapeGraphic c = (ShapeGraphic) containerStack.get(containerStack.size()-1);
             String nm = attrs.getValue("name");
-            SlotChangeListener l = SlotChangeListener.get(nm);
+            SlotChangeListener l = slotListeners.get(nm);
             if (c!=null && l!=null)
                 c.addSlotListener(l);
         } else if (name.equals("component")) {
@@ -259,15 +279,15 @@ public class ViewConfigParser extends XMLParser  {
 
     // utiltity
 
-    public static SlotChangeListener createSlotChangeListener(Attributes attrs) {
+    public SlotChangeListener createSlotChangeListener(Attributes attrs) {
         String name = attrs.getValue("name");
         String slot = attrs.getValue("slot");
         SlotChangeListener sl = new SlotChangeListener(name, slot);
-        SlotChangeListener.add(name, sl);
+        slotListeners.add(name, sl);
         return sl;
     }
 
-    public static void createTrigger(Attributes attrs) {
+    public  void createTrigger(Attributes attrs) {
         if (lastSlotChangeListener == null)
             return;
         // <trigger value="busy" action="setrenderer" name="processedJobRenderer"/>
@@ -277,20 +297,20 @@ public class ViewConfigParser extends XMLParser  {
 
         if (action.equals("setrenderer")) {
             String nm = attrs.getValue("name");
-            ShapeRenderer sr = ShapeRenderer.get(nm);
-            lastSlotChangeListener.setRendererTrigger(sr, value);
+            ShapeRenderer sr = shapeRenderers.get(nm);
+            lastSlotChangeListener.setRendererTrigger(nm, sr, value);
         }  else if (action.equals("setshape")) {
             String shp = attrs.getValue("shape");
-            RectangularShape shape = Shapes.get(shp);
-            lastSlotChangeListener.setShapeTrigger(shape, value);
+            RectangularShape shape = shapes.get(shp);
+            lastSlotChangeListener.setShapeTrigger(shp, shape, value);
         }  else if (action.equals("setlabelrenderer")) {
             String nm = attrs.getValue("name");
-            LabelRenderer lblr = LabelRenderer.get(nm);
-            lastSlotChangeListener.setLabelRendererTrigger(lblr, value);
+            LabelRenderer lblr = labelRenderers.get(nm);
+            lastSlotChangeListener.setLabelRendererTrigger(nm, lblr, value);
         }
     }
 
-    public static RectangularShape createShape(Attributes attrs) {
+    public  RectangularShape createShape(Attributes attrs) {
         // <shape name="circle1" class="java.awt.geom.Ellipse2D.Double" x="0" y="0" w="10" h="10"/>
         double x=Double.parseDouble(attrs.getValue("x"));
         double y=Double.parseDouble(attrs.getValue("y"));
@@ -308,11 +328,11 @@ public class ViewConfigParser extends XMLParser  {
             ((RoundRectangle)shape).setRoundRect(x,y,w,h,arcw,arch);
         } else
             shape.setFrame(x,y,w,h);
-        Shapes.add(name, shape);
+        shapes.add(name, shape);
         return shape;
     }
 
-    public static LabelRenderer createLabelRenderer(Attributes attrs) {
+    public LabelRenderer createLabelRenderer(Attributes attrs) {
         //<labelrenderer name="defaultLabelRenderer" xoff="+2" yoff="+5" font="default" color="Color.blue"/>
         String x = attrs.getValue("xoff");
         String y = attrs.getValue("yoff");
@@ -327,14 +347,14 @@ public class ViewConfigParser extends XMLParser  {
         String name = attrs.getValue("name");
 
         LabelRenderer lblr= new LabelRenderer(name, xoff, yoff, null, color);
-        LabelRenderer.add(lblr);
+        labelRenderers.add(lblr);
         String mouseOver = attrs.getValue("mouseover");
         if (mouseOver != null && mouseOver.equals("true"))
             lblr.setMouseOverOnly(true);
         return lblr;
     }
 
-    public static LabelRenderer createContainerLabelRenderer(Attributes attrs) {
+    public LabelRenderer createContainerLabelRenderer(Attributes attrs) {
         double xoff = Double.parseDouble(attrs.getValue("xoff"));
         double yoff = Double.parseDouble(attrs.getValue("yoff"));
         String font = attrs.getValue("font");
@@ -342,7 +362,7 @@ public class ViewConfigParser extends XMLParser  {
         Color color = getColor(col);
         String name = attrs.getValue("name");
         ContainerLabelRenderer lblr= new ContainerLabelRenderer(name, xoff, yoff, null, color);
-        LabelRenderer.add(lblr);
+        labelRenderers.add(lblr);
         return lblr;
     }
 
@@ -388,7 +408,7 @@ public class ViewConfigParser extends XMLParser  {
     }
 
 
-    public static ShapeRenderer createShapeRenderer(Attributes attrs) {
+    public ShapeRenderer createShapeRenderer(Attributes attrs) {
        //<shaperenderer name="defaultRenderer" paint="Color.green" selectedpaint="Color.yellow" linewidth="2" bordered="true" filled="true"/>
         String name = attrs.getValue("name");
         Paint paint = getPaint(attrs.getValue("paint"));
@@ -399,7 +419,7 @@ public class ViewConfigParser extends XMLParser  {
         boolean bordered = "true".equals(attrs.getValue("bordered"));
         boolean filled = "true".equals(attrs.getValue("filled"));
         ShapeRenderer sh = new ShapeRenderer(name, paint, selectedPaint, fillPaint, selfillPaint, linewidth, bordered, filled);
-        ShapeRenderer.add(sh);
+        shapeRenderers.add(sh);
         return sh;
     }
 
@@ -451,7 +471,7 @@ public class ViewConfigParser extends XMLParser  {
         return new FramePredicate(kind, name, parentRelationship);
     }
 
-    protected static ShapeGraphic createComponent(Attributes attrs) {
+    protected  ShapeGraphic createComponent(Attributes attrs) {
         String classname = attrs.getValue("class");
         ShapeGraphic shape = (ShapeGraphic) createInstance(classname);
         shape.setId(attrs.getValue("id"));
@@ -461,13 +481,13 @@ public class ViewConfigParser extends XMLParser  {
         String vis = attrs.getValue("visible");
         String shapeName = attrs.getValue("shape");
         if (shapeName != null)
-            shape.setShapePrototype(Shapes.get(shapeName));
+            shape.setShapePrototype(shapes.get(shapeName));
         String labelrender = attrs.getValue("labelrender");
         String shaperender = attrs.getValue("shaperender");
         if (labelrender != null)
-            shape.setLabelRenderer(LabelRenderer.get(labelrender));
+            shape.setLabelRenderer(labelRenderers.get(labelrender));
         if (shaperender != null)
-            shape.setRenderer(ShapeRenderer.get(shaperender));
+            shape.setRenderer(shapeRenderers.get(shaperender));
 
         boolean visible = true;
         if (vis != null)
@@ -496,13 +516,13 @@ public class ViewConfigParser extends XMLParser  {
         String vis = attrs.getValue("visible");
         String shapeName = attrs.getValue("shape");
         if (shapeName != null)
-            container.setShapePrototype(Shapes.get(shapeName));
+            container.setShapePrototype(shapes.get(shapeName));
         String labelrender = attrs.getValue("labelrender");
         String shaperender = attrs.getValue("shaperender");
         if (labelrender != null)
-            container.setLabelRenderer(LabelRenderer.get(labelrender));
+            container.setLabelRenderer(labelRenderers.get(labelrender));
         if (shaperender != null)
-            container.setRenderer(ShapeRenderer.get(shaperender));
+            container.setRenderer(shapeRenderers.get(shaperender));
 
 
         boolean visible = true;

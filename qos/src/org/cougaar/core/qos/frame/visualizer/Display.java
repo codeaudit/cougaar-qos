@@ -3,10 +3,10 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import org.cougaar.core.qos.frame.visualizer.util.XMLParser;
 import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
-import org.cougaar.core.qos.frame.visualizer.util.ChangeModel;
-import org.cougaar.core.qos.frame.visualizer.test.TickEvent;
+import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListeners;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
 import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
+import org.cougaar.core.qos.frame.visualizer.event.*;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
@@ -31,8 +31,13 @@ import org.xml.sax.Attributes;
  * Time: 9:31:15 AM
  * To change this template use File | Settings | File Templates.
  */
-public class Display extends AnimatedCanvas {
+public class Display extends AnimatedCanvas implements ChangeListener {
     public static boolean ENABLE_ANIMATION = false;//true;
+
+    Shapes shapes;
+    LabelRenderers labelRenderers;
+    ShapeRenderers shapeRenderers;
+    SlotChangeListeners slotListeners;
 
     ShapeContainer root;
     boolean initialized, processingTickEvent;
@@ -48,8 +53,8 @@ public class Display extends AnimatedCanvas {
     ControlPanel cPanel;
 
     // changes
-    ChangeModel changes;
-    ChangeEvent change;
+    org.cougaar.core.qos.frame.visualizer.event.ChangeModel tickStatusListeners;
+    ChangeEvent tickCompleted;
     Object lock;
 
 
@@ -58,29 +63,98 @@ public class Display extends AnimatedCanvas {
     public Display(FrameModel frameModel, File xmlFile) {
         lock = new Object();
         this.frameModel = frameModel;
+
         //graphics = new HashMap();
         transitions = new ArrayList();
         tickEventQueue = new ArrayList();
         frameContainerMap = new HashMap();
         prototypeMap = new HashMap();
         processingTickEvent = initialized = false;
-        changes = new ChangeModel();
-        change = new ChangeEvent(this);
+        tickStatusListeners = new org.cougaar.core.qos.frame.visualizer.event.ChangeModel();
+        tickCompleted = new ChangeEvent(this);
         ViewConfigParser parser = new ViewConfigParser();
         parser.parse(xmlFile);
         wSpec = parser.windowSpec;
+        shapes = parser.getShapes();
+        labelRenderers = parser.getLabelRenderers();
+        shapeRenderers = parser.getShapeRenderers();
+        slotListeners  = parser.getSlotListeners();
+
         root = parser.root;
         initialized = (root != null);
         if (initialized) {
             if (animating != null)
                 animating.start();
         }
+        frameModel.addAddedFramesListener(this);
+        frameModel.addChangedFramesListener(this);
+        frameModel.addRemovedFramesListener(this);
+        frameModel.addTransitionListener(this);
+    }
+
+    public Shapes getShapes() {
+        return shapes;
+    }
+    public LabelRenderers getLabelRenderers() {
+        return labelRenderers;
+    }
+    public ShapeRenderers getShapeRenderers() {
+        return shapeRenderers;
+    }
+    public SlotChangeListeners getSlotListeners() {
+        return slotListeners;
+    }
+
+
+    public void stateChanged(ChangeEvent e) {
+        ProcessEventHelper helper = new ProcessEventHelper(e);
+        if (SwingUtilities.isEventDispatchThread())
+            helper.run();
+        else SwingUtilities.invokeLater(helper);
+    }
+
+    class ProcessEventHelper implements Runnable {
+        ChangeEvent e;
+        public ProcessEventHelper(ChangeEvent che) { e = che;}
+        public void run() {
+            if (e instanceof AddedFramesEvent) {
+                // process added frames
+                AddedFramesEvent ee = (AddedFramesEvent)e;
+                root.update(frameModel, ee.getAddedDataFrames(), null, ee.getAddedRelationFrames());
+
+            } else if (e instanceof ChangedFramesEvent) {
+                // process slot changes of data frames
+                ChangedFramesEvent ee = (ChangedFramesEvent) e;
+                HashMap changeMap = ee.getChangedDataFrames();
+                if (changeMap == null)
+                    return;
+                org.cougaar.core.qos.frame.Frame frame;
+                ShapeGraphic sh;
+                for (Iterator ii=changeMap.keySet().iterator(); ii.hasNext();) {
+                    frame = (org.cougaar.core.qos.frame.Frame)ii.next();
+                    sh = frameModel.getGraphic(frame);
+                    if (sh!= null) {
+                        for (Iterator jj=((Collection)changeMap.get(frame)).iterator(); jj.hasNext();)
+                            sh.processFrameChange(frame, (org.cougaar.core.qos.frame.Frame.Change) jj.next());
+                    }
+                }
+            } else if (e instanceof RemovedFramesEvent) {
+                ;// nothing yet
+            } else if (e instanceof TickEvent) {
+                // process new transitions (add to a transition queue to be picked up by the
+                // animation thread)
+                tickEventOccured((TickEvent)e);
+            }
+        }
     }
 
 
 
-    public void addChangeListener(ChangeListener l) {
-        changes.addListener(l);
+    public void addTickStatusListener(ChangeListener l) {
+        tickStatusListeners.addListener(l);
+    }
+    public void removeTickStatusListener(ChangeListener l) {
+        tickStatusListeners.removeListener(l);
     }
 
     public Component getControlPanel() {
@@ -108,6 +182,7 @@ public class Display extends AnimatedCanvas {
     }
 
     public void step(int w, int h) {
+        //System.out.println("step");
         if (!initialized)
             return;
         synchronized (lock) {
@@ -120,16 +195,18 @@ public class Display extends AnimatedCanvas {
                 if (finished)
                     remove.add(t);
             }
+            int temp = transitions.size();
             for (Iterator rr=remove.iterator(); rr.hasNext();)
                 transitions.remove(rr.next());
-            if (transitions.size() == 0) {
+            if (temp > 0 && transitions.size() == 0) {
                 processingTickEvent = false;
-                changes.notifyListeners(change);
+                tickStatusListeners.notifyListeners(tickCompleted);
             }
         }
     }
 
     public void render(int w, int h, Graphics2D g2) {
+        //System.out.println("render");
         if (!initialized)
             return;
         synchronized (lock) {
@@ -155,21 +232,15 @@ public class Display extends AnimatedCanvas {
     public ShapeGraphic findShape(double x, double y) {
         return root.find(x,y);
     }
-   /*
-    public ShapeGraphic findShape(org.cougaar.core.qos.frame.Frame f) {
-        ShapeGraphic g = null; //getGraphic(f);
-        return (g == null ? root.find(f) : g);
-        //return root.find(f);
-    }*/
 
-    public void tickEventOccured(TickEvent tick) {
+    public void tickEventOccured(org.cougaar.core.qos.frame.visualizer.event.TickEvent tick) {
         synchronized (lock) {
             tickEventQueue.add(tick); 
         } 
     }
 
     public void processNextTickEvent() {
-        TickEvent tickEvent=null;
+        org.cougaar.core.qos.frame.visualizer.event.TickEvent tickEvent=null;
         synchronized (lock) {
             if (tickEventQueue.size() > 0) {
                 tickEvent = (TickEvent)tickEventQueue.get(0);

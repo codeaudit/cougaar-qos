@@ -39,8 +39,7 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.UnaryPredicate;
 
-import org.cougaar.core.qos.frame.visualizer.test.TickEvent;
-import org.cougaar.core.qos.frame.visualizer.test.FrameChanges;
+import org.cougaar.core.qos.frame.visualizer.util.FrameChanges;
 
 import javax.swing.*;
 

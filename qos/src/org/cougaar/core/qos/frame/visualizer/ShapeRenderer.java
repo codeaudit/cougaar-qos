@@ -13,21 +13,13 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class ShapeRenderer {
-    private static HashMap shapeRenderers = new HashMap();
-    public static void add(ShapeRenderer r) {
-        if (shapeRenderers.get(r.getName()) == null)
-            shapeRenderers.put(r.getName(), r);
-    }
-    public static ShapeRenderer get(String name) {
-        return (ShapeRenderer) shapeRenderers.get(name);
-    }
 
 
     public final static Paint DEFAULT_PAINT = Color.blue;
     public final static Paint DEFAULT_SELECTED_PAINT = Color.magenta;
     public final static Paint DEFAULT_FILL_PAINT = Color.blue;
     public final static Paint DEFAULT_SELECTED_FILL_PAINt = Color.blue.brighter();
-    public final static int DEFAULT_LINE_WIDTH = 2;
+    public final static int   DEFAULT_LINE_WIDTH = 2;
 
     String rendererName;
     Paint  paint = DEFAULT_PAINT, selectedPaint = DEFAULT_SELECTED_PAINT;

@@ -1,4 +1,4 @@
-package org.cougaar.core.qos.frame.visualizer.test;
+package org.cougaar.core.qos.frame.visualizer.util;
 
 import org.cougaar.core.qos.frame.Frame;
 

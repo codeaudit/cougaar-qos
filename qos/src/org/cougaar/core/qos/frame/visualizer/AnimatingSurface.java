@@ -76,17 +76,23 @@ public abstract class AnimatingSurface extends Surface implements Runnable {
 
 
     public void run() {
-
+        //Dimension d = getSize();
         Thread me = Thread.currentThread();
 
-        while (thread == me && !isShowing() || getSize().width == 0) {
+        while (thread == me  && getSize().width == 0) {
             try {
                 thread.sleep(200);
             } catch (InterruptedException e) { }
         }
 
+
         while (thread == me) {
-            repaint();
+            if (isShowing())
+                repaint();
+           else {
+                Dimension d = getSize();
+                step(d.width, d.height);
+            }
             try {
                 thread.sleep(sleepAmount);
             } catch (InterruptedException e) { }

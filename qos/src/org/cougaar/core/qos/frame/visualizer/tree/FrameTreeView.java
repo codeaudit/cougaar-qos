@@ -3,17 +3,22 @@ package org.cougaar.core.qos.frame.visualizer.tree;
 import org.cougaar.core.qos.frame.visualizer.FrameModel;
 import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
+import org.cougaar.core.qos.frame.visualizer.event.*;
 import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
 import org.cougaar.core.qos.frame.Frame;
 import org.cougaar.core.qos.frame.RelationFrame;
 import org.cougaar.core.qos.frame.PrototypeFrame;
+import org.cougaar.core.qos.frame.DataFrame;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.tree.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
@@ -23,10 +28,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,23 +37,33 @@ import java.util.ArrayList;
  * Time: 8:57:37 AM
  * To change this template use File | Settings | File Templates.
  */
-public class FrameTreeView extends TreeView {
+public class FrameTreeView extends TreeView implements ChangeListener {
     HashMap frameMap;
     FrameModel frameModel;
     FrameInheritenceView frameInheritenceView;
     JLabel selectedLabel, selectedFrameLabel;
-
+    DefaultTreeModel treeModel;
+    boolean rootNameNotSet = true;
     private transient Logger log = Logging.getLogger(getClass().getName());
 
 
-    public FrameTreeView() {
+    public FrameTreeView(FrameModel frameModel) {
         super();
         init();
         frameMap = new HashMap();
-        //frameModel = new FrameTableModel();
+        this.frameModel = frameModel;
+        root = new DefaultMutableTreeNode("frameset");
+        treeModel = new DefaultTreeModel(root);
+        tree.setModel(treeModel);
+
+
         Icon frameIcon = IconFactory.getIcon(IconFactory.FRAME_ICON);
         Icon relationIcon = IconFactory.getIcon(IconFactory.RELATION_ICON);
         tree.setCellRenderer(new FrameRenderer(frameIcon, relationIcon));
+
+        frameModel.addAddedFramesListener(this);
+        frameModel.addChangedFramesListener(this);
+        frameModel.addRemovedFramesListener(this);
     }
 
     public Component createOtherComponent() {
@@ -61,15 +73,8 @@ public class FrameTreeView extends TreeView {
         rightPanel.add(frameInheritenceView, BorderLayout.CENTER);
 
         selectedLabel = new JLabel("selected:");
-        selectedFrameLabel = new JLabel("");
-        JLabel slotDef = newLegendLabel("Slot Definition", ColorDefs.slotDefinitionColor, true);
-        JLabel inheritedSlot = newLegendLabel("Container Slot", ColorDefs.inheritedSlotColor, true);
-        JLabel localSlot = newLegendLabel("Prototype Slot", ColorDefs.localSlotColor, true);
-        Box legend = Box.createHorizontalBox();
-        legend.add(slotDef);
-        legend.add(inheritedSlot);
-        legend.add(localSlot);
-        legend.setBorder(BorderFactory.createEtchedBorder());
+        selectedFrameLabel = new JLabel("");      
+        Box legend = createHorizontalFrameLegend();
 
         Box labelBox = Box.createHorizontalBox();
         labelBox.add(selectedLabel);
@@ -81,7 +86,18 @@ public class FrameTreeView extends TreeView {
         return rightPanel;
     }
 
-    JLabel newLegendLabel(String label, Color color, boolean hasBorder) {
+    public static Box createHorizontalFrameLegend() {
+        JLabel slotDef = newLegendLabel("Slot Definition", ColorDefs.slotDefinitionColor, true);
+        JLabel inheritedSlot = newLegendLabel("Container Slot", ColorDefs.inheritedSlotColor, true);
+        JLabel localSlot = newLegendLabel("Prototype Slot", ColorDefs.localSlotColor, true);
+        Box legend = Box.createHorizontalBox();
+        legend.add(slotDef);
+        legend.add(inheritedSlot);
+        legend.add(localSlot);
+        legend.setBorder(BorderFactory.createEtchedBorder());
+        return legend;
+    }
+    public static JLabel newLegendLabel(String label, Color color, boolean hasBorder) {
         JLabel lbl = new JLabel(label);
         lbl.setOpaque(true);
         lbl.setBackground(color);
@@ -105,14 +121,55 @@ public class FrameTreeView extends TreeView {
     }
 
 
-    public void buildFrameTree(FrameModel frameModel) {
-        this.frameModel = frameModel;
-        root = new DefaultMutableTreeNode("frameset '"+frameModel.getFrameSetName()+"'");
-        frameMap.clear();
+     public void stateChanged(ChangeEvent e) {
+        MyFrameEventHelper helper = new MyFrameEventHelper(e);
+        if (SwingUtilities.isEventDispatchThread())
+            helper.run();
+        else SwingUtilities.invokeLater(helper);
+    }
 
-        if (log.isDebugEnabled())
-            log.debug("buildFrameTree frameModel"+frameModel);
 
+
+    class MyFrameEventHelper implements Runnable {
+        ChangeEvent e;
+        public MyFrameEventHelper(ChangeEvent che) { e = che;}
+        public void run() {
+            if (e instanceof AddedFramesEvent) {
+                // process added frames
+                AddedFramesEvent ee = (AddedFramesEvent)e;
+                HashSet addedDataFrames = ee.getAddedDataFrames();
+                if (addedDataFrames != null)
+                    createNodes(addedDataFrames);
+
+                HashSet addedRelationFrames = ee.getAddedRelationFrames();
+                if (addedRelationFrames != null)
+                    processRelationships(addedRelationFrames);
+
+            }  else if (e instanceof ChangedFramesEvent) {
+                ChangedFramesEvent ee = (ChangedFramesEvent) e;
+                //HashMap dataFrames = ee.getChangedDataFrames();
+
+                HashMap relationFrames = ee.getChangedRelationFrames();
+                if (relationFrames != null)
+                    processRelationships(relationFrames.keySet());
+
+            }  else if (e instanceof RemovedFramesEvent) {
+                 ;
+            }
+            if (rootNameNotSet) {
+                root.setUserObject("frameset '"+frameModel.getFrameSetName()+"'");
+                rootNameNotSet = false;
+                TreePath p = new TreePath(root);
+                if (!tree.isExpanded(p))
+                    tree.expandPath(p);
+            }   
+        }
+    }
+
+
+ /*
+
+    public void updateTree() {
         Collection relationshipFrames = process(frameModel.getAllFrames());
         processRelationships(relationshipFrames);
         Collection rootNodes = findRootLevelNodes();
@@ -122,12 +179,8 @@ public class FrameTreeView extends TreeView {
         }
         tree.setModel(new DefaultTreeModel(root));
     }
-
-    /*private String makeNodeKey(String name, String proto)
-    {
-    return name +"__"+proto;
-    } */
-
+    */
+/*
     protected Collection process(Collection frames) {
         ArrayList relationships = new ArrayList();
         org.cougaar.core.qos.frame.Frame f;
@@ -151,7 +204,7 @@ public class FrameTreeView extends TreeView {
             log.debug("FrameTreeView: found "+ relationships.size() + " relation frames and "+frameMap.values().size()+" framenodes");
         return relationships;
     }
-
+*/
 
     protected void processRelationships(Collection relationshipFrames) {
         org.cougaar.core.qos.frame.RelationFrame f;
@@ -167,8 +220,8 @@ public class FrameTreeView extends TreeView {
             pf = f.relationshipParent();
             cf = f.relationshipChild();
             relationship = (String) f.getKind();
-            parent = (FrameNode) frameMap.get(pf);
-            child  = (FrameNode) frameMap.get(cf);
+            parent = createNode(pf);//(FrameNode) frameMap.get(pf);
+            child  = createNode(cf);//(FrameNode) frameMap.get(cf);
             if (parent != null && child != null) {
                 if (child.getParent() != null) {
                     FrameNode tmp = child;
@@ -182,14 +235,40 @@ public class FrameTreeView extends TreeView {
                     if (log.isDebugEnabled())
                         log.debug("creating RelationFrameNode:  "+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
                     relationNode = new FrameNode(relationship);
-                    parent.addRelationshipNode(relationNode);
+                    parent.addRelationshipNode(treeModel, relationNode);
                 }
-                relationNode.add(child);
+                //relationNode.add(child);
+                treeModel.insertNodeInto(child, relationNode, 0);
             } else {
                 if (log.isDebugEnabled())
-                    log.debug("can't create node: parent='"+f.getParentValue()+"'("+(parent!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
+                    log.debug("error: can't create node,  parent='"+f.getParentValue()+"'("+(parent!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
                 ;// print something here
             }
+        }
+
+        Collection rootNodes = findRootLevelNodes();
+        for (Iterator ii=rootNodes.iterator(); ii.hasNext();)
+            treeModel.insertNodeInto((DefaultMutableTreeNode) ii.next(), root, 0);
+
+    }
+
+    protected FrameNode createNode(org.cougaar.core.qos.frame.Frame frame) {
+        FrameNode newNode = (FrameNode) frameMap.get(frame);
+        if (newNode == null) {
+            if (log.isDebugEnabled())
+                    log.debug("creating FrameNode for frame '"+frame.getValue("name")+"'");
+            newNode = new FrameNode(frame);
+            frameMap.put(frame, newNode);
+        }
+        return newNode;
+    }
+
+    protected void createNodes(Collection dataFrames) {
+        org.cougaar.core.qos.frame.Frame  f;
+        for (Iterator ii=dataFrames.iterator(); ii.hasNext();) {
+            f = (org.cougaar.core.qos.frame.Frame) ii.next();
+            if (f instanceof DataFrame)
+                  createNode(f);
         }
     }
 
@@ -203,7 +282,7 @@ public class FrameTreeView extends TreeView {
         }
         return rootLevelNodes;
     }
-
+  /*
     protected Collection findFrames(Collection frames, FramePredicate predicate) {
         org.cougaar.core.qos.frame.Frame f;
         ArrayList flist = new ArrayList();
@@ -214,7 +293,7 @@ public class FrameTreeView extends TreeView {
         }
         return flist;
     }
-
+     */
 
     private class FrameRenderer extends DefaultTreeCellRenderer {
         Icon relationIcon;

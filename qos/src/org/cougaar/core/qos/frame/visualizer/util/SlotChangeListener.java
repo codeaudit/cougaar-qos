@@ -25,19 +25,6 @@ import java.util.Iterator;
  */
 public class SlotChangeListener implements Cloneable  {
 
-    private static HashMap listeners = new HashMap();
-    public static void add(String name, SlotChangeListener l) {
-        listeners.put(name, l);
-    }
-    public static SlotChangeListener get(String name) {
-        return getCopy(name);
-    }
-    private static SlotChangeListener getCopy(String name) {
-        SlotChangeListener s = (SlotChangeListener) listeners.get(name);
-        if (s!= null)
-            return (SlotChangeListener) s.cloneInstance();
-        return null;
-    }
 
     //public final static String SET_RENDERER = "setrenderer";
     //public final static String SET_SHAPE = "setshape";
@@ -57,20 +44,27 @@ public class SlotChangeListener implements Cloneable  {
         triggerMap = new HashMap();
     }
 
+    public String getName() {
+        return listenerName;
+    }
+    public String getSlotName() {
+        return slotName;
+    }
+
     public void setShapeGraphic(ShapeGraphic sh){
         this.shapeGraphic = sh;
     }
 
-    public void setRendererTrigger(ShapeRenderer r, Object value) {
-        addTrigger(value, new SetRenderer(r));
+    public void setRendererTrigger(String shRendererName, ShapeRenderer r, Object value) {
+        addTrigger(value, new SetRenderer(slotName, shRendererName,r));
     }
 
-    public void setLabelRendererTrigger(LabelRenderer r, Object value) {
-        addTrigger(value,  new SetLabelRenderer(r));
+    public void setLabelRendererTrigger(String lblRendererName, LabelRenderer r, Object value) {
+        addTrigger(value,  new SetLabelRenderer(slotName, lblRendererName, r));
     }
 
-    public void setShapeTrigger(RectangularShape shape, Object value) {
-        addTrigger(value, new SetShape(shape));
+    public void setShapeTrigger(String shapeName, RectangularShape shape, Object value) {
+        addTrigger(value, new SetShape(slotName, shapeName, shape));
     }
 
     protected void addTrigger(Object value, TriggerAction action) {
@@ -90,7 +84,7 @@ public class SlotChangeListener implements Cloneable  {
             Object value    = change.getValue();
 
             //if (log.isDebugEnabled())
-              //  log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
+            //  log.debug("frame "+frame+"  changed   slot="+slotName+"  value="+value+" child="+frame.getValue("child-value"));
             Trigger t = (Trigger) triggerMap.get(value);
             if (t!=null)
                 SwingUtilities.invokeLater(t);
@@ -109,7 +103,7 @@ public class SlotChangeListener implements Cloneable  {
             if (t!=null) {
                 //System.out.println("SlotchangeListener for slot '"+slotName+"' validating value ="+value);
                 //if (log.isDebugEnabled())
-                  //  log.debug("validating value ="+value);
+                //  log.debug("validating value ="+value);
                 SwingUtilities.invokeLater(t);
             }
         }
@@ -131,13 +125,62 @@ public class SlotChangeListener implements Cloneable  {
                 clonedT = t.cloneInstance();
                 clonedT.setParent(cloned);
                 cloned.triggerMap.put(key, clonedT);
-	        }
+            }
 
-	        return cloned;
+            return cloned;
         } catch (CloneNotSupportedException ee) {
             ee.printStackTrace();
         }
         return null;
+    }
+
+
+    protected static void pad(StringBuffer sb, int start, int end) {
+        int i, length = sb.length();
+        for (i=start; (i <= end && i < length); i++)
+            sb.setCharAt(i,' ');
+    }
+    protected static StringBuffer getPadded(int numSpaces) {
+        StringBuffer sb = new StringBuffer();
+        sb.setLength(numSpaces);
+        pad(sb, 0, numSpaces-1);
+        return sb;
+    }
+
+    /*
+    <slotChangeListener name="jobWatcher" slot="job-status">
+       <trigger value="processing" action="setrenderer" name="processedJobRenderer"/>
+       <trigger value="processing" action="setshape" shape="circle2"/>
+       <?trigger value="processing" action="setlabelrenderer" name="defaultLabelRenderer"/?>
+       <trigger value="waiting" action="setrenderer" name="waitingJobRenderer"/>
+       <trigger value="waiting" action="setshape" shape="circle1"/>
+       <trigger value="done" action="setshape" shape="circle0"/>
+       <trigger value="done" action="setrenderer" name="doneJobRenderer"/>
+    </slotChangeListener>
+    */
+    // hack
+    public String toXML(int indent, int offset) {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append(getPadded(indent));
+        sb.append("<slotChangeListener name=\""+listenerName+"\" slot=\""+slotName+"\">\n");
+        TriggerAction t;
+        String triggActions[];
+
+        for (Iterator ii=triggerMap.values().iterator(); ii.hasNext();) {
+            //sb.append(getPadded(indent+offset));
+            triggActions =  ((Trigger)ii.next()).toXML();
+            if (triggActions == null || triggActions.length ==0)
+                continue;
+            for (int i=0; i < triggActions.length; i++) {
+                sb.append(getPadded(indent+(2*offset)));
+                sb.append(triggActions[i]);
+                sb.append("\n");
+            }
+        }
+        sb.append(getPadded(indent));
+        sb.append("</slotChangeListener>");
+        return sb.toString();
     }
 }
 
@@ -145,84 +188,119 @@ public class SlotChangeListener implements Cloneable  {
 
 
 
-    class Trigger implements Runnable, Cloneable {
-        ArrayList actionList;
-        ShapeGraphic shapeGraphic;
-        SlotChangeListener listener;
+class Trigger implements Runnable, Cloneable {
+    ArrayList actionList;
+    ShapeGraphic shapeGraphic;
+    SlotChangeListener listener;
 
-        public Trigger() {
-            actionList = new ArrayList();
-        }
-        public void setParent(SlotChangeListener l) {
-            listener = l;
-        }
-        public void setGraphic(ShapeGraphic g) {
-            this.shapeGraphic = g;
-        }
-        public void run() {
-            if (actionList.size() > 0) {
-                for (Iterator ii=actionList.iterator(); ii.hasNext();)
-                  ((TriggerAction)ii.next()).execute(listener.shapeGraphic);
-            }
-        }
-        public void add(TriggerAction t) {
-            if (t!=null)
-                actionList.add(t);
-        }
-        public Trigger cloneInstance() {
-            try {
-                return (Trigger) this.clone();
-            } catch (CloneNotSupportedException ee) {
-                ee.printStackTrace();
-            }
-            return null;
+    public Trigger() {
+        actionList = new ArrayList();
+    }
+    public void setParent(SlotChangeListener l) {
+        listener = l;
+    }
+    public void setGraphic(ShapeGraphic g) {
+        this.shapeGraphic = g;
+    }
+    public void run() {
+        if (actionList.size() > 0) {
+            for (Iterator ii=actionList.iterator(); ii.hasNext();)
+                ((TriggerAction)ii.next()).execute(listener.shapeGraphic);
         }
     }
+    public void add(TriggerAction t) {
+        if (t!=null)
+            actionList.add(t);
+    }
+    public Trigger cloneInstance() {
+        try {
+            return (Trigger) this.clone();
+        } catch (CloneNotSupportedException ee) {
+            ee.printStackTrace();
+        }
+        return null;
+    }
+    /*
+       <trigger value="processing" action="setrenderer" name="processedJobRenderer"/>
+       <trigger value="processing" action="setshape" shape="circle2"/>
+       <?trigger value="processing" action="setlabelrenderer" name="defaultLabelRenderer"/?>
+    */
+    public String[] toXML() {
+        String xml[] = new String[actionList.size()];
+        TriggerAction t;
+        int i=0;
+        for (Iterator ii=actionList.iterator(); ii.hasNext();i++) {
+            t = (TriggerAction)ii.next();
+            xml[i]= t.toXML();
+        }
+        return xml;
+    }
+}
 
 
-    class TriggerAction implements Cloneable {
-        public TriggerAction() {}
-        public void execute(ShapeGraphic shapeGraphic) {}
+class TriggerAction implements Cloneable {
+    String slotName;
+    public TriggerAction(String slotName) { this.slotName = slotName;}
+    public void execute(ShapeGraphic shapeGraphic) {}
+    public String toXML() {return "";}
+}
+
+class SetRenderer extends TriggerAction {
+    ShapeRenderer shapeRenderer;
+    String shapeRendererName;
+
+    public SetRenderer(String slotName, String shRendererName, ShapeRenderer r) {
+        super(slotName);
+        shapeRendererName = shRendererName;
+        shapeRenderer=r;
+    }
+    public void execute(ShapeGraphic shapeGraphic) {
+        if(shapeGraphic !=null && shapeRenderer != null)
+            shapeGraphic.setRenderer(shapeRenderer);
     }
 
-    class SetRenderer extends TriggerAction {
-        ShapeRenderer shapeRenderer;
-        public SetRenderer(ShapeRenderer r) {
-            super();
-            shapeRenderer=r;
-        }
-        public void execute(ShapeGraphic shapeGraphic) {
-            if(shapeGraphic !=null && shapeRenderer != null)
-                shapeGraphic.setRenderer(shapeRenderer);
-        }
+    public String toXML() {
+        return "<trigger value=\""+slotName+"\" action=\"setrenderer\" name=\""+shapeRendererName+"\"/>";
     }
+}
 
 
-    class SetLabelRenderer extends TriggerAction {
-        LabelRenderer labelRenderer;
-        public SetLabelRenderer(LabelRenderer lblr) {
-            super();
-            this.labelRenderer = lblr;
-        }
-        public void execute(ShapeGraphic shapeGraphic) {
-            if (shapeGraphic != null && labelRenderer != null)
-                shapeGraphic.setLabelRenderer(labelRenderer);
-        }
+class SetLabelRenderer extends TriggerAction {
+    LabelRenderer labelRenderer;
+    String labelRendererName;
+    public SetLabelRenderer(String slotName, String lblRendererName, LabelRenderer lblr) {
+        super(slotName);
+        this.labelRendererName = lblRendererName;
+        this.labelRenderer = lblr;
     }
+    public void execute(ShapeGraphic shapeGraphic) {
+        if (shapeGraphic != null && labelRenderer != null)
+            shapeGraphic.setLabelRenderer(labelRenderer);
+    }
+    public String toXML() {
+        return "<trigger value=\""+slotName+"\" action=\"setlabelrenderer\" name=\""+labelRendererName+"\"/>";
+    }
+}
 
-    class SetShape extends TriggerAction {
-        RectangularShape shape;
-        public SetShape(RectangularShape shape) {
-            super();
-            this.shape=shape;
-        }
-        public void execute(ShapeGraphic shapeGraphic) {
-            if (shapeGraphic != null) {
-                shapeGraphic.setShapePrototype(shape);
-                shapeGraphic.createShape();
-            }
+class SetShape extends TriggerAction {
+    RectangularShape shape;
+    String shapeName;
+
+    public SetShape(String slotName, String shName, RectangularShape shape) {
+        super(slotName);
+        this.shapeName = shName;
+        this.shape=shape;
+    }
+    public void execute(ShapeGraphic shapeGraphic) {
+        if (shapeGraphic != null) {
+            shapeGraphic.setShapePrototype(shape);
+            shapeGraphic.createShape();
         }
     }
+    public String toXML() {
+        return "<trigger value=\""+slotName+"\" action=\"setshape\" shape=\""+shapeName+"\"/>";
+    }
+}
 
 
 

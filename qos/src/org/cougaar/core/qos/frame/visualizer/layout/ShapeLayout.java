@@ -19,6 +19,12 @@ public abstract class ShapeLayout implements Cloneable {
         hpadding=vpadding=0d;
     }
 
+    public double left() { return leftMargin;}
+    public double right() { return rightMargin;}
+    public double top() { return topMargin;}
+    public double bottom() { return bottomMargin;}
+    public double hpadding() { return hpadding; }
+    public double vpadding() {return vpadding;}
     //public void setContainer(ShapeContainer c) {
     //  container = c;
     // }

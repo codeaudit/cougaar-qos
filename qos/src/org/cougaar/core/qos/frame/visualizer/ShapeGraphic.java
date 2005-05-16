@@ -35,18 +35,11 @@ public class ShapeGraphic implements Cloneable {
     // logging
     protected Logger log = Logging.getLogger(getClass().getName());
     // for the container tree display
-    protected ShapeGraphicNode treeNode;
+    //protected ShapeGraphicNode treeNode;
 
 
     public ShapeGraphic() {
         this(null, null);
-        /*this.id = null;
-        this.label = null;
-        x=y=0d;
-        width=height=10d; // default?
-        visible = true;
-        selected = false;
-        isPrototype = false; */
     }
 
     protected ShapeGraphic(String id, String label) {
@@ -57,15 +50,15 @@ public class ShapeGraphic implements Cloneable {
         visible = true;
         selected = mouseOver =false;
         slotListeners = new ArrayList();
-        treeNode = null;
+        //treeNode = null;
     }
 
-
+   /*
     public ShapeGraphicNode getTreeNode() {
         if (treeNode == null)
             treeNode = new ShapeGraphicNode(this, (parent != null ? parent.getTreeNode() : null));
         return treeNode;
-    }
+    } */
 
     public void setMouseOver(boolean mouseOver) {
         this.mouseOver = mouseOver;
@@ -80,6 +73,10 @@ public class ShapeGraphic implements Cloneable {
         slotListeners.add(l);
     }
 
+    public Collection getSlotListeners() {
+        return slotListeners;
+    }
+    
     public void validateListeners() {
         SlotChangeListener sl;
         for (Iterator ii=slotListeners.iterator(); ii.hasNext();) {
@@ -141,6 +138,9 @@ public class ShapeGraphic implements Cloneable {
     public void setFrameIdSlotName(String slotName) {
         frameidSlotName = slotName;
     }
+    public String getFrameIdSlotName() {
+        return frameidSlotName;
+    }
 
     public void setFrame(org.cougaar.core.qos.frame.Frame frame) {
         this.frame = frame;
@@ -199,10 +199,16 @@ public class ShapeGraphic implements Cloneable {
 
     public void setParent(ShapeContainer container) {
         this.parent = container;
-        /*if (treeNode != null) {
-            ShapeGraphicNode n = (ShapeGraphicNode) treeNode.getParent();
-            if (n != null && n != parent.getTreeNode())
-                parent.getTreeNode().add(treeNode);
+        /*
+        treeNode = getTreeNode();
+        if (treeNode != null) {
+            ShapeGraphicNode oldParentNode = (ShapeGraphicNode) treeNode.getParent();
+            ShapeGraphicNode newParentNode =  parent.getTreeNode();
+            if (oldParentNode != null && oldParentNode != newParentNode) {
+                newParentNode.add(treeNode);
+                //if (frameModel != null)
+                  //  frameModel.containerTreeNodeChanged(newParentNode, treeNode);
+            }
         } */
     }
 

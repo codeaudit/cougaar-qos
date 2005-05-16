@@ -35,7 +35,7 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.frame.*;
 import org.cougaar.core.qos.frame.visualizer.test.ContainsPredicate;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.visualizer.test.TickEvent;
+import org.cougaar.core.qos.frame.visualizer.event.*;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
@@ -45,6 +45,8 @@ import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 
 
@@ -59,7 +61,7 @@ public class FrameModel {
     protected HashSet relationshipFrames;
     // keep track of all shape graphic objects that have an associated Frame object (prototypes and grouping containers
     // are not currently kept track of
-    HashMap graphicsMap;
+    private HashMap graphicsMap;
     // relationship frames that have child == null || parent == null
     protected HashSet pendingRelationshipFrames;
 
@@ -69,34 +71,119 @@ public class FrameModel {
 
     private transient Logger log = Logging.getLogger(getClass().getName());
 
-    DisplayWindow displayWindow;
+    //DisplayWindow displayWindow;
     static String TICK_EVENT_LABEL = "TICK";
     protected int tickNumber;
 
-
-
-
+    ChangeModel addedFramesListeners;
+    ChangeModel changedFramesListeners;
+    ChangeModel removedFramesListeners;
+    ChangeModel transitionListeners;
+    ChangeModel graphicChangeListeners;
 
     public FrameModel() {
         tickNumber = 0;
-        this.displayWindow = null;
         relationshipFrames = new HashSet();
         pendingRelationshipFrames = new HashSet();
         dataFrames = new HashSet();
         allFrames = new HashSet();
         graphicsMap = new HashMap();
+
+        addedFramesListeners = new ChangeModel();
+        changedFramesListeners = new ChangeModel();
+        removedFramesListeners = new ChangeModel();
+        transitionListeners = new ChangeModel();
+        graphicChangeListeners = new ChangeModel();
+
+        // views
+        //this.displayWindow = null;
+        //this.containerView = null;
+        //this.frameTreeView = null;
     }
 
 
-    public synchronized void registerGraphic(org.cougaar.core.qos.frame.Frame f, ShapeGraphic graphic) {
+
+    public synchronized void addAddedFramesListener(ChangeListener l) {
+        addedFramesListeners.addListener(l);
+    }
+    public synchronized void removeAddedFramesListener(ChangeListener l) {
+        addedFramesListeners.removeListener(l);
+    }
+    public synchronized void addChangedFramesListener(ChangeListener l) {
+        changedFramesListeners.addListener(l);
+    }
+    public synchronized void removeChangedFramesListener(ChangeListener l) {
+        changedFramesListeners.removeListener(l);
+    }
+    public synchronized void addRemovedFramesListener(ChangeListener l) {
+        removedFramesListeners.addListener(l);
+    }
+    public synchronized void removeRemovedFramesListener(ChangeListener l) {
+        removedFramesListeners.addListener(l);
+    }
+    public synchronized void addTransitionListener(ChangeListener l) {
+        transitionListeners.addListener(l);
+    }
+    public synchronized void removeTransitionListener(ChangeListener l) {
+        transitionListeners.removeListener(l);
+    }
+    public synchronized void addGraphicChangeListener(ChangeListener l) {
+        graphicChangeListeners.addListener(l);
+    }
+    public synchronized void removeGraphicChangeListener(ChangeListener l) {
+        graphicChangeListeners.removeListener(l);
+    }
+
+    protected synchronized void notifyAddedFrames(AddedFramesEvent e) {
+        addedFramesListeners.notifyListeners(e);
+        //SwingUtilities.invokeLater(new NotifyHelper(addedFramesListeners, e));
+    }
+    protected synchronized void notifyChangedFrames(ChangedFramesEvent e) {
+        changedFramesListeners.notifyListeners(e);
+        //SwingUtilities.invokeLater(new NotifyHelper(changedFramesListeners, e));
+    }
+    protected synchronized void notifyRemovedFrames(RemovedFramesEvent e) {
+        removedFramesListeners.notifyListeners(e);
+        //SwingUtilities.invokeLater(new NotifyHelper(removedFramesListeners, e));
+    }
+    protected synchronized void notifyNewTransitions(TickEvent e) {
+        transitionListeners.notifyListeners(e);
+        //SwingUtilities.invokeLater(new NotifyHelper(transitionListeners, e));
+    }
+
+    public synchronized void fireContainerAddedChild(ShapeContainer c, ShapeGraphic newchild) {
+         graphicChangeListeners.notifyListeners(new ContainerChildAddedEvent(this, c, newchild));
+    }
+
+    public synchronized void fireContainerRemovedChild(ShapeContainer c, ShapeGraphic removedchild) {
+         graphicChangeListeners.notifyListeners(new ContainerChildRemovedEvent(this, c, removedchild));
+    }
+
+   /*
+    class NotifyHelper implements Runnable {
+        ChangeModel changes;
+        ChangeEvent event;
+        public NotifyHelper(ChangeModel m, ChangeEvent e) {
+            changes = m;
+            event = e;
+        }
+        public void run() {
+            changes.notifyListeners(event);
+        }
+    }*/
+
+
+
+    public synchronized boolean registerGraphic(org.cougaar.core.qos.frame.Frame f, ShapeGraphic graphic) {
         if (f == null || graphic == null)
-            return;
+            return false;
         ShapeGraphic sg;
         if ((sg=(ShapeGraphic)graphicsMap.get(f)) != null) {
             if (sg != graphic)
                 throw new IllegalArgumentException("Error: "+graphic+" is already registered for frame "+f);
         }
         graphicsMap.put(f, graphic);
+        return true;
     }
 
     public synchronized void unregisterGraphic(org.cougaar.core.qos.frame.Frame f, ShapeGraphic graphic) {
@@ -116,26 +203,19 @@ public class FrameModel {
         return frameSet != null;
     }
 
-    public synchronized void setDisplayWindow(DisplayWindow displayWindow) {
-        this.displayWindow = displayWindow;
-    }
+    //public synchronized void setDisplayWindow(DisplayWindow displayWindow) {
+    //    this.displayWindow = displayWindow;
+    //}
 
     public synchronized void setFrameSet(FrameSet frameSet) {
         this.frameSet = frameSet;
-        /*process(allFrames);
-        if (log.isDebugEnabled())
-            log.debug("setFrames("+internalid+"): initialized with "+allFrames.size()+" frames and frameset="+frameSet.getName());
-
-        displayWindow.setFrameHelper(this);       */
     }
 
-    //public synchronized void setFrames(Collection allFrames, Collection addedFrames) {
     public synchronized void framesAdded(Collection addedFrames) {
         if (log.isDebugEnabled())
             log.debug("addFrames("+internalid+"): initialized with "+addedFrames.size()+" frames and frameset="+frameSet.getName());
         this.allFrames.addAll(addedFrames);
         process(addedFrames);
-        //displayWindow.setFrameHelper(this);
     }
 
     public synchronized void framesRemoved(Collection removedFrames) {
@@ -143,7 +223,6 @@ public class FrameModel {
             log.debug("removeFrames("+internalid+"): initialized with "+removedFrames.size()+" frames and frameset="+frameSet.getName());
 
         allFrames.removeAll(removedFrames);
-        //displayWindow.setFrameHelper(this);
     }
 
     public synchronized void framesChanged(HashMap changes) {
@@ -151,15 +230,11 @@ public class FrameModel {
     }
 
 
-
-
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Data exporation methods
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public String getFrameSetName() {
         return frameSet.getName();
-    }
-
-    public String toString() {
-        return "FrameModel("+internalid+"):  frameset='"+getFrameSetName()+"' has "+allFrames.size()+" frames, "+dataFrames.size()+" data frames";
     }
 
     public synchronized Collection getAllFrames() {
@@ -221,7 +296,7 @@ public class FrameModel {
     }
 
 
-    public Collection findFrames(FramePredicate predicate) {
+    public synchronized Collection findFrames(FramePredicate predicate) {
         return findFrames(allFrames, predicate);
     }
 
@@ -272,6 +347,9 @@ public class FrameModel {
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  Incoming event processing and notification
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     protected boolean isValid(RelationFrame rframe) {
         return (rframe.relationshipChild() != null && rframe.relationshipParent() != null);
     }
@@ -310,26 +388,7 @@ public class FrameModel {
             else newRelationFrames = moreNewRelations;
         }
 
-        //if (newDataFrames != null)
-          //  newDataFramesAdded(newDataFrames);
-        //if (newRelationFrames != null)
-          //  newRelationsAdded(newRelationFrames);
-        //ShapeGraphic root = displayWindow.getDisplay().getRootContainer();
-        //root.update(this, newDataFrames, null, newRelationFrames);
-        SwingUtilities.invokeLater(new RootUpdateHelper(newDataFrames, null, newRelationFrames));
-    }
-
-    class RootUpdateHelper implements Runnable {
-        HashSet newDataFrames, removedDataFrames, newRelationFrames;
-        public RootUpdateHelper(HashSet newDataFrames, HashSet removedDataFrames, HashSet newRelationFrames) {
-            RootUpdateHelper.this.newDataFrames = newDataFrames;
-            RootUpdateHelper.this.removedDataFrames = removedDataFrames;
-            RootUpdateHelper.this.newRelationFrames = newRelationFrames;
-        }
-        public void run() {
-            ShapeGraphic root = displayWindow.getDisplay().getRootContainer();
-            root.update(FrameModel.this, newDataFrames, removedDataFrames, newRelationFrames);
-        }
+        notifyAddedFrames(new AddedFramesEvent(this, newDataFrames, newRelationFrames));
     }
 
 
@@ -354,19 +413,7 @@ public class FrameModel {
         }
         return validRelationFrames;
     }
-   /*
-    protected void newRelationsAdded(Collection newRelationFrames) {
-        if (log.isDebugEnabled())
-                log.debug("newRelationsAdded( "+newRelationFrames.size()+ ")");
-    }
 
-    protected void newDataFramesAdded(Collection newDataFrames) {
-         if (log.isDebugEnabled())
-                log.debug("newDataFramesAdded( "+newDataFrames.size()+ ")");
-    }
-     */
-        //if (transitions.size() > 0)
-        //  pluginDisplay.tickEventOccured(new TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
 
     protected void processChanges(HashMap changeMap) {
         // A collection of Frame.Change instances.
@@ -374,9 +421,13 @@ public class FrameModel {
         org.cougaar.core.qos.frame.Frame frame;
         Collection changeReports, trans;
 
+        HashMap changedDataFrames = null; //new HashMap();
+        HashMap changedRelationFrames = null; //new HashMap();
+
         for (Iterator ii=changeMap.keySet().iterator(); ii.hasNext(); ) {
             frame = (org.cougaar.core.qos.frame.Frame) ii.next();
             changeReports = (Collection) changeMap.get(frame);
+
 
             if (frame instanceof RelationFrame) {
                 if (log.isDebugEnabled())
@@ -387,24 +438,33 @@ public class FrameModel {
                     trans = processRelationshipChanges((RelationFrame)frame, changeReports);
                     if (trans != null)
                          transitions.addAll(trans);
+                    if (changedRelationFrames == null)
+                        changedRelationFrames = new HashMap();
+                    changedRelationFrames.put(frame, changeReports);
                 }
             } else {
+                if (changeReports != null && changeReports.size() > 0) {
+                    if (changedDataFrames == null)
+                        changedDataFrames = new HashMap();
+                    changedDataFrames.put(frame, changeReports);
+                }
+
                 // if this is not a relationship change (we currently only animate the relationship changes)
                 // than trigger the container's  slot listeners (if any)
-                ShapeGraphic sh = getGraphic(frame);
-                if (log.isDebugEnabled())
-                    log.debug("Observed changed "+frame+ "  container="+ (sh==null?"NULL!!!":sh.toString()));
-
-                if (sh != null) {
-                    for (Iterator jj=changeReports.iterator(); jj.hasNext();)
-                        sh.processFrameChange(frame, (Frame.Change) jj.next());
-                }
+                //ShapeGraphic sh = getGraphic(frame);
+                //if (log.isDebugEnabled())
+                //    log.debug("Observed changed "+frame+ "  container="+ (sh==null?"NULL!!!":sh.toString()));
+                //SwingUtilities.invokeLater(new SetChangeHelper(frame, sh, changeReports));
             }
         }
         if (transitions.size() > 0)
-            displayWindow.tickEventOccured(new TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
+            notifyNewTransitions(new org.cougaar.core.qos.frame.visualizer.event.TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
+            //displayWindow.tickEventOccured(new org.cougaar.core.qos.frame.visualizer.event.TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
 
+        if (changedDataFrames != null || changedRelationFrames != null)
+            notifyChangedFrames(new ChangedFramesEvent(this, changedDataFrames, changedRelationFrames));
     }
+
 
 
     protected Transition processRelationshipFrame(RelationFrame rframe) {
@@ -461,4 +521,8 @@ public class FrameModel {
         return transitions;
     }
 
+
+    public String toString() {
+        return "FrameModel("+internalid+"):  frameset='"+getFrameSetName()+"' has "+allFrames.size()+" frames, "+dataFrames.size()+" data frames";
+    }
 }

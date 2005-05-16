@@ -13,20 +13,21 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class LabelRenderer {
-    private static HashMap labelRenderers = new HashMap();
+    /*private static HashMap labelRenderers = new HashMap();
     public static void add(LabelRenderer r) {
         if (labelRenderers.get(r.getName()) == null)
             labelRenderers.put(r.getName(), r);
     }
     public static LabelRenderer get(String name) {
         return (LabelRenderer) labelRenderers.get(name);
-    }
+    }   */
 
     protected String rendererName;
     protected double xoffset, yoffset;
     protected Paint paint = null;
     protected Font font = null;
-    protected boolean onMouseOverOnly = false, mouseIsOverShape=false;
+    boolean onMouseOverOnly = false;
+    protected boolean mouseIsOverShape=false;
 
     public LabelRenderer(String rendererName, double xoff, double yoff) {
        this(rendererName, xoff, yoff, null, null);
@@ -46,6 +47,10 @@ public class LabelRenderer {
     }
     public void setMouseOverOnly(boolean onmouseover) {
         onMouseOverOnly = onmouseover;
+    }
+
+    public Paint getPaint() {
+        return paint;    
     }
 
     public String getName() {
