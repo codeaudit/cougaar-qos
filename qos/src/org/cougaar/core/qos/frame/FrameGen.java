@@ -1374,7 +1374,9 @@ public class FrameGen
 			       + ");");
 		writer.println("            }");
 		writer.println("        };");
-		writer.println("        " +sname+ " = org.cougaar.core.qos.metrics.MetricImpl.UndefinedMetric;");
+		writer.println("        " +sname+ " = " +
+			       "getFrameSet().getMetricValue(this, \""
+			       +path+ "\");");
 		writer.println("        getFrameSet().subscribeToMetric(this, "
 			       +obs+ ", \""  +path+ "\");");
 	    }

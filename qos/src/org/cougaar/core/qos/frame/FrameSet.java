@@ -33,6 +33,7 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
 
+import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 
 /**
@@ -223,5 +224,8 @@ public interface FrameSet
     public void subscribeToMetric(DataFrame frame, 
 				  Observer observer, 
 				  String path);
+
+    public Metric getMetricValue(DataFrame frame, String path);
+
 
 }

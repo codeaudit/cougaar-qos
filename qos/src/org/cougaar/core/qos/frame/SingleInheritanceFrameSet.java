@@ -40,6 +40,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
@@ -484,6 +485,10 @@ public class SingleInheritanceFrameSet
 	metrics.subscribeToValue(path, observer, frame);
     }
 
+    public Metric getMetricValue(DataFrame frame, String path)
+    {
+	return metrics.getValue(path, frame);
+    }
 
 
 
