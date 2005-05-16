@@ -300,7 +300,7 @@ public class FrameGen
 	
 	Set elements = new HashSet();
 	elements.add("frames");
-	writer.print("<!ELEMENT frames (");
+	writer.print("<!ELEMENT "+domain+" (");
 	Iterator itr = proto_slots.keySet().iterator();
 	boolean first = true;
 	while (itr.hasNext()) {

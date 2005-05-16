@@ -174,6 +174,7 @@ public class FrameSetParser
     private String current_slot;
     private HashMap path_specs;
     private HashMap references;
+    private String domain;
 
     private ServiceBroker sb;
     private BlackboardService bbs;
@@ -259,7 +260,9 @@ public class FrameSetParser
 		startFrame(attrs);
 	    } else if (name.equals("path")) {
 		startPath(attrs);
-	    } else { 
+	    } else if (domain == null) { 
+		domain = name;
+	    } else {
 		// implicit frame
 		startFrame(name);
 	    }
@@ -293,6 +296,8 @@ public class FrameSetParser
 		// no-op
 	    } else if (current_slot != null) {
 		current_slot = null;
+	    } else if (domain != null && domain.equals(name)) {
+		domain = null;
 	    } else {
 		endFrame();
 	    }
