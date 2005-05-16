@@ -72,9 +72,10 @@ public class FrameGen
     // The FrameSet's domain
     private String domain;
 
-    // Path to the root of the output tree
+    // Path to the root of the output trees
     private String java_output_root;
     private String jess_output_root;
+    private String dtd_output_root;
 
     // FrameSet subdirectory of the output_path; derived from the package
     private String output_directory;
@@ -112,10 +113,11 @@ public class FrameGen
     private String container_relation;
 
 
-    public FrameGen(String java_path, String clp_path)
+    public FrameGen(String java_path, String clp_path, String dtd_path)
     {
 	this.java_output_root = java_path;
 	this.jess_output_root = clp_path;
+	this.dtd_output_root = dtd_path;
     }
 
     public void parseProtoFile(File xml_file)
@@ -139,7 +141,9 @@ public class FrameGen
 	}
 
 	if (java_output_root != null) generatePrototypes(package_name);
-	if (jess_output_root != null) generateShadowClasses(package_name);
+	if (jess_output_root != null) 
+	    generateShadowClasses(package_name, domain);
+	if (dtd_output_root != null) generateDTD(domain);
     }
 
 
@@ -280,7 +284,95 @@ public class FrameGen
 
     // Code Generation 
 
-    private void generateShadowClasses(String pkg)
+    private void generateDTD(String domain)
+    {
+	File out = new File(dtd_output_root, domain+".dtd");
+	PrintWriter writer = null;
+	try {
+	    FileWriter fw = new FileWriter(out);
+	    writer = new PrintWriter(fw);
+	} catch (java.io.IOException iox) {
+	    iox.printStackTrace();
+	    System.exit(-1);
+	}
+	
+	writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+	
+	Set elements = new HashSet();
+	elements.add("frames");
+	writer.print("<!ELEMENT frames (");
+	Iterator itr = proto_slots.keySet().iterator();
+	boolean first = true;
+	while (itr.hasNext()) {
+	    String proto = (String) itr.next();
+	    if (!first) writer.print(" | ");
+	    first = false;
+	    writer.print(proto);
+	}
+	writer.println(")*>");
+
+	itr = proto_slots.keySet().iterator();
+	while (itr.hasNext()) {
+	    String proto = (String) itr.next();
+	    write_protocol_dtd(writer, proto, elements);
+	}
+
+	writer.close();
+	System.out.println("Wrote " + out);
+    }
+
+    private void write_slots_dtd(PrintWriter writer, 
+				 String proto,
+				 Set slots,
+				 Set elements)
+    {
+	Iterator itr = slots.iterator();
+	while (itr.hasNext()) {
+	    String slot = (String) itr.next();
+	    if (!elements.contains(slot)) {
+		writer.println("<!ELEMENT " +slot+ " (#PCDATA)>");
+		elements.add(slot);
+	    }
+	}
+    }
+
+    private void collectProtoSlots(String proto, Set slots)
+    {
+	Map local_slots = (HashMap) proto_slots.get(proto);
+	if (local_slots != null) slots.addAll(local_slots.keySet());
+	Attributes attrs = (Attributes) proto_attrs.get(proto);
+	String parent = attrs.getValue("prototype");
+	if (parent != null) collectProtoSlots(parent, slots);
+    }
+
+    private void write_protocol_dtd (PrintWriter writer, 
+				     String proto,
+				     Set elements)
+    {
+	if (elements.contains(proto)) return;
+	elements.add(proto);
+	writer.print("<!ELEMENT " +proto+ " ");
+	Set slots = new HashSet();
+	collectProtoSlots(proto, slots);
+	if (slots.isEmpty()) {
+	    writer.print("EMPTY");
+	} else {
+	    writer.print("(");
+	    Iterator itr = slots.iterator();
+	    boolean first = true;
+	    while (itr.hasNext()) {
+		String slot = (String) itr.next();
+		if (!first) writer.print(" | ");
+		first = false;
+		writer.print(slot);
+	    }
+	    writer.print(")*");
+	}
+	writer.println(">");
+	write_slots_dtd(writer, proto, slots, elements);
+    }
+
+    private void generateShadowClasses(String pkg, String domain)
     {
 	File out = new File(jess_output_root, domain+".clp");
 	PrintWriter writer = null;
@@ -1766,6 +1858,7 @@ public class FrameGen
     {
 	String java_path = null;
 	String clp_path = null;
+	String dtd_path = null;
 	int i = 0;
 	while (i < args.length) {
 	    String arg = args[i];
@@ -1775,10 +1868,13 @@ public class FrameGen
 	    } else if (arg.equals("-clp")) {
 		clp_path = args[++i];
 		System.out.println("Jess root path is " + clp_path);
+	    } else if (arg.equals("-dtd")) {
+		dtd_path = args[++i];
+		System.out.println("DTD root path is " + dtd_path);
 	    } else if (arg.endsWith(".xml")) {
 		System.out.println("XML file is " + arg);
 		File file = new File(arg);
-		FrameGen generator = new FrameGen(java_path, clp_path);
+		FrameGen generator = new FrameGen(java_path, clp_path,dtd_path);
 		generator.parseProtoFile(file);
 	    }
 	    ++i;

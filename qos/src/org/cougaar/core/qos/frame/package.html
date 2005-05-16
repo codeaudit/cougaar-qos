@@ -108,16 +108,19 @@ their semantic interpretation.
   <dt><b>frameset</b></dt>
 
   <dd>A <code>frameset</code> element is used to describe a FrameSet.
-    It has three required attributes.  The <code>frame-inheritance</code>
-    describes the prototype inheritance structure.  The only supported
-    value right now is "single" (i.e., single inheritance).  The
-    <code>container-relation</code> attribute specifies which relation
-    prototype defines the containment hierarchy.  Any defined relation
-    prototype can be specified here.  The <code>package</code> attribute is
-    used by the code generator: the classes generated for this
-    frameset's prototypes will be put in the given package and the
-    files will be written to the corresponding directory stucture,
-    following standard Java conventions.<p>
+    It has four required attributes.  The
+    <code>frame-inheritance</code> describes the prototype inheritance
+    structure.  The only supported value right now is "single" (i.e.,
+    single inheritance).  The <code>container-relation</code>
+    attribute specifies which relation prototype defines the
+    containment hierarchy.  Any defined relation prototype can be
+    specified here.  The <code>package</code> attribute is used by the
+    code generator: the classes generated for this frameset's
+    prototypes will be put in the given package and the files will be
+    written to the corresponding directory stucture, following
+    standard Java conventions.  Finally, the <code>domain</code>
+    attribute specifies a name for whatever logical domain the
+    framset's prototypes are describing.<p>
 
   </dd>
 
@@ -316,13 +319,18 @@ their semantic interpretation.
 
   <dt><b>frames</b></dt>
 
-  <dd> A <code>frames</code> element can be used to group
-    <code>frame</code> elements.  It has no attributes and is not
-    required.  Ordinarily a <code>frames</code> element would be within
-    a <code>frameset</code> element in an XML file. But it can also be
-    at the top level if the file is being read in to an existing
-    FrameSet.<p>
+  <dd> A <code>frames</code> element can be used to group frame
+    elements.  It has no attributes and is not required.  Ordinarily a
+    <code>frames</code> is the top level element of a frame data file.
+    All other element types only occur in frame prototype (meta-data)
+    files.
 
+    <p>The frame elements in a <code>frames</code> have a
+    domain-specific format.  In particular the element tags correspond
+    to prototype names in that domain.  Similarly, the tags on
+    sub-elements of a frame element correspond to slots of that
+    prototype.
+    <p>
   </dd>
   
   <dt><b>frame</b></dt>

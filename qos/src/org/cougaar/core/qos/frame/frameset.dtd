@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT frameset (prototypes)>
+<!ATTLIST frameset frame-inheritance CDATA "single"
+	           package CDATA #REQUIRED
+	           container-relation CDATA #REQUIRED
+	           domain CDATA #REQUIRED>
+<!ELEMENT prototypes (prototype | relation-prototype | path)*>
+<!ELEMENT prototype (slot*)>
+<!ATTLIST prototype name CDATA #REQUIRED
+	            prototype CDATA #IMPLIED
+	            container CDATA #IMPLIED
+	            doc CDATA #IMPLIED>
+<!ELEMENT relation-prototype (slot*)>
+<!ATTLIST relation-prototype name CDATA #REQUIRED
+	                     prototype CDATA #IMPLIED
+	                     container CDATA #IMPLIED
+	                     parent-prototype CDATA #IMPLIED
+	                     parent-slot CDATA #IMPLIED
+	                     child-prototype CDATA #IMPLIED
+	                     child-slot CDATA #IMPLIED
+	                     doc CDATA #IMPLIED>
+<!ELEMENT path (fork*, slot-reference?)>
+<!ATTLIST path name CDATA #REQUIRED>
+<!ELEMENT slot EMPTY>
+<!ATTLIST slot name CDATA #REQUIRED
+	       type CDATA #IMPLIED
+	       default-value CDATA #IMPLIED
+	       units CDATA #IMPLIED
+	       path CDATA #IMPLIED
+	       doc CDATA #IMPLIED
+	       member (true | false) "true"
+	       warn (true | false) "true"
+	       immutable (true | false) "false"
+	       notify-blackboard (true | false) "true"
+	       notify-listeners (true | false) "true"
+	       transient (true | false) "false">
+<!ELEMENT fork EMPTY>
+<!ATTLIST fork relation CDATA #REQUIRED
+	       role CDATA #REQUIRED>
+<!ELEMENT slot-reference EMPTY>
+<!ATTLIST slot-reference name CDATA #REQUIRED>

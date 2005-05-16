@@ -94,6 +94,12 @@ public class FrameSetParser
 	    reference = attrs.getValue("reference");
 	}
 
+	DataFrameSpec(String name)
+	{
+	    super();
+	    prototype = name;
+	}
+
 	Frame makeFrame(FrameSet frameSet)
 	{
 	    Frame frame = frameSet.makeFrame(prototype, props);
@@ -253,7 +259,10 @@ public class FrameSetParser
 		startFrame(attrs);
 	    } else if (name.equals("path")) {
 		startPath(attrs);
-	    } 
+	    } else { 
+		// implicit frame
+		startFrame(name);
+	    }
 	} catch (Exception ex) {
 	    log.error("startElement " +name, ex);
 	}
@@ -276,7 +285,17 @@ public class FrameSetParser
 		endFrame();
 	    } else if (name.equals("path")) {
 		endPath();
-	    } 
+	    } else if (name.equals("fork")) {
+		// no-op
+	    } else if (name.equals("slot")) {
+		// no-op
+	    } else if (name.equals("slot-reference")) {
+		// no-op
+	    } else if (current_slot != null) {
+		current_slot = null;
+	    } else {
+		endFrame();
+	    }
 	} catch (Exception ex) {
 	    log.error("endElement " +name, ex);
 	}
@@ -299,7 +318,6 @@ public class FrameSetParser
 		    if (ref != null) value = ref.getUID().toString();
 		}
 		frame_spec.put(current_slot, value);
-		current_slot = null;
 	    }
 	} catch (Exception ex) {
 	    log.error(null, ex);
@@ -352,6 +370,14 @@ public class FrameSetParser
 	    log.debug("startFrame");
 
 	frame_spec = new DataFrameSpec(attrs);
+    }
+
+    private void startFrame(String name)
+    {
+	if (log.isDebugEnabled())
+	    log.debug("startFrame");
+
+	frame_spec = new DataFrameSpec(name);
     }
 
     private void endFrame()
