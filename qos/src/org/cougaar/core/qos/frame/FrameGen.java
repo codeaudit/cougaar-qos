@@ -69,8 +69,12 @@ public class FrameGen
     // The FrameSet's package
     private String package_name;
 
+    // The FrameSet's domain
+    private String domain;
+
     // Path to the root of the output tree
-    private String output_root;
+    private String java_output_root;
+    private String jess_output_root;
 
     // FrameSet subdirectory of the output_path; derived from the package
     private String output_directory;
@@ -108,9 +112,10 @@ public class FrameGen
     private String container_relation;
 
 
-    public FrameGen(String path)
+    public FrameGen(String java_path, String clp_path)
     {
-	this.output_root = path;
+	this.java_output_root = java_path;
+	this.jess_output_root = clp_path;
     }
 
     public void parseProtoFile(File xml_file)
@@ -133,7 +138,8 @@ public class FrameGen
 	    return;
 	}
 
-	generatePrototypes(package_name);
+	if (java_output_root != null) generatePrototypes(package_name);
+	if (jess_output_root != null) generateShadowClasses(package_name);
     }
 
 
@@ -191,6 +197,7 @@ public class FrameGen
     private void startFrameset(Attributes attrs)
     {
 	package_name = attrs.getValue("package");
+	domain = attrs.getValue("domain");
 
 	container_relation = attrs.getValue("container-relation");
 	String inheritance = attrs.getValue("frame-inheritance");
@@ -198,7 +205,7 @@ public class FrameGen
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	output_directory = output_root + File.separator+ 
+	output_directory = java_output_root + File.separator+ 
 	    package_name.replaceAll("\\.", File.separator);
     }
 
@@ -272,6 +279,30 @@ public class FrameGen
 
 
     // Code Generation 
+
+    private void generateShadowClasses(String pkg)
+    {
+	File out = new File(jess_output_root, domain+".clp");
+	PrintWriter writer = null;
+	try {
+	    FileWriter fw = new FileWriter(out);
+	    writer = new PrintWriter(fw);
+	} catch (java.io.IOException iox) {
+	    iox.printStackTrace();
+	    System.exit(-1);
+	}
+
+	writer.println("(import " +package_name+ ".*)");
+	Iterator itr = proto_slots.keySet().iterator();
+	while (itr.hasNext()) {
+	    String proto = (String) itr.next();
+	    String class_name = fixName(proto, true);
+	    writer.println("(defclass " +proto+ " " +class_name+ ")");
+	}
+	writer.println("(defclass frame-change org.cougaar.core.qos.frame.Frame$Change)");
+	writer.close();
+	System.out.println("Wrote " + out);
+    }
 
     private void generatePrototypes(String pkg)
     {
@@ -1733,11 +1764,24 @@ public class FrameGen
 
     public static void main(String[] args)
     {
-	String path = args[0];
-	FrameGen generator = new FrameGen(path);
-	for (int i=1; i<args.length; i++) {
-	    File file = new File(args[i]);
-	    generator.parseProtoFile(file);
+	String java_path = null;
+	String clp_path = null;
+	int i = 0;
+	while (i < args.length) {
+	    String arg = args[i];
+	    if (arg.equals("-java")) {
+		java_path = args[++i];
+		System.out.println("Java root path is " + java_path);
+	    } else if (arg.equals("-clp")) {
+		clp_path = args[++i];
+		System.out.println("Jess root path is " + clp_path);
+	    } else if (arg.endsWith(".xml")) {
+		System.out.println("XML file is " + arg);
+		File file = new File(arg);
+		FrameGen generator = new FrameGen(java_path, clp_path);
+		generator.parseProtoFile(file);
+	    }
+	    ++i;
 	}
     }
 
