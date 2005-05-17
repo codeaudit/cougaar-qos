@@ -164,17 +164,17 @@ abstract public class DataFrame
 
 
     private Properties props;
-    private transient HashMap ddeps = new HashMap();
-    private transient HashMap rdeps = new HashMap();
-    private transient HashMap slot_map = new HashMap();
-    private transient HashMap path_dependents = new HashMap();
-    private transient Object rlock = new Object();
+    private transient HashMap ddeps;
+    private transient HashMap rdeps;
+    private transient HashMap slot_map;
+    private transient HashMap path_dependents;
+    private transient Object rlock;
     private transient PropertyChangeSupport pcs;
 
     protected DataFrame(FrameSet frameSet, UID uid)
     {
 	super(frameSet, uid);
-	this.pcs = new PropertyChangeSupport(this);
+	initializeTransients();
     }
 
     // Subclass responsibility
@@ -190,7 +190,17 @@ abstract public class DataFrame
 	throws java.io.IOException, ClassNotFoundException
     {
 	in.defaultReadObject();
+	initializeTransients();
+    }
+    
+    private void initializeTransients()
+    {
 	pcs = new PropertyChangeSupport(this);
+	ddeps = new HashMap();
+	rdeps = new HashMap();
+	slot_map = new HashMap();
+	path_dependents = new HashMap();
+	rlock = new Object();
     }
 
     // PropertyChangeListener
