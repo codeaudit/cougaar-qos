@@ -165,7 +165,8 @@ public class FrameTreeView extends TreeView implements ChangeListener {
                  ;
             }
             if (rootNameNotSet) {
-                root.setUserObject("frameset '"+frameModel.getFrameSetName()+"'");
+                ((FrameNode)root).setLabel("frameset '"+frameModel.getFrameSetName()+"'");
+                //treeModel.nodeChanged(root);
                 rootNameNotSet = false;
                 TreePath p = new TreePath(root);
                 if (!tree.isExpanded(p))

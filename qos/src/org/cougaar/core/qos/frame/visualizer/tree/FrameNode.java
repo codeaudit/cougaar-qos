@@ -26,12 +26,12 @@ public class FrameNode extends DefaultMutableTreeNode {
     HashSet cachedChildren;
 
     public FrameNode() {
-        this((String)null);
+        this("");
     }
 
     public FrameNode(String relationship) {
         super(relationship);
-        this.relationship = relationship;
+        this.relationship = (relationship != null && relationship.length() > 0 ? relationship : null);
         this.relationshipNodes = new HashMap();
         this.cachedChildren = new HashSet();
         this.proxies = new ArrayList();
@@ -66,6 +66,9 @@ public class FrameNode extends DefaultMutableTreeNode {
         return relationship;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
     public String toString() {
         return label;
     }
