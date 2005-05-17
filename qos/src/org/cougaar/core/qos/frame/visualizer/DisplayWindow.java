@@ -34,7 +34,7 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
     Display display;
     ContainerTreeView containerView;
     FrameTreeView frameView;
-    //FrameSnapshotView frameSnapshotView;
+    FrameSnapshotView frameSnapshotView;
     JTabbedPane tabbedPane;
     FrameModel frameModel;
 
@@ -50,12 +50,12 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         displPanel.add(controlPanel, BorderLayout.SOUTH);
         containerView = new ContainerTreeView(frameModel, display);
         frameView = new FrameTreeView(frameModel);
-        //frameSnapshotView = new FrameSnapshotView(frameView);
+        frameSnapshotView = new FrameSnapshotView(frameView);
 
         tabbedPane.addTab("Graphic", displPanel);
         tabbedPane.addTab("View Tree", containerView);
         tabbedPane.addTab("Frames", frameView);
-        //tabbedPane.addTab("Snapshots", frameSnapshotView);
+        tabbedPane.addTab("Snapshots", frameSnapshotView);
 
         ViewConfigParser.WindowSpec w = display.getWindowSpec();
         String title = w.getTitle();
@@ -92,7 +92,7 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
     }
 
 
- /*
+
     class FrameSnapshotView extends JPanel {
         FrameTreeView frameTreeView;
         JLabel htmlView;
@@ -114,7 +114,7 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
             TreeNode root = frameTreeView.getRootNode();
             StringWriter sw = new StringWriter();
             PrintWriter w = new PrintWriter(sw);
-            TreeWriter.write(w, root, 5,5);
+            HTMLTreeWriter.write(w, root, 5,5);
             htmlView.setText(sw.toString());
         }
 
@@ -128,5 +128,5 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         }
 
     }
-    */
+
 }

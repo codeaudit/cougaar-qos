@@ -273,7 +273,7 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         for (Iterator ii=rootNodes.iterator(); ii.hasNext();)
             insertNode((FrameNode)ii.next(), (FrameNode)root);
             //treeModel.insertNodeInto((DefaultMutableTreeNode) ii.next(), root, 0);
-        treeModel.nodeStructureChanged(root);
+        //treeModel.nodeStructureChanged(root);
     }
 
     protected void insertNode(FrameNode childNode, FrameNode parentNode) {

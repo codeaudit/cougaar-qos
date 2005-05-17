@@ -19,7 +19,7 @@ public class HTMLTreeWriter extends FormatWriter {
         super();
     }
     protected void writeHtml(PrintWriter w, TreeNode node, int indentation, int offset) {
-        write(w, indentation, "<p>");
+        //write(w, indentation, "<li>");
         if (node instanceof FrameNode) {
             if (((FrameNode) node).isRelationNode())
                 write(w, indentation, "<i>"+node+"</i>");
@@ -34,14 +34,14 @@ public class HTMLTreeWriter extends FormatWriter {
                 writeHtml(w, child, indentation+offset, offset);
             }
         }
-        write(w, indentation, "</p>");
+        //write(w, indentation, "</li>");
     }
 
     public static void write(PrintWriter w, TreeNode root, int indentation, int offset) {
         HTMLTreeWriter tw = new HTMLTreeWriter();
-        tw.write(w, 0, "<html><body bgcolor=\"#FFFFFF\">");
+        tw.write(w, 0, "<html><body><pre>");      //bgcolor="#FFFFFF"
         tw.writeHtml(w, root, indentation+offset, offset);
-        tw.write(w, 0, "</body></html>");
+        tw.write(w, 0, "</pre></body></html>");
     }
     public static  void write(TreeNode root, int indentation, int offset) {
         PrintWriter w = new PrintWriter(System.out, true);
