@@ -26,7 +26,7 @@ public class FrameNode extends DefaultMutableTreeNode {
     HashSet cachedChildren;
 
     public FrameNode() {
-        this("");
+        this((String)null);
     }
 
     public FrameNode(String relationship) {
