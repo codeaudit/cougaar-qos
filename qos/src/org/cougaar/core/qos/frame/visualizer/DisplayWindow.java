@@ -17,6 +17,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.net.URL;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -37,10 +38,7 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
     JTabbedPane tabbedPane;
     FrameModel frameModel;
 
-
-
-
-    public DisplayWindow(FrameModel frameModel, File xmlFile) {
+    public DisplayWindow(FrameModel frameModel, URL xmlFile) {
         super("");
         this.frameModel = frameModel;
         //frameModel.setDisplayWindow(this);

@@ -1,0 +1,65 @@
+<cougaar-topology>
+
+  <host>
+    <name>cranberry.dsl.bbn.com</name>
+  </host>
+
+  <host>
+    <name>test.dsl.bbn.com</name>
+  </host>
+
+  <node>
+    <name>NODE1</name>
+  </node>
+
+  <node>
+    <name>NODE2</name>
+  </node>
+
+  <agent>
+    <name>NODE1</name>
+  </agent>
+
+  <agent>
+    <name>REAR-NameServer</name>
+  </agent>
+
+  <agent>
+    <name>loader</name>
+  </agent>
+
+  <agent>
+    <name>other</name>
+  </agent>
+
+  <NodeOnHost>
+    <parent-value>cranberry.dsl.bbn.com</parent-value>
+    <child-value>NODE1</child-value>
+  </NodeOnHost>
+
+  <NodeOnHost>
+    <parent-value>cranberry.dsl.bbn.com</parent-value>
+    <child-value>NODE2</child-value>
+  </NodeOnHost>
+
+  <AgentInNode>
+    <parent-value>NODE1</parent-value>
+    <child-value>REAR-NameServer</child-value>
+  </AgentInNode>
+
+  <AgentInNode>
+    <parent-value>NODE1</parent-value>
+    <child-value>loader</child-value>
+  </AgentInNode>
+
+  <AgentInNode>
+    <parent-value>NODE1</parent-value>
+    <child-value>NODE1</child-value>
+  </AgentInNode>
+
+  <AgentInNode>
+    <parent-value>NODE2</parent-value>
+    <child-value>other</child-value>
+  </AgentInNode>
+
+</cougaar-topology>

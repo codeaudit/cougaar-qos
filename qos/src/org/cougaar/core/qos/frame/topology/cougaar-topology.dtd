@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT cougaar-topology (NodeOnHost | agent | contains | thing | node | host | AgentInNode | relationship)*>
+<!ELEMENT NodeOnHost (parent-value | child-value)*>
+<!ELEMENT parent-value (#PCDATA)>
+<!ELEMENT child-value (#PCDATA)>
+<!ELEMENT agent (bytesIn | cpuLoadAverage | persistSizeLast | msgIn | cpuLoadMJips | name | bytesOut | msgOut)*>
+<!ELEMENT bytesIn (#PCDATA)>
+<!ELEMENT cpuLoadAverage (#PCDATA)>
+<!ELEMENT persistSizeLast (#PCDATA)>
+<!ELEMENT msgIn (#PCDATA)>
+<!ELEMENT cpuLoadMJips (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT bytesOut (#PCDATA)>
+<!ELEMENT msgOut (#PCDATA)>
+<!ELEMENT contains (parent-value | child-value)*>
+<!ELEMENT thing (name)*>
+<!ELEMENT node (bytesIn | cpuLoadAverage | msgIn | cpuLoadMJips | name | bytesOut | msgOut | vmSize)*>
+<!ELEMENT vmSize (#PCDATA)>
+<!ELEMENT host (loadAverage | jips | effectiveMJips | name | count)*>
+<!ELEMENT loadAverage (#PCDATA)>
+<!ELEMENT jips (#PCDATA)>
+<!ELEMENT effectiveMJips (#PCDATA)>
+<!ELEMENT count (#PCDATA)>
+<!ELEMENT AgentInNode (parent-value | child-value)*>
+<!ELEMENT relationship (parent-value | child-value)*>

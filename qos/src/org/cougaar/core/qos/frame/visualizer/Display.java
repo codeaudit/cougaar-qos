@@ -14,6 +14,7 @@ import org.cougaar.util.log.Logging;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.io.File;
+import java.net.URL;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.awt.*;
@@ -63,7 +64,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
 
 
 
-    public Display(FrameModel frameModel, File xmlFile) {
+    public Display(FrameModel frameModel, URL xmlFile) {
         lock = new Object();
         this.frameModel = frameModel;
         tickNumber = 0;

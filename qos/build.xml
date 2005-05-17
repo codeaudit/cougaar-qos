@@ -230,6 +230,7 @@
       <include name="**/*.png"/>
       <include name="**/*.properties"/>
       <include name="**/*.xml"/>
+      <include name="**/*.dtd"/>
       <include name="**/*.wav"/>
       <include name="**/*.au"/>
     </patternset>
@@ -764,4 +765,21 @@
 	<fileset dir="${doc}" />
       </copy>
     </target>
+
+    <target name="framesets"
+	  description="Generate classes from Prototype Frames"
+	  >
+    <java classname="org.cougaar.core.qos.frame.FrameGen">
+      <classpath>
+	<pathelement path="${TARGETBASE}/lib/qos.jar"/>
+	<pathelement path="${TARGETBASE}/lib/xercesImpl.jar"/>
+      </classpath>
+      <arg value="-java"/> 
+      <arg value="src"/> 
+      <arg value="-dtd"/>
+      <arg value="src/org/cougaar/core/qos/frame/topology"/>
+      <arg value="src/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
+    </java>
+  </target>
+
 </project>

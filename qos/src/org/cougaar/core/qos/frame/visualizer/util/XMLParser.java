@@ -29,13 +29,12 @@ public abstract class XMLParser extends DefaultHandler {
     protected XMLParser() {
     }
 
-    public void parse(File xml_file) {
+    public void parse(URL url) {
         try {
             XMLReader producer = XMLReaderFactory.createXMLReader();
             DefaultHandler consumer = this;
             producer.setContentHandler(consumer);
             producer.setErrorHandler(consumer);
-            URL url = xml_file.toURL();
             producer.parse(url.toString());
         } catch (Throwable ex) {
             ex.printStackTrace();

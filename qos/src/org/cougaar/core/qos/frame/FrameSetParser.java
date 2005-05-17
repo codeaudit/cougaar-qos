@@ -213,21 +213,22 @@ public class FrameSetParser
 		
 	this.frame_set = frameSet;
 	this.frame_set_name = name;
-	File xml_file = ConfigFinder.getInstance().locateFile(xml_filename);
-	if (xml_file == null) {
-	    if (log.isWarnEnabled())
-		log.warn("Can't find FrameSet file " + xml_filename);
-	    return null;
-	}
+// 	File xml_file = ConfigFinder.getInstance().locateFile(xml_filename);
+// 	if (xml_file == null) {
+// 	    if (log.isWarnEnabled())
+// 		log.warn("Can't find FrameSet file " + xml_filename);
+// 	    return null;
+// 	}
+	ClassLoader loader = FrameSetParser.class.getClassLoader();
 	try {
 	    XMLReader producer = XMLReaderFactory.createXMLReader();
 	    DefaultHandler consumer = this; 
 	    producer.setContentHandler(consumer);
 	    producer.setErrorHandler(consumer);
-	    URL url = xml_file.toURL();
+	    URL url = loader.getResource(xml_filename); // xml_file.toURL();
 	    producer.parse(url.toString());
 	} catch (Throwable ex) {
-	    log.error("Error parsing FrameSet file " + xml_file, ex);
+	    log.error("Error parsing FrameSet file " + xml_filename, ex);
 	}
 	return frame_set;
     }

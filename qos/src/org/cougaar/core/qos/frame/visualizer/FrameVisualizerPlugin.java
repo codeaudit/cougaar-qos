@@ -28,6 +28,7 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.*;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
@@ -94,9 +95,11 @@ public class FrameVisualizerPlugin
         newFramesPresent = false;
 
         String specFileName = (String) getParameter("spec-file");
-        File xml_file = ConfigFinder.getInstance().locateFile(specFileName);
+//         File xml_file = ConfigFinder.getInstance().locateFile(specFileName);
+	ClassLoader loader = FrameVisualizerPlugin.class.getClassLoader();
+	URL xml_url = loader.getResource(specFileName);
         frameModel = new FrameModel();
-        pluginDisplay = new DisplayWindow(frameModel, xml_file);
+        pluginDisplay = new DisplayWindow(frameModel, xml_url);
 
         //SwingUtilities.invokeLater(new CreateWindowHelper(xml_file));
         super.start();

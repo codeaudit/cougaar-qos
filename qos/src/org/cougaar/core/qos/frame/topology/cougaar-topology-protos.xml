@@ -1,0 +1,110 @@
+<frameset
+   domain="cougaar-topology"
+   frame-inheritance="single"
+   package="org.cougaar.core.qos.frame.topology"
+   container-relation="contains">
+  
+
+  <!-- Root entity prototype -->
+  <prototypes>
+    <prototype name="thing">
+      <slot name="name" 
+	    type="String"
+	    immutable="true"/>
+    </prototype>
+
+    <!-- Root relationship prototype -->
+    <relation-prototype name="relationship"
+			parent-prototype="thing"
+			parent-slot="name"
+			child-prototype="thing"
+			child-slot="name">
+      <slot name="parent-value"/>
+      <slot name="child-value" />
+    </relation-prototype>
+    
+    <!-- FrameSet container-relation -->
+    <prototype name="contains" prototype="relationship">
+    </prototype>
+
+
+
+    <prototype name="host"
+	       prototype="thing">
+      <!-- The metric-path implies that the slot has the following
+	attributes: read-only, member, transient, and type "Metric".
+	-->
+      <slot name="effectiveMJips" 
+	    metric-path="Host($(name)):EffectiveMJips()"/>
+
+      <slot name="count" 
+	    metric-path="Host($(name)):Count()"/>
+
+      <slot name="jips" 
+	    metric-path="Host($(name)):Jips()"/>
+
+      <slot name="loadAverage" 
+	    metric-path="Host($(name)):LoadAverage()"/>
+    </prototype>
+
+    <prototype name="node"
+	       container="host"
+	       prototype="thing">
+
+      <slot name="cpuLoadAverage" 
+	    metric-path="Node($(name)):CPULoadAvg(10)"/>
+      <slot name="cpuLoadMJips" 
+	    metric-path="Node($(name)):CPULoadMJips(10)"/>
+      <slot name="msgIn" 
+	    metric-path="Node($(name)):MsgIn(10)"/>
+      <slot name="msgOut" 
+	    metric-path="Node($(name)):MsgOut(10)"/>
+      <slot name="bytesIn" 
+	    metric-path="Node($(name)):BytesIn(10)"/>
+      <slot name="bytesOut" 
+	    metric-path="Node($(name)):BytesOut(10)"/>
+      <slot name="vmSize" 
+	    metric-path="Node($(name)):VMSize()"/>
+
+
+    </prototype>
+
+    <prototype name="agent"
+	       container="node"
+	       prototype="thing">
+
+      <slot name="cpuLoadAverage" 
+	    metric-path="Agent($(name)):CPULoadAvg(10)"/>
+      <slot name="cpuLoadMJips" 
+	    metric-path="Agent($(name)):CPULoadMJips(10)"/>
+      <slot name="msgIn" 
+	    metric-path="Agent($(name)):MsgIn(10)"/>
+      <slot name="msgOut" 
+	    metric-path="Agent($(name)):MsgOut(10)"/>
+      <slot name="bytesIn" 
+	    metric-path="Agent($(name)):BytesIn(10)"/>
+      <slot name="bytesOut" 
+	    metric-path="Agent($(name)):BytesOut(10)"/>
+      <slot name="persistSizeLast" 
+	    metric-path="Agent($(name)):PersistSizeLast()"/>
+    </prototype>
+
+    <relation-prototype name="NodeOnHost"
+			prototype="contains"
+			parent-prototype="host"
+			child-prototype="node">
+    </relation-prototype>
+
+    <relation-prototype name="AgentInNode"
+			prototype="contains"
+			parent-prototype="node"
+			child-prototype="agent">
+    </relation-prototype>
+
+
+  </prototypes>
+
+
+
+</frameset>
+
