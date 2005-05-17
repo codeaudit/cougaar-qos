@@ -45,20 +45,8 @@ public class ViewConfigWriter {
   }
 
 
-   abstract class SpecFormatWriter {
+   abstract class SpecFormatWriter extends FormatWriter {
         public SpecFormatWriter() {}
-        protected void indent(PrintWriter w, int numSpaces) {
-           for (int i=0; i<numSpaces; i++)
-               w.print(' ');
-        }
-        void write(PrintWriter w, int indentation, String str){
-            indent(w, indentation);
-            w.println(str);
-        }
-        void writeLines(PrintWriter w, int indentation, String lines[]){
-            for (int i=0; i < lines.length; i++)
-                write(w, indentation, lines[i]);
-        }
         public abstract boolean write(DisplayWindow window, PrintWriter w, int indentation, int offset);
     }
 

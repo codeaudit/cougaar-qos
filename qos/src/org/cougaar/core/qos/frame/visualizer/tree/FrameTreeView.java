@@ -3,6 +3,8 @@ package org.cougaar.core.qos.frame.visualizer.tree;
 import org.cougaar.core.qos.frame.visualizer.FrameModel;
 import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
+import org.cougaar.core.qos.frame.visualizer.util.FormatWriter;
+import org.cougaar.core.qos.frame.visualizer.util.TreeWriter;
 import org.cougaar.core.qos.frame.visualizer.event.*;
 import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
@@ -24,6 +26,7 @@ import org.cougaar.util.log.Logging;
 
 import java.net.URL;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
@@ -52,7 +55,8 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         init();
         frameMap = new HashMap();
         this.frameModel = frameModel;
-        root = new DefaultMutableTreeNode("frameset");
+        root = new FrameNode();//DefaultMutableTreeNode("frameset");
+        root.setUserObject("frameset");
         treeModel = new DefaultTreeModel(root);
         tree.setModel(treeModel);
 
@@ -64,6 +68,10 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         frameModel.addAddedFramesListener(this);
         frameModel.addChangedFramesListener(this);
         frameModel.addRemovedFramesListener(this);
+    }
+
+    public TreeNode getRootNode() {
+        return root;
     }
 
     public Component createOtherComponent() {
@@ -162,7 +170,8 @@ public class FrameTreeView extends TreeView implements ChangeListener {
                 TreePath p = new TreePath(root);
                 if (!tree.isExpanded(p))
                     tree.expandPath(p);
-            }   
+            }
+            //TreeWriter.write(root, 5, 5);
         }
     }
 
@@ -209,7 +218,7 @@ public class FrameTreeView extends TreeView implements ChangeListener {
     protected void processRelationships(Collection relationshipFrames) {
         org.cougaar.core.qos.frame.RelationFrame f;
         org.cougaar.core.qos.frame.Frame pf, cf;
-        FrameNode parent, child;
+        FrameNode parentNode, childNode;
         String relationship, parentName, childName, parentProto, childProto;
         for (Iterator ii=relationshipFrames.iterator(); ii.hasNext();) {
             f = (org.cougaar.core.qos.frame.RelationFrame) ii.next();
@@ -225,36 +234,44 @@ public class FrameTreeView extends TreeView implements ChangeListener {
                         log.debug("processRelationships:  invalid relation frame, ignoring"+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
                 return;
             }
-            parent = createNode(pf);//(FrameNode) frameMap.get(pf);
-            child  = createNode(cf);//(FrameNode) frameMap.get(cf);
-            if (parent != null && child != null) {
-                if (child.getParent() != null) {
-                    FrameNode tmp = child;
-                    child = new FrameNodeProxy(child);
-                    tmp.addProxy((FrameNodeProxy)child);
+            parentNode = createNode(pf);
+            childNode  = createNode(cf);
+            if (parentNode != null && childNode != null) {
+                if (childNode.getParent() != null && childNode.getParent() != parentNode) {
+                    FrameNode tmp = childNode;
+                    childNode = new FrameNodeProxy(childNode);
+                    tmp.addProxy((FrameNodeProxy)childNode);
                     if (log.isDebugEnabled())
                         log.debug("creating *FrameNodeProxy for frame '"+f.getChildValue()+"'  relation="+relationship);
                 }
-                FrameNode relationNode = parent.getRelationshipNode(relationship);
+                FrameNode relationNode = parentNode.getRelationshipNode(relationship);
                 if (relationNode == null) {
                     if (log.isDebugEnabled())
                         log.debug("creating RelationFrameNode:  "+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
                     relationNode = new FrameNode(relationship);
-                    parent.addRelationshipNode(treeModel, relationNode);
+                    parentNode.addRelationshipNode(treeModel, relationNode);
                 }
                 //relationNode.add(child);
-                treeModel.insertNodeInto(child, relationNode, 0);
+                //treeModel.insertNodeInto(childNode, relationNode, 0);
+                insertNode(childNode, relationNode);
             } else {
                 if (log.isDebugEnabled())
-                    log.debug("++error: can't create node,  parent='"+f.getParentValue()+"'("+(parent!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
+                    log.debug("++error: can't create node,  parent='"+f.getParentValue()+"'("+(parentNode!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(childNode!=null?"found":"not found")+") relationship='"+relationship+"'");
                 ;// print something here
             }
         }
 
         Collection rootNodes = findRootLevelNodes();
+        TreeNode tnode;
         for (Iterator ii=rootNodes.iterator(); ii.hasNext();)
-            treeModel.insertNodeInto((DefaultMutableTreeNode) ii.next(), root, 0);
+            insertNode((FrameNode)ii.next(), (FrameNode)root);
+            //treeModel.insertNodeInto((DefaultMutableTreeNode) ii.next(), root, 0);
 
+    }
+
+    protected void insertNode(FrameNode childNode, FrameNode parentNode) {
+         if (!parentNode.hasChild(childNode))
+            treeModel.insertNodeInto(childNode, parentNode, 0);
     }
 
     protected FrameNode createNode(org.cougaar.core.qos.frame.Frame frame) {

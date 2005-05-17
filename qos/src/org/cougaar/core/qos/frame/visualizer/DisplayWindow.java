@@ -2,17 +2,23 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
 import org.cougaar.core.qos.frame.visualizer.util.ViewConfigWriter;
+import org.cougaar.core.qos.frame.visualizer.util.HTMLTreeWriter;
+import org.cougaar.core.qos.frame.visualizer.util.TreeWriter;
 import org.cougaar.core.qos.frame.visualizer.tree.ContainerTreeView;
 import org.cougaar.core.qos.frame.visualizer.tree.FrameTreeView;
 import org.cougaar.core.qos.frame.visualizer.event.TickEvent;
 
 import javax.swing.*;
+import javax.swing.tree.TreeNode;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Enumeration;
 
@@ -27,8 +33,12 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
     Display display;
     ContainerTreeView containerView;
     FrameTreeView frameView;
+    //FrameSnapshotView frameSnapshotView;
     JTabbedPane tabbedPane;
     FrameModel frameModel;
+
+
+
 
     public DisplayWindow(FrameModel frameModel, File xmlFile) {
         super("");
@@ -42,10 +52,12 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         displPanel.add(controlPanel, BorderLayout.SOUTH);
         containerView = new ContainerTreeView(frameModel, display);
         frameView = new FrameTreeView(frameModel);
+        //frameSnapshotView = new FrameSnapshotView(frameView);
 
         tabbedPane.addTab("Graphic", displPanel);
         tabbedPane.addTab("View Tree", containerView);
         tabbedPane.addTab("Frames", frameView);
+        //tabbedPane.addTab("Snapshots", frameSnapshotView);
 
         ViewConfigParser.WindowSpec w = display.getWindowSpec();
         String title = w.getTitle();
@@ -82,4 +94,41 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
     }
 
 
+ /*
+    class FrameSnapshotView extends JPanel {
+        FrameTreeView frameTreeView;
+        JLabel htmlView;
+
+        public FrameSnapshotView(FrameTreeView frameView) {
+            super(new BorderLayout());
+            this.frameTreeView = frameView;
+            Box buttonBox = Box.createHorizontalBox();
+            buttonBox.add(Box.createHorizontalGlue());
+            buttonBox.add(new JButton(new RefreshAction()));
+            add(buttonBox, BorderLayout.NORTH);
+
+            htmlView = new JLabel();
+            JScrollPane sp = new JScrollPane(htmlView);
+            add(sp, BorderLayout.CENTER);
+        }
+
+        public void doRefresh() {
+            TreeNode root = frameTreeView.getRootNode();
+            StringWriter sw = new StringWriter();
+            PrintWriter w = new PrintWriter(sw);
+            TreeWriter.write(w, root, 5,5);
+            htmlView.setText(sw.toString());
+        }
+
+        class RefreshAction extends AbstractAction {
+            public RefreshAction() {
+                super("Refresh");
+            }
+            public void actionPerformed(ActionEvent e) {
+                doRefresh();
+            }
+        }
+
+    }
+    */
 }
