@@ -151,7 +151,7 @@ public class FrameVisualizerPlugin
             if (frameSet == null)
                 frameSet = frame.getFrameSet();
             if (log.isDebugEnabled()) {
-                log.debug("Observed added "+frame);
+                log.debug("Observed added '"+frame.getValue("name")+"' "+frame);
             }
             // Handle new Frame
             added.add(frame);

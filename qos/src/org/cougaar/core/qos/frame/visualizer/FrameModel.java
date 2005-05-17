@@ -72,17 +72,17 @@ public class FrameModel {
     private transient Logger log = Logging.getLogger(getClass().getName());
 
     //DisplayWindow displayWindow;
-    static String TICK_EVENT_LABEL = "TICK";
-    protected int tickNumber;
+    //static String TICK_EVENT_LABEL = "TICK";
+    //protected int tickNumber;
 
     ChangeModel addedFramesListeners;
     ChangeModel changedFramesListeners;
     ChangeModel removedFramesListeners;
-    ChangeModel transitionListeners;
+    //ChangeModel transitionListeners;
     ChangeModel graphicChangeListeners;
 
     public FrameModel() {
-        tickNumber = 0;
+        //tickNumber = 0;
         relationshipFrames = new HashSet();
         pendingRelationshipFrames = new HashSet();
         dataFrames = new HashSet();
@@ -92,7 +92,7 @@ public class FrameModel {
         addedFramesListeners = new ChangeModel();
         changedFramesListeners = new ChangeModel();
         removedFramesListeners = new ChangeModel();
-        transitionListeners = new ChangeModel();
+        //transitionListeners = new ChangeModel();
         graphicChangeListeners = new ChangeModel();
 
         // views
@@ -121,12 +121,12 @@ public class FrameModel {
     public synchronized void removeRemovedFramesListener(ChangeListener l) {
         removedFramesListeners.addListener(l);
     }
-    public synchronized void addTransitionListener(ChangeListener l) {
+    /*public synchronized void addTransitionListener(ChangeListener l) {
         transitionListeners.addListener(l);
     }
     public synchronized void removeTransitionListener(ChangeListener l) {
         transitionListeners.removeListener(l);
-    }
+    }*/
     public synchronized void addGraphicChangeListener(ChangeListener l) {
         graphicChangeListeners.addListener(l);
     }
@@ -146,10 +146,10 @@ public class FrameModel {
         removedFramesListeners.notifyListeners(e);
         //SwingUtilities.invokeLater(new NotifyHelper(removedFramesListeners, e));
     }
-    protected synchronized void notifyNewTransitions(TickEvent e) {
-        transitionListeners.notifyListeners(e);
-        //SwingUtilities.invokeLater(new NotifyHelper(transitionListeners, e));
-    }
+    //protected synchronized void notifyNewTransitions(TickEvent e) {
+    //    transitionListeners.notifyListeners(e);
+    //    //SwingUtilities.invokeLater(new NotifyHelper(transitionListeners, e));
+    //}
 
     public synchronized void fireContainerAddedChild(ShapeContainer c, ShapeGraphic newchild) {
          graphicChangeListeners.notifyListeners(new ContainerChildAddedEvent(this, c, newchild));
@@ -423,24 +423,40 @@ public class FrameModel {
 
         HashMap changedDataFrames = null; //new HashMap();
         HashMap changedRelationFrames = null; //new HashMap();
+        RelationFrame rf;
 
+        // if any of the pending relations became valid since the last time we checked, process
+        // them as new frames
+        Collection validRelations = checkPendingRelations();
+        if (validRelations != null && validRelations.size() > 0)
+            process(validRelations);
         for (Iterator ii=changeMap.keySet().iterator(); ii.hasNext(); ) {
             frame = (org.cougaar.core.qos.frame.Frame) ii.next();
             changeReports = (Collection) changeMap.get(frame);
 
 
             if (frame instanceof RelationFrame) {
-                if (log.isDebugEnabled())
-                    log.debug("processChanges:  frame="+frame.getKind()+" "+frame+"  changes.size="+changeReports.size());
-                // if this is a relationship change, create transition that will animate moving a
-                // child from one parent to another
-                if (changeReports != null && changeReports.size() > 0) {
-                    trans = processRelationshipChanges((RelationFrame)frame, changeReports);
-                    if (trans != null)
-                         transitions.addAll(trans);
-                    if (changedRelationFrames == null)
-                        changedRelationFrames = new HashMap();
-                    changedRelationFrames.put(frame, changeReports);
+                rf = (RelationFrame) frame;
+                // if a relation frame gets changed and the relationship points to a frame that has not been added
+                // add this relation to the pending relations
+                if (!isValid(rf)) {
+                    pendingRelationshipFrames.add(rf);
+                    if (log.isDebugEnabled())
+                        log.debug("processChanges(:"+internalid+" added relationFrame ("+rf.getKind()+") to pendingFrames size="+pendingRelationshipFrames.size());
+                } else {
+                    if (log.isDebugEnabled())
+                        log.debug("processChanges:  frame="+frame.getKind()+" "+frame+"  changes.size="+changeReports.size());
+                    // if this is a relationship change, create transition that will animate moving a
+                    // child from one parent to another
+                    if (changeReports != null && changeReports.size() > 0) {
+                        //trans = processRelationshipChanges((RelationFrame)frame, changeReports);
+                        //if (trans != null)
+                        //     transitions.addAll(trans);
+
+                        if (changedRelationFrames == null)
+                            changedRelationFrames = new HashMap();
+                        changedRelationFrames.put(frame, changeReports);
+                    }
                 }
             } else {
                 if (changeReports != null && changeReports.size() > 0) {
@@ -457,8 +473,9 @@ public class FrameModel {
                 //SwingUtilities.invokeLater(new SetChangeHelper(frame, sh, changeReports));
             }
         }
-        if (transitions.size() > 0)
-            notifyNewTransitions(new org.cougaar.core.qos.frame.visualizer.event.TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
+
+        //if (transitions.size() > 0)
+        //    notifyNewTransitions(new org.cougaar.core.qos.frame.visualizer.event.TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
             //displayWindow.tickEventOccured(new org.cougaar.core.qos.frame.visualizer.event.TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitions));
 
         if (changedDataFrames != null || changedRelationFrames != null)
@@ -466,15 +483,22 @@ public class FrameModel {
     }
 
 
+    public static String getName(org.cougaar.core.qos.frame.Frame frame) {
+        return (frame != null ? (String)frame.getValue("name") : null);
+    }
 
+
+    /*
     protected Transition processRelationshipFrame(RelationFrame rframe) {
         ShapeGraphic child, parent;
         Frame fchild, fparent;
 
         fparent = rframe.relationshipParent();
         fchild  = rframe.relationshipChild();
-        //if (log.isDebugEnabled())
-        //    log.debug("processRelationshipChange: Relation '"+rframe.getKind()+"'");
+        if (fparent == null || fchild == null) {
+            if (log.isDebugEnabled())
+                log.debug("processRelationshipChange: invalid Relation '"+rframe.getKind()+"'  parent="+getName(fparent)+" child="+getName(fchild));
+        }
 
         parent = getGraphic(fparent);
         child  = getGraphic(fchild);
@@ -520,7 +544,7 @@ public class FrameModel {
         }
         return transitions;
     }
-
+    */
 
     public String toString() {
         return "FrameModel("+internalid+"):  frameset='"+getFrameSetName()+"' has "+allFrames.size()+" frames, "+dataFrames.size()+" data frames";

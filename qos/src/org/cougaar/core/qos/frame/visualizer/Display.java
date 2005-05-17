@@ -7,6 +7,7 @@ import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListeners;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
 import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
 import org.cougaar.core.qos.frame.visualizer.event.*;
+import org.cougaar.core.qos.frame.*;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
@@ -16,6 +17,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.awt.*;
+import java.awt.Frame;
 import java.awt.geom.Point2D;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -33,7 +35,8 @@ import org.xml.sax.Attributes;
  */
 public class Display extends AnimatedCanvas implements ChangeListener {
     public static boolean ENABLE_ANIMATION = false;//true;
-
+    static String TICK_EVENT_LABEL = "TICK";
+    protected int tickNumber;
     Shapes shapes;
     LabelRenderers labelRenderers;
     ShapeRenderers shapeRenderers;
@@ -63,7 +66,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
     public Display(FrameModel frameModel, File xmlFile) {
         lock = new Object();
         this.frameModel = frameModel;
-
+        tickNumber = 0;
         //graphics = new HashMap();
         transitions = new ArrayList();
         tickEventQueue = new ArrayList();
@@ -89,7 +92,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         frameModel.addAddedFramesListener(this);
         frameModel.addChangedFramesListener(this);
         frameModel.addRemovedFramesListener(this);
-        frameModel.addTransitionListener(this);
+        //frameModel.addTransitionListener(this);
     }
 
     public Shapes getShapes() {
@@ -104,7 +107,6 @@ public class Display extends AnimatedCanvas implements ChangeListener {
     public SlotChangeListeners getSlotListeners() {
         return slotListeners;
     }
-
 
     public void stateChanged(ChangeEvent e) {
         ProcessEventHelper helper = new ProcessEventHelper(e);
@@ -138,15 +140,95 @@ public class Display extends AnimatedCanvas implements ChangeListener {
                             sh.processFrameChange(frame, (org.cougaar.core.qos.frame.Frame.Change) jj.next());
                     }
                 }
+                // process relationship changes
+                HashMap relationChangesMap = ee.getChangedRelationFrames();
+                RelationFrame rf;
+                Collection  changeReports;
+                ArrayList transitionList = new ArrayList();
+
+                for (Iterator ii=relationChangesMap.keySet().iterator(); ii.hasNext(); ) {
+                    rf = (RelationFrame) ii.next();
+                    changeReports = (Collection) relationChangesMap.get(rf);
+                    Collection trans = processRelationshipChanges(rf, changeReports);
+                    if (trans != null)
+                        transitionList.addAll(trans);
+                }
+                if (transitionList.size() > 0)
+                    tickEventOccured(new TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitionList));
+
             } else if (e instanceof RemovedFramesEvent) {
                 ;// nothing yet
-            } else if (e instanceof TickEvent) {
+            }// else if (e instanceof TickEvent) {
                 // process new transitions (add to a transition queue to be picked up by the
                 // animation thread)
-                tickEventOccured((TickEvent)e);
-            }
+               // tickEventOccured((TickEvent)e);
+            //}
         }
     }
+
+
+
+    protected Transition processRelationshipFrame(RelationFrame rframe) {
+           ShapeGraphic child, parent;
+           org.cougaar.core.qos.frame.Frame fchild, fparent;
+
+           fparent = rframe.relationshipParent();
+           fchild  = rframe.relationshipChild();
+           if (fparent == null || fchild == null) {
+               if (log.isDebugEnabled())
+                   log.debug("processRelationshipChange: invalid Relation '"+rframe.getKind()+"'  parent="+FrameModel.getName(fparent)+" child="+FrameModel.getName(fchild));
+           }
+
+           parent = frameModel.getGraphic(fparent);
+           child  = frameModel.getGraphic(fchild);
+           if (parent == null || child == null) {
+               if (log.isDebugEnabled())
+                   log.debug("--error: did not find shapes: Relation '"+rframe.getKind()+"' changed   parent="+(fparent==null?"+NULL+":rframe.getParentValue())
+                       +"  child="+(fchild==null?"+NULL+":rframe.getChildValue())+" parentFrame="+fparent+" childFrame="+fchild);
+               return null;
+           }
+           if (child.getParent() != null && child.getParent().getId().equals(parent.getId())) {
+               if (log.isDebugEnabled())
+                   log.debug("--warning: old parent = "+child.getParent()+" new parent="+parent+", ignoring...");
+               return null;
+           }
+           if (log.isDebugEnabled())
+               log.debug("Relation '"+rframe.getKind()+"' changed   parent="+(fparent==null?"+NULL+":rframe.getParentValue())
+                       +"  child="+(fchild==null?"+NULL+":rframe.getChildValue()));//+" parentFrame="+fparent+" childFrame="+fchild);
+
+
+           return new Transition(child, child.getParent(), (ShapeContainer)parent);
+       }
+
+        protected Collection processRelationshipChanges(RelationFrame rframe, Collection changeReports) {
+           ShapeGraphic child, parent;
+           org.cougaar.core.qos.frame.Frame fchild, fparent;
+           ArrayList transitions = null; //new ArrayList();
+
+           if (log.isDebugEnabled())
+               log.debug("processRelationshipChanges: frame="+rframe.getKind()+" changeReports.size="+changeReports.size());
+
+           Transition t;
+           for (Iterator ii=changeReports.iterator(); ii.hasNext();) {
+               org.cougaar.core.qos.frame.Frame.Change change = (org.cougaar.core.qos.frame.Frame.Change) ii.next();
+               // Handle change to existing frame
+               //slotName = change.getSlotName();
+               //value    = change.getValue();
+               t = processRelationshipFrame(rframe);
+               if (t!=null) {
+                   if (transitions == null)
+                       transitions = new ArrayList();
+                   transitions.add(t);
+               }
+           }
+           return transitions;
+       }
+
+
+
+
+
+
 
 
 

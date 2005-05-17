@@ -117,7 +117,7 @@ public class FrameTreeView extends TreeView implements ChangeListener {
     protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
         //frameInheritenceView.clear();
         frameInheritenceView.setFrame(frame);
-        selectedFrameLabel.setText( (frame instanceof PrototypeFrame ? ((PrototypeFrame)frame).getName() : (String)frame.getValue("name")));
+        selectedFrameLabel.setText( (frame instanceof PrototypeFrame ? ((PrototypeFrame)frame).getName() : FrameModel.getName(frame)));
     }
 
 
@@ -220,6 +220,11 @@ public class FrameTreeView extends TreeView implements ChangeListener {
             pf = f.relationshipParent();
             cf = f.relationshipChild();
             relationship = (String) f.getKind();
+            if (pf == null || cf  == null) { // we got ourselves an invalid relation frame (if parent || child has not arrived yet)
+                if (log.isDebugEnabled())
+                        log.debug("processRelationships:  invalid relation frame, ignoring"+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
+                return;
+            }
             parent = createNode(pf);//(FrameNode) frameMap.get(pf);
             child  = createNode(cf);//(FrameNode) frameMap.get(cf);
             if (parent != null && child != null) {
@@ -241,7 +246,7 @@ public class FrameTreeView extends TreeView implements ChangeListener {
                 treeModel.insertNodeInto(child, relationNode, 0);
             } else {
                 if (log.isDebugEnabled())
-                    log.debug("error: can't create node,  parent='"+f.getParentValue()+"'("+(parent!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
+                    log.debug("++error: can't create node,  parent='"+f.getParentValue()+"'("+(parent!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(child!=null?"found":"not found")+") relationship='"+relationship+"'");
                 ;// print something here
             }
         }
@@ -253,10 +258,12 @@ public class FrameTreeView extends TreeView implements ChangeListener {
     }
 
     protected FrameNode createNode(org.cougaar.core.qos.frame.Frame frame) {
+        if (frame == null)
+            return null;
         FrameNode newNode = (FrameNode) frameMap.get(frame);
         if (newNode == null) {
             if (log.isDebugEnabled())
-                    log.debug("creating FrameNode for frame '"+frame.getValue("name")+"'");
+                    log.debug("creating FrameNode for frame '"+FrameModel.getName(frame)+"'");
             newNode = new FrameNode(frame);
             frameMap.put(frame, newNode);
         }

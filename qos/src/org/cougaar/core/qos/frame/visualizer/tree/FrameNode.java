@@ -44,7 +44,7 @@ public class FrameNode extends DefaultMutableTreeNode {
             this.relationship = null;
 	        this.relationshipNodes = new HashMap();
             this.proxies = new ArrayList();
-            this.label = (frame instanceof PrototypeFrame ? ((PrototypeFrame)frame).getName() : (String) frame.getValue("name"));
+            this.label = (frame == null ? "" : (frame instanceof PrototypeFrame ? ((PrototypeFrame)frame).getName() : (String) frame.getValue("name")));
         }
 
         // hack
