@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT window (shape | labelrenderer | shaperenderer | 
+                  containerlabelrenderer | slotChangeListener | container)*>
+<!ATTLIST window title CDATA #REQUIRED
+	         w CDATA #REQUIRED
+	         h CDATA #REQUIRED>
+
+<!ELEMENT shape EMPTY>
+<!ATTLIST shape name CDATA #REQUIRED
+	        class CDATA #REQUIRED
+	        w CDATA #REQUIRED
+	        h CDATA #REQUIRED
+	        x CDATA #REQUIRED
+	        y CDATA #REQUIRED
+	        arcw CDATA #IMPLIED
+	        arch CDATA #IMPLIED>
+
+<!ELEMENT labelrenderer EMPTY>
+<!ATTLIST labelrenderer name CDATA #REQUIRED
+	                xoff CDATA #IMPLIED
+	                yoff CDATA #IMPLIED
+	                font CDATA #IMPLIED
+	                color CDATA #IMPLIED
+	                mouseover (true | false) "false">
+
+<!ELEMENT containerlabelrenderer EMPTY>
+<!ATTLIST containerlabelrenderer name CDATA #REQUIRED
+	                         xoff CDATA #IMPLIED
+	                         yoff CDATA #IMPLIED
+	                         font CDATA #IMPLIED
+	                         color CDATA #IMPLIED>
+
+<!ELEMENT shaperenderer EMPTY>
+<!ATTLIST shaperenderer name CDATA #REQUIRED
+	                paint CDATA #REQUIRED
+	                selectedpaint CDATA #REQUIRED
+	                fillpaint CDATA #REQUIRED
+	                selfillpaint CDATA #REQUIRED
+	                linewidth CDATA #REQUIRED
+	                bordered (true | false) "false"
+	                filled (true | false) "false">
+
+<!ELEMENT slotChangeListener (trigger*)>
+<!ATTLIST slotChangeListener name CDATA #REQUIRED
+	                     slot CDATA #REQUIRED>
+
+<!ELEMENT trigger EMPTY>
+<!ATTLIST trigger value CDATA #REQUIRED
+                  action CDATA #REQUIRED   
+                  shape CDATA #IMPLIED
+                  name CDATA #IMPLIED>
+
+<!ELEMENT container (layout | container | framepredicate | component |
+	             slotlistener)*>
+
+<!-- labelrender might be required but specA.xml sometimes omits it -->
+<!ATTLIST container id CDATA #REQUIRED
+	            class CDATA #REQUIRED
+	            labelrender CDATA #IMPLIED
+	            shaperender CDATA #REQUIRED
+	            prototype (true | false) "false"
+	            visible (true | false) "true"
+	            shape CDATA #REQUIRED
+	            idframeslot CDATA #IMPLIED>
+
+<!ELEMENT component (framepredicate | slotlistener)*>
+<!ATTLIST component id CDATA #REQUIRED
+	            class CDATA #REQUIRED
+	            labelrender CDATA #REQUIRED
+	            shaperender CDATA #REQUIRED
+	            prototype (true | false) "false"
+	            visible (true | false) "true"
+	            shape CDATA #REQUIRED
+	            idframeslot CDATA #IMPLIED>
+
+<!ELEMENT layout EMPTY>
+<!ATTLIST layout class CDATA #REQUIRED
+                 left CDATA #REQUIRED
+                 right CDATA #REQUIRED
+                 bottom CDATA #REQUIRED
+                 top CDATA #REQUIRED
+                 hpadding CDATA #REQUIRED
+                 vpadding CDATA #REQUIRED>
+
+<!ELEMENT framepredicate EMPTY>
+<!ATTLIST framepredicate isa CDATA #REQUIRED
+                         parentRelationship CDATA #REQUIRED>
+
+<!ELEMENT slotlistener EMPTY>
+<!ATTLIST slotlistener name CDATA #REQUIRED>
+
