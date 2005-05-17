@@ -149,6 +149,28 @@ public class CoordinationArtifactBrokerPlugin
     }
 
 	
+    private static class Provisioner
+    {
+	ConnectionSpec spec;
+	RolePlayer player;
+	CoordinationArtifactProvider cap;
+
+	Provisioner(ConnectionSpec spec,
+		    RolePlayer player,
+		    CoordinationArtifactProvider cap)
+	{
+	    this.spec = spec;
+	    this.player = player;
+	    this.cap = cap;
+	}
+
+	void provide() 
+	{
+	    cap.provideFacet(spec, player);
+	}
+    }
+
+
     private static class PendingRequest
     {
 	ConnectionSpec spec;
@@ -164,9 +186,9 @@ public class CoordinationArtifactBrokerPlugin
     private class Impl implements CoordinationArtifactBroker
     {
 	ThreadService tsvc;
-	ArrayList pendingRequests;
+	ArrayList pendingRequests, pendingProvides;
 	ArrayList providers;
-	Schedulable requestsThread;
+	Schedulable requestsThread, providesThread;
 	ServiceBroker sb;
 
 	Impl(ServiceBroker sb)
@@ -174,13 +196,22 @@ public class CoordinationArtifactBrokerPlugin
 	    tsvc = (ThreadService)
 		sb.getService(this, ThreadService.class, null);
 	    pendingRequests = new ArrayList();
+	    pendingProvides = new ArrayList();
 	    providers = new ArrayList();
-	    Runnable runner = new Runnable() {
+	    Runnable requests_runner = new Runnable() {
 		    public void run() {
 			checkPendingRequests();
 		    }
 		};
-	    requestsThread = tsvc.getThread(this, runner, "ArtifactBroker");
+	    Runnable provides_runner = new Runnable() {
+		    public void run() {
+			checkPendingProvides();
+		    }
+		};
+	    requestsThread = 
+		tsvc.getThread(this, requests_runner, "ArtifactBroker req");
+	    providesThread = 
+		tsvc.getThread(this, provides_runner, "ArtifactBroker prv");
 	    this.sb = sb;
 	}
 
@@ -197,6 +228,21 @@ public class CoordinationArtifactBrokerPlugin
 		requestsThread.start();
 	    }
 	}
+
+	private void provide(ConnectionSpec spec,
+			     RolePlayer player,
+			     CoordinationArtifactProvider cap)
+	{
+	    // assume one queued request per player
+	    if (log.isDebugEnabled())
+		log.debug("Queue provision of " +cap);
+	    synchronized (pendingProvides) {
+		Provisioner p = new Provisioner(spec, player, cap);
+		pendingProvides.add(p);
+		providesThread.start();
+	    }
+	}
+
 
 
 
@@ -225,22 +271,34 @@ public class CoordinationArtifactBrokerPlugin
 	    }
 	}
 
-	private boolean findFacet(ConnectionSpec spec, RolePlayer player) 
+	private void checkPendingProvides() 
+	{
+	    synchronized (pendingProvides) {
+		Iterator itr = pendingProvides.iterator();
+		while (itr.hasNext()) {
+		    Provisioner p = (Provisioner) itr.next();
+		    if (log.isDebugEnabled())
+			log.debug("Provision of " +p.cap);
+		    p.provide();
+		}
+	    }
+	}
+
+	private boolean findFacet(ConnectionSpec spec, 
+				  RolePlayer player) 
 	{
 	    if (log.isDebugEnabled())
 		log.debug("Looking for " +spec.ca_kind+ " " +spec.role);
 	    synchronized (providers) {
 		for (int i=0; i<providers.size(); i++) {
-		    CoordinationArtifactProvider cat = (CoordinationArtifactProvider) 
-			providers.get(i);
-		    
-		    if (cat.supports(spec)) {
+		    CoordinationArtifactProvider cap = 
+			(CoordinationArtifactProvider) providers.get(i);
+		    if (cap.supports(spec)) {
 			if (log.isDebugEnabled())
 			    log.debug("Found " +spec.ca_kind+ " " 
 				      +spec.role);
-			cat.provideFacet(spec, player);
+			provide(spec, player, cap);
 			return true;
-			
 		    }
 		}
 	    }
