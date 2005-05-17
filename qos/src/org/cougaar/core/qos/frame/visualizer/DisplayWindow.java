@@ -48,14 +48,14 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         JPanel displPanel = new JPanel(new BorderLayout());
         displPanel.add(display, BorderLayout.CENTER);
         displPanel.add(controlPanel, BorderLayout.SOUTH);
-        containerView = new ContainerTreeView(frameModel, display);
-        frameView = new FrameTreeView(frameModel);
-        frameSnapshotView = new FrameSnapshotView(frameView);
+        //containerView = new ContainerTreeView(frameModel, display);
+        //frameView = new FrameTreeView(frameModel);
+        //frameSnapshotView = new FrameSnapshotView(frameView);
 
         tabbedPane.addTab("Graphic", displPanel);
-        tabbedPane.addTab("View Tree", containerView);
-        tabbedPane.addTab("Frames", frameView);
-        tabbedPane.addTab("Snapshots", frameSnapshotView);
+        //tabbedPane.addTab("View Tree", containerView);
+        //tabbedPane.addTab("Frames", frameView);
+        //tabbedPane.addTab("Snapshots", frameSnapshotView);
 
         ViewConfigParser.WindowSpec w = display.getWindowSpec();
         String title = w.getTitle();
