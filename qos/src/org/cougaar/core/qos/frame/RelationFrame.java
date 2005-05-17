@@ -43,6 +43,24 @@ abstract public class RelationFrame
     private static Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.RelationFrame.class);
 
+    // This is only here to suppress useless warnings when the
+    // frameset fails to find one of the relations two operands.
+    private transient long failed_lookup_time;
+
+    long failed_lookup_time()
+    {
+	long now = System.currentTimeMillis();
+	if (failed_lookup_time == 0) failed_lookup_time = now;
+	return now - failed_lookup_time;
+    }
+
+    void clear_failed_lookup_time()
+    {
+	failed_lookup_time = 0;
+    }
+	
+
+
     protected RelationFrame(FrameSet frameSet, UID uid)
     {
 	super(frameSet, uid);

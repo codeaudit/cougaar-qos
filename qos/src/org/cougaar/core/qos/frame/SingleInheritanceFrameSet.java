@@ -57,6 +57,8 @@ import org.cougaar.core.util.UniqueObject;
 public class SingleInheritanceFrameSet
     implements FrameSet
 {
+    private static final long LOOKUP_WARN_TIME = 10000;
+
     private final String name;
     private final String pkg;
     private final LoggingService log;
@@ -379,17 +381,29 @@ public class SingleInheritanceFrameSet
     {
 	DataFrame result = (DataFrame) findFrame(proto, slot, value);
 	if (result == null) {
-	    if (log.isWarnEnabled())
-		log.warn(" Proto = " +proto+
-			 " Slot = " +slot+
-			 " Value = " +value+
-			 " matches nothing");
+	    long time =  relationship.failed_lookup_time();
+	    if (time > LOOKUP_WARN_TIME) {
+		// reset the timer
+		relationship.clear_failed_lookup_time();
+		if (log.isWarnEnabled())
+		    log.warn(" Proto = " +proto+
+			     " Slot = " +slot+
+			     " Value = " +value+
+			     " matches nothing in " +name);
+	    } else if (log.isDebugEnabled()) {
+		log.debug(" Proto = " +proto+
+			     " Slot = " +slot+
+			     " Value = " +value+
+			     " matches nothing in " +name);
+	    }
 	} else {
-	    if (log.isInfoEnabled())
-		log.info(" Caching: Proto = " +proto+
-			 " Slot = " +slot+
-			 " Value = " +value+
-			 " Result = " +result);
+	    if (log.isDebugEnabled())
+		log.debug(" Caching: Proto = " +proto+
+			  " Slot = " +slot+
+			  " Value = " +value+
+			  " Result = " +result+ 
+			  "in " +name);
+	    relationship.clear_failed_lookup_time();
 	    cache.put(relationship, result);
 	}
 	return result;
