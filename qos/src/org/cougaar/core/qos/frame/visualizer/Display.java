@@ -129,33 +129,38 @@ public class Display extends AnimatedCanvas implements ChangeListener {
                 // process slot changes of data frames
                 ChangedFramesEvent ee = (ChangedFramesEvent) e;
                 HashMap changeMap = ee.getChangedDataFrames();
-                if (changeMap == null)
-                    return;
-                org.cougaar.core.qos.frame.Frame frame;
-                ShapeGraphic sh;
-                for (Iterator ii=changeMap.keySet().iterator(); ii.hasNext();) {
-                    frame = (org.cougaar.core.qos.frame.Frame)ii.next();
-                    sh = frameModel.getGraphic(frame);
-                    if (sh!= null) {
-                        for (Iterator jj=((Collection)changeMap.get(frame)).iterator(); jj.hasNext();)
-                            sh.processFrameChange(frame, (org.cougaar.core.qos.frame.Frame.Change) jj.next());
+                if (changeMap != null) {
+                    org.cougaar.core.qos.frame.Frame frame;
+                    ShapeGraphic sh;
+                    for (Iterator ii=changeMap.keySet().iterator(); ii.hasNext();) {
+                        frame = (org.cougaar.core.qos.frame.Frame)ii.next();
+                        sh = frameModel.getGraphic(frame);
+                        if (sh!= null) {
+                            for (Iterator jj=((Collection)changeMap.get(frame)).iterator(); jj.hasNext();)
+                                sh.processFrameChange(frame, (org.cougaar.core.qos.frame.Frame.Change) jj.next());
+                        }
                     }
                 }
                 // process relationship changes
                 HashMap relationChangesMap = ee.getChangedRelationFrames();
-                RelationFrame rf;
-                Collection  changeReports;
-                ArrayList transitionList = new ArrayList();
+                if (relationChangesMap != null) {
+                    RelationFrame rf;
+                    Collection  changeReports;
+                    ArrayList transitionList = new ArrayList();
 
-                for (Iterator ii=relationChangesMap.keySet().iterator(); ii.hasNext(); ) {
-                    rf = (RelationFrame) ii.next();
-                    changeReports = (Collection) relationChangesMap.get(rf);
-                    Collection trans = processRelationshipChanges(rf, changeReports);
-                    if (trans != null)
-                        transitionList.addAll(trans);
+                    for (Iterator ii=relationChangesMap.keySet().iterator(); ii.hasNext(); ) {
+                        rf = (RelationFrame) ii.next();
+                        changeReports = (Collection) relationChangesMap.get(rf);
+                        Collection trans = processRelationshipChanges(rf, changeReports);
+                        if (trans != null)
+                            transitionList.addAll(trans);
+                    }
+                    if (transitionList.size() > 0) {
+                        if (log.isDebugEnabled())
+                            log.debug("ProcessEventHelper: creating a tick event #"+(tickNumber+1)+" with "+transitionList.size()+" transitions");
+                        tickEventOccured(new TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitionList));
+                    }
                 }
-                if (transitionList.size() > 0)
-                    tickEventOccured(new TickEvent(this, tickNumber++, TICK_EVENT_LABEL, transitionList));
 
             } else if (e instanceof RemovedFramesEvent) {
                 ;// nothing yet
