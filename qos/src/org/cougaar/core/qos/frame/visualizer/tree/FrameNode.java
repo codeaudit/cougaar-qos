@@ -44,6 +44,7 @@ public class FrameNode extends DefaultMutableTreeNode {
         this.frame = frame;
         this.relationship = null;
         this.relationshipNodes = new HashMap();
+        this.cachedChildren = new HashSet();
         this.proxies = new ArrayList();
         this.label = (frame == null ? "" : (frame instanceof PrototypeFrame ? ((PrototypeFrame)frame).getName() : (String) frame.getValue("name")));
     }
