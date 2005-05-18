@@ -21,6 +21,7 @@ public class ShapeGraphic implements Cloneable {
     protected ShapeRenderer renderer;
     protected RectangularShape shape, shapePrototype;
     protected double x,y,width,height;
+    protected double originalWidth, originalHeight; // remember original size (some layout mgrs do resizeing)
     protected boolean visible, selected, mouseOver, isPrototype;
     protected ShapeContainer parent;
 
@@ -263,7 +264,13 @@ public class ShapeGraphic implements Cloneable {
 
     public void setShapePrototype(RectangularShape shape) {
         this.shapePrototype = shape;
+        if (shape != null) {
+            Rectangle2D r = shape.getFrame();
+            originalWidth = (r.getWidth() > 0 ? r.getWidth() : originalWidth);
+            originalHeight = (r.getHeight() > 0 ? r.getHeight() : originalHeight);
+        }
     }
+
     public RectangularShape createShape() {
         if (shapePrototype != null) {
             RectangularShape tmp = shape;
@@ -294,6 +301,12 @@ public class ShapeGraphic implements Cloneable {
         this.y = y;
         this.width = width;
         this.height= height;
+        if (shape != null)
+            shape.setFrame(x,y,width,height);
+    }
+    public void resetSize() {
+        this.width = originalWidth;
+        this.height = originalHeight;
         if (shape != null)
             shape.setFrame(x,y,width,height);
     }

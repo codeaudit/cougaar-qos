@@ -307,6 +307,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         //synchronized (lock) {
             super.render(w,h,g2);
             root.draw(g2);
+            root.drawLabel(g2);
 
             Transition t;
             for (Iterator ii=transitions.iterator(); ii.hasNext();) {

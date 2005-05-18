@@ -111,13 +111,20 @@ public class ShapeContainer extends ShapeGraphic {
         if (children.size() > 0)
             drawChildren(g2);
     }
-
+    public void drawLabel(Graphics2D g2) {
+        super.drawLabel(g2);
+        if (children.size() > 0)
+            drawChildrenLabels(g2);
+    }
     protected void drawChildren(Graphics2D g2) {
         ShapeGraphic sh;
         for (Iterator ii=children.iterator(); ii.hasNext();) {
             sh=(ShapeGraphic) ii.next();
             sh.draw(g2);
         }
+    }
+    protected void drawChildrenLabels(Graphics2D g2) {
+        ShapeGraphic sh;
         // drawing the label used to be in the sh.draw() call but
         // moved it here so that the labels don't get drawn over
         // by the shape of the next item

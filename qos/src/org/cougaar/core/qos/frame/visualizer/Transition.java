@@ -63,8 +63,10 @@ public class Transition {
         //double xoff=0d, yoff=0d;
 
         if (firstStep) {
-            if (fromContainer != null)
+            if (fromContainer != null)  {
                 fromContainer.remove(shape);
+                shape.resetSize();
+            }
 
             if (!Display.ENABLE_ANIMATION || fromPos == null) {
                 lastStep = true;
@@ -136,6 +138,7 @@ public class Transition {
 
     public void draw(Graphics2D g2) {
         shape.draw(g2);
+        shape.drawLabel(g2);
     }
 
     public String toString() {
