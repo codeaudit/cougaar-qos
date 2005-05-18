@@ -774,10 +774,6 @@
 	<pathelement path="${TARGETBASE}/lib/qos.jar"/>
 	<pathelement path="${TARGETBASE}/lib/xercesImpl.jar"/>
       </classpath>
-      <arg value="-java"/> 
-      <arg value="src"/> 
-      <arg value="-dtd"/>
-      <arg value="src/org/cougaar/core/qos/frame/topology"/>
       <arg value="src/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
     </java>
   </target>

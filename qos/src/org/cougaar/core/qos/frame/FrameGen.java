@@ -77,9 +77,6 @@ public class FrameGen
     private String jess_output_root;
     private String dtd_output_root;
 
-    // FrameSet subdirectory of the output_path; derived from the package
-    private String output_directory;
-
     // The prototype currently being parsed
     private String current_prototype;
 
@@ -140,10 +137,19 @@ public class FrameGen
 	    return;
 	}
 
-	if (java_output_root != null) generatePrototypes(package_name);
-	if (jess_output_root != null) 
-	    generateShadowClasses(package_name, domain);
-	if (dtd_output_root != null) generateDTD(domain);
+	if (java_output_root != null) {
+	    generatePrototypes(package_name, java_output_root);
+	} else {
+	    generatePrototypes(package_name, "src");
+	}
+	if (jess_output_root != null) {
+	    generateShadowClasses(package_name, jess_output_root, domain);
+	}
+	if (dtd_output_root != null) {
+	    generateDTD(domain, dtd_output_root);
+	} else {
+	    generateDTD(domain, xml_file.getParentFile().getPath());
+	}
     }
 
 
@@ -209,8 +215,6 @@ public class FrameGen
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
-	output_directory = java_output_root + File.separator+ 
-	    package_name.replaceAll("\\.", File.separator);
     }
 
     private void startPrototype(Attributes attrs)
@@ -284,9 +288,9 @@ public class FrameGen
 
     // Code Generation 
 
-    private void generateDTD(String domain)
+    private void generateDTD(String domain, String root)
     {
-	File out = new File(dtd_output_root, domain+".dtd");
+	File out = new File(root, domain+".dtd");
 	PrintWriter writer = null;
 	try {
 	    FileWriter fw = new FileWriter(out);
@@ -372,9 +376,9 @@ public class FrameGen
 	write_slots_dtd(writer, proto, slots, elements);
     }
 
-    private void generateShadowClasses(String pkg, String domain)
+    private void generateShadowClasses(String pkg, String root, String domain)
     {
-	File out = new File(jess_output_root, domain+".clp");
+	File out = new File(root, domain+".clp");
 	PrintWriter writer = null;
 	try {
 	    FileWriter fw = new FileWriter(out);
@@ -396,8 +400,11 @@ public class FrameGen
 	System.out.println("Wrote " + out);
     }
 
-    private void generatePrototypes(String pkg)
+    private void generatePrototypes(String pkg, String root)
     {
+	String output_directory = root + File.separator+ 
+	    pkg.replaceAll("\\.", File.separator);
+
 	Iterator itr;
 
 	itr = proto_slots.entrySet().iterator();
@@ -430,14 +437,15 @@ public class FrameGen
 	    }
 
 
-	    generatePrototype(prototype, pkg, doc,
+	    generatePrototype(prototype, output_directory, pkg, doc,
 			      parent, container, 
 			      local_slots, override_slots,
 			      units_override_slots);
 	}
     }
 
-    private void generatePrototype(String prototype, 
+    private void generatePrototype(String prototype,
+				   String output_directory,
 				   String pkg,
 				   String doc,
 				   String parent, 
