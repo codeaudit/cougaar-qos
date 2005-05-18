@@ -60,13 +60,13 @@ public class Display extends AnimatedCanvas implements ChangeListener {
     // changes
     org.cougaar.core.qos.frame.visualizer.event.ChangeModel tickStatusListeners;
     ChangeEvent tickCompleted;
-    Object lock;
+    //Object lock;
 
 
 
 
     public Display(FrameModel frameModel, URL xmlFile, ThreadService tsvc) {
-        lock = new Object();
+        //lock = new Object();
         this.frameModel = frameModel;
         tickNumber = 0;
         //graphics = new HashMap();
@@ -271,16 +271,21 @@ public class Display extends AnimatedCanvas implements ChangeListener {
     }
 
     public void step(int w, int h) {
-        //System.out.println("step");
         if (!initialized)
             return;
-        synchronized (lock) {
+        //if (log.isDebugEnabled())
+          //  log.debug("**step: w="+w+" h="+h);
+        if (!processingTickEvent)
+             processNextTickEvent();
+        //synchronized (lock) {
             ArrayList remove = new ArrayList();
             Transition t;
             boolean finished;
             for (Iterator ii=transitions.iterator(); ii.hasNext();) {
                 t = (Transition) ii.next();
                 finished = t.step();
+                if (log.isDebugEnabled())
+                    log.debug("\n******* transition step: "+t);
                 if (finished)
                     remove.add(t);
             }
@@ -290,15 +295,16 @@ public class Display extends AnimatedCanvas implements ChangeListener {
             if (temp > 0 && transitions.size() == 0) {
                 processingTickEvent = false;
                 tickStatusListeners.notifyListeners(tickCompleted);
+                //processNextTickEvent();
             }
-        }
+        //}
     }
 
     public void render(int w, int h, Graphics2D g2) {
         //System.out.println("render");
         if (!initialized)
             return;
-        synchronized (lock) {
+        //synchronized (lock) {
             super.render(w,h,g2);
             root.draw(g2);
 
@@ -308,9 +314,9 @@ public class Display extends AnimatedCanvas implements ChangeListener {
                 t.draw(g2);
             }
 
-            if (!processingTickEvent)
-                processNextTickEvent();
-        }
+            //if (!processingTickEvent)
+            //    processNextTickEvent();
+        //}
     }
 
 
@@ -323,24 +329,24 @@ public class Display extends AnimatedCanvas implements ChangeListener {
     }
 
     public void tickEventOccured(org.cougaar.core.qos.frame.visualizer.event.TickEvent tick) {
-        synchronized (lock) {
+        //synchronized (lock) {
             tickEventQueue.add(tick); 
-        } 
+        //}
     }
 
     public void processNextTickEvent() {
         org.cougaar.core.qos.frame.visualizer.event.TickEvent tickEvent=null;
-        synchronized (lock) {
+        //synchronized (lock) {
             if (tickEventQueue.size() > 0) {
                 tickEvent = (TickEvent)tickEventQueue.get(0);
                 tickEventQueue.remove(0);
             }
-        }
+        //}
         if (tickEvent == null)
             return;
         processingTickEvent = true;
         if (log.isDebugEnabled())
-            log.debug("processing "+tickEvent);
+            log.debug("\nprocessing "+tickEvent);
 
         transitions.addAll(tickEvent.getTransitions());
     }

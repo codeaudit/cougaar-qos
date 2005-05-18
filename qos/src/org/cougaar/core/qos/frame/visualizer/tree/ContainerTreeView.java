@@ -25,9 +25,11 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,41 +44,49 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
     ShapeGraphicTableModel shapeModel;
     ShapeTableCellRenderer cellRenderer;
     FrameTableCellRenderer frameCellRenderer;
-    HashMap containerToNodeMap;
+    //HashMap containerToNodeMap;
     Display display;
     DefaultTreeModel treeModel;
     JLabel selectedLabel, selectedFrameLabel;
     Box legend;
+    boolean initialBuildDone = false;
+    ArrayList treePaths;
+
+    boolean showPrototypes = true;
+
 
     public ContainerTreeView(FrameModel frameModel, Display display) {
         super();
-        containerToNodeMap = new HashMap();
+        //containerToNodeMap = new HashMap();
         this.display = display;
         this.frameModel = frameModel;
         frameTableModel = new FrameTableModel();
         shapeModel = new ShapeGraphicTableModel();
         cellRenderer = new ShapeTableCellRenderer(false, shapeModel);
         frameCellRenderer = new FrameTableCellRenderer(false, true, frameTableModel);
-
+        treePaths = new ArrayList();
         Icon containerIcon = IconFactory.getIcon(IconFactory.CONTAINER_ICON);
         Icon componentIcon = IconFactory.getIcon(IconFactory.COMPONENT_ICON);
         Icon prototypeIcon = IconFactory.getIcon(IconFactory.CONTAINER_PROTOTYPE_ICON);
         Icon frameIcon     = IconFactory.getIcon(IconFactory.FRAME_ICON);
         tree.setCellRenderer(new ContainerRenderer(containerIcon, componentIcon, prototypeIcon, frameIcon));
 
-        root =  createNode(display.getRootContainer());
-        treeModel = new DefaultTreeModel(root);
-        tree.setModel(treeModel);
-        buildTree(null, display.getRootContainer());
-        tree.expandPath(new TreePath(root));
+        //root =  createNode(display.getRootContainer());
+        //treeModel = new DefaultTreeModel(root);
+        //tree.setModel(treeModel);
+        rebuildTree();
+        //tree.expandPath(new TreePath(root));
 
-        frameModel.addGraphicChangeListener(this);
-        //frameModel.addAddedFramesListener(this);
+        //frameModel.addGraphicChangeListener(this);
+        frameModel.addAddedFramesListener(this);
         //frameModel.addChangedFramesListener(this);
         //frameModel.addRemovedFramesListener(this);
         //frameModel.addTransitionListener(this);
     }
 
+    public TreeNode getRootNode() {
+        return root;
+    }
 
     public Component createOtherComponent() {
         super.createOtherComponent();
@@ -92,25 +102,51 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
         labelBox.add(Box.createHorizontalStrut(10));
         labelBox.add(selectedFrameLabel);
         labelBox.add(Box.createHorizontalGlue());
+        labelBox.add(new JButton(new ShowHidePrototypes()));
+        labelBox.add(new JButton(new RefreshAction()));
+        labelBox.add(Box.createHorizontalStrut(10));
         labelBox.add(legend);
         rightPanel.add(labelBox, BorderLayout.NORTH);
         return rightPanel;
     }
 
-
-
     public void stateChanged(ChangeEvent e) {
-        MyEventHelper helper = new MyEventHelper(e);
-        if (SwingUtilities.isEventDispatchThread())
-            helper.run();
-        else SwingUtilities.invokeLater(helper);
+        if (!initialBuildDone) {
+            MyEventHelper helper = new MyEventHelper(e);
+            if (SwingUtilities.isEventDispatchThread())
+                helper.run();
+            else SwingUtilities.invokeLater(helper);
+           initialBuildDone = true;
+        }
+    }
+
+    class ShowHidePrototypes extends AbstractAction {
+        public ShowHidePrototypes() {
+            super((showPrototypes ? "Hide Protoypes" : "Show Prototypes"));
+        }
+        public void actionPerformed(ActionEvent e) {
+            showPrototypes = !showPrototypes;
+            putValue(Action.NAME, (showPrototypes ? "Hide Protoypes" : "Show Prototypes"));
+            rebuildTree();
+        }
+    }
+
+    class RefreshAction extends AbstractAction {
+        public RefreshAction() {
+            super("Refresh Tree");
+        }
+        public void actionPerformed(ActionEvent e) {
+            rebuildTree();
+        }
     }
 
     class MyEventHelper implements Runnable {
         ChangeEvent e;
         public MyEventHelper(ChangeEvent che) { e = che;}
         public void run() {
-            if (e instanceof ContainerChildRemovedEvent) {
+            updateTree(display.getRootContainer());
+
+            /*if (e instanceof ContainerChildRemovedEvent) {
                 //ContainerChildRemovedEvent ee = (ContainerChildRemovedEvent)e;
                 //ShapeContainer c = ee.getContainer();
                 //ShapeGraphic gr = ee.getChild();
@@ -147,8 +183,9 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
                 //AddedFramesEvent ee = (AddedFramesEvent)e;
                // if (ee.getAddedDataFrames() != null)
                 //    updateTree(display.getRootContainer());
-            }
+            } */
         }
+
     }
 
     protected void displayShapeGraphicInTable(ShapeGraphic g) {
@@ -169,27 +206,42 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
         legend.setVisible(true);
     }
 
+    public void rebuildTree() {
+        updateTree(display.getRootContainer());
+    }
     public void updateTree(ShapeContainer rootContainer) {
-        buildTree(null, rootContainer);
-        
+        treePaths = new ArrayList();
+        root = buildTree(null, rootContainer);
+        treeModel = new DefaultTreeModel(root);
+        tree.setModel(treeModel);
+        // expand all container nodes
+        TreePath tp;
+        for (Iterator ii=treePaths.iterator(); ii.hasNext();) {
+           tp = (TreePath) ii.next();
+           tree.expandPath(tp);
+            //System.out.println("expanding path "+tp);
+        }
     }
 
     protected DefaultMutableTreeNode createNode(ShapeGraphic graphic) {
-        ShapeGraphicNode newNode = (ShapeGraphicNode) containerToNodeMap.get(graphic);
+        return new ShapeGraphicNode(graphic);
+        /*ShapeGraphicNode newNode = (ShapeGraphicNode) containerToNodeMap.get(graphic);
         if (newNode == null) {
-            newNode = new ShapeGraphicNode(graphic);
-            containerToNodeMap.put(graphic, newNode);
+         newNode = new ShapeGraphicNode(graphic);
+         containerToNodeMap.put(graphic, newNode);
         }
-        return newNode;
+        return newNode;*/
     }
 
     protected DefaultMutableTreeNode createNode(org.cougaar.core.qos.frame.Frame frame) {
+        return new FrameNode(frame);
+        /*
         FrameNode newNode = (FrameNode) containerToNodeMap.get(frame);
         if (newNode == null) {
             newNode = new FrameNode(frame);
             containerToNodeMap.put(frame, newNode);
         }
-        return newNode;
+        return newNode; */
     }
 
     public DefaultMutableTreeNode buildTree(ShapeGraphicNode parent, Object userObject) {
@@ -199,27 +251,36 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
             ShapeGraphic graphic = (ShapeGraphic)userObject;
             newNode = (ShapeGraphicNode) createNode(graphic);
             if (parent != null && !parent.hasChild(newNode))
-                treeModel.insertNodeInto(newNode, parent, 0);
+                parent.add(newNode);
+                //treeModel.insertNodeInto(newNode, parent, 0);
 
             if (graphic.hasFrame()) {
                 DefaultMutableTreeNode fnode = createNode(graphic.getFrame());
                 if (!newNode.hasChild(fnode))
-                    treeModel.insertNodeInto(fnode, newNode, 0);
+                    //treeModel.insertNodeInto(fnode, newNode, 0);
+                    newNode.add(fnode);
 
             }
             if (graphic.isContainer()) {
                 ShapeContainer sc = (ShapeContainer) graphic;
                 ShapeGraphic g;
-                for (Iterator ii=sc.getPrototypes().iterator(); ii.hasNext();) {
-                    g = (ShapeGraphic) ii.next();
-                    buildTree(newNode, g);
+                if (showPrototypes) {
+                    for (Iterator ii=sc.getPrototypes().iterator(); ii.hasNext();) {
+                        g = (ShapeGraphic) ii.next();
+                        buildTree(newNode, g);
+                    }
                 }
-                for (Iterator ii=sc.getChildren().iterator(); ii.hasNext();) {
-                    g = (ShapeGraphic) ii.next();
-                    buildTree(newNode, g);
-                }
+                if (sc.getChildren().size() > 0) {
+                    for (Iterator ii=sc.getChildren().iterator(); ii.hasNext();) {
+                        g = (ShapeGraphic) ii.next();
+                        buildTree(newNode, g);
+                    }
+                } else
+                    addPath(parent);
 
-            }
+            }  else
+                addPath(parent);
+
 
         }  /*else if (userObject instanceof org.cougaar.core.qos.frame.Frame) {
             org.cougaar.core.qos.frame.Frame frame = (org.cougaar.core.qos.frame.Frame)userObject;
@@ -230,7 +291,15 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
         return newNode;
     }
 
-
+   void addPath(ShapeGraphicNode parent) {
+       if (parent == null)
+           return;
+       ShapeGraphic sg = parent.getShapeGraphic();
+       if (sg != null && sg.isPrototype())
+           return;
+       TreePath tp = new TreePath(parent.getPath());
+       treePaths.add(tp);
+   }
 
     private class ContainerRenderer extends DefaultTreeCellRenderer {
         Icon containerIcon;

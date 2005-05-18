@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
 import java.util.*;
 
 /**
@@ -42,11 +43,15 @@ import java.util.*;
  */
 public class FrameTreeView extends TreeView implements ChangeListener {
     HashMap frameMap;
+    HashMap relationshipMap;
+    HashSet relationMappedFrameNodes;
+    ArrayList treePaths;
+
     FrameModel frameModel;
     FrameInheritenceView frameInheritenceView;
     JLabel selectedLabel, selectedFrameLabel;
     DefaultTreeModel treeModel;
-    boolean rootNameNotSet = true;
+    boolean rootNameNotSet = true, initialBuildDone = false;
     private transient Logger log = Logging.getLogger(getClass().getName());
 
 
@@ -54,6 +59,9 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         super();
         init();
         frameMap = new HashMap();
+        relationshipMap = new HashMap();
+        relationMappedFrameNodes = new HashSet();
+        treePaths = new ArrayList();
         this.frameModel = frameModel;
         root = new FrameNode();//DefaultMutableTreeNode("frameset");
         root.setUserObject("frameset");
@@ -66,8 +74,8 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         tree.setCellRenderer(new FrameRenderer(frameIcon, relationIcon));
 
         frameModel.addAddedFramesListener(this);
-        frameModel.addChangedFramesListener(this);
-        frameModel.addRemovedFramesListener(this);
+        //frameModel.addChangedFramesListener(this);
+        //frameModel.addRemovedFramesListener(this);
     }
 
     public TreeNode getRootNode() {
@@ -89,9 +97,19 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         labelBox.add(Box.createHorizontalStrut(10));
         labelBox.add(selectedFrameLabel);
         labelBox.add(Box.createHorizontalGlue());
+        labelBox.add(new JButton(new RefreshFrameTreeAction()));
         labelBox.add(legend);
         rightPanel.add(labelBox, BorderLayout.NORTH);
         return rightPanel;
+    }
+
+    class RefreshFrameTreeAction extends AbstractAction {
+        public RefreshFrameTreeAction() {
+            super("Refresh Tree");
+        }
+        public void actionPerformed(ActionEvent e) {
+            rebuildTree();
+        }
     }
 
     public static Box createHorizontalFrameLegend() {
@@ -130,10 +148,13 @@ public class FrameTreeView extends TreeView implements ChangeListener {
 
 
      public void stateChanged(ChangeEvent e) {
-        MyFrameEventHelper helper = new MyFrameEventHelper(e);
-        if (SwingUtilities.isEventDispatchThread())
-            helper.run();
-        else SwingUtilities.invokeLater(helper);
+         if (!initialBuildDone)  {
+            MyFrameEventHelper helper = new MyFrameEventHelper(e);
+            if (SwingUtilities.isEventDispatchThread())
+                helper.run();
+            else SwingUtilities.invokeLater(helper);
+            initialBuildDone = true;
+         }
     }
 
 
@@ -142,6 +163,8 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         ChangeEvent e;
         public MyFrameEventHelper(ChangeEvent che) { e = che;}
         public void run() {
+            rebuildTree();
+            /*
             if (e instanceof AddedFramesEvent) {
                 // process added frames
                 AddedFramesEvent ee = (AddedFramesEvent)e;
@@ -173,23 +196,60 @@ public class FrameTreeView extends TreeView implements ChangeListener {
                     tree.expandPath(p);
             }
             //TreeWriter.write(root, 5, 5);
+            */
         }
     }
 
 
- /*
 
-    public void updateTree() {
-        Collection relationshipFrames = process(frameModel.getAllFrames());
+
+
+
+    public void rebuildTree() {
+        root = new FrameNode();
+        ((FrameNode)root).setLabel("frameset '"+frameModel.getFrameSetName()+"'");
+        frameMap = new HashMap(11);
+        relationshipMap = new HashMap(11);
+        relationMappedFrameNodes = new HashSet(0);
+        treePaths = new ArrayList();
+
+        Collection dataFrames         = frameModel.getDataFrames();
+        Collection relationshipFrames = frameModel.getRelationshipFrames();
+        createNodes(dataFrames);
+
         processRelationships(relationshipFrames);
-        Collection rootNodes = findRootLevelNodes();
-
-        for (Iterator ii=rootNodes.iterator(); ii.hasNext();) {
-            root.add((DefaultMutableTreeNode) ii.next());
-        }
+        //Collection rootNodes = findRootLevelNodes();
+        //for (Iterator ii=rootNodes.iterator(); ii.hasNext();) {
+        //    root.add((DefaultMutableTreeNode) ii.next());
+        //}
         tree.setModel(new DefaultTreeModel(root));
+        // expand all paths
+        expandTree((FrameNode)root);
     }
-    */
+
+    void expandTree(FrameNode root) {
+        walkTree(root);
+        TreePath tp;
+        for (Iterator ii=treePaths.iterator(); ii.hasNext();) {
+           tp = (TreePath) ii.next();
+           tree.expandPath(tp);
+           //System.out.println("expanding path "+tp);
+        }
+    }
+
+    void walkTree(FrameNode node) {
+        if (node.isLeaf()) {
+            treePaths.add(new TreePath( ((FrameNode)node.getParent()).getPath()));
+            return;
+        }
+        FrameNode tn;
+        for (Enumeration ee=node.children(); ee.hasMoreElements();) {
+            tn = (FrameNode) ee.nextElement();
+            walkTree(tn);
+        }
+    }
+
+
 /*
     protected Collection process(Collection frames) {
         ArrayList relationships = new ArrayList();
@@ -218,15 +278,13 @@ public class FrameTreeView extends TreeView implements ChangeListener {
 
     protected void processRelationships(Collection relationshipFrames) {
         org.cougaar.core.qos.frame.RelationFrame f;
-        org.cougaar.core.qos.frame.Frame pf, cf;
+        org.cougaar.core.qos.frame.DataFrame pf, cf;
         FrameNode parentNode, childNode;
-        String relationship, parentName, childName, parentProto, childProto;
+        String relationship;
+
         for (Iterator ii=relationshipFrames.iterator(); ii.hasNext();) {
             f = (org.cougaar.core.qos.frame.RelationFrame) ii.next();
-            //parentName = (String) f.getParentValue();
-            //childName  = (String) f.getChildValue();
-            //parentProto = (String) f.getParentPrototype();
-            //childProto  = (String) f.getChildPrototype();
+
             pf = f.relationshipParent();
             cf = f.relationshipChild();
             relationship = (String) f.getKind();
@@ -235,37 +293,21 @@ public class FrameTreeView extends TreeView implements ChangeListener {
                     log.debug("processRelationships:  invalid relation frame, ignoring"+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
                 return;
             }
-            parentNode = createNode(pf);
-            childNode  = createNode(cf);
-            FrameNode relationNode = parentNode.getRelationshipNode(relationship);
 
+            parentNode = createNode(pf);
+            childNode  = createNodeFromRelation(f, cf);
+            FrameNode relationNode = parentNode.getRelationshipNode(relationship);
 
             if (relationNode == null) {
                 if (log.isDebugEnabled())
                     log.debug("creating RelationFrameNode:  "+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());
                 relationNode = new FrameNode(relationship);
                 parentNode.addRelationshipNode(treeModel, relationNode);
-            } //else if (relationNode.getParent() != parentNode) {
-                //throw new NullPointerException("relation parent node != parentNode");
-            //}
-
-            TreeNode tmpParent = childNode.getParent();
-            if (tmpParent != null && tmpParent != relationNode && !relationNode.hasChild(childNode)) {
-
-                FrameNode tmp = childNode;
-                childNode = new FrameNodeProxy(childNode);
-                tmp.addProxy((FrameNodeProxy)childNode);
-                if (log.isDebugEnabled())
-                    log.debug("creating *FrameNodeProxy for frame "+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue()+" parentF="+pf+" childF="+cf+"\n\t\t\tchild already has a parent="+tmp.getParent());
+            } 
+            if (!relationNode.hasChild(childNode)) {
+                treePaths.add(new TreePath(relationNode.getPath()));
                 insertNode(childNode, relationNode);
-            } else if (!relationNode.hasChild(childNode))
-                insertNode(childNode, relationNode);
-
-            /*} else {
-            if (log.isDebugEnabled())
-            log.debug("++error: can't create node,  parent='"+f.getParentValue()+"'("+(parentNode!=null?"found":"not found")+") childName='"+f.getChildValue()+"'("+(childNode!=null?"found":"not found")+") relationship='"+relationship+"'");
-            ;// print something here
-            } */
+            }
         }
 
         Collection rootNodes = findRootLevelNodes();
@@ -279,6 +321,31 @@ public class FrameTreeView extends TreeView implements ChangeListener {
     protected void insertNode(FrameNode childNode, FrameNode parentNode) {
          if (!parentNode.hasChild(childNode))
             treeModel.insertNodeInto(childNode, parentNode, 0);
+    }
+
+
+    protected FrameNode createNodeFromRelation(RelationFrame rf, DataFrame childFrame) {
+        FrameNode childNode = (FrameNode) relationshipMap.get(rf);
+        if (childNode == null) {
+            // check if this node exists
+            childNode = (FrameNode) frameMap.get(childFrame);
+            if (childNode != null) { // it exists, now check if there is any relation frame mapped to it
+                if (relationMappedFrameNodes.contains(childNode)) {
+                    // some relation node is already mapped to this childNode, create a proxy
+                    FrameNode tmp = childNode;
+                    childNode = new FrameNodeProxy(childNode);
+                    tmp.addProxy((FrameNodeProxy)childNode);
+                }
+                relationMappedFrameNodes.add(childNode);
+                relationshipMap.put(rf, childNode);
+
+            }  else { // childNode is has not been created yet
+                childNode = createNode(childFrame);
+                relationMappedFrameNodes.add(childNode);
+                relationshipMap.put(rf, childNode);
+            }
+        }
+        return childNode;
     }
 
     protected FrameNode createNode(org.cougaar.core.qos.frame.Frame frame) {

@@ -305,6 +305,8 @@ public class ShapeGraphic implements Cloneable {
     public void draw(Graphics2D g2) {
         if (renderer != null && visible)
             renderer.drawShape(g2, this);
+    }
+    public void drawLabel(Graphics2D g2) {
         if (labelRenderer != null && visible)
             labelRenderer.drawLabel(g2, this);
     }

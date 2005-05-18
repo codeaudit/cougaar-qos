@@ -245,6 +245,10 @@ public class FrameModel {
         return relationshipFrames;
     }
 
+    public synchronized Collection getDataFrames() {
+        return dataFrames;
+    }
+
     public org.cougaar.core.qos.frame.Frame findFrame(FramePredicate predicate) {
         return findFrame(allFrames, predicate);
     }

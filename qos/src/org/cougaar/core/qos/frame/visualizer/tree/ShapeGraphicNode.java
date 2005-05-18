@@ -51,6 +51,11 @@ public class ShapeGraphicNode extends DefaultMutableTreeNode {
         return (cachedChildren.contains(child));
     }
 
+    public void insert(MutableTreeNode child, int index) {
+        cachedChildren.add(child);
+        super.insert(child, index);
+    }
+
     public void add(MutableTreeNode newChild) {
         cachedChildren.add(newChild);
         super.add(newChild);

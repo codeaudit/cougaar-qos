@@ -43,12 +43,11 @@ package org.cougaar.core.qos.frame.visualizer;
 
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
+
 import java.awt.*;
 
 
-/**
- * Demos that animate extend this class.
- */
+
 public abstract class AnimatingSurface extends Surface implements Runnable {
 
     public Schedulable thread;
@@ -67,21 +66,21 @@ public abstract class AnimatingSurface extends Surface implements Runnable {
 
 
     public synchronized void stop() {
-	if (thread != null) thread.cancel();
+        if (thread != null) thread.cancel();
     }
 
 
     public void run() {
-	if  (getSize().width == 0) {
-	    thread.schedule(200);
-	} else {
-	    if (isShowing())
+        if  (getSize().width == 0) {
+            thread.schedule(200);
+        } else {
+            if (isShowing())
                 repaint();
-	    else {
+            else {
                 Dimension d = getSize();
                 step(d.width, d.height);
             }
-	    thread.schedule(sleepAmount);
-	}
+            thread.schedule(sleepAmount);
+        }
     }
 }

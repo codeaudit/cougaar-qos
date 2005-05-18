@@ -118,6 +118,13 @@ public class ShapeContainer extends ShapeGraphic {
             sh=(ShapeGraphic) ii.next();
             sh.draw(g2);
         }
+        // drawing the label used to be in the sh.draw() call but
+        // moved it here so that the labels don't get drawn over
+        // by the shape of the next item
+        for (Iterator ii=children.iterator(); ii.hasNext();) {
+            sh=(ShapeGraphic) ii.next();
+            sh.drawLabel(g2);
+        }
     }
 
     public boolean hasPrototype(String kind) {

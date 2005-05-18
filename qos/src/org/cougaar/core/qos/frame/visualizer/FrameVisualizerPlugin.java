@@ -97,14 +97,14 @@ public class FrameVisualizerPlugin
 
         String specFileName = (String) getParameter("spec-file");
 //         File xml_file = ConfigFinder.getInstance().locateFile(specFileName);
-	ClassLoader loader = FrameVisualizerPlugin.class.getClassLoader();
-	URL xml_url = loader.getResource(specFileName);
+        ClassLoader loader = FrameVisualizerPlugin.class.getClassLoader();
+        URL xml_url = loader.getResource(specFileName);
         frameModel = new FrameModel();
-
         ServiceBroker sb = getServiceBroker();
-	ThreadService tsvc = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
+        ThreadService tsvc = (ThreadService)
+                sb.getService(this, ThreadService.class, null);
         pluginDisplay = new DisplayWindow(frameModel, xml_url, tsvc);
+
 
         //SwingUtilities.invokeLater(new CreateWindowHelper(xml_file));
         super.start();
@@ -171,7 +171,7 @@ public class FrameVisualizerPlugin
             if (!frameModel.hasFrameSet())
                 frameModel.setFrameSet(frameSet);
 
-             frameModel.framesAdded(added);
+            frameModel.framesAdded(added);
             //pluginDisplay.setFrameHelper(frameModel);
             newFramesPresent = false;
         }
@@ -193,7 +193,7 @@ public class FrameVisualizerPlugin
             changes.put(frame, ch);
         }
         if (log.isDebugEnabled())
-                log.debug("Calling frameModel.framesChanged");
+            log.debug("Calling frameModel.framesChanged");
         frameModel.framesChanged(changes);
     }
 

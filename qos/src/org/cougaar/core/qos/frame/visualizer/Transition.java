@@ -137,4 +137,10 @@ public class Transition {
     public void draw(Graphics2D g2) {
         shape.draw(g2);
     }
+
+    public String toString() {
+        String from = (fromContainer != null ? fromContainer.id : "null");
+        String to = (toContainer != null ? toContainer.id : "null");
+        return "Transition:  move '"+shape.id+"'  from '"+from+"' to '"+to+"'";
+    }
 }
