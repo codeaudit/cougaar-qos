@@ -242,11 +242,11 @@ public class FrameModel {
     }
 
     public synchronized Collection getRelationshipFrames() {
-        return relationshipFrames;
+        return new HashSet(relationshipFrames);
     }
 
     public synchronized Collection getDataFrames() {
-        return dataFrames;
+        return new HashSet(dataFrames);
     }
 
     public org.cougaar.core.qos.frame.Frame findFrame(FramePredicate predicate) {
