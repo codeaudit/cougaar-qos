@@ -99,9 +99,15 @@ hope to deal with this in a future release. <p>
 
 <h2>XML Specification</h2>
 
-<p>FrameSets and Frames can be loaded into Cougaar via xml file.  This
-section describes the relevant XML elements, their attributes and
-their semantic interpretation.
+<p>FrameSets and Frames can be loaded into Cougaar via xml files.
+  This section describes the XML elements and attributes for
+  PrototypeFrames.  The formal description is in framesets.dtd.  The
+  DTD format for the DataFrames of any particular domain is generated
+  from the PrototypeFrames.  Those are not described in detail here,
+  but in general each Prototype has a corresponding element that can
+  contains elements for the slots in that Prototype.  Slot elements
+  have only PCDATA for the value of the slot.  For an example, see
+  cougaar-topology.dtd and test-frames.xml.
 
 <dl>
 
@@ -120,7 +126,8 @@ their semantic interpretation.
     written to the corresponding directory stucture, following
     standard Java conventions.  Finally, the <code>domain</code>
     attribute specifies a name for whatever logical domain the
-    framset's prototypes are describing.<p>
+    framset's prototypes are describing.  This name should be the root
+    element in xml data files for this domain.<p>
 
   </dd>
 
@@ -312,34 +319,6 @@ their semantic interpretation.
     in the <code>path</code>.  It simply names a slot.  As such it has
     one required attribute, <code>name</code>.
     <p>
-
-  </dd>
-
-
-
-  <dt><b>frames</b></dt>
-
-  <dd> A <code>frames</code> element can be used to group frame
-    elements.  It has no attributes and is not required.  Ordinarily a
-    <code>frames</code> is the top level element of a frame data file.
-    All other element types only occur in frame prototype (meta-data)
-    files.
-
-    <p>The frame elements in a <code>frames</code> have a
-    domain-specific format.  In particular the element tags correspond
-    to prototype names in that domain.  Similarly, the tags on
-    sub-elements of a frame element correspond to slots of that
-    prototype.
-    <p>
-  </dd>
-  
-  <dt><b>frame</b></dt>
-
-  <dd>A <code>frame</code> element describes a DataFrame.  It has one
-    required attribute, <code>prototype</code>, which must name a
-    PrototypeFrame in the same FrameSet.  The sub-elements are simply
-    slot names, the content of which is the frame's initial value for
-    that slot.  <p>
 
   </dd>
 
