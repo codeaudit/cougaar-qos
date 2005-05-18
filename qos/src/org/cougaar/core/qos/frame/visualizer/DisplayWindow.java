@@ -7,6 +7,7 @@ import org.cougaar.core.qos.frame.visualizer.util.TreeWriter;
 import org.cougaar.core.qos.frame.visualizer.tree.ContainerTreeView;
 import org.cougaar.core.qos.frame.visualizer.tree.FrameTreeView;
 import org.cougaar.core.qos.frame.visualizer.event.TickEvent;
+import org.cougaar.core.service.ThreadService;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -38,12 +39,14 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
     JTabbedPane tabbedPane;
     FrameModel frameModel;
 
-    public DisplayWindow(FrameModel frameModel, URL xmlFile) {
+    public DisplayWindow(FrameModel frameModel, URL xmlFile,
+			 ThreadService tsvc)
+    {
         super("");
         this.frameModel = frameModel;
         //frameModel.setDisplayWindow(this);
         tabbedPane = new JTabbedPane();
-        display = new Display(frameModel, xmlFile);
+        display = new Display(frameModel, xmlFile, tsvc);
         Component controlPanel = display.getControlPanel();
         JPanel displPanel = new JPanel(new BorderLayout());
         displPanel.add(display, BorderLayout.CENTER);

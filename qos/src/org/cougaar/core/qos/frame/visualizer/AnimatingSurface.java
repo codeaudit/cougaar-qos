@@ -41,6 +41,8 @@
 
 package org.cougaar.core.qos.frame.visualizer;
 
+import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.thread.Schedulable;
 import java.awt.*;
 
 
@@ -49,54 +51,37 @@ import java.awt.*;
  */
 public abstract class AnimatingSurface extends Surface implements Runnable {
 
-    public Thread thread;
+    public Schedulable thread;
 
     public abstract void step(int w, int h);
 
     public abstract void reset(int newwidth, int newheight);
 
 
-    public void start() {
+    public void start(ThreadService tsvc) {
         if (thread == null && !dontThread) {
-            thread = new Thread(this);
-            //thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setName(name);// + " Demo");
-            thread.start();
+            thread = tsvc.getThread(this, this, name);
+            thread.schedule(0);
         }
     }
 
 
     public synchronized void stop() {
-        if (thread != null) {
-            thread.interrupt();
-        }
-        thread = null;
-        notifyAll();
+	if (thread != null) thread.cancel();
     }
 
 
     public void run() {
-        //Dimension d = getSize();
-        Thread me = Thread.currentThread();
-
-        while (thread == me  && getSize().width == 0) {
-            try {
-                thread.sleep(200);
-            } catch (InterruptedException e) { }
-        }
-
-
-        while (thread == me) {
-            if (isShowing())
+	if  (getSize().width == 0) {
+	    thread.schedule(200);
+	} else {
+	    if (isShowing())
                 repaint();
-           else {
+	    else {
                 Dimension d = getSize();
                 step(d.width, d.height);
             }
-            try {
-                thread.sleep(sleepAmount);
-            } catch (InterruptedException e) { }
-        }
-        thread = null;
+	    thread.schedule(sleepAmount);
+	}
     }
 }

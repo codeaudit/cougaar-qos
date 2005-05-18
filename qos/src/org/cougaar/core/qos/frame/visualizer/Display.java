@@ -8,6 +8,7 @@ import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
 import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
 import org.cougaar.core.qos.frame.visualizer.event.*;
 import org.cougaar.core.qos.frame.*;
+import org.cougaar.core.service.ThreadService;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
@@ -64,7 +65,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
 
 
 
-    public Display(FrameModel frameModel, URL xmlFile) {
+    public Display(FrameModel frameModel, URL xmlFile, ThreadService tsvc) {
         lock = new Object();
         this.frameModel = frameModel;
         tickNumber = 0;
@@ -88,7 +89,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         initialized = (root != null);
         if (initialized) {
             if (animating != null)
-                animating.start();
+                animating.start(tsvc);
         }
         frameModel.addAddedFramesListener(this);
         frameModel.addChangedFramesListener(this);

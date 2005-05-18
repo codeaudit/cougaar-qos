@@ -37,6 +37,7 @@ import org.cougaar.core.qos.frame.*;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.core.service.ThreadService;
 import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.UnaryPredicate;
 
@@ -99,7 +100,11 @@ public class FrameVisualizerPlugin
 	ClassLoader loader = FrameVisualizerPlugin.class.getClassLoader();
 	URL xml_url = loader.getResource(specFileName);
         frameModel = new FrameModel();
-        pluginDisplay = new DisplayWindow(frameModel, xml_url);
+
+        ServiceBroker sb = getServiceBroker();
+	ThreadService tsvc = (ThreadService)
+	    sb.getService(this, ThreadService.class, null);
+        pluginDisplay = new DisplayWindow(frameModel, xml_url, tsvc);
 
         //SwingUtilities.invokeLater(new CreateWindowHelper(xml_file));
         super.start();
