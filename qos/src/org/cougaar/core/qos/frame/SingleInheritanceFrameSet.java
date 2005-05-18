@@ -228,10 +228,8 @@ public class SingleInheritanceFrameSet
 
 	// Publish the frame itself as the change, or just a change
 	// record for the specific slot?
-	ArrayList changes = new ArrayList(1);
 	Frame.Change change = new Frame.Change(frame.getUID(), slot, value);
-	changes.add(change);
-	publishChange(frame, changes);
+	publishChange(frame, change);
     }
 
 
@@ -682,11 +680,11 @@ public class SingleInheritanceFrameSet
 
     private static class Change {
 	UniqueObject object;
-	Collection changes;
-	Change(UniqueObject object, Collection changes)
+	Object change;
+	Change(UniqueObject object, Object change)
 	{
 	    this.object = object;
-	    this.changes = changes;
+	    this.change = change;
 	}
     }
 
@@ -716,7 +714,11 @@ public class SingleInheritanceFrameSet
 		log.debug("about to publish " + change);
 	    if (change instanceof Change) {
 		Change chng = (Change) change;
-		bbs.publishChange(chng.object, chng.changes);
+		ArrayList changes_list = new ArrayList(1);
+		changes_list.add(chng.change);
+		if (log.isDebugEnabled())
+		    log.debug("Publish change " + chng.change);
+		bbs.publishChange(chng.object, changes_list);
 	    } else  if (change instanceof Add) {
 		Add add = (Add) change;
 		bbs.publishAdd(add.object);
@@ -736,7 +738,9 @@ public class SingleInheritanceFrameSet
 		Object change = change_queue.get(i);
 		if (change instanceof Change) {
 		    Change chng = (Change) change;
-		    bbs.publishChange(chng.object, chng.changes);
+		    ArrayList changes_list = new ArrayList(1);
+		    changes_list.add(chng.change);
+		    bbs.publishChange(chng.object, changes_list);
 		} else  if (change instanceof Add) {
 		    Add add = (Add) change;
 		    bbs.publishAdd(add.object);
@@ -757,10 +761,10 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    void publishChange(UniqueObject object, ArrayList changes)
+    void publishChange(UniqueObject object, Object change)
     {
 	synchronized (change_queue_lock) {
-	    change_queue.add(new Change(object, changes));
+	    change_queue.add(new Change(object, change));
 	    bbs.signalClientActivity();
 	}
     }

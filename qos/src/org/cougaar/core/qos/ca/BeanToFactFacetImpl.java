@@ -70,7 +70,7 @@ abstract public class BeanToFactFacetImpl
 
     private void do_execute(BlackboardService bbs)
     {
-	if (!sub.hasChanged()) {
+	if (sub == null || !sub.hasChanged()) {
 	    if (log.isDebugEnabled())
 		log.debug("No Bean changes");
 	    return;

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 
 
-import org.cougaar.core.blackboard.ChangeReport;
+import org.cougaar.core.blackboard.OverrideChangeReport;
 import org.cougaar.core.qos.metrics.VariableEvaluator;
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
@@ -186,26 +186,29 @@ abstract public class Frame
      * a Frame.  Collections of these are included with frame changes
      * published to the Blackboard.
      */
-    public static class Change implements ChangeReport {
+    public static class Change implements OverrideChangeReport {
 	private final String slot;
 	private final Object value;
 	private final UID frame_uid;
-	private final int hashcode;
 
 	public Change(UID frame_uid, String attr, Object val)
 	{
 	    this.slot = attr;
 	    this.value = val;
 	    this.frame_uid = frame_uid;
-	    String puid = frame_uid.toString() +attr+ val.toString();
-	    this.hashcode = puid.hashCode();
 	}
 	
+	public String toString()
+	{
+	    return "[" +frame_uid+ " " +slot+ "->" +value+ "]";
+	}
+
 	public String getSlotName() { return slot; }
 
 	public Object getValue() { return value; }
 	
 	public UID getFrameUID() { return frame_uid; }
+
 
 	// Object
 	public boolean equals(Object o) 
@@ -213,12 +216,13 @@ abstract public class Frame
 	    return
 		((o == this) ||
 		 ((o instanceof Change) &&
-		  hashcode == (((Change) o).hashcode)));
+		  slot.equals((((Change) o).slot)) &&
+		  frame_uid.equals((((Change) o).frame_uid))));
 	}
 
 	public int hashCode() 
 	{
-	    return hashcode;
+	    return slot.hashCode() ^ frame_uid.hashCode();
 	}
     }
 

@@ -130,6 +130,10 @@ public class PrototypeFrame
 	    if (value != null) {
 		result = value;
 	    } else if (path_name != null) {
+		if (origin instanceof PrototypeFrame) {
+		    // Makes no sense to follow a path in this case.
+		    return null;
+		}
 		Path path;
 		synchronized (path_cache) {
 		    path = (Path) path_cache.get(path_name);
