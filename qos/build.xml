@@ -59,6 +59,7 @@
 <project name="qos" default="compile">
     <property name="module" value="qos"/>
     <property name="moduleUp" value="qos"/>
+    <property environment="env"/>
 
     <!-- ====== Basic Directories, and user property over-rides  ====== -->
     <!-- MODSOURCE is where the sources for the module are -->
@@ -83,6 +84,11 @@
     <!-- Set any not-yet-set properties to values specific to this
     installation -->
     <property file="${TARGETBASE}/global.properties" />
+
+    <!-- Absolute path for COUGAAR_SRC_PATH installation -->
+    <property name="ABSOLUTE_SRC_BASE" value="${env.COUGAAR_SRC_PATH}" />
+
+	
 
     <!-- You can also have a user-specific global properties file. -->
     <!-- Windows users will have to set user.home, eg by invoking
@@ -160,7 +166,7 @@
     <!-- Note that JAVA_HOME must have been set in a .properties file -->
     <!-- Otherwise, the dynamically found version is used (usually finds the jre, ugh ). -->
     <!-- Also note that we're now using a checked-in version of tools.jar -->
-    <property environment="env"/>
+    
     <property name="java.home" value="${env.JAVA_HOME}"/>
     <property name="jdk.home" value="${env.JAVA_HOME}"/>
     
@@ -769,12 +775,13 @@
     <target name="framesets"
 	  description="Generate classes from Prototype Frames"
 	  >
-    <java classname="org.cougaar.core.qos.frame.FrameGen">
+    <!-- Fork to a new VM to allow codegen in Eclipse -->
+    <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes" dir="${ABSOLUTE_SRC_BASE}/qos">
       <classpath>
 	<pathelement path="${TARGETBASE}/lib/qos.jar"/>
 	<pathelement path="${TARGETBASE}/lib/xercesImpl.jar"/>
       </classpath>
-      <arg value="src/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
+      <arg value="${TARGETBASE}/qos/src/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
     </java>
   </target>
 
