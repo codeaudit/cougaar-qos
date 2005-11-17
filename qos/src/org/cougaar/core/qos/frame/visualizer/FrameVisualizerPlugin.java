@@ -99,6 +99,10 @@ public class FrameVisualizerPlugin
 //         File xml_file = ConfigFinder.getInstance().locateFile(specFileName);
         ClassLoader loader = FrameVisualizerPlugin.class.getClassLoader();
         URL xml_url = loader.getResource(specFileName);
+        if (xml_url == null){
+            log.error("View Spec file not found " + specFileName);
+            return;
+        }
         frameModel = new FrameModel();
         ServiceBroker sb = getServiceBroker();
         ThreadService tsvc = (ThreadService)
