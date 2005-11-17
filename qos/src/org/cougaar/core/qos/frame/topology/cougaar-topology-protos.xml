@@ -45,6 +45,10 @@
 
       <slot name="loadAverage" 
 	    metric-path="Host($(name)):LoadAverage()"/>
+      <slot name="status" 
+	    type="String"
+            default-value="unknown"/>
+
     </prototype>
 
     <prototype name="node"
@@ -65,14 +69,14 @@
 	    metric-path="Node($(name)):BytesOut(10)"/>
       <slot name="vmSize" 
 	    metric-path="Node($(name)):VMSize()"/>
-
-
+      <slot name="status" 
+	    type="String"
+            default-value="unknown"/>
     </prototype>
 
     <prototype name="agent"
 	       container="node"
 	       prototype="thing">
-
       <slot name="cpuLoadAverage" 
 	    metric-path="Agent($(name)):CPULoadAvg(10)"/>
       <slot name="cpuLoadMJips" 
@@ -87,6 +91,75 @@
 	    metric-path="Agent($(name)):BytesOut(10)"/>
       <slot name="persistSizeLast" 
 	    metric-path="Agent($(name)):PersistSizeLast()"/>
+      <slot name="status" 
+	    type="String"
+            default-value="unknown"/>
+    </prototype>
+
+  <!-- Workaround Default Value can not be overridden (bug or  feature?)
+       So do not define the slots in parent
+    -->
+    <prototype name="indicator"
+	       container="agent"
+	       prototype="thing">
+      <slot name="status" 
+	    type="String"
+            default-value="unknown"/>
+    </prototype>
+
+    <prototype name="msgIndicator"
+	       prototype="indicator">
+      <slot name="idleThreshold" 
+	    type="double"
+            default-value="0.0"/>
+      <slot name="calmThreshold" 
+	    type="double"
+            default-value="1.0"/>
+      <slot name="normalThreshold" 
+	    type="double"
+            default-value="10.0"/>
+      <slot name="busyThreshold" 
+	    type="double"
+            default-value="100.0"/>
+      <slot name="franticThreshold" 
+	    type="double"
+            default-value="1000.0"/>
+    </prototype>
+
+    <prototype name="msgInIndicator"
+	       prototype="msgIndicator">
+      <slot name="watchSlot" 
+	    type="String"
+            default-value="msgOut"/>
+    </prototype>
+
+    <prototype name="msgOutIndicator"
+	       prototype="msgIndicator">
+      <slot name="watchSlot" 
+	    type="String"
+            default-value="msgOut"/>
+    </prototype>
+
+    <prototype name="cpuIndicator"
+	       prototype="indicator">
+      <slot name="watchSlot" 
+	    type="String"
+            default-value="cpuLoadAverage"/>
+      <slot name="idleThreshold" 
+	    type="double"
+            default-value="0.0"/>
+      <slot name="calmThreshold" 
+	    type="double"
+            default-value="0.2"/>
+      <slot name="normalThreshold" 
+	    type="double"
+            default-value="0.5"/>
+      <slot name="busyThreshold" 
+	    type="double"
+            default-value="1.0"/>
+      <slot name="franticThreshold" 
+	    type="double"
+            default-value="2.0"/>
     </prototype>
 
     <relation-prototype name="NodeOnHost"
@@ -101,10 +174,14 @@
 			child-prototype="agent">
     </relation-prototype>
 
+    <relation-prototype name="IndicatorOnAgent"
+			prototype="contains"
+			parent-prototype="agent"
+			child-prototype="indicator">
+    </relation-prototype>
+
 
   </prototypes>
-
-
 
 </frameset>
 

@@ -21,6 +21,7 @@ public class Node
     private transient Metric bytesIn;
     private transient Metric cpuLoadAverage;
     private transient Metric msgIn;
+    private String status;
     private transient Metric cpuLoadMJips;
     private transient Metric bytesOut;
     private transient Metric msgOut;
@@ -37,6 +38,7 @@ public class Node
                 UID uid)
     {
         super(frameSet, uid);
+        initializeStatus("unknown");
     }
 
 
@@ -56,6 +58,8 @@ public class Node
         __props.put("cpuLoadAverage", __value != null ? __value : NIL);
         __value = getMsgIn__AsObject();
         __props.put("msgIn", __value != null ? __value : NIL);
+        __value = getStatus__AsObject();
+        __props.put("status", __value != null ? __value : NIL);
         __value = getCpuLoadMJips__AsObject();
         __props.put("cpuLoadMJips", __value != null ? __value : NIL);
         __value = getBytesOut__AsObject();
@@ -175,6 +179,54 @@ public class Node
     {
         this.msgIn = force_Metric(new_value);
         slotInitialized("msgIn", new_value);
+    }
+
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+
+    String getStatus__NoWarn()
+    {
+        return status;
+    }
+
+
+    Object getStatus__AsObject()
+    {
+        return status;
+    }
+
+
+    public void setStatus(String __new_value)
+    {
+        String __old_value = status;
+        this.status = __new_value;
+        slotModified("status", __old_value, __new_value, true, true);
+    }
+
+
+    public void setStatus__AsObject(Object __new_value)
+    {
+        Object __old_value = getStatus__AsObject();
+        this.status = force_String(__new_value);
+        slotModified("status", __old_value, __new_value, true, true);
+    }
+
+
+    protected void initializeStatus(String new_value)
+    {
+        this.status = new_value;
+        slotInitialized("status", new_value);
+    }
+
+
+    void initializeStatus__AsObject(Object new_value)
+    {
+        this.status = force_String(new_value);
+        slotInitialized("status", new_value);
     }
 
 
@@ -477,17 +529,18 @@ public class Node
         }
     }
     private static final int bytesIn__HashVar__ = "bytesIn".hashCode();
+    private static final int jips__HashVar__ = "jips".hashCode();
+    private static final int status__HashVar__ = "status".hashCode();
+    private static final int cpuLoadMJips__HashVar__ = "cpuLoadMJips".hashCode();
     private static final int loadAverage__HashVar__ = "loadAverage".hashCode();
     private static final int cpuLoadAverage__HashVar__ = "cpuLoadAverage".hashCode();
-    private static final int jips__HashVar__ = "jips".hashCode();
     private static final int msgIn__HashVar__ = "msgIn".hashCode();
     private static final int effectiveMJips__HashVar__ = "effectiveMJips".hashCode();
-    private static final int cpuLoadMJips__HashVar__ = "cpuLoadMJips".hashCode();
-    private static final int bytesOut__HashVar__ = "bytesOut".hashCode();
-    private static final int name__HashVar__ = "name".hashCode();
     private static final int count__HashVar__ = "count".hashCode();
-    private static final int vmSize__HashVar__ = "vmSize".hashCode();
+    private static final int name__HashVar__ = "name".hashCode();
+    private static final int bytesOut__HashVar__ = "bytesOut".hashCode();
     private static final int msgOut__HashVar__ = "msgOut".hashCode();
+    private static final int vmSize__HashVar__ = "vmSize".hashCode();
 
 
     protected Object getLocalValue(String __slot)
@@ -495,28 +548,30 @@ public class Node
        int __key = __slot.hashCode();
        if (bytesIn__HashVar__ == __key)
             return getBytesIn__AsObject();
+       else if (jips__HashVar__ == __key)
+            return getJips__AsObject();
+       else if (status__HashVar__ == __key)
+            return getStatus__AsObject();
+       else if (cpuLoadMJips__HashVar__ == __key)
+            return getCpuLoadMJips__AsObject();
        else if (loadAverage__HashVar__ == __key)
             return getLoadAverage__AsObject();
        else if (cpuLoadAverage__HashVar__ == __key)
             return getCpuLoadAverage__AsObject();
-       else if (jips__HashVar__ == __key)
-            return getJips__AsObject();
        else if (msgIn__HashVar__ == __key)
             return getMsgIn__AsObject();
        else if (effectiveMJips__HashVar__ == __key)
             return getEffectiveMJips__AsObject();
-       else if (cpuLoadMJips__HashVar__ == __key)
-            return getCpuLoadMJips__AsObject();
-       else if (bytesOut__HashVar__ == __key)
-            return getBytesOut__AsObject();
-       else if (name__HashVar__ == __key)
-            return getName__AsObject();
        else if (count__HashVar__ == __key)
             return getCount__AsObject();
-       else if (vmSize__HashVar__ == __key)
-            return getVmSize__AsObject();
+       else if (name__HashVar__ == __key)
+            return getName__AsObject();
+       else if (bytesOut__HashVar__ == __key)
+            return getBytesOut__AsObject();
        else if (msgOut__HashVar__ == __key)
             return getMsgOut__AsObject();
+       else if (vmSize__HashVar__ == __key)
+            return getVmSize__AsObject();
        else
            return super.getLocalValue(__slot);
     }
@@ -526,7 +581,10 @@ public class Node
                                  Object __value)
     {
        int __key = __slot.hashCode();
-       super.setLocalValue(__slot, __value);
+       if (status__HashVar__ == __key)
+            setStatus__AsObject(__value);
+       else
+            super.setLocalValue(__slot, __value);
     }
 
 
@@ -540,6 +598,8 @@ public class Node
             initializeCpuLoadAverage__AsObject(__value);
        else if (msgIn__HashVar__ == __key)
             initializeMsgIn__AsObject(__value);
+       else if (status__HashVar__ == __key)
+            initializeStatus__AsObject(__value);
        else if (cpuLoadMJips__HashVar__ == __key)
             initializeCpuLoadMJips__AsObject(__value);
        else if (bytesOut__HashVar__ == __key)
@@ -677,6 +737,25 @@ public class Node
     }
 
 
+    public SlotDescription slotMetaData__Status()
+    {
+        SlotDescription __desc = new SlotDescription();
+        __desc.name = "status";
+        __desc.prototype = "node";
+        __desc.is_writable = true;
+        Object __value;
+        __value = status;
+        if (__value != null) {
+            __desc.is_overridden = true;
+            __desc.value = __value;
+        } else {
+            __desc.is_overridden = false;
+            __desc.value = "unknown";
+        }
+        return __desc;
+    }
+
+
     public SlotDescription slotMetaData__CpuLoadMJips()
     {
         SlotDescription __desc = new SlotDescription();
@@ -803,6 +882,7 @@ public class Node
         map.put("bytesIn", slotMetaData__BytesIn());
         map.put("cpuLoadAverage", slotMetaData__CpuLoadAverage());
         map.put("msgIn", slotMetaData__MsgIn());
+        map.put("status", slotMetaData__Status());
         map.put("cpuLoadMJips", slotMetaData__CpuLoadMJips());
         map.put("bytesOut", slotMetaData__BytesOut());
         map.put("msgOut", slotMetaData__MsgOut());

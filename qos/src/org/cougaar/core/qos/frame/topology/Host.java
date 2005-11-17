@@ -21,6 +21,7 @@ public class Host
     private transient Metric loadAverage;
     private transient Metric jips;
     private transient Metric effectiveMJips;
+    private String status;
     private transient Metric count;
 
 
@@ -34,6 +35,7 @@ public class Host
                 UID uid)
     {
         super(frameSet, uid);
+        initializeStatus("unknown");
     }
 
 
@@ -53,6 +55,8 @@ public class Host
         __props.put("jips", __value != null ? __value : NIL);
         __value = getEffectiveMJips__AsObject();
         __props.put("effectiveMJips", __value != null ? __value : NIL);
+        __value = getStatus__AsObject();
+        __props.put("status", __value != null ? __value : NIL);
         __value = getCount__AsObject();
         __props.put("count", __value != null ? __value : NIL);
     }
@@ -154,6 +158,54 @@ public class Host
     }
 
 
+    public String getStatus()
+    {
+        return status;
+    }
+
+
+    String getStatus__NoWarn()
+    {
+        return status;
+    }
+
+
+    Object getStatus__AsObject()
+    {
+        return status;
+    }
+
+
+    public void setStatus(String __new_value)
+    {
+        String __old_value = status;
+        this.status = __new_value;
+        slotModified("status", __old_value, __new_value, true, true);
+    }
+
+
+    public void setStatus__AsObject(Object __new_value)
+    {
+        Object __old_value = getStatus__AsObject();
+        this.status = force_String(__new_value);
+        slotModified("status", __old_value, __new_value, true, true);
+    }
+
+
+    protected void initializeStatus(String new_value)
+    {
+        this.status = new_value;
+        slotInitialized("status", new_value);
+    }
+
+
+    void initializeStatus__AsObject(Object new_value)
+    {
+        this.status = force_String(new_value);
+        slotInitialized("status", new_value);
+    }
+
+
     public Metric getCount()
     {
         return count;
@@ -187,6 +239,7 @@ public class Host
     private static final int loadAverage__HashVar__ = "loadAverage".hashCode();
     private static final int jips__HashVar__ = "jips".hashCode();
     private static final int effectiveMJips__HashVar__ = "effectiveMJips".hashCode();
+    private static final int status__HashVar__ = "status".hashCode();
     private static final int count__HashVar__ = "count".hashCode();
 
 
@@ -199,6 +252,8 @@ public class Host
             return getJips__AsObject();
        else if (effectiveMJips__HashVar__ == __key)
             return getEffectiveMJips__AsObject();
+       else if (status__HashVar__ == __key)
+            return getStatus__AsObject();
        else if (count__HashVar__ == __key)
             return getCount__AsObject();
        else
@@ -210,7 +265,10 @@ public class Host
                                  Object __value)
     {
        int __key = __slot.hashCode();
-       super.setLocalValue(__slot, __value);
+       if (status__HashVar__ == __key)
+            setStatus__AsObject(__value);
+       else
+            super.setLocalValue(__slot, __value);
     }
 
 
@@ -224,6 +282,8 @@ public class Host
             initializeJips__AsObject(__value);
        else if (effectiveMJips__HashVar__ == __key)
             initializeEffectiveMJips__AsObject(__value);
+       else if (status__HashVar__ == __key)
+            initializeStatus__AsObject(__value);
        else if (count__HashVar__ == __key)
             initializeCount__AsObject(__value);
        else
@@ -328,6 +388,25 @@ public class Host
     }
 
 
+    public SlotDescription slotMetaData__Status()
+    {
+        SlotDescription __desc = new SlotDescription();
+        __desc.name = "status";
+        __desc.prototype = "host";
+        __desc.is_writable = true;
+        Object __value;
+        __value = status;
+        if (__value != null) {
+            __desc.is_overridden = true;
+            __desc.value = __value;
+        } else {
+            __desc.is_overridden = false;
+            __desc.value = "unknown";
+        }
+        return __desc;
+    }
+
+
     public SlotDescription slotMetaData__Count()
     {
         SlotDescription __desc = new SlotDescription();
@@ -352,6 +431,7 @@ public class Host
         map.put("loadAverage", slotMetaData__LoadAverage());
         map.put("jips", slotMetaData__Jips());
         map.put("effectiveMJips", slotMetaData__EffectiveMJips());
+        map.put("status", slotMetaData__Status());
         map.put("count", slotMetaData__Count());
     }
 }

@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<window title="Cougaar Topology Viewer" w="800" h="700">
+  
+  <shape name="circleSmall"
+	 class="org.cougaar.core.qos.frame.visualizer.shapes.Ellipse" x="0"
+	 y="0" w="10" h="10"/>
+  <shape name="circleMed"
+	 class="org.cougaar.core.qos.frame.visualizer.shapes.Ellipse" x="0"
+	 y="0" w="15" h="15"/>
+  <shape name="circleLarge"
+	 class="org.cougaar.core.qos.frame.visualizer.shapes.Ellipse" x="0"
+	 y="0" w="20" h="20"/>
+  <shape name="RectSmall"
+	 class="org.cougaar.core.qos.frame.visualizer.shapes.Rectangle" x="0"
+	 y="0" w="10" h="10" />
+  <shape name="RoundRectSmall"
+	 class="org.cougaar.core.qos.frame.visualizer.shapes.RoundRectangle"
+	 x="0" y="0" w="10" h="10" arcw="25" arch="25" />
+
+  <shape name="RoundRectLarge"
+	 class="org.cougaar.core.qos.frame.visualizer.shapes.RoundRectangle"
+	 x="0" y="0" w="175" h="15" arcw="25" arch="25" />
+
+  <shape name="RoundRectFat"
+	 class="org.cougaar.core.qos.frame.visualizer.shapes.RoundRectangle"
+	 x="0" y="0" w="200" h="80" arcw="25" arch="25" />
+
+  <labelrenderer name="centerLabelRenderer" xoff="+10" yoff="+15"
+		 font="default" color="Color.black"/>
+  <labelrenderer name="tightLabelRenderer" xoff="+7" yoff="+12"
+		 font="default" color="Color.black"/>
+  <labelrenderer name="lowerLabelRenderer" xoff="0" yoff="+20"
+		 font="default" color="Color.black"/>
+  <labelrenderer name="mouseLabelRenderer" xoff="0" yoff="+20"
+		 font="default" color="Color.blue" mouseover="true"/>
+  <containerlabelrenderer name="queueLabelRenderer" xoff="+10"
+			  yoff="+15" font="default" color="Color.blue"/>
+  
+  <shaperenderer name="defaultRenderer" paint="Color.blue"
+		 selectedpaint="Color.yellow" fillpaint="Color.white"
+		 selfillpaint="Color.green" linewidth="1" bordered="true"
+		 filled="false"/>
+  <shaperenderer name="rootRenderer" paint="#FFFFFF"
+		 selectedpaint="#FFFFFF" fillpaint="#FFFFFF" selfillpaint="#FFFFFF"
+		 linewidth="1" bordered="true" filled="false"/>
+
+  <shaperenderer name="hostRenderer" paint="(200,250,250)"
+		 selectedpaint="Color.magenta" fillpaint="(200,250,250)"
+		 selfillpaint="Color.magenta" linewidth="2" bordered="true"
+		 filled="true" />
+  <shaperenderer name="nodeRenderer" paint="(100,200,200)"
+		 selectedpaint="Color.magenta" fillpaint="(100,200,200)"
+		 selfillpaint="Color.magenta" linewidth="2" bordered="true"
+		 filled="true" />
+  <shaperenderer name="agentRenderer" paint="(50,150,150)"
+		 selectedpaint="Color.magenta" fillpaint="(50,150,150)"
+		 selfillpaint="Color.magenta" linewidth="2" bordered="true"
+		 filled="true"/>
+
+
+  <shaperenderer name="unknownPastelRenderer" paint="(220,220,220)"
+		 selectedpaint="Color.magenta" fillpaint="(220,220,220)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="idlePastelRenderer" paint="(220,220,250)"
+		 selectedpaint="Color.magenta" fillpaint="(220,220,250)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="calmPastelRenderer" paint="(220,250,250)"
+		 selectedpaint="Color.magenta" fillpaint="(220,250,250)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="normalPastelRenderer" paint="(250,250,220)"
+		 selectedpaint="Color.magenta" fillpaint="(250,250,220)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="busyPastelRenderer" paint="(250,235,220)"
+		 selectedpaint="Color.magenta" fillpaint="(250,235,220)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="franticPastelRenderer" paint="(250,220,220)"
+		 selectedpaint="Color.magenta" fillpaint="(250,220,220)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <slotChangeListener name="statusPastelWatcher" slot="status">
+    <trigger value="unknown" action="setrenderer" name="unknownPastelRenderer"/>
+    <trigger value="idle" action="setrenderer" name="idlePastelRenderer"/>
+    <trigger value="calm" action="setrenderer" name="calmPastelRenderer"/>
+    <trigger value="normal" action="setrenderer" name="normalPastelRenderer"/>
+    <trigger value="busy" action="setrenderer" name="busyPastelRenderer"/>
+    <trigger value="frantic" action="setrenderer" name="franticPastelRenderer"/>
+  </slotChangeListener>
+
+
+
+<shaperenderer name="unknownLightRenderer" paint="(200,200,200)"
+		 selectedpaint="Color.magenta" fillpaint="(200,200,200)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="idleLightRenderer" paint="(150,175,220)"
+		 selectedpaint="Color.magenta" fillpaint="(150,175,220)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="calmLightRenderer" paint="(125,220,220)"
+		 selectedpaint="Color.magenta" fillpaint="(125,220,220)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="normalLightRenderer" paint="(220,220,125)"
+		 selectedpaint="Color.magenta" fillpaint="(220,220,125)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="busyLightRenderer" paint="(250,160,125)"
+		 selectedpaint="Color.magenta" fillpaint="(250,160,100)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="franticLightRenderer" paint="(230,125,125)"
+		 selectedpaint="Color.magenta" fillpaint="(230,125,125)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <slotChangeListener name="statusLightWatcher" slot="status">
+    <trigger value="unknown" action="setrenderer" name="unknownLightRenderer"/>
+    <trigger value="idle" action="setrenderer" name="idleLightRenderer"/>
+    <trigger value="calm" action="setrenderer" name="calmLightRenderer"/>
+    <trigger value="normal" action="setrenderer" name="normalLightRenderer"/>
+    <trigger value="busy" action="setrenderer" name="busyLightRenderer"/>
+    <trigger value="frantic" action="setrenderer" name="franticLightRenderer"/>
+  </slotChangeListener>
+
+
+
+  <shaperenderer name="unknownDarkRenderer" paint="(150,150,150)"
+		 selectedpaint="Color.magenta" fillpaint="(150,150,150)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="idleDarkRenderer" paint="(100,120,181)"
+		 selectedpaint="Color.magenta" fillpaint="(100,120,181)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="calmDarkRenderer" paint="(0,181,181)"
+		 selectedpaint="Color.magenta" fillpaint="(0,181,181)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="normalDarkRenderer" paint="(201,181,0)"
+		 selectedpaint="Color.magenta" fillpaint="(201,181,0)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="busyDarkRenderer" paint="(220,130,0)"
+		 selectedpaint="Color.magenta" fillpaint="(220,130,0)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="franticDarkRenderer" paint="(181,75,75)"
+		 selectedpaint="Color.magenta" fillpaint="(181,75,75)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <slotChangeListener name="statusDarkWatcher" slot="status">
+    <trigger value="unknown" action="setrenderer" name="unknownDarkRenderer"/>
+    <trigger value="idle" action="setrenderer" name="idleDarkRenderer"/>
+    <trigger value="calm" action="setrenderer" name="calmDarkRenderer"/>
+    <trigger value="normal" action="setrenderer" name="normalDarkRenderer"/>
+    <trigger value="busy" action="setrenderer" name="busyDarkRenderer"/>
+    <trigger value="frantic" action="setrenderer" name="franticDarkRenderer"/>
+  </slotChangeListener>
+
+
+
+
+ <shaperenderer name="unknownSaturatedRenderer" paint="(150,150,150)"
+		 selectedpaint="Color.magenta" fillpaint="(150,150,150)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="idleSaturatedRenderer" paint="(160,210,255)"
+		 selectedpaint="Color.magenta" fillpaint="(160,210,255)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="calmSaturatedRenderer" paint="Color.cyan"
+		 selectedpaint="Color.magenta" fillpaint="Color.cyan"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="normalSaturatedRenderer" paint="(230,240,0)"
+		 selectedpaint="Color.magenta" fillpaint="(230,240,0)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="busySaturatedRenderer" paint="(255,180,0)"
+		 selectedpaint="Color.magenta" fillpaint="(255,180,0)"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <shaperenderer name="franticSaturatedRenderer" paint="Color.red"
+		 selectedpaint="Color.magenta" fillpaint="Color.red"
+		 selfillpaint="Color.magenta" linewidth="1" bordered="true"
+		 filled="true"/>
+
+  <slotChangeListener name="statusSaturatedWatcher" slot="status">
+    <trigger value="unknown" action="setrenderer" name="unknownSaturatedRenderer"/>
+    <trigger value="idle" action="setrenderer" name="idleSaturatedRenderer"/>
+    <trigger value="calm" action="setrenderer" name="calmSaturatedRenderer"/>
+    <trigger value="normal" action="setrenderer" name="normalSaturatedRenderer"/>
+    <trigger value="busy" action="setrenderer" name="busySaturatedRenderer"/>
+    <trigger value="frantic" action="setrenderer" name="franticSaturatedRenderer"/>
+  </slotChangeListener>
+ 
+   <container id="root"
+	     class="org.cougaar.core.qos.frame.visualizer.ShapeContainer"
+	     shape="RectSmall" labelrender="defaultLabelRenderer"
+	     shaperender="rootRenderer">
+    <layout  class="org.cougaar.core.qos.frame.visualizer.layout.HorizontalLayout"
+	     left="2" right="2" bottom="5" top="5" hpadding="5" vpadding="0"/>
+    <container id="host" idframeslot="name"
+	       class="org.cougaar.core.qos.frame.visualizer.ShapeContainer"
+	       prototype="true" shape="RectSmall"
+	       labelrender="centerLabelRenderer"
+	       shaperender="hostRenderer">
+      <layout  class="org.cougaar.core.qos.frame.visualizer.layout.HorizontalLayout"
+               left="5" right="5" bottom="5" top="20" hpadding="5"
+	       vpadding="5"/>
+      <slotlistener name="statusPastelWatcher"  />
+      <framepredicate isa="host"  parentRelationship="contains"/>
+      <container id="node" idframeslot="name"
+		 class="org.cougaar.core.qos.frame.visualizer.ShapeContainer"
+		 prototype="true" shape="RoundRectLarge"
+		 labelrender="centerLabelRenderer"
+		 shaperender="nodeRenderer">
+        <layout	 class="org.cougaar.core.qos.frame.visualizer.layout.VerticalBoxLayout" 
+		 left="5" right="5" bottom="5" top="20"	 hpadding="0" vpadding="5"/>
+        <framepredicate isa="node"  parentRelationship="NodeOnHost"/>
+        <slotlistener name="statusLightWatcher"  />
+        <container id="agent" idframeslot="name"
+		   class="org.cougaar.core.qos.frame.visualizer.ShapeContainer"
+		   prototype="true" shape="RoundRectFat"
+		   labelrender="centerLabelRenderer"
+		   shaperender="agentRenderer">
+          <layout class="org.cougaar.core.qos.frame.visualizer.layout.VerticalBoxLayout" 
+		  left="15" right="5" bottom="5" top="20" hpadding="0" vpadding="5"/>
+          <framepredicate isa="agent"
+		   parentRelationship="AgentInNode"/>
+          <slotlistener name="statusDarkWatcher"  />
+	  <component id="indicator" idframeslot="name"
+		     class="org.cougaar.core.qos.frame.visualizer.ShapeGraphic"
+		     prototype="true" shape="RoundRectLarge"
+		     labelrender="tightLabelRenderer"
+		     shaperender="idleRenderer">
+            <framepredicate isa="indicator"  parentRelationship="indicatorOnAgent"/>
+            <slotlistener name="statusSaturatedWatcher"  />
+	  </component>
+        </container>
+      </container>
+    </container>
+  </container>
+  
+</window>
+

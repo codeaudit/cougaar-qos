@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT cougaar-topology (NodeOnHost | agent | contains | thing | node | host | AgentInNode | relationship)*>
-<!ELEMENT NodeOnHost (parent-value | child-value)*>
+<!ELEMENT cougaar-topology (indicator | contains | node | msgOutIndicator | IndicatorOnAgent | relationship | NodeOnHost | agent | msgInIndicator | thing | host | cpuIndicator | AgentInNode | msgIndicator)*>
+<!ELEMENT indicator (status | name)*>
+<!ELEMENT status (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT contains (parent-value | child-value)*>
 <!ELEMENT parent-value (#PCDATA)>
 <!ELEMENT child-value (#PCDATA)>
-<!ELEMENT agent (bytesIn | cpuLoadAverage | persistSizeLast | msgIn | cpuLoadMJips | name | bytesOut | msgOut)*>
+<!ELEMENT node (bytesIn | cpuLoadAverage | msgIn | status | cpuLoadMJips | name | bytesOut | msgOut | vmSize)*>
 <!ELEMENT bytesIn (#PCDATA)>
 <!ELEMENT cpuLoadAverage (#PCDATA)>
-<!ELEMENT persistSizeLast (#PCDATA)>
 <!ELEMENT msgIn (#PCDATA)>
 <!ELEMENT cpuLoadMJips (#PCDATA)>
-<!ELEMENT name (#PCDATA)>
 <!ELEMENT bytesOut (#PCDATA)>
 <!ELEMENT msgOut (#PCDATA)>
-<!ELEMENT contains (parent-value | child-value)*>
-<!ELEMENT thing (name)*>
-<!ELEMENT node (bytesIn | cpuLoadAverage | msgIn | cpuLoadMJips | name | bytesOut | msgOut | vmSize)*>
 <!ELEMENT vmSize (#PCDATA)>
-<!ELEMENT host (loadAverage | jips | effectiveMJips | name | count)*>
+<!ELEMENT msgOutIndicator (calmThreshold | idleThreshold | watchSlot | status | normalThreshold | name | franticThreshold | busyThreshold)*>
+<!ELEMENT calmThreshold (#PCDATA)>
+<!ELEMENT idleThreshold (#PCDATA)>
+<!ELEMENT watchSlot (#PCDATA)>
+<!ELEMENT normalThreshold (#PCDATA)>
+<!ELEMENT franticThreshold (#PCDATA)>
+<!ELEMENT busyThreshold (#PCDATA)>
+<!ELEMENT IndicatorOnAgent (parent-value | child-value)*>
+<!ELEMENT relationship (parent-value | child-value)*>
+<!ELEMENT NodeOnHost (parent-value | child-value)*>
+<!ELEMENT agent (bytesIn | cpuLoadAverage | persistSizeLast | msgIn | status | cpuLoadMJips | name | bytesOut | msgOut)*>
+<!ELEMENT persistSizeLast (#PCDATA)>
+<!ELEMENT msgInIndicator (calmThreshold | idleThreshold | watchSlot | status | normalThreshold | name | franticThreshold | busyThreshold)*>
+<!ELEMENT thing (name)*>
+<!ELEMENT host (loadAverage | jips | effectiveMJips | status | name | count)*>
 <!ELEMENT loadAverage (#PCDATA)>
 <!ELEMENT jips (#PCDATA)>
 <!ELEMENT effectiveMJips (#PCDATA)>
 <!ELEMENT count (#PCDATA)>
+<!ELEMENT cpuIndicator (calmThreshold | idleThreshold | watchSlot | status | normalThreshold | name | franticThreshold | busyThreshold)*>
 <!ELEMENT AgentInNode (parent-value | child-value)*>
-<!ELEMENT relationship (parent-value | child-value)*>
+<!ELEMENT msgIndicator (calmThreshold | idleThreshold | status | normalThreshold | name | franticThreshold | busyThreshold)*>
