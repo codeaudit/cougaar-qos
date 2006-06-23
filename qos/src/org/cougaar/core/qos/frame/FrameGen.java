@@ -304,7 +304,7 @@ extends DefaultHandler
 	    Set<String> slots,
 	    Set<String> elements) {
 	for (String slot : slots) {
-	    if (!elements.contains(slot)) {
+	    if (!elements.contains(slot) && !proto_slots.containsKey(slot)) {
 		writer.println("<!ELEMENT " +slot+ " (#PCDATA)>");
 		elements.add(slot);
 	    }
