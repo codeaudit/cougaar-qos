@@ -364,7 +364,6 @@
       <javac srcdir="${examples}"
 	     destdir="${module.examples}"
 	     includeAntRuntime="no"
-	     source="1.4"
 	     debug="${build.compiler.debug}"
 	     optimize="${build.compiler.optimize}"
 	     deprecation="${build.compiler.deprecation}">
@@ -461,7 +460,6 @@
       <available property="has.build" file="${module.classes}"/>
       <!-- source=1.4 required for asserts -->
       <javac srcdir="${src}" destdir="${module.classes}"
-	     source="1.4"
 	     includeAntRuntime="no"
 	     debug="${build.compiler.debug}"
 	     optimize="${build.compiler.optimize}"
@@ -541,7 +539,7 @@
     <!-- ====================================================================== -->	
     <target name="compile-tests" depends="prepare, junit, compile" description="Compile unit tests" if="junit.present"> 
       <mkdir dir="${module.regress}" />
-      <javac srcdir="${regress}" destdir="${module.regress}" source="1.4"
+      <javac srcdir="${regress}" destdir="${module.regress}"
 	     deprecation="${build.compiler.deprecation}"
 	     optimize="off"
 	     debug="on">
@@ -613,7 +611,6 @@
 	       use="true"
 	       doclet="org.cougaar.tools.javadoc.CougaarDoclet"
 	       docletpath="${target.clib}/build.jar"
-	       source="1.4"
 	       additionalparam="-breakiterator"
 	       windowtitle="${moduleUp} API"
 	       doctitle="${moduleUp} API"
