@@ -75,6 +75,7 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
         //getContentPane().add(controlPanel, BorderLayout.SOUTH);
+        setTitle(title);
         pack();
         setSize(d);
         setVisible(true);
