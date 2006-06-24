@@ -458,11 +458,12 @@ public class SingleInheritanceFrameSet
 	    return false;
 	} else {
 	    if (isContainmentRelation(relationship)) {
+                DataFrame old;
 		synchronized (containers) {
-		    DataFrame old = (DataFrame) containers.get(child);
-		    child.containerChange(old, parent);
+		    old = (DataFrame) containers.get(child);
 		    containers.put(child, parent);
 		}
+                child.containerChange(old, parent);
 		if (log.isInfoEnabled())
 		    log.info("Parent of " +child+ " is " +parent);
 	    }
