@@ -343,6 +343,23 @@ extends DefaultHandler
 	write_slots_dtd(writer, proto, slots, elements);
     }
 
+    private void generateShadowClass(PrintWriter writer, String proto, Set<String> generated) {
+        if (generated.contains(proto)) {
+            return;
+        }
+        generated.add(proto);
+        String base = proto_attrs.get(proto).getValue("prototype");
+        if (base != null && !generated.contains(base)) {
+            generateShadowClass(writer, base, generated);
+        }
+        String class_name = fixName(proto, true);
+        writer.print("(defclass " +proto+ " " +class_name);
+        if (base != null) {
+            writer.print(" extends " + base);
+        }
+        writer.println(")");
+    }
+
     private void generateShadowClasses(String pkg, String root, String domain) {
 	File out = new File(root, domain+".clp");
 	PrintWriter writer = null;
@@ -354,10 +371,10 @@ extends DefaultHandler
 	    System.exit(-1);
 	}
 
+        Set<String> generated = new HashSet<String>();
 	writer.println("(import " +package_name+ ".*)");
 	for (String proto : proto_slots.keySet()) {
-	    String class_name = fixName(proto, true);
-	    writer.println("(defclass " +proto+ " " +class_name+ ")");
+            generateShadowClass(writer, proto, generated);
 	}
 	writer.println("(defclass frame-change org.cougaar.core.qos.frame.Frame$Change)");
 	writer.close();
