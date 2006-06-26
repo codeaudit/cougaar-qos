@@ -543,6 +543,7 @@ extends DefaultHandler
 	    String  slot, 
 	    Attributes attrs) {
 	String type = getSlotType(prototype, slot);
+	if (proto_attrs.containsKey(type)) type = fixName(type, true);
 	boolean memberp = isMember(prototype, slot);
 	boolean transientp = isTransient(prototype, slot);
 	if (memberp) {
@@ -672,21 +673,25 @@ extends DefaultHandler
 	for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
 	    String slot = entry.getKey();
 	    Attributes attrs = entry.getValue();
-	    String type = getSlotType(prototype, slot);
-	    writeGetter(writer, prototype, slot, attrs, type, true);
-	    writeGetter(writer, prototype, slot, attrs, type, false);
-	    writeGetterAsObject(writer, prototype, slot, attrs, type);
-	    writeSetter(writer, prototype, slot, attrs, type);
-	    writeSetterAsObject(writer, prototype, slot, attrs, type);
-	    writeInitializer(writer, prototype, slot, attrs, type);
-	    writeInitializerAsObject(writer, prototype, slot, attrs, type);
-	    writeRemover(writer, prototype, slot, attrs, type);
+	    String slotType = getSlotType(prototype, slot);
+	    String javaType = slotType;
+	    if (proto_attrs.containsKey(javaType)) javaType = fixName(javaType, true);
+	    writeGetter(writer, prototype, slot, attrs, javaType, true);
+	    writeGetter(writer, prototype, slot, attrs, javaType, false);
+	    writeGetterAsObject(writer, prototype, slot, attrs, javaType);
+	    writeSetter(writer, prototype, slot, attrs, slotType, javaType);
+	    writeSetterAsObject(writer, prototype, slot, attrs, slotType, javaType);
+	    writeInitializer(writer, prototype, slot, attrs, javaType);
+	    writeInitializerAsObject(writer, prototype, slot, attrs, slotType, javaType);
+	    writeRemover(writer, prototype, slot, attrs, javaType);
 	}
 	for (Map.Entry<String,Attributes> entry : override_slots.entrySet()) {
 	    String slot = entry.getKey();
 	    if (isMember(prototype, slot)) continue;
 	    Attributes attrs = entry.getValue();
-	    String type = getSlotType(prototype, slot);
+	    String stype = getSlotType(prototype, slot);
+	    String type = stype;
+	    if (proto_attrs.containsKey(type)) type = fixName(type, true);
 	    writeOverrideGetter(writer, prototype, slot, attrs, type, true);
 	    writeOverrideGetter(writer, prototype, slot, attrs, type, false);
 	    writeOverrideGetterAsObject(writer, prototype, slot, attrs, type);
@@ -822,7 +827,8 @@ extends DefaultHandler
 	    String prototype,
 	    String slot,
 	    Attributes attrs,
-	    String type) {
+	    String slotType,
+	    String javaType) {
 	if (isReadOnly(prototype, slot)) return;
 
 	boolean synchronize = relation_prototypes.contains(prototype);
@@ -834,18 +840,18 @@ extends DefaultHandler
 	writer.print("\n\n    public ");
 	if (synchronize) writer.print("synchronized ");
 	writer.println("void set" +accessor_name+
-		"("+type+" __new_value) {");
+		"("+javaType+" __new_value) {");
 	if (memberp) {
-	    writer.println("        "+type+" __old_value = " +fixed_name+ ";");
+	    writer.println("        "+javaType+" __old_value = " +fixed_name+ ";");
 	    writer.println("        this." +fixed_name+ " = __new_value;");
 	} else {
-	    writer.println("        "+type+" __old_value = ("
-		    +type+ ") getProperty(\"" +slot+ "\");");
+	    writer.println("        "+javaType+" __old_value = ("
+		    +javaType+ ") getProperty(\"" +slot+ "\");");
 	    writer.println("        setProperty(\"" +slot+ "\", __new_value);");
 	}
 	writer.println("        slotModified(\"" +slot+ "\", "
-		+typeToObject(type, "__old_value")+ ", "
-		+typeToObject(type, "__new_value")+ ", "
+		+typeToObject(slotType, "__old_value")+ ", "
+		+typeToObject(slotType, "__new_value")+ ", "
 		+notify_listeners_p+ ", " +notify_blackboard_p
 		+ ");");
 	writer.println("    }");
@@ -856,7 +862,8 @@ extends DefaultHandler
 	    String prototype,
 	    String slot,
 	    Attributes attrs,
-	    String type) {
+	    String slotType,
+	    String javaType) {
 	if (isReadOnly(prototype, slot)) return;
 
 	boolean synchronize = relation_prototypes.contains(prototype);
@@ -873,11 +880,11 @@ extends DefaultHandler
 	    writer.println("        Object __old_value = get" 
 		    +accessor_name+AsObject+ "();");
 	    writer.println("        this." +fixed_name+ " = "
-		    + objectToType(type, "__new_value")+ ";");
+		    + objectToType(slotType, javaType, "__new_value")+ ";");
 	} else {
 	    writer.println("        Object __old_value = getProperty(\"" +slot+ "\");");
 	    writer.println("        setProperty(\"" +slot+ "\", "
-		    +objectToType(type, "__new_value")+
+		    +objectToType(slotType, javaType, "__new_value")+
 	    ");");
 	}
 	writer.println("        slotModified(\"" +slot+ 
@@ -934,7 +941,8 @@ extends DefaultHandler
 	    String prototype,
 	    String slot,
 	    Attributes attrs,
-	    String type) {
+	    String slotType,
+	    String javaType) {
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	boolean memberp = isMember(prototype, slot);
@@ -943,10 +951,10 @@ extends DefaultHandler
 		AsObject+ "(Object new_value) {");
 	if (memberp) {
 	    writer.println("        this." +fixed_name+ " = "
-		    +objectToType(type, "new_value")+ ";");
+		    +objectToType(slotType, javaType, "new_value")+ ";");
 	} else {
 	    writer.println("        setProperty(\"" +slot+ "\", "
-		    +objectToType(type, "new_value")+ 
+		    +objectToType(slotType, javaType, "new_value")+ 
 	    ");");
 	}
 	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
@@ -1652,12 +1660,17 @@ extends DefaultHandler
 	type.equals("Long") ||
 	type.equals("Integer") ||
 	type.equals("Boolean") ||
-	type.equals(Metric_Type);
+	type.equals(Metric_Type) ||
+	proto_attrs.containsKey(type);
     }
 
 
-    private String objectToType(String type, String var) {
-	return "force_"+type+"(" +var+ ")";
+    private String objectToType(String slotType, String javaType, String var) {
+	if (proto_attrs.containsKey(slotType)) {
+	    return "(" + javaType+ ") " + var;
+	} else {
+	    return "force_"+slotType+"(" +var+ ")";
+	}
     }
 
 
@@ -1679,12 +1692,13 @@ extends DefaultHandler
     }
 
     private String typeToObject(String type, String var) {
-	if (isObjectType(type))
+	if (isObjectType(type)) {
 	    return var;
-	else 
+	} else {
 	    return literalToObject(type, var);
+	}
     }
-
+    
     private String simpleValue(String type, String value) {
 	if (isObjectType(type))
 	    return literalToObject(type, value);
