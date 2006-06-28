@@ -66,6 +66,10 @@ extends DefaultHandler
     private static final String AsObject = "__AsObject";
     private static final String Metric_Type = "Metric";
 
+    // Copyright notice
+    private boolean inCopyright;
+    private String copyright;
+    
     // The FrameSet's package
     private String package_name;
 
@@ -149,6 +153,7 @@ extends DefaultHandler
 
 
 
+    
     // SAX
     public void startElement(String uri, String local, String name, Attributes attrs) {
 	if (name.equals("frameset")) {
@@ -168,6 +173,8 @@ extends DefaultHandler
 	    slot(attrs);
 	} else if (name.equals("slot-reference")) {
 	    slot_reference(attrs);
+	} else if (name.equals("copyright")) {
+	   inCopyright = true;
 	}
     }
 
@@ -182,11 +189,20 @@ extends DefaultHandler
 	    endRelationPrototype();
 	} else if (name.equals("path")) {
 	    endPath();
-	} 
+	} else if (name.equals("copyright")) {
+	    inCopyright = false; 
+	}
     }
 
-    // Not using this yet
     public void characters(char buf[], int offset, int length) {
+	if (inCopyright) {
+	    String text = new String(buf, offset, length);
+	    if (copyright == null) {
+		copyright = text;
+	    } else {
+		copyright += text;
+	    }
+	}
     }
 
 
@@ -496,6 +512,9 @@ extends DefaultHandler
 	    String parent,
 	    boolean importMetrics,
 	    boolean importSlotDescriptions) {
+	if (copyright != null) {
+	    writer.println(copyright);
+	}
 	boolean is_root_relation = 
 	    parent == null && relation_prototypes.contains(prototype);
 	String name = fixName(prototype, true);
