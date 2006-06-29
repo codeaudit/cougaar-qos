@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!ELEMENT frameset (copyright | prototypes)>
+<!ELEMENT frameset (copyright | prototypes)*>
 <!ATTLIST frameset frame-inheritance CDATA "single"
 	           package CDATA #REQUIRED
 	           container-relation CDATA #REQUIRED
@@ -29,6 +29,7 @@
 	       default-value CDATA #IMPLIED
 	       units CDATA #IMPLIED
 	       path CDATA #IMPLIED
+		   metric-path CDATA #IMPLIED
 	       doc CDATA #IMPLIED
 	       member (true | false) "true"
 	       warn (true | false) "true"
