@@ -31,9 +31,11 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Observer;
 import java.util.Properties;
@@ -55,8 +57,7 @@ import org.cougaar.core.util.UniqueObject;
  * containment hierarchy.
  */
 public class SingleInheritanceFrameSet
-    implements FrameSet
-{
+    implements FrameSet {
     private static final long LOOKUP_WARN_TIME = 10000;
 
     private final String name;
@@ -66,32 +67,31 @@ public class SingleInheritanceFrameSet
     private final BlackboardService bbs;
     private final MetricsService metrics;
     private final Object change_queue_lock, relation_lock;
-    private ArrayList change_queue;
-    private HashMap kb; // UID -> object
-    private HashMap cached_classes; // proto name -> Class
-    private HashMap prototypes; // proto name -> PrototypeFrame
-    private HashMap parent_cache, child_cache; // RelationFrame -> DataFrame
-    private HashMap paths; // path name -> Path
-    private HashSet frames; // all DataFrames
+    private List<ChangeQueueEntry> change_queue;
+    private Map<UID,Object> kb; // values can be either Frames or Paths
+    private Map<String,Class> cached_classes;
+    private Map<String,PrototypeFrame> prototypes;
+    private Map<RelationFrame,DataFrame> parent_cache, child_cache;
+    private Map<String,Path> paths;
+    private Set<DataFrame> frames;
 
     // Containment hackery
-    private HashSet pending_relations;
-    private HashMap containers;
+    private Set<RelationFrame> pending_relations;
+    private Map<DataFrame,DataFrame> containers;
     private String container_relation;
 
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
 				     BlackboardService bbs,
 				     String name,
-				     String container_relation)
-    {
+				     String container_relation) {
 	this.name = name;
 	this.container_relation = container_relation;
-	this.cached_classes = new HashMap();
-	this.parent_cache = new HashMap();
-	this.child_cache = new HashMap();
-	this.paths = new HashMap();
-	this.frames = new HashSet();
+	this.cached_classes = new HashMap<String,Class>();
+	this.parent_cache = new HashMap<RelationFrame,DataFrame>();
+	this.child_cache = new HashMap<RelationFrame,DataFrame>();
+	this.paths = new HashMap<String,Path>();
+	this.frames = new HashSet<DataFrame>();
 	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
@@ -104,17 +104,16 @@ public class SingleInheritanceFrameSet
 	metrics = (MetricsService)
 	    sb.getService(this, MetricsService.class, null);
 
- 	this.kb = new HashMap();
-	this.prototypes = new HashMap();
+ 	this.kb = new HashMap<UID,Object>();
+	this.prototypes = new HashMap<String,PrototypeFrame>();
 
-	this.pending_relations = new HashSet();
-	this.containers = new HashMap();
+	this.pending_relations = new HashSet<RelationFrame>();
+	this.containers = new HashMap<DataFrame,DataFrame>();
     }
 
 
     // Object creation
-    private void addObject(UniqueObject object)
-    {
+    private void addObject(UniqueObject object) {
 	if (log.isInfoEnabled())
 	    log.info("Adding  " +object);
 	synchronized (kb) {
@@ -122,19 +121,17 @@ public class SingleInheritanceFrameSet
 	}
 	if (object instanceof DataFrame) {
 	    synchronized (frames) {
-		frames.add(object);
+		frames.add((DataFrame) object);
 	    }
 	    if (object instanceof RelationFrame) {
 		cacheRelation((RelationFrame) object);
 	    } else {
 		// Any new DataFrame could potentially resolve as yet
 		// unfilled values in relations.
-		int resolved = 0;
 		synchronized (pending_relations) {
-		    Iterator itr = pending_relations.iterator();
+		    Iterator<RelationFrame> itr = pending_relations.iterator();
 		    while (itr.hasNext()) {
-			RelationFrame frame = (RelationFrame) itr.next();
-			boolean success = cacheRelation(frame);
+			boolean success = cacheRelation(itr.next());
 			if (success) itr.remove();
 		    }
 		}
@@ -142,22 +139,19 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    public DataFrame makeFrame(String proto, Properties values)
-    {
+    public DataFrame makeFrame(String proto, Properties values) {
 	UID uid = uids.nextUID();
 	return makeFrame(proto, values, uid);
     }
 
-    public DataFrame makeFrame(String proto, Properties values, UID uid)
-    {
+    public DataFrame makeFrame(String proto, Properties values, UID uid) {
 	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
 	addObject(frame);
 	publishAdd(frame);
 	return frame;
     }
 
-    public DataFrame makeFrame(DataFrame frame)
-    {
+    public DataFrame makeFrame(DataFrame frame) {
 	addObject(frame);
 	publishAdd(frame);
 	return frame;
@@ -167,8 +161,7 @@ public class SingleInheritanceFrameSet
     // should be a prototype of.  
     public PrototypeFrame makePrototype(String proto, 
 					String parent, 
-					Properties values)
-    {
+					Properties values) {
 	UID uid = uids.nextUID();
 	return makePrototype(proto, parent, values, uid);
     }
@@ -176,11 +169,9 @@ public class SingleInheritanceFrameSet
     public PrototypeFrame makePrototype(String proto, 
 					String parent, 
 					Properties values,
-					UID uid)
-    {
+					UID uid) {
 	PrototypeFrame frame = null;
 	synchronized (prototypes) { 
-	    
 	    if (prototypes.containsKey(proto)) {
 		if (log.isWarnEnabled())
 		    log.warn("Ignoring prototype " +proto);
@@ -198,8 +189,7 @@ public class SingleInheritanceFrameSet
 	return frame;
     }
 
-    public Path makePath(String name, Path.Fork[] forks, String slot)
-    {
+    public Path makePath(String name, Path.Fork[] forks, String slot) {
 	UID uid = uids.nextUID();
 	Path path = new Path(uid, name, forks, slot);
 	synchronized (paths) {
@@ -211,8 +201,7 @@ public class SingleInheritanceFrameSet
     }
 
     // Removing and modifying frames
-    public void valueUpdated(DataFrame frame, String slot, Object value)
-    {
+    public void valueUpdated(DataFrame frame, String slot, Object value) {
 	if (frame instanceof RelationFrame) {
 	    RelationFrame rframe = (RelationFrame) frame;
 	    synchronized (relation_lock) {
@@ -233,9 +222,10 @@ public class SingleInheritanceFrameSet
     }
 
 
-    public void removeFrame(DataFrame frame)
-    {
-	synchronized (kb) { kb.remove(frame.getUID()); }
+    public void removeFrame(DataFrame frame) {
+	synchronized (kb) { 
+	    kb.remove(frame.getUID());
+	}
 
 	// Handle the removal of containment relationship frames
 	if (frame instanceof RelationFrame) {
@@ -248,20 +238,17 @@ public class SingleInheritanceFrameSet
 
 
 
-    public String getName()
-    {
+    public String getName() {
 	return name;
     }
 
-    public String getPackageName()
-    {
+    public String getPackageName() {
 	return pkg;
     }
 
-    public Collection getPrototypes()
-    {
+    public Collection<PrototypeFrame> getPrototypes() {
 	synchronized (prototypes) {
-	    return new ArrayList(prototypes.values());
+	    return Collections.unmodifiableCollection(prototypes.values());
 	}
     }
 
@@ -269,18 +256,16 @@ public class SingleInheritanceFrameSet
 
     // Hierarchy
 
-    public PrototypeFrame getPrototype(Frame frame)
-    {
+    public PrototypeFrame getPrototype(Frame frame) {
 	String proto = frame.getKind();
 	if (proto == null) return null;
 	synchronized (prototypes) {
-	    return (PrototypeFrame) prototypes.get(proto);
+	    return prototypes.get(proto);
 	}
     }
 
     // Old version, replaced by reflection
-    public boolean descendsFromOld(Frame frame, String prototype)
-    {
+    public boolean descendsFromOld(Frame frame, String prototype) {
 	String proto = frame.getKind();
 	if (proto == null) return false;
 	if (proto.equals(prototype)) {
@@ -288,21 +273,20 @@ public class SingleInheritanceFrameSet
 	}
 	Frame proto_frame = null;
 	synchronized (prototypes) {
-	    proto_frame = (Frame) prototypes.get(proto);
+	    proto_frame = prototypes.get(proto);
 	}
 	boolean result =
 	    proto_frame != null &&  descendsFromOld(proto_frame, prototype);
 	return result;
     }
 
-    private static final Object CNF = new Object();
-    public Class classForPrototype(String prototype)
-    {
+    private static final Class CNF = Object.class;
+    public Class classForPrototype(String prototype) {
 	// cache these!
 	synchronized (cached_classes) {
-	    Object klass = cached_classes.get(prototype);
+	    Class klass = cached_classes.get(prototype);
 	    if (klass == CNF) return null;
-	    if (klass != null) return (Class) klass;
+	    if (klass != null) return klass;
 
 	    
 	    String classname = pkg +"."+ FrameGen.fixName(prototype, true);
@@ -318,16 +302,18 @@ public class SingleInheritanceFrameSet
 	    }
 	}
     }
+    
+    public Class classForPrototype(PrototypeFrame pframe) {
+	return classForPrototype(pframe.getName());
+    }
 
 
-    public boolean descendsFrom(DataFrame frame, String prototype)
-    {
+    public boolean descendsFrom(DataFrame frame, String prototype) {
 	Class klass = classForPrototype(prototype);
 	return klass != null ? descendsFrom(frame, klass, prototype) : false;
     }
 
-    boolean descendsFrom(DataFrame frame, Class klass, String prototype)
-    {
+    boolean descendsFrom(DataFrame frame, Class klass, String prototype) {
 	boolean result = klass.isInstance(frame);
 	if (log.isDebugEnabled())
 	    log.debug(frame+ 
@@ -336,8 +322,7 @@ public class SingleInheritanceFrameSet
 	return result;
     }
 
-    public boolean descendsFrom(PrototypeFrame frame, String prototype)
-    {
+    public boolean descendsFrom(PrototypeFrame frame, String prototype) {
 	boolean result;
 	Class klass1 = classForPrototype(prototype);
 	Class klass2 = classForPrototype(frame.getName());
@@ -358,26 +343,23 @@ public class SingleInheritanceFrameSet
 
     // Relationships
 
-    private boolean isContainmentRelation(DataFrame frame)
-    {
+    private boolean isContainmentRelation(DataFrame frame) {
 	return descendsFrom(frame, container_relation);
     }
 
-    public DataFrame getContainer(DataFrame frame)
-    {
+    public DataFrame getContainer(DataFrame frame) {
 	synchronized (containers) {
-	    return (DataFrame) containers.get(frame);
+	    return containers.get(frame);
 	}
     }
 
     // Caller should synchronize on relation_lock
     private DataFrame getRelate(RelationFrame relationship,
-				HashMap cache,
+				Map<RelationFrame,DataFrame> cache,
 				String proto,
 				String slot,
-				Object value)
-    {
-	DataFrame result = (DataFrame) findFrame(proto, slot, value);
+				Object value) {
+	DataFrame result = findFrame(proto, slot, value);
 	if (result == null) {
 	    long time =  relationship.failed_lookup_time();
 	    if (time > LOOKUP_WARN_TIME) {
@@ -408,42 +390,39 @@ public class SingleInheritanceFrameSet
     }
 
 
-    public DataFrame getRelationshipParent(RelationFrame relationship)
-    {
+    public DataFrame getRelationshipParent(RelationFrame relationship) {
 	synchronized (relation_lock) {
-	    DataFrame result = (DataFrame) parent_cache.get(relationship);
+	    DataFrame result = parent_cache.get(relationship);
 	    if (result != null) {
 		if (log.isInfoEnabled())
 		    log.info(" Found cached relation value " +result);
 		return result;
 	    }
 
-	    String proto = (String) relationship.getParentPrototype();
-	    String slot = (String) relationship.getParentSlot();
+	    String proto = relationship.getParentPrototype();
+	    String slot = relationship.getParentSlot();
 	    Object value = relationship.getParentValue();
 	    return getRelate(relationship, parent_cache, proto, slot, value);
 	}
     }
 
-    public DataFrame getRelationshipChild(RelationFrame relationship)
-    {
+    public DataFrame getRelationshipChild(RelationFrame relationship) {
 	synchronized (relation_lock) {
-	    DataFrame result = (DataFrame) child_cache.get(relationship);
+	    DataFrame result = child_cache.get(relationship);
 	    if (result != null) {
 		if (log.isInfoEnabled())
 		    log.info(" Found cached relation value " +result);
 		return result;
 	    }
 
-	    String proto = (String) relationship.getChildPrototype();
-	    String slot = (String) relationship.getChildSlot();
+	    String proto = relationship.getChildPrototype();
+	    String slot = relationship.getChildSlot();
 	    Object value = relationship.getChildValue();
 	    return getRelate(relationship, child_cache, proto, slot, value);
 	}
     }
 
-    private boolean cacheRelation(RelationFrame relationship)
-    {
+    private boolean cacheRelation(RelationFrame relationship) {
 	// cache a containment relationship
 		    
 	DataFrame parent = getRelationshipParent(relationship);
@@ -460,7 +439,7 @@ public class SingleInheritanceFrameSet
 	    if (isContainmentRelation(relationship)) {
                 DataFrame old;
 		synchronized (containers) {
-		    old = (DataFrame) containers.get(child);
+		    old = containers.get(child);
 		    containers.put(child, parent);
 		}
                 child.containerChange(old, parent);
@@ -471,8 +450,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private void decacheRelation(RelationFrame relationship)
-    {
+    private void decacheRelation(RelationFrame relationship) {
 	synchronized (relation_lock) {
 	    child_cache.remove(relationship);
 	    parent_cache.remove(relationship);
@@ -493,13 +471,11 @@ public class SingleInheritanceFrameSet
     // Metrics
     public void subscribeToMetric(DataFrame frame, 
 				  Observer observer, 
-				  String path)
-    {
+				  String path) {
 	metrics.subscribeToValue(path, observer, frame);
     }
 
-    public Metric getMetricValue(DataFrame frame, String path)
-    {
+    public Metric getMetricValue(DataFrame frame, String path) {
 	return metrics.getValue(path, frame);
     }
 
@@ -508,8 +484,11 @@ public class SingleInheritanceFrameSet
 
     // Query
 
-    public Frame findFrame(UID uid)
-    {
+    public PrototypeFrame findPrototypeFrame(String name) {
+	return prototypes.get(name);
+    }
+    
+    public Frame findFrame(UID uid) {
 	synchronized (kb) {
 	    Object raw = kb.get(uid);
 	    if (raw instanceof Frame)
@@ -519,8 +498,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    public DataFrame findFrame(String proto, String slot, Object value)
-    {
+    public DataFrame findFrame(String proto, String slot, Object value) {
 	if (slot == null || proto == null || value == null) return null;
 
 	    
@@ -528,9 +506,7 @@ public class SingleInheritanceFrameSet
 	if (klass == null) return null;
 
 	synchronized (frames) {
-	    Iterator itr = frames.iterator();
-	    while (itr.hasNext()) {
-		DataFrame frame = (DataFrame) itr.next();
+	    for (DataFrame frame : frames) {
 		if (descendsFrom(frame, klass, proto)) {
 		    Object candidate = frame.getValue(slot);
 		    if (candidate != null && candidate.equals(value)) 
@@ -541,16 +517,13 @@ public class SingleInheritanceFrameSet
 	return null;
     }
 
-    public Set findFrames(String proto, Properties slot_value_pairs)
-    {
+    public Set<DataFrame> findFrames(String proto, Properties slot_value_pairs) {
 	Class klass = classForPrototype(proto);
 	if (klass == null) return null;
 
-	HashSet results = new HashSet();
+	Set<DataFrame> results = new HashSet<DataFrame>();
 	synchronized (frames) {
-	    Iterator itr = frames.iterator();
-	    while (itr.hasNext()) {
-		DataFrame frame = (DataFrame) itr.next();
+	    for (DataFrame frame : frames) {
 		if (descendsFrom(frame, klass, proto) &&
 		    frame.matchesSlots(slot_value_pairs))
 		    results.add(frame);
@@ -559,20 +532,17 @@ public class SingleInheritanceFrameSet
 	return results;
       }
 
-    Set findChildren(DataFrame parent, 
-		     String relation_prototype,
-		     Map map)
-    {
+    Set<DataFrame> findChildren(DataFrame parent, 
+	    String relation_prototype,
+	    Map<RelationFrame,DataFrame> map) {
 	Class klass = classForPrototype(relation_prototype);
 	if (klass == null) return null;
-	HashSet results = map != null ? null : new HashSet();
+	Set<DataFrame> results = map != null ? null : new HashSet<DataFrame>();
 	synchronized (relation_lock) {
-	    Iterator itr = parent_cache.entrySet().iterator();
-	    while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry) itr.next();
+	    for (Map.Entry<RelationFrame,DataFrame> entry : parent_cache.entrySet()) {
 		if (entry.getValue().equals(parent)) {
-		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    Object child = child_cache.get(relation);
+		    RelationFrame relation = entry.getKey();
+		    DataFrame child = child_cache.get(relation);
 		    if (child != null &&
 			descendsFrom(relation, klass, relation_prototype)) {
 			if (map != null)
@@ -586,21 +556,18 @@ public class SingleInheritanceFrameSet
 	return results;
     }
 
-    Set findParents(DataFrame child, 
-		    String relation_prototype,
-		    Map map)
-    {
+    Set<DataFrame> findParents(DataFrame child, 
+	    String relation_prototype,
+	    Map<RelationFrame,DataFrame> map) {
 	Class klass = classForPrototype(relation_prototype);
 	if (klass == null) return null;
 
-	HashSet results = map != null ? null : new HashSet();
+	Set<DataFrame> results = map != null ? null : new HashSet<DataFrame>();
 	synchronized (relation_lock) {
-	    Iterator itr = child_cache.entrySet().iterator();
-	    while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry) itr.next();
+	    for (Map.Entry<RelationFrame,DataFrame> entry : child_cache.entrySet()) {
 		if (entry.getValue().equals(child)) {
-		    RelationFrame relation = (RelationFrame) entry.getKey();
-		    Object parent = parent_cache.get(relation);
+		    RelationFrame relation = entry.getKey();
+		    DataFrame parent = parent_cache.get(relation);
 		    if (parent != null &&
 			descendsFrom(relation, klass, relation_prototype)) {
 			if (map != null)
@@ -614,10 +581,9 @@ public class SingleInheritanceFrameSet
 	return results;
     }
 
-    public Set findRelations(Frame frame, // should be DataFrame
-			     String role,
-			     String relation_proto)
-    {
+    public Set<DataFrame> findRelations(Frame frame, // should be DataFrame
+	    String role,
+	    String relation_proto) {
 	if (role.equals("parent")) {
 	    return findParents((DataFrame) frame, relation_proto, null);
 	} else if (role.equals("child")) {
@@ -630,11 +596,10 @@ public class SingleInheritanceFrameSet
 				
     }
 
-    public Map findRelationshipFrames(DataFrame frame, 
-				      String role, 
-				      String relation_proto)
-    {
-	Map map = new HashMap();
+    public Map<RelationFrame,DataFrame> findRelationshipFrames(DataFrame frame, 
+	    String role, 
+	    String relation_proto) {
+	Map<RelationFrame,DataFrame> map = new HashMap<RelationFrame,DataFrame>();
 	if (role.equals("parent")) {
 	    findParents(frame, relation_proto, map);
 	} else if (role.equals("child")) {
@@ -647,8 +612,7 @@ public class SingleInheritanceFrameSet
 				
     }
 
-    public Path findPath(UID uid)
-    {
+    public Path findPath(UID uid) {
 	synchronized (kb) {
 	    Object raw = kb.get(uid);
 	    if (raw instanceof Path)
@@ -658,10 +622,9 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    public Path findPath(String name)
-    {
+    public Path findPath(String name) {
 	synchronized (paths) {
-	    return (Path) paths.get(name);
+	    return paths.get(name);
 	}
     }
 
@@ -670,30 +633,31 @@ public class SingleInheritanceFrameSet
 
 		
     // BBS queue
-
-    private static class Add {
-	UniqueObject object;
-	Add(UniqueObject object)
-	{
+    
+    private static class ChangeQueueEntry {
+	final UniqueObject object;
+	public ChangeQueueEntry(UniqueObject object) {
 	    this.object = object;
 	}
     }
 
-    private static class Change {
-	UniqueObject object;
+    private static class Add extends ChangeQueueEntry {
+	Add(UniqueObject object) {
+	    super(object);
+	}
+    }
+
+    private static class Change extends ChangeQueueEntry {
 	Object change;
-	Change(UniqueObject object, Object change)
-	{
-	    this.object = object;
+	Change(UniqueObject object, Object change) {
+	    super(object);
 	    this.change = change;
 	}
     }
 
-    private static class Remove {
-	UniqueObject object;
-	Remove(UniqueObject object)
-	{
-	    this.object = object;
+    private static class Remove extends ChangeQueueEntry {
+	Remove(UniqueObject object) {
+	    super(object);
 	}
     }
 
@@ -701,21 +665,20 @@ public class SingleInheritanceFrameSet
     // Synchronized for a shorter time but doesn't work reliably.
     // Sometimes items are added while this is in progress and
     // execute doesn't run again.
-    public void processQueue()
-    {
-	ArrayList changes = null;
+    public void processQueue() {
+	List<ChangeQueueEntry> changes = null;
 	synchronized (change_queue_lock) {
-	    changes = new ArrayList(change_queue);
-	    change_queue = new ArrayList();
+	    changes = new ArrayList<ChangeQueueEntry>(change_queue);
+	    change_queue = new ArrayList<ChangeQueueEntry>();
 	}
 	int count = changes.size();
 	for (int i=0; i<count; i++) {
-	    Object change = changes.get(i);
+	    ChangeQueueEntry change = changes.get(i);
 	    if (log.isDebugEnabled())
 		log.debug("about to publish " + change);
 	    if (change instanceof Change) {
 		Change chng = (Change) change;
-		ArrayList changes_list = new ArrayList(1);
+		List<Object> changes_list = new ArrayList<Object>(1);
 		changes_list.add(chng.change);
 		if (log.isDebugEnabled())
 		    log.debug("Publish change " + chng.change);
@@ -731,15 +694,14 @@ public class SingleInheritanceFrameSet
     }
 
     // Old version
-    public void processQueueSlow()
-    {
+    public void processQueueSlow() {
 	synchronized (change_queue_lock) {
 	    int count = change_queue.size();
 	    for (int i=0; i<count; i++) {
-		Object change = change_queue.get(i);
+		ChangeQueueEntry change = change_queue.get(i);
 		if (change instanceof Change) {
 		    Change chng = (Change) change;
-		    ArrayList changes_list = new ArrayList(1);
+		    List<Object> changes_list = new ArrayList<Object>(1);
 		    changes_list.add(chng.change);
 		    bbs.publishChange(chng.object, changes_list);
 		} else  if (change instanceof Add) {
@@ -754,24 +716,21 @@ public class SingleInheritanceFrameSet
 	}
     }
 	
-    void publishAdd(UniqueObject object)
-    {
+    void publishAdd(UniqueObject object) {
 	synchronized (change_queue_lock) {
 	    change_queue.add(new Add(object));
 	    bbs.signalClientActivity();
 	}
     }
 
-    void publishChange(UniqueObject object, Object change)
-    {
+    void publishChange(UniqueObject object, Object change) {
 	synchronized (change_queue_lock) {
 	    change_queue.add(new Change(object, change));
 	    bbs.signalClientActivity();
 	}
     }
 
-    void publishRemove(UniqueObject object)
-    {
+    void publishRemove(UniqueObject object) {
 	synchronized (change_queue_lock) {
 	    change_queue.add(new Remove(object));
 	    bbs.signalClientActivity();
@@ -785,12 +744,9 @@ public class SingleInheritanceFrameSet
 
     // XML dumping
 
-    void dumpDataFrames(PrintWriter writer, int indentation, int offset)
-    {
+    void dumpDataFrames(PrintWriter writer, int indentation, int offset) {
 	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
-	    while (itr.hasNext()) {
-		Object raw = itr.next();
+	    for (Object raw : kb.values()) {
 		if (raw instanceof DataFrame) {
 		    DataFrame frame = (DataFrame) raw;
 		    frame.dump(writer, indentation, offset);
@@ -800,8 +756,7 @@ public class SingleInheritanceFrameSet
     }
 
     void dumpData(File file, int indentation, int offset)
-	throws java.io.IOException
-    {
+    throws java.io.IOException {
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
 
@@ -821,26 +776,17 @@ public class SingleInheritanceFrameSet
 
 
 
-    void dumpProtoFrames(PrintWriter writer, int indentation, int offset)
-    {
+    void dumpProtoFrames(PrintWriter writer, int indentation, int offset) {
 	synchronized (prototypes) {
-	    Iterator itr = prototypes.values().iterator();
-	    while (itr.hasNext()) {
-		Object raw = itr.next();
-		if (raw instanceof PrototypeFrame) {
-		    PrototypeFrame frame = (PrototypeFrame) raw;
-		    frame.dump(writer, indentation, offset);
-		}
+	    for (PrototypeFrame frame : prototypes.values()) {
+		frame.dump(writer, indentation, offset);
 	    }
 	}
     }
 
-    void dumpPaths(PrintWriter writer, int indentation, int offset)
-    {
+    void dumpPaths(PrintWriter writer, int indentation, int offset) {
 	synchronized (kb) {
-	    Iterator itr = kb.values().iterator();
-	    while (itr.hasNext()) {
-		Object raw = itr.next();
+	    for (Object raw : kb.values()) {
 		if (raw instanceof Path) {
 		    Path path = (Path) raw;
 		    path.dump(writer, indentation, offset);
@@ -850,8 +796,7 @@ public class SingleInheritanceFrameSet
     }
 
     void dumpPrototypes(File file, int indentation, int offset)
-	throws java.io.IOException
-    {
+	throws java.io.IOException {
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
 
@@ -882,8 +827,7 @@ public class SingleInheritanceFrameSet
 
 
     public  void dump(File proto_file, File data_file)
-	throws java.io.IOException
-    {
+	throws java.io.IOException {
 	dumpPrototypes(proto_file, 0, 2);
 	dumpData(data_file, 0, 2);
     }

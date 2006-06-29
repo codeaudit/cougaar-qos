@@ -42,8 +42,7 @@ import org.cougaar.core.util.UID;
  * handle inter-Frame relationships.
  */
 
-public interface FrameSet
-{
+public interface FrameSet {
     /**
      * Returns the name of the FrameSet.
      */
@@ -74,6 +73,13 @@ public interface FrameSet
      * the first match is returned.
      */
     public DataFrame findFrame(String kind, String slot, Object value);
+    
+    /**
+     * 
+     * @param name The name of a prototype
+     * @return the corresponding PrototypeFrame
+     */
+    public PrototypeFrame findPrototypeFrame(String name);
 
     /**
      * Returns the frame with the given UID. There can be at most one.
@@ -94,7 +100,7 @@ public interface FrameSet
      * Returns a collection of DataFrames that match all the
      * slot/value pairs.
      */
-    public Set findFrames(String kind, Properties slot_value_pairs);
+    public Set<DataFrame> findFrames(String kind, Properties slot_value_pairs);
 
     /**
      * Returns a collection of {@link DataFrame}s representing frames
@@ -102,18 +108,18 @@ public interface FrameSet
      * prototype, and in which the given frame plays the given role
      * ("parent" or "child").
      */
-    public Set findRelations(Frame frame, // should be DataFrame
-			     String role,
-			     String relation_proto);
+    public Set<DataFrame> findRelations(Frame frame, // should be DataFrame
+	    String role,
+	    String relation_proto);
 
     /**
      * Returns a collection of {@link RelationFrame}s representing
      * relationships of the given prototype in which the given frame
      * plays the given role ("parent" or "child").
      */
-    public Map findRelationshipFrames(DataFrame frame,
-				      String role, 
-				      String relation_proto);
+    public Map<RelationFrame,DataFrame> findRelationshipFrames(DataFrame frame,
+	    String role, 
+	    String relation_proto);
 
     /**
      * Adds a previously constucted DataFrame to this FrameSet.  The
@@ -205,12 +211,17 @@ public interface FrameSet
     /**
      * Returns a collection of all PrototypeFrames in the FrameSet,
      */
-    public Collection getPrototypes();
+    public Collection<PrototypeFrame> getPrototypes();
 
     /**
      * Return the generated class for the given prototype
      */
-    public Class classForPrototype(String prototype);
+    public Class classForPrototype(String prototypeName);
+    
+    /**
+     * Return the generated class for the given prototype
+     */
+    public Class classForPrototype(PrototypeFrame prototype);
 
     /**
      * Dump the DataFrames as XML.
