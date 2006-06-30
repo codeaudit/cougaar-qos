@@ -51,9 +51,7 @@ final public class ResponseRelayImpl
 
     private static class ResponseRelayImplFactory 
 	implements Relay.TargetFactory, Serializable {
-	private final MessageAddress target;
 	public ResponseRelayImplFactory(MessageAddress target) {
-	    this.target = target;
 	}
 	public Relay.Target create(
 				   UID uid, MessageAddress source, Object content,

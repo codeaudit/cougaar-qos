@@ -52,9 +52,7 @@ final public class QueryRelayImpl
 
     private static class QueryRelayImplFactory 
 	implements Relay.TargetFactory, Serializable {
-	private final MessageAddress target;
 	public QueryRelayImplFactory(MessageAddress target) {
-	    this.target = target;
 	}
 	public Relay.Target create(
 				   UID uid, MessageAddress source, Object content,

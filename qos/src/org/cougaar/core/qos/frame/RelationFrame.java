@@ -29,8 +29,6 @@ package org.cougaar.core.qos.frame;
 import java.util.Map;
 
 import org.cougaar.core.util.UID;
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
 
 /**
  * This extension to {@link DataFrame} is the basic representation of a
@@ -39,9 +37,7 @@ import org.cougaar.util.log.Logging;
 abstract public class RelationFrame
     extends DataFrame 
 {
-    private static Logger log = 
-	Logging.getLogger(org.cougaar.core.qos.frame.RelationFrame.class);
-
+    
     // This is only here to suppress useless warnings when the
     // frameset fails to find one of the relations two operands.
     private transient long failed_lookup_time;

@@ -20,8 +20,6 @@ import org.cougaar.core.qos.frame.visualizer.Shapes;
 import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
 import org.cougaar.core.qos.frame.visualizer.shapes.RoundRectangle;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
 import org.xml.sax.Attributes;
 
 /**
@@ -135,7 +133,6 @@ public class ViewConfigParser extends XMLParser  {
     public WindowSpec windowSpec;
     Vector containerStack;
     public ShapeContainer root;
-    private transient Logger log = Logging.getLogger(getClass().getName());
     protected static HashMap colorNameMap=null;
     protected static SlotChangeListener lastSlotChangeListener = null;
 

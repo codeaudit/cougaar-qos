@@ -17,7 +17,6 @@ public abstract class XMLParser extends DefaultHandler {
     public final static String EMPTY_STR_ARR[]      = new String[0];
     public final static Properties EMPTY_PROPERTIES = new Properties();
 
-    private static final Object UNDEFINED = new Object();
     private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
     private static final String DRIVER_DEFAULT ="org.apache.crimson.parser.XMLReaderImpl";
 

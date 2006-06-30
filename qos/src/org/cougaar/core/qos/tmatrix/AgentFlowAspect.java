@@ -32,7 +32,6 @@ import org.cougaar.core.mts.AttributeConstants;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.node.NodeControlService;
-import org.cougaar.core.service.LoggingService;
 import org.cougaar.mts.base.CommFailureException;
 import org.cougaar.mts.base.DestinationLink;
 import org.cougaar.mts.base.DestinationLinkDelegateImplBase;
@@ -56,7 +55,6 @@ public class AgentFlowAspect
 {
   
     private TrafficMatrix trafficMatrix;
-    private LoggingService log;
     
     public AgentFlowAspect() {
 	trafficMatrix = new TrafficMatrix();
@@ -69,10 +67,6 @@ public class AgentFlowAspect
 
 	NodeControlService ncs = (NodeControlService)
 	    sb.getService(this, NodeControlService.class, null);
-
-
-	log =  (LoggingService)
-	    sb.getService(this, LoggingService.class, null);
 
 	if (ncs != null) {
 	    ServiceBroker rootsb = ncs.getRootServiceBroker();

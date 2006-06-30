@@ -56,7 +56,6 @@ public class FrameVisualizerPlugin
     private IncrementalSubscription sub;
     private LoggingService log;
     private String frameSetName;
-    private DisplayWindow pluginDisplay;
     private ArrayList frameCache;
 
 
@@ -105,7 +104,7 @@ public class FrameVisualizerPlugin
         ServiceBroker sb = getServiceBroker();
         ThreadService tsvc = (ThreadService)
                 sb.getService(this, ThreadService.class, null);
-        pluginDisplay = new DisplayWindow(frameModel, xml_url, tsvc);
+        new DisplayWindow(frameModel, xml_url, tsvc);
 
 
         //SwingUtilities.invokeLater(new CreateWindowHelper(xml_file));

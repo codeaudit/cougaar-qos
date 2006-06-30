@@ -11,8 +11,6 @@ import org.cougaar.core.qos.frame.Frame;
 import org.cougaar.core.qos.frame.visualizer.LabelRenderer;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 import org.cougaar.core.qos.frame.visualizer.ShapeRenderer;
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,9 +28,6 @@ public class SlotChangeListener implements Cloneable  {
     ShapeGraphic shapeGraphic;
     String listenerName, slotName;
     HashMap triggerMap;
-
-
-    private transient Logger log = Logging.getLogger(getClass().getName());
 
 
 

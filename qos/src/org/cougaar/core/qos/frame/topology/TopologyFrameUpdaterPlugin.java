@@ -42,7 +42,6 @@ import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
-import org.cougaar.core.qos.rss.AgentHostUpdater;
 import org.cougaar.core.qos.rss.AgentTopologyService;
 import org.cougaar.core.service.AlarmService;
 import org.cougaar.core.service.BlackboardService;
@@ -67,11 +66,7 @@ extends ParameterizedPlugin {
     private FrameSet frameSet;
     private AlarmService alarmService;
     private WhitePagesService wp;
-    private AgentHostUpdater agentHostUpdater;
     private AgentTopologyService topologyService;
-    private Set agents;
-    private Set nodes;
-    private Set hosts;
     
     private Set getAgentsFromWP() {
         Set justAgents=new HashSet();
@@ -411,7 +406,6 @@ extends ParameterizedPlugin {
         sb.getService(this, LoggingService.class, null);
         alarmService = (AlarmService)  sb.getService(this, AlarmService.class, null);
         wp = (WhitePagesService)  sb.getService(this, WhitePagesService.class, null);
-        agentHostUpdater = (AgentHostUpdater) sb.getService(this, AgentHostUpdater.class, null);
         topologyService = (AgentTopologyService) sb.getService(this, AgentTopologyService.class, null);
     }
     
@@ -458,17 +452,10 @@ extends ParameterizedPlugin {
     //    the current frameset implementation 
     //    does not register changes to frames for changes in thier parent
     
-    private IncrementalSubscription indicatorSubscription;
     private IncrementalSubscription agentSubscription;
     private IncrementalSubscription nodeSubscription;
     private IncrementalSubscription hostSubscription;
     
-    
-    private static final UnaryPredicate indicatorPredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
-            return (o instanceof Indicator);
-        }
-    }; 
     
     private static final UnaryPredicate agentPredicate = new UnaryPredicate() {
         public boolean execute(Object o) {

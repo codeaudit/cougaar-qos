@@ -40,14 +40,12 @@ abstract public class CoordinationArtifactProviderPlugin
     protected abstract CoordinationArtifactProviderImpl 
 	makeProvider(ServiceBroker sb);
 
-    private CoordinationArtifactProviderImpl impl;
-
     public void start()
     {
 	super.start();
 
 	ServiceBroker sb = getServiceBroker();
-	impl = makeProvider(sb);
+	makeProvider(sb);
     }
 
     protected void setupSubscriptions() 

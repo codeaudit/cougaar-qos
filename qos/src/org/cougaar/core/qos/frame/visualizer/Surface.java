@@ -91,7 +91,7 @@ public abstract class Surface extends JPanel implements Printable {
 
     private long orig, start, frame;
     private Toolkit toolkit;
-    private boolean perfMonitor, outputPerf;
+    private boolean perfMonitor;
     private int biw, bih;
     private boolean clearOnce;
     private boolean toBeInitialized = true;
@@ -108,7 +108,7 @@ public abstract class Surface extends JPanel implements Printable {
         //    java -Djava2demo.perf= -cp Java2Demo.jar demos.Clipping.ClipAnim
         try {
             if (System.getProperty("java2demo.perf") != null) {
-                perfMonitor = outputPerf = true;
+                perfMonitor = true;
             }
         } catch (Exception ex) { }
         if (this instanceof AnimatingSurface) {
@@ -432,7 +432,6 @@ public abstract class Surface extends JPanel implements Printable {
         if ((frame % REPORTFRAMES) == 0) {
             long end = System.currentTimeMillis();
             long rel = (end - start);
-            long tot = (end - orig);
             if (frame == 0) {
                 perfStr = name + " " + rel+" ms";
                 if (animating == null || animating.thread == null) {

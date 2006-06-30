@@ -31,7 +31,6 @@ import org.cougaar.core.qos.metrics.Constants;
 import com.bbn.rss.AbstractContextInstantiater;
 import com.bbn.rss.ContextInstantiater;
 import com.bbn.rss.DataFormula;
-import com.bbn.rss.DataValue;
 import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
 
@@ -73,7 +72,6 @@ public class AgentFlowDS
 
     private static final String SOURCE_AGENT = "sourceAgent".intern();
     private static final String DESTINATION_AGENT = "destinationAgent".intern();
-    private static final DataValue NO_VALUE = DataValue.NO_VALUE;
 
 
     public AgentFlowDS(String[] parameters, ResourceContext parent) 

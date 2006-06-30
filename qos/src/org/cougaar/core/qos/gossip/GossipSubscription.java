@@ -70,7 +70,6 @@ class GossipSubscription
     }
 
     private GossipQualifierService qualifier_svc;
-    private MessageAddress neighbor;
     private MetricsService svc;
     private HashMap callbacks;
     private ValueGossip changes;
@@ -81,7 +80,6 @@ class GossipSubscription
     {
 	this.svc = svc;
 	this. qualifier_svc = qualifierService;
-	this.neighbor = neighbor;
 	callbacks = new HashMap();
 	changes = null;
     }

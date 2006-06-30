@@ -35,7 +35,6 @@ import java.util.Set;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
-import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.BlackboardService;
 
 /**
@@ -47,7 +46,6 @@ public class FrameSetServicePlugin
     implements ServiceProvider
 {
     private FrameSetService impl;
-    private LoggingService log;
     private HashMap sets;
     private HashMap pending;
 
@@ -59,9 +57,7 @@ public class FrameSetServicePlugin
 	pending = new HashMap();
 
 	ServiceBroker sb = getServiceBroker();
-	log = (LoggingService)
-           sb.getService(this, LoggingService.class, null);
-
+	
 	impl = new Impl();
 	sb.addService(FrameSetService.class, this);
 
