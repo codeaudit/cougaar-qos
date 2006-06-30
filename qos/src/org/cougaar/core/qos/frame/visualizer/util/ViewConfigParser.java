@@ -1,20 +1,28 @@
 package org.cougaar.core.qos.frame.visualizer.util;
 
-import org.xml.sax.Attributes;
-import org.cougaar.core.qos.frame.visualizer.*;
-import org.cougaar.core.qos.frame.visualizer.shapes.RoundRectangle;
-import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
-import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.util.log.Logging;
-import org.cougaar.util.log.Logger;
-
-import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Paint;
 import java.awt.geom.RectangularShape;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.HashMap;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import org.cougaar.core.qos.frame.visualizer.ContainerLabelRenderer;
+import org.cougaar.core.qos.frame.visualizer.LabelRenderer;
+import org.cougaar.core.qos.frame.visualizer.LabelRenderers;
+import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
+import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
+import org.cougaar.core.qos.frame.visualizer.ShapeRenderer;
+import org.cougaar.core.qos.frame.visualizer.ShapeRenderers;
+import org.cougaar.core.qos.frame.visualizer.Shapes;
+import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
+import org.cougaar.core.qos.frame.visualizer.shapes.RoundRectangle;
+import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
+import org.xml.sax.Attributes;
 
 /**
  * Created by IntelliJ IDEA.

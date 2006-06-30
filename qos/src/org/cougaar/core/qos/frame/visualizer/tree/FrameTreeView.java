@@ -1,38 +1,40 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import org.cougaar.core.qos.frame.visualizer.FrameModel;
-import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
-import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-import org.cougaar.core.qos.frame.visualizer.util.FormatWriter;
-import org.cougaar.core.qos.frame.visualizer.util.TreeWriter;
-import org.cougaar.core.qos.frame.visualizer.event.*;
-import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
-import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.Frame;
-import org.cougaar.core.qos.frame.RelationFrame;
-import org.cougaar.core.qos.frame.PrototypeFrame;
-import org.cougaar.core.qos.frame.DataFrame;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
-import javax.swing.tree.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
+import org.cougaar.core.qos.frame.DataFrame;
+import org.cougaar.core.qos.frame.PrototypeFrame;
+import org.cougaar.core.qos.frame.RelationFrame;
+import org.cougaar.core.qos.frame.visualizer.FrameModel;
+import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-
-import java.net.URL;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
-import java.awt.event.ActionEvent;
-import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.

@@ -29,7 +29,6 @@ package org.cougaar.core.qos.ca;
 import org.cougaar.core.agent.service.alarm.Alarm;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.AlarmService;
-import org.cougaar.core.service.BlackboardService;
 
 /**
  * Does the main work of the Alarm Coordinaton Artifact.  In

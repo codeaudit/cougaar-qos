@@ -26,9 +26,6 @@
 
 package org.cougaar.core.qos.ca;
 
-import java.util.Properties;
-
-import org.cougaar.core.component.ServiceBroker;
 
 /**
  * This interface describes the broker service that finds {@link

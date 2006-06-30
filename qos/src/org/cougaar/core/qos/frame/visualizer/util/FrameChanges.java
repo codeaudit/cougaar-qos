@@ -1,10 +1,9 @@
 package org.cougaar.core.qos.frame.visualizer.util;
 
-import org.cougaar.core.qos.frame.Frame;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Collection;
+
+import org.cougaar.core.qos.frame.Frame;
 
 /**
  * Created by IntelliJ IDEA.

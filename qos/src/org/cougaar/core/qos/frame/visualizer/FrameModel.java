@@ -26,27 +26,26 @@
 
 package org.cougaar.core.qos.frame.visualizer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.cougaar.core.blackboard.IncrementalSubscription;
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.frame.*;
-import org.cougaar.core.qos.frame.visualizer.test.ContainsPredicate;
+import javax.swing.event.ChangeListener;
+
+import org.cougaar.core.qos.frame.FrameSet;
+import org.cougaar.core.qos.frame.RelationFrame;
+import org.cougaar.core.qos.frame.visualizer.event.AddedFramesEvent;
+import org.cougaar.core.qos.frame.visualizer.event.ChangeModel;
+import org.cougaar.core.qos.frame.visualizer.event.ChangedFramesEvent;
+import org.cougaar.core.qos.frame.visualizer.event.ContainerChildAddedEvent;
+import org.cougaar.core.qos.frame.visualizer.event.ContainerChildRemovedEvent;
+import org.cougaar.core.qos.frame.visualizer.event.RemovedFramesEvent;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.visualizer.event.*;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
-import org.cougaar.core.service.BlackboardService;
-import org.cougaar.core.service.LoggingService;
-import org.cougaar.util.ConfigFinder;
-import org.cougaar.util.UnaryPredicate;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
 
 
 

@@ -27,13 +27,10 @@
 package org.cougaar.core.qos.ca;
 
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Properties;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.relay.Relay;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.util.UID;

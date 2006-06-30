@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 

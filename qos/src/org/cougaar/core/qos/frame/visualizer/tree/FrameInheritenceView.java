@@ -1,20 +1,19 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
+import java.awt.Component;
+import java.util.ArrayList;
+
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+
+import org.cougaar.core.qos.frame.PrototypeFrame;
 import org.cougaar.core.qos.frame.visualizer.FrameModel;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
-import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.PrototypeFrame;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.tree.*;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.awt.*;
 
   /**
  * Created by IntelliJ IDEA.

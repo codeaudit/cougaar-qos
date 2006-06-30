@@ -1,10 +1,9 @@
 package org.cougaar.core.qos.frame.visualizer.event;
 
+import javax.swing.event.ChangeEvent;
+
 import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-
-import javax.swing.event.ChangeEvent;
-import java.util.HashSet;
 
 /**
  * Created by IntelliJ IDEA.

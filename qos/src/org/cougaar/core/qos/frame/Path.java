@@ -29,7 +29,6 @@ package org.cougaar.core.qos.frame;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;

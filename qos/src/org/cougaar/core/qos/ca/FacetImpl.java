@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.ca;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.cougaar.core.component.ServiceBroker;

@@ -1,19 +1,21 @@
 package org.cougaar.core.qos.frame.visualizer;
 
-import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListener;
-import org.cougaar.core.qos.frame.visualizer.tree.ShapeGraphicNode;
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
-
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+
+import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
+import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListener;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 public class ShapeGraphic implements Cloneable {
     protected String id, label;

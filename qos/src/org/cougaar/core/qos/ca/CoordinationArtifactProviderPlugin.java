@@ -26,10 +26,6 @@
 
 package org.cougaar.core.qos.ca;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 

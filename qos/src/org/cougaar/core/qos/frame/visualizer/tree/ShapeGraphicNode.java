@@ -1,13 +1,12 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
+import java.util.HashSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.util.HashSet;
+
+import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 
 /**
  * Created by IntelliJ IDEA.

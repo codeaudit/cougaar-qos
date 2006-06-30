@@ -1,24 +1,14 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableColumn;
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.Enumeration;
-import java.awt.*;
+import java.awt.Dimension;
 
-
+import javax.swing.DefaultCellEditor;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.*;
-import java.util.Vector;
-import java.util.Properties;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.

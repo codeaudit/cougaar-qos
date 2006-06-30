@@ -1,12 +1,7 @@
 package org.cougaar.core.qos.frame.visualizer.util;
 
-import org.cougaar.core.qos.frame.visualizer.LabelRenderer;
-import org.cougaar.core.qos.frame.visualizer.ContainerLabelRenderer;
-
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Collection;
-import java.awt.*;
+import java.util.HashMap;
 
 /**
  * Created by IntelliJ IDEA.

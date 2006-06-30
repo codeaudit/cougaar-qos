@@ -26,30 +26,23 @@
 
 package org.cougaar.core.qos.tmatrix;
 
-import java.util.Set;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
-
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.mts.AttributeConstants;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.node.NodeControlService;
-import org.cougaar.mts.std.AttributedMessage;
+import org.cougaar.core.service.LoggingService;
+import org.cougaar.mts.base.CommFailureException;
+import org.cougaar.mts.base.DestinationLink;
+import org.cougaar.mts.base.DestinationLinkDelegateImplBase;
 import org.cougaar.mts.base.MessageDeliverer;
 import org.cougaar.mts.base.MessageDelivererDelegateImplBase;
 import org.cougaar.mts.base.MisdeliveredMessageException;
-import org.cougaar.mts.base.CommFailureException;
-import org.cougaar.mts.base.UnregisteredNameException;
 import org.cougaar.mts.base.NameLookupException;
-import org.cougaar.mts.base.SendLink;
-import org.cougaar.mts.base.DestinationLink;
-import org.cougaar.mts.base.DestinationLinkDelegateImplBase;
-import org.cougaar.mts.base.SendLinkDelegateImplBase;
 import org.cougaar.mts.base.StandardAspect;
-import org.cougaar.core.service.LoggingService;
+import org.cougaar.mts.base.UnregisteredNameException;
+import org.cougaar.mts.std.AttributedMessage;
 
 /*
  * Counts msgs and bytes and adds to local TrafficMatrix. 

@@ -2,16 +2,6 @@ package org.cougaar.core.qos.frame.visualizer.tree;
 
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.*;
-import java.util.Vector;
-import java.util.Properties;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.awt.*;
-
 /**
  * Created by IntelliJ IDEA.
  * User: mwalczak

@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.cougaar.core.util.UID;

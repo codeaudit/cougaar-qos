@@ -40,12 +40,28 @@
 
 package org.cougaar.core.qos.frame.visualizer;
 
-import org.cougaar.core.qos.frame.visualizer.AnimatingSurface;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferUShort;
+import java.awt.image.DirectColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.print.*;
-import java.awt.event.*;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 

@@ -29,12 +29,11 @@ package org.cougaar.core.qos.ca;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.cougaar.util.UnaryPredicate;
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.LoggingService;
-import org.cougaar.core.service.community.CommunityService;
 import org.cougaar.core.service.community.Community;
+import org.cougaar.core.service.community.CommunityService;
 import org.cougaar.multicast.AttributeBasedAddress;
+import org.cougaar.util.UnaryPredicate;
 
 
 /**

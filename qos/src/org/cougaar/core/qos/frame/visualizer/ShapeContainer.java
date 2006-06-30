@@ -1,16 +1,17 @@
 package org.cougaar.core.qos.frame.visualizer;
 
-import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
-import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.visualizer.test.ContainsPredicate;
-import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListener;
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
+import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
+import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListener;
 
 /**
  * Created by IntelliJ IDEA.

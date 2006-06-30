@@ -27,20 +27,13 @@
 package org.cougaar.core.qos.tmatrix;
 
 import java.io.Serializable;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.cougaar.core.component.BindingSite;
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.component.ServiceProvider;
-import org.cougaar.core.qos.metrics.DecayingHistory;
 import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.service.LoggingService;
-import org.cougaar.core.component.Component;
-import org.cougaar.util.GenericStateModelAdapter;
+import org.cougaar.core.qos.metrics.DecayingHistory;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 

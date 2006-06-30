@@ -27,15 +27,14 @@
 package org.cougaar.core.qos.ca;
 
 import java.util.Enumeration;
-import java.util.Properties;
 import java.util.Iterator;
+import java.util.Properties;
+
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
-
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.relay.Relay;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.community.Community;

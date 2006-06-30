@@ -29,7 +29,6 @@ package org.cougaar.core.qos.ca;
 import java.util.HashMap;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
 

@@ -26,23 +26,19 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Properties;
 
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.BlackboardService;
+import org.cougaar.core.service.LoggingService;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-
-import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.BlackboardService;
-import org.cougaar.core.service.LoggingService;
-import org.cougaar.util.ConfigFinder;
 
 
 /**

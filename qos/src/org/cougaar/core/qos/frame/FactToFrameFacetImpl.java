@@ -28,7 +28,6 @@ package org.cougaar.core.qos.frame;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import org.cougaar.core.component.ServiceBroker;

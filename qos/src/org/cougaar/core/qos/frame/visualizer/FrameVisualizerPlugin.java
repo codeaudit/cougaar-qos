@@ -26,24 +26,22 @@
 
 package org.cougaar.core.qos.frame.visualizer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.frame.*;
+import org.cougaar.core.qos.frame.DataFrame;
+import org.cougaar.core.qos.frame.Frame;
+import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
-import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.UnaryPredicate;
-
-import org.cougaar.core.qos.frame.visualizer.util.FrameChanges;
-
-import javax.swing.*;
 
 
 public class FrameVisualizerPlugin

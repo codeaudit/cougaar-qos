@@ -1,9 +1,10 @@
 package org.cougaar.core.qos.frame.visualizer;
 
-import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-
-import java.awt.*;
-import java.util.HashMap;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
 
 /**
  * Created by IntelliJ IDEA.

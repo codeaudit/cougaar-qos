@@ -2,8 +2,6 @@ package org.cougaar.core.qos.frame.topology;
 
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
-import org.cougaar.core.qos.frame.SlotDescription;
-import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 
 public class NodeOnHost

@@ -1,22 +1,9 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
-import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
+import java.awt.Component;
+
+import javax.swing.JTable;
+
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-import org.cougaar.core.qos.frame.Frame;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeSelectionModel;
-import javax.swing.tree.TreePath;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-
-import java.net.URL;
-import java.io.IOException;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
-import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.

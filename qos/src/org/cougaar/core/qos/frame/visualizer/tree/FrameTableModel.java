@@ -1,16 +1,14 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Properties;
+
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.PrototypeFrame;
 import org.cougaar.core.qos.frame.SlotDescription;
-import org.xml.sax.helpers.AttributesImpl;
-
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.*;
-import java.util.*;
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.

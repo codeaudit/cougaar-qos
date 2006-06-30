@@ -1,32 +1,34 @@
 package org.cougaar.core.qos.frame.visualizer;
 
 
-import org.cougaar.core.qos.frame.visualizer.util.XMLParser;
-import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JSlider;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.cougaar.core.qos.frame.RelationFrame;
+import org.cougaar.core.qos.frame.visualizer.event.AddedFramesEvent;
+import org.cougaar.core.qos.frame.visualizer.event.ChangedFramesEvent;
+import org.cougaar.core.qos.frame.visualizer.event.RemovedFramesEvent;
+import org.cougaar.core.qos.frame.visualizer.event.TickEvent;
 import org.cougaar.core.qos.frame.visualizer.util.SlotChangeListeners;
-import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
-import org.cougaar.core.qos.frame.visualizer.event.*;
-import org.cougaar.core.qos.frame.*;
+import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import java.io.File;
-import java.net.URL;
-import java.lang.reflect.Constructor;
-import java.util.*;
-import java.awt.*;
-import java.awt.Frame;
-import java.awt.geom.Point2D;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.MouseEvent;
-
-
-import org.xml.sax.Attributes;
 
 /**
  * Created by IntelliJ IDEA.

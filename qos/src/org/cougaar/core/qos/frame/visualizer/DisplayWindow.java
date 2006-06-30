@@ -1,29 +1,31 @@
 package org.cougaar.core.qos.frame.visualizer;
 
-import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
-import org.cougaar.core.qos.frame.visualizer.util.ViewConfigWriter;
-import org.cougaar.core.qos.frame.visualizer.util.HTMLTreeWriter;
-import org.cougaar.core.qos.frame.visualizer.util.TreeWriter;
-import org.cougaar.core.qos.frame.visualizer.tree.ContainerTreeView;
-import org.cougaar.core.qos.frame.visualizer.tree.FrameTreeView;
-import org.cougaar.core.qos.frame.visualizer.event.TickEvent;
-import org.cougaar.core.component.ContainerView;
-import org.cougaar.core.service.ThreadService;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.net.URL;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Collection;
-import java.util.Enumeration;
+import java.net.URL;
+
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+
+import org.cougaar.core.qos.frame.visualizer.tree.ContainerTreeView;
+import org.cougaar.core.qos.frame.visualizer.tree.FrameTreeView;
+import org.cougaar.core.qos.frame.visualizer.util.HTMLTreeWriter;
+import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
+import org.cougaar.core.service.ThreadService;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,18 +1,22 @@
 package org.cougaar.core.qos.frame.visualizer.util;
 
-import org.cougaar.core.qos.frame.visualizer.*;
+import java.awt.Dimension;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Iterator;
+
+import org.cougaar.core.qos.frame.visualizer.Display;
+import org.cougaar.core.qos.frame.visualizer.DisplayWindow;
+import org.cougaar.core.qos.frame.visualizer.LabelRenderers;
+import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
+import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
+import org.cougaar.core.qos.frame.visualizer.ShapeRenderers;
+import org.cougaar.core.qos.frame.visualizer.Shapes;
 import org.cougaar.core.qos.frame.visualizer.layout.ShapeLayout;
 import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.core.qos.frame.visualizer.tree.ShapeGraphicNode;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Collection;
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.

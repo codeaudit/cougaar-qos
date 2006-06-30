@@ -1,35 +1,38 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
+import org.cougaar.core.qos.frame.visualizer.Display;
+import org.cougaar.core.qos.frame.visualizer.FrameModel;
 import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-import org.cougaar.core.qos.frame.visualizer.FrameModel;
-import org.cougaar.core.qos.frame.visualizer.Display;
-import org.cougaar.core.qos.frame.visualizer.event.*;
 import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
-import org.cougaar.core.qos.frame.Frame;
-import org.cougaar.core.qos.frame.PrototypeFrame;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.tree.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-
-import java.net.URL;
-import java.io.IOException;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
-import java.awt.event.ActionEvent;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.

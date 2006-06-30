@@ -1,14 +1,10 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
+import java.util.Enumeration;
+
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import java.util.*;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.ObjectInputStream;
 
 /**
  * Created by IntelliJ IDEA.

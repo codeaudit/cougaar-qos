@@ -1,14 +1,15 @@
 package org.cougaar.core.qos.frame.visualizer;
 
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
-
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.HashMap;
+
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 
 

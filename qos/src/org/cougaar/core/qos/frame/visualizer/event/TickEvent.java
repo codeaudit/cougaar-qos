@@ -1,12 +1,9 @@
 package org.cougaar.core.qos.frame.visualizer.event;
 
-import org.cougaar.core.qos.frame.visualizer.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.event.ChangeEvent;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.

@@ -34,7 +34,6 @@ import com.bbn.rss.DataFormula;
 import com.bbn.rss.DataValue;
 import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
-import com.bbn.ResourceStatus.ResourceNode;
 
 
 /**

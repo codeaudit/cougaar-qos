@@ -1,20 +1,18 @@
 package org.cougaar.core.qos.frame.visualizer.util;
 
-import org.cougaar.core.qos.frame.Frame;
-import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-import org.cougaar.core.qos.frame.visualizer.ShapeRenderer;
-import org.cougaar.core.qos.frame.visualizer.LabelRenderer;
-import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
-import org.cougaar.core.qos.frame.visualizer.test.FramePredicate;
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
-
-import javax.swing.*;
-import java.awt.*;
 import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.swing.SwingUtilities;
+
+import org.cougaar.core.qos.frame.Frame;
+import org.cougaar.core.qos.frame.visualizer.LabelRenderer;
+import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
+import org.cougaar.core.qos.frame.visualizer.ShapeRenderer;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 /**
  * Created by IntelliJ IDEA.

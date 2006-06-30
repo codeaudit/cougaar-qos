@@ -27,10 +27,8 @@
 package org.cougaar.core.qos.ca;
 
 import java.lang.reflect.Constructor;
-
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import org.cougaar.core.component.ServiceBroker;

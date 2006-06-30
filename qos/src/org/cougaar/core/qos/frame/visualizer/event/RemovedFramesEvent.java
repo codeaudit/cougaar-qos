@@ -1,9 +1,8 @@
 package org.cougaar.core.qos.frame.visualizer.event;
 
-import javax.swing.event.ChangeEvent;
-import java.util.Collection;
-import java.util.ArrayList;
 import java.util.HashSet;
+
+import javax.swing.event.ChangeEvent;
 
 /**
  * Created by IntelliJ IDEA.

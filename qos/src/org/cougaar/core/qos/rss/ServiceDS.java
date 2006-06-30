@@ -31,13 +31,12 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.node.NodeIdentificationService;
 import org.cougaar.core.qos.metrics.Constants;
 
+import com.bbn.ResourceStatus.ResourceNode;
 import com.bbn.rss.AbstractContextInstantiater;
 import com.bbn.rss.ContextInstantiater;
 import com.bbn.rss.DataFormula;
-import com.bbn.rss.DataValue;
 import com.bbn.rss.RSS;
 import com.bbn.rss.ResourceContext;
-import com.bbn.ResourceStatus.ResourceNode;
 
 /**
  * This RSS ResourcContext represents subsystems in a Node, other than
