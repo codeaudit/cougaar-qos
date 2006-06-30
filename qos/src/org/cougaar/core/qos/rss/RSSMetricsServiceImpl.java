@@ -170,7 +170,7 @@ public class RSSMetricsServiceImpl
 	DestinationDS.register();
 	NodeDS.register();
 	ServiceDS.register();
-	org.cougaar.core.qos.gossip.GossipIntegraterDS.register();
+	org.cougaar.core.qos.gossip.GossipIntegraterDS.registerContext();
 
 	// Make a Timer available to RSS and TEC
 	CougaarTimer timer = new CougaarTimer(sb);

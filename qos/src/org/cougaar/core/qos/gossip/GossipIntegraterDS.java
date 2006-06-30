@@ -38,11 +38,9 @@ import com.bbn.rss.IntegraterDS;
  * without messing up the standard IntegratorDS.
  */
 
-public class GossipIntegraterDS extends IntegraterDS 
-{
+public class GossipIntegraterDS extends IntegraterDS {
 
-    public static void register()
-    {
+    public static void registerContext() {
 	ContextInstantiater cinst = new AbstractContextInstantiater() {
 		public ResourceContext instantiateContext(String[] parameters, 
 							  ResourceContext parent)
@@ -64,14 +62,12 @@ public class GossipIntegraterDS extends IntegraterDS
     }
 
     public GossipIntegraterDS(String[] keys, ResourceContext parent) 
-	throws ParameterError
-    {
+	throws ParameterError {
 	super(keys, parent);
     }
 
 
-    protected DataFormula instantiateFormula(String kind)
-    {
+    protected DataFormula instantiateFormula(String kind) {
 	if (kind.equals("GossipFormula")) {
 	    return new GossipFormula();
 	} else {
