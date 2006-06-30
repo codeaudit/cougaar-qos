@@ -48,7 +48,6 @@ public class FramePredicate {
             //System.out.println("comparing  f.isa('"+kind+"' name='"+name+"') = "+f.isa(kind));
 
             boolean nameBool = true;
-            boolean framesetBool = true;
             boolean kindBool = true;
 
             kindBool     = (kind != null ? f.isa(kind) : true);

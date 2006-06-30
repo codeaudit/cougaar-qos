@@ -210,8 +210,6 @@ public class Display extends AnimatedCanvas implements ChangeListener {
        }
 
         protected Collection processRelationshipChanges(RelationFrame rframe, Collection changeReports) {
-           ShapeGraphic child, parent;
-           org.cougaar.core.qos.frame.Frame fchild, fparent;
            ArrayList transitions = null; //new ArrayList();
 
            if (log.isDebugEnabled())
@@ -219,10 +217,11 @@ public class Display extends AnimatedCanvas implements ChangeListener {
 
            Transition t;
            for (Iterator ii=changeReports.iterator(); ii.hasNext();) {
-               org.cougaar.core.qos.frame.Frame.Change change = (org.cougaar.core.qos.frame.Frame.Change) ii.next();
+               // org.cougaar.core.qos.frame.Frame.Change change = (org.cougaar.core.qos.frame.Frame.Change) ii.next();
                // Handle change to existing frame
                //slotName = change.getSlotName();
                //value    = change.getValue();
+               ii.next();
                t = processRelationshipFrame(rframe);
                if (t!=null) {
                    if (transitions == null)

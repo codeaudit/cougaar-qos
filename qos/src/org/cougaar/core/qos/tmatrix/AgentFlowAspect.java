@@ -149,9 +149,8 @@ public class AgentFlowAspect
 		theRecord.byteCount+=msgBytes;
 	    }
 
-	    TrafficMatrix.TrafficRecord theNewRecord = 
-		ensureTrafficRecord(message.getOriginator(), 
-				    message.getTarget());
+	    
+	    ensureTrafficRecord(message.getOriginator(), message.getTarget());
 	
 	    
 	}

@@ -221,7 +221,6 @@ public class ShapeGraphic implements Cloneable {
 
     public ShapeContainer getParentWithFrame() {
         ShapeContainer p = parent;
-        org.cougaar.core.qos.frame.Frame f;
         while (p!=null) {
             if (p.frame != null)
                 return p;

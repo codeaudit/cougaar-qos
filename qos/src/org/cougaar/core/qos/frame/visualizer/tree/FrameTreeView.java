@@ -313,7 +313,6 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         }
 
         Collection rootNodes = findRootLevelNodes();
-        TreeNode tnode;
         for (Iterator ii=rootNodes.iterator(); ii.hasNext();)
             insertNode((FrameNode)ii.next(), (FrameNode)root);
             //treeModel.insertNodeInto((DefaultMutableTreeNode) ii.next(), root, 0);

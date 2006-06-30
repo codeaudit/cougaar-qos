@@ -50,12 +50,10 @@ class RelayReclaimer
     // should only be called from add()
     private void reclaim(BlackboardService blackboard) 
     {
-	long now = System.currentTimeMillis();
 	Iterator itr = relays.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
 	    Object relay = entry.getKey();
-	    long expiration_time = ((Long) entry.getValue()).longValue();
 	    if (true) {
 		blackboard.publishRemove(relay);
 		itr.remove();

@@ -79,7 +79,6 @@ public class TMatrixTracePlugin
   
     // Examples - Get the TrafficMatrix & print out at an interval
     public void run() {
-	int count =0;
 	TrafficMatrix agentFlowSnapshot = agentFlowService.snapshotMatrix();
 	/*
 	// Ex.#1: print out matrix using TrafficIterator

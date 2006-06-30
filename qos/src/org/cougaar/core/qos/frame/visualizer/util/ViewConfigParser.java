@@ -341,12 +341,10 @@ public class ViewConfigParser extends XMLParser  {
         //<labelrenderer name="defaultLabelRenderer" xoff="+2" yoff="+5" font="default" color="Color.blue"/>
         String x = attrs.getValue("xoff");
         String y = attrs.getValue("yoff");
-        boolean negativeX = x.startsWith("-");
         String xo = (x.startsWith("+") ? x.substring(x.lastIndexOf("+")) : (x.startsWith("-") ? x.substring(x.lastIndexOf("-")) : x));
         String yo = (y.startsWith("+") ? y.substring(y.lastIndexOf("+")) : (y.startsWith("-") ? y.substring(y.lastIndexOf("-")) : y));
         double xoff = Double.parseDouble(xo);
         double yoff = Double.parseDouble(yo);
-        String font = attrs.getValue("font");
         String col  = attrs.getValue("color");
         Color color = getColor(col);
         String name = attrs.getValue("name");
@@ -362,7 +360,6 @@ public class ViewConfigParser extends XMLParser  {
     public LabelRenderer createContainerLabelRenderer(Attributes attrs) {
         double xoff = Double.parseDouble(attrs.getValue("xoff"));
         double yoff = Double.parseDouble(attrs.getValue("yoff"));
-        String font = attrs.getValue("font");
         String col  = attrs.getValue("color");
         Color color = getColor(col);
         String name = attrs.getValue("name");

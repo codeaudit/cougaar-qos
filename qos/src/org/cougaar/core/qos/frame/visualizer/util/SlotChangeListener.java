@@ -157,7 +157,6 @@ public class SlotChangeListener implements Cloneable  {
 
         sb.append(getPadded(indent));
         sb.append("<slotChangeListener name=\""+listenerName+"\" slot=\""+slotName+"\">\n");
-        TriggerAction t;
         String triggActions[];
 
         for (Iterator ii=triggerMap.values().iterator(); ii.hasNext();) {

@@ -274,7 +274,6 @@ public class FrameModel {
     }
     public synchronized RelationFrame findRelation(Collection relationFrames, org.cougaar.core.qos.frame.DataFrame parent, org.cougaar.core.qos.frame.DataFrame child, String relationName) {
         Collection relations = findRelations(relationFrames, parent, child);
-        String name;
         RelationFrame rf;
         for (Iterator ii=relations.iterator(); ii.hasNext();) {
             rf = (RelationFrame) ii.next();
@@ -420,9 +419,8 @@ public class FrameModel {
 
     protected void processChanges(HashMap changeMap) {
         // A collection of Frame.Change instances.
-        ArrayList transitions = new ArrayList();
         org.cougaar.core.qos.frame.Frame frame;
-        Collection changeReports, trans;
+        Collection changeReports;
 
         HashMap changedDataFrames = null; //new HashMap();
         HashMap changedRelationFrames = null; //new HashMap();

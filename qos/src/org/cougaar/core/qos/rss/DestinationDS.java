@@ -204,7 +204,6 @@ public class DestinationDS
 	    Logger logger =
 		Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
 	    if (logger.isDebugEnabled()) {
-		String agent = (String) getContext().getValue(DESTINATION);
 		logger.debug("Recalculating CapacityMax with" +
 			     " my address = " +myAddr+
 			     " dest address = " +agentAddr+

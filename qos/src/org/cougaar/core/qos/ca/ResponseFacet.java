@@ -160,7 +160,6 @@ abstract public class ResponseFacet
 	// Pass back response relay
 	UID uid = nextUID();
 	//String s = "Response Matrix";
-	long timestamp = System.currentTimeMillis();
 	    
 	// Remove old respsonse, reassign
 	if(lastResponse != null) {

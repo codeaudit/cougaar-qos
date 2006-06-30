@@ -241,7 +241,7 @@ public class ShapeContainer extends ShapeGraphic {
         // this can be either a container with no associated frame (used for grouping)
         // of a container with a frame and a frame predicate
         //FramePredicate fp = getFramePredicate();
-        org.cougaar.core.qos.frame.Frame  f2, f = getFrame();
+        org.cougaar.core.qos.frame.Frame f = getFrame();
 
         ShapeGraphic shg;
         Collection frames;

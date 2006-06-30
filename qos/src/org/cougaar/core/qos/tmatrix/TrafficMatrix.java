@@ -133,7 +133,6 @@ public class TrafficMatrix implements Serializable
     
     // Deep copy
     public TrafficMatrix(TrafficMatrix matrix) {
-	Logger log = getLogger();
 	//log.debug("TrafficMatrix passed to constructor: "+matrix);
 	this.outermatrix = new HashMap(89);  	
 	synchronized (matrix) {	  	    

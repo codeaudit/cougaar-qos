@@ -25,9 +25,7 @@ public class VerticalBoxLayout extends ShapeLayout {
         Rectangle2D.Double bounds = (Rectangle2D.Double) container.getBounds2D();
         Collection children = container.getChildren();
         ShapeGraphic child;
-        int num = children.size();
         double totalheight = bounds.height - (topMargin+bottomMargin);
-        double totalwidth = bounds.width - (leftMargin+rightMargin);
         double heightSum=0;
         double nHeight, i;
         Rectangle2D.Double chBounds;

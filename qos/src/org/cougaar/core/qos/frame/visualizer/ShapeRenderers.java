@@ -40,9 +40,7 @@ public class ShapeRenderers {
            ShapeRenderer s;
            String shpStr[] = new String[shapeRenderers.size()];
            int i=0;
-           String tag=null;
-           Color paint, selectedPaint, fillPaint, selectedFillPaint;
-           BasicStroke lineStroke;
+           
            // boolean drawBorder = true, drawFilled=false;
            for (Iterator ii=shapeRenderers.keySet().iterator(); ii.hasNext(); i++) {
                shapeRendererName = (String) ii.next();
