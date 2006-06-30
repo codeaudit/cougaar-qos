@@ -87,11 +87,11 @@ public class DestinationDS
 	if (parameters == null || parameters.length != 1) {
 	    throw new ParameterError("DestinationDS: wrong number of parameters");
 	}
-	if (!(parameters[0] instanceof String)) {
+	if (!(parameters[0] != null)) {
 	    throw new ParameterError("DestinationDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
-	    String destination = (String) parameters[0];
+	    String destination = parameters[0];
 	    bindSymbolValue(DESTINATION, destination);
 	    String node_name = (String) getValue(NodeDS.NODENAME);
 	    historyPrefix = "Node" +KEY_SEPR+ node_name

@@ -112,11 +112,11 @@ public class ServiceDS
 	if (parameters == null || parameters.length != 1) {
 	    throw new ParameterError("ServiceDS: wrong number of parameters");
 	}
-	if (!(parameters[0] instanceof String)) {
+	if (!(parameters[0] != null)) {
 	    throw new ParameterError("ServiceDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
-	    String servicename = (String) parameters[0];
+	    String servicename = parameters[0];
 	    bindSymbolValue(SERVICENAME, servicename);
 	    historyPrefix = "Service" +KEY_SEPR+ servicename;
 	}

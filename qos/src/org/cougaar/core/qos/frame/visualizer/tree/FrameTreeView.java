@@ -289,7 +289,7 @@ public class FrameTreeView extends TreeView implements ChangeListener {
 
             pf = f.relationshipParent();
             cf = f.relationshipChild();
-            relationship = (String) f.getKind();
+            relationship = f.getKind();
             if (pf == null || cf  == null) { // we got ourselves an invalid relation frame (if parent || child has not arrived yet)
                 if (log.isDebugEnabled())
                     log.debug("processRelationships:  invalid relation frame, ignoring"+f.getParentValue()+"=>"+relationship+"==>"+f.getChildValue());

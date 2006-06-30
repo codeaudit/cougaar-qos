@@ -29,7 +29,7 @@ public class HorizontalLayout extends ShapeLayout {
         int num = children.size();
         double x,y, pnWidth, nWidth, i;
 
-        nWidth = totalwidth / (double)num;
+        nWidth = totalwidth / num;
         pnWidth= nWidth-(2*hpadding);
         i=0d;
         for (Iterator ii=children.iterator(); ii.hasNext();) {

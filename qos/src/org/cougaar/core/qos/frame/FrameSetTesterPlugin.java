@@ -55,8 +55,8 @@ public class FrameSetTesterPlugin
     public void start()
     {
 
-	String files = (String) getParameter("frame-set-files");
-	String name = (String) getParameter("frame-set");
+	String files = getParameter("frame-set-files");
+	String name = getParameter("frame-set");
 
 	if (files != null) {
 	    StringTokenizer tk = new StringTokenizer(files, ",");

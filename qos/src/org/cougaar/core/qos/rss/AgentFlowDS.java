@@ -61,8 +61,8 @@ public class AgentFlowDS
 		{
 		    if (parameters == null || parameters.length != 1) 
 			return null;
-		    String src = (String) parameters[0];
-		    String dst = (String) parameters[1];
+		    String src = parameters[0];
+		    String dst = parameters[1];
 		    return src +"->"+ dst;
 		}		
 
@@ -104,16 +104,16 @@ public class AgentFlowDS
 	if (parameters == null || parameters.length != 2) {
 	    throw new ParameterError("AgentFlowDS: wrong number of parameters");
 	}
-	if (!(parameters[0] instanceof String)) {
+	if (!(parameters[0] != null)) {
 	    throw new ParameterError("AgentFlowDS: wrong parameter 1 type");
 	} else {
-	    source = (String) parameters[0];
+	    source = parameters[0];
 	    bindSymbolValue(SOURCE_AGENT, source);
 	}
-	if (!(parameters[1] instanceof String)) {
+	if (!(parameters[1] != null)) {
 	    throw new ParameterError("AgentFlowDS: wrong parameter 2 type");
 	} else {
-	    destination = (String) parameters[1];
+	    destination = parameters[1];
 	    bindSymbolValue(DESTINATION_AGENT, destination);
 	    historyPrefix = "AgentFlow" +KEY_SEPR+ 
 		source  +KEY_SEPR+ 

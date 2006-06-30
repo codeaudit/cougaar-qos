@@ -140,11 +140,11 @@ public class AgentDS
 	if (parameters == null || parameters.length != 1) {
 	    throw new ParameterError("AgentDS: wrong number of parameters");
 	}
-	if (!(parameters[0] instanceof String)) {
+	if (!(parameters[0] != null)) {
 	    throw new ParameterError("AgentDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
-	    String agentname = (String) parameters[0];
+	    String agentname = parameters[0];
 	    bindSymbolValue(AGENTNAME, agentname);
 	    historyPrefix = "Agent" +KEY_SEPR+ agentname;
 	}

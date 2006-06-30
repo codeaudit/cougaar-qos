@@ -27,7 +27,7 @@ public class SlotChangeListeners {
     private SlotChangeListener getCopy(String name) {
         SlotChangeListener s = (SlotChangeListener) listeners.get(name);
         if (s!= null)
-            return (SlotChangeListener) s.cloneInstance();
+            return s.cloneInstance();
         return null;
     }
 

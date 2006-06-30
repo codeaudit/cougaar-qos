@@ -147,11 +147,11 @@ public class NodeDS
 	if (parameters == null || parameters.length != 1) {
 	    throw new ParameterError("NodeDS: wrong number of parameters");
 	}
-	if (!(parameters[0] instanceof String)) {
+	if (!(parameters[0] != null)) {
 	    throw new ParameterError("NodeDS: wrong parameter type");
 	} else {
 	    // could canonicalize here
-	    String nodename = (String) parameters[0];
+	    String nodename = parameters[0];
 	    bindSymbolValue(NODENAME, nodename);
 	    historyPrefix = "Node" +KEY_SEPR+ nodename;
 	}

@@ -89,11 +89,11 @@ public class FrameVisualizerPlugin
     }
 
     public void start() {
-        frameSetName = (String) getParameter("frame-set");
+        frameSetName = getParameter("frame-set");
         frameCache = new ArrayList();
         newFramesPresent = false;
 
-        String specFileName = (String) getParameter("spec-file");
+        String specFileName = getParameter("spec-file");
 //         File xml_file = ConfigFinder.getInstance().locateFile(specFileName);
         ClassLoader loader = FrameVisualizerPlugin.class.getClassLoader();
         URL xml_url = loader.getResource(specFileName);

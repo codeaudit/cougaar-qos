@@ -194,7 +194,7 @@ public abstract class Surface extends JPanel implements Printable {
                                              int imgType) {
         BufferedImage bi = null;
         if (imgType == 0) {
-            bi = (BufferedImage) g2.getDeviceConfiguration().
+            bi = g2.getDeviceConfiguration().
                                     createCompatibleImage(w, h);  
         } else if (imgType > 0 && imgType < 14) {
             bi = new BufferedImage(w, h, imgType);

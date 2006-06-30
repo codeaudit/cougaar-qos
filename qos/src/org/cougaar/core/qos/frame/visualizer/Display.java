@@ -269,7 +269,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         if (!initialized)
             return;
 
-        root.reshape(0d,0d,(double)w, (double)h);
+        root.reshape(0d,0d,w, h);
     }
 
     public void step(int w, int h) {
@@ -402,7 +402,7 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         public void stateChanged(ChangeEvent e) {
             Object source = e.getSource();
             if (source == animationDelaySlider) {
-                sleepAmount = (long) animationDelaySlider.getValue();
+                sleepAmount = animationDelaySlider.getValue();
             } else if (source == animationOn) {
                 Display.ENABLE_ANIMATION = animationOn.isSelected();
             }

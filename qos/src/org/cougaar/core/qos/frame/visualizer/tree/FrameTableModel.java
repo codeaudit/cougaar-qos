@@ -143,7 +143,7 @@ public class FrameTableModel extends TBLModel {
 
   public Object getValueAt(int row, int col) {
       if (row >-1 && row < frameSlotNames.size()) {
-        Object val= (Object) ( col == 0 ? frameSlotNames.get(row) : frameSlots.get((String) frameSlotNames.get(row)));
+        Object val= ( col == 0 ? frameSlotNames.get(row) : frameSlots.get(frameSlotNames.get(row)));
 	if (val == null || val.equals(DataFrame.NIL))
 	    return "";
 	return val;

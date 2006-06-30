@@ -421,9 +421,9 @@ extends ParameterizedPlugin {
     }
     
     public void start() {
-         String files = (String) getParameter("frame-set-files",
+         String files = getParameter("frame-set-files",
                                              "org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml");
-        String name = (String) getParameter("frame-set","societyTopology");
+        String name = getParameter("frame-set","societyTopology");
         
         if (files != null) {
             // Get a list of files from frame-set-files parameter

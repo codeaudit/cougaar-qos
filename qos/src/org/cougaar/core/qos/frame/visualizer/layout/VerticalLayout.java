@@ -29,7 +29,7 @@ public class VerticalLayout extends ShapeLayout {
         double totalwidth = bounds.width - (leftMargin+rightMargin);
         double x,y, pnHeight, nHeight, i;
 
-        nHeight = totalheight / (double)num;
+        nHeight = totalheight / num;
         pnHeight= nHeight - (2*vpadding);
         i=0d;
         for (Iterator ii=children.iterator(); ii.hasNext();) {
