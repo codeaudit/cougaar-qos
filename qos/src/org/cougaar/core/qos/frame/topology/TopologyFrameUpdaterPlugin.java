@@ -206,11 +206,6 @@ extends ParameterizedPlugin {
         return agentFrame;
     }
     
-    private Indicator findIndicator(String indicatorName) {
-        Indicator indicatorFrame= (Indicator) frameSet.findFrame("indicator","name",indicatorName);
-        return indicatorFrame;
-    }
-    
     private boolean assureAgentInFrameSet(String agentName) {
         //check that agent->node->hostin WP, before adding to frameset
         MessageAddress agentAddress=MessageAddress.getMessageAddress(agentName);

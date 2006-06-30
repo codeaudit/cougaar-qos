@@ -53,13 +53,6 @@ abstract public class DataFrame
     extends Frame
     implements PropertyChangeListener
 {
-    // Used only by the reflective methods. none of which are called
-    // anymore.
-    private static final Object[] ARGS0 = {};
-    private static final Class[] TYPES0 = {};
-    private static final Class[] TYPES1 = { Object.class };
-    private static final Class[] CTYPES = { FrameSet.class, UID.class};
-
     public static final String NIL = "NIL";
     
     private static HashMap FramePackages = new HashMap();;
@@ -121,7 +114,7 @@ abstract public class DataFrame
 	    log.debug("Searching for FrameMaker for prototype "
 		      +proto+ " in package " +pkg);
 	// force a class load (ugh)
-	Class klass = frameSet.classForPrototype(proto);
+	frameSet.classForPrototype(proto);
 	DataFrame frame = null;
 	FrameMaker maker = findFrameMaker(pkg, proto);
 	if (maker != null) {
@@ -134,35 +127,6 @@ abstract public class DataFrame
     }
 
     
-
-    // Not used anymore, here for documentation
-    private static DataFrame newFrameReflective(String pkg,
-						FrameSet frameSet,
-						String proto, 
-						UID uid,
-						Properties values)
-    {
-	Class klass = frameSet.classForPrototype(proto);
-	if (klass == null) return null;
-
-	DataFrame frame = null;
-	Object[] args = { frameSet, uid };
-	try {
-	    java.lang.reflect.Constructor cons = klass.getConstructor(CTYPES);
-	    frame = (DataFrame) cons.newInstance(args);
-	    if (log.isDebugEnabled())
-		log.debug("Made frame " +frame);
-	} catch (Exception ex) {
-	    log.error("Error making frame", ex);
-	    return null;
-	}
-	frame.initializeValues(values);
-	return frame;
-    }
-
-
-
-
     private Properties props;
     private transient HashMap ddeps;
     private transient HashMap rdeps;
@@ -450,35 +414,6 @@ abstract public class DataFrame
 	if (frameSet == null) return kind.equals(getKind());
 	return frameSet.descendsFrom(this, kind);
     }
-
-    // Not used, here for documentation
-    private Properties getAllSlotsReflective()
-    {
-	Properties props = new VisibleProperties();
-	Class klass = getClass();
-	java.lang.reflect.Method[] methods = klass.getMethods();
-	for (int i=0; i<methods.length; i++) {
-	    java.lang.reflect.Method meth = methods[i];
-	    Class rtype = meth.getReturnType();
-	    Class[] ptypes = meth.getParameterTypes();
-	    String name = meth.getName();
-	    if (rtype == Object.class && ptypes.length == 0 && name.startsWith("get")) {
-		try {
-		    Object value = meth.invoke(this, ARGS0);
-		    if (value != null) {
-			String attr_name = name.substring(3);
-			props.put(attr_name, value);
-		    }
-		} catch (Exception ex) {
-		    if (log.isWarnEnabled())
-			log.warn("Couldn't invoke " +name+ " on " +this);
-		}
-	    }
-	}
-	return props;
-    }
-
-
 
 
 
@@ -780,82 +715,5 @@ abstract public class DataFrame
 		fireContainerChanges(new_container);
 	}
     }
-
-
-
-    
-    // The following four methods are no longer used and are kept here
-    // for documentation purposes.
-    private Object getLocalValueReflective(String slot)
-    {
-	Class klass = getClass();
-	String mname = "get" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
-	    Object result = meth.invoke(this, ARGS0);
-	    if (log.isDebugEnabled())
-		log.debug("Slot " +slot+ " of " +this+ " = " +result);
-	    return result;
-	} catch (Exception ex) {
-	    // This is not necessarily an error.  It could mean one of
-	    // our children was supposed to have this value and
-	    // didn't, so it asked us.
-	    if (log.isDebugEnabled())
-		log.debug("Couldn't get slot " +slot+ " of " +this+
-			  " via " +mname);
-	    return null;
-	}
-    }
-
-    private void setLocalValueReflective(String slot, Object value)
-    {
-	Class klass = getClass();
-	String mname = "set" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
-	    Object[] args1 = { value };
-	    meth.invoke(this, args1);
-	    if (log.isDebugEnabled())
-		log.debug("Set slot " +slot+ " of " +this+ " to " + value);
-	} catch (Exception ex) {
-	    log.error("Error setting slot " +slot+ " of " +this+
-		      " via " +mname);
-	}
-    }
-
-
-    private void removeLocalValueReflective(String slot)
-    {
-	Class klass = getClass();
-	String mname = "remove" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES0);
-	    meth.invoke(this, ARGS0);
-	    if (log.isDebugEnabled())
-		log.debug("Removed value of slot " +slot);
-	} catch (Exception ex) {
-	    if (log.isDebugEnabled())
-		log.debug("Couldn't remove value of slot " +slot+ " of " +this+
-			  " via " +mname);
-	}
-    }
-
-    private void initializeLocalValueReflective(String slot, Object value)
-    {
-	Class klass = getClass();
-	String mname = "initialize" + FrameGen.fixName(slot, true);
-	try {
-	    java.lang.reflect.Method meth = klass.getMethod(mname, TYPES1);
-	    Object[] args1 = { value };
-	    meth.invoke(this, args1);
-	    if (log.isDebugEnabled())
-		log.debug("Initializing slot " +slot+ " of " +this+ 
-			 " to " + value);
-	} catch (Exception ex) {
-	    log.error("Error initializing slot " +slot+ " of " +this+
-		      " via " +mname);
-	}
-    }
-
 
 }

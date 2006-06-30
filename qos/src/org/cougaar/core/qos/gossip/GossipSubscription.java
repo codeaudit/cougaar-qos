@@ -137,14 +137,6 @@ class GossipSubscription
 	}
     }
 
-    private synchronized void removeKey(String key) {
-	Callback cb = (Callback) callbacks.get(key);
-	if (cb != null) {
-	    cb.unsubscribe();
-	    callbacks.remove(key);
-	}
-    }
-
 }
 
     
