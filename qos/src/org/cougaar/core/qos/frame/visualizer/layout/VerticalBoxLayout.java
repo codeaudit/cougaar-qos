@@ -29,7 +29,7 @@ public class VerticalBoxLayout extends ShapeLayout {
         double totalheight = bounds.height - (topMargin+bottomMargin);
         double totalwidth = bounds.width - (leftMargin+rightMargin);
         double heightSum=0;
-        double x,y, nHeight, i;
+        double nHeight, i;
         Rectangle2D.Double chBounds;
 
         i=0d;

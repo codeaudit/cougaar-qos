@@ -81,17 +81,12 @@ extends ParameterizedPlugin {
             SchedulableStatus.endBlocking();
         }
         String agentName;
-        MessageAddress agentAddress=null;
         for (Iterator iter = rawAgents.iterator(); iter.hasNext(); ) {
             agentName = (String) iter.next();
             try {
                 SchedulableStatus.beginWait("WP call for version slot");       
                 if (wp.get(agentName,"version") != null) {
-                    agentAddress=MessageAddress.getMessageAddress(agentName);
                     justAgents.add(agentName);
-//                    log.info("Agent="+ agentName + 
-//                            " Node=" + topologyService.getAgentNode(agentAddress) +
-//                            " Host=" + topologyService.getAgentHost(agentAddress) );
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -209,11 +204,11 @@ extends ParameterizedPlugin {
         String hostName=topologyService.getAgentHost(agentAddress);
         if (hostName==null) return false;
         // Assure  agent->node->host in frameset
-        Agent agentFrame=findOrMakeAgent(agentName);
-        Node nodeFrame=findOrMakeNode(nodeName);
-        Host hostFrame=findOrMakeHost(hostName);
-        AgentInNode agentRelationship = findOrMakeOrMoveAgentInNode(nodeName,agentName);
-        NodeOnHost nodeRelationship = findOrMakeOrMoveNodeOnHost(hostName,nodeName);
+        findOrMakeAgent(agentName);
+        findOrMakeNode(nodeName);
+        findOrMakeHost(hostName);
+        findOrMakeOrMoveAgentInNode(nodeName,agentName);
+        findOrMakeOrMoveNodeOnHost(hostName,nodeName);
         return true;
     }
     
@@ -381,19 +376,7 @@ extends ParameterizedPlugin {
             Set agents=getAgentsFromWP();
             for (Iterator iter = agents.iterator(); iter.hasNext(); ) {
                 agentName = (String) iter.next();
-                boolean added=assureAgentInFrameSet(agentName);
-//                if (log.isInfoEnabled()){
-//                    log.info("assure Agent=" + agentName + " added=" +added);
-//                }
-//                if (log.isInfoEnabled() && added){
-//                    Indicator msgOut = findIndicator(agentName+"MsgOut");
-//                    Indicator msgIn = findIndicator(agentName+"MsgIn");
-//                    Indicator cpu = findIndicator(agentName+"Cpu");
-//                    log.info("agent=" +agentName+
-//                            " MsgIn=" +indicatorStatus(msgIn)+
-//                            " MsgOut=" +indicatorStatus(msgOut)+
-//                            " CPU=" +indicatorStatus(cpu));
-//                }
+                assureAgentInFrameSet(agentName);
             }
             restart();
          }

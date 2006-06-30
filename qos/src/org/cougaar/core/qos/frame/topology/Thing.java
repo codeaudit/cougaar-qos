@@ -94,7 +94,6 @@ public class Thing
     protected void setLocalValue(String __slot,
                                  Object __value)
     {
-       int __key = __slot.hashCode();
     }
 
 

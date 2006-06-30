@@ -28,7 +28,7 @@ public class HorizontalBoxLayout extends ShapeLayout {
         double totalheight= bounds.height-(topMargin+bottomMargin);
         double widthSum=0;
         int num = children.size();
-        double x,y, nWidth, i;
+        double nWidth, i;
 
         Rectangle2D.Double chBounds;
         i=0d;

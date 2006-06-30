@@ -27,7 +27,7 @@ public class HorizontalLayout extends ShapeLayout {
         double totalwidth = bounds.width-(leftMargin+rightMargin);
         double totalheight= bounds.height-(topMargin+bottomMargin);
         int num = children.size();
-        double x,y, pnWidth, nWidth, i;
+        double pnWidth, nWidth, i;
 
         nWidth = totalwidth / num;
         pnWidth= nWidth-(2*hpadding);

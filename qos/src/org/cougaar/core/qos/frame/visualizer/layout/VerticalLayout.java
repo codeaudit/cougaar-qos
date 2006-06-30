@@ -27,7 +27,7 @@ public class VerticalLayout extends ShapeLayout {
         int num = children.size();
         double totalheight = bounds.height - (topMargin+bottomMargin);
         double totalwidth = bounds.width - (leftMargin+rightMargin);
-        double x,y, pnHeight, nHeight, i;
+        double pnHeight, nHeight, i;
 
         nHeight = totalheight / num;
         pnHeight= nHeight - (2*vpadding);
