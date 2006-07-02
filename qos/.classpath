@@ -2,9 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/cougaar-sys"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mtsstd"/>
+	<classpathentry kind="lib" path="/jars/lib/log4j.jar"/>
+	<classpathentry kind="lib" path="/jars/lib/servlet.jar"/>
+	<classpathentry kind="lib" path="/jars/lib/quoSumo.jar"/>
 	<classpathentry kind="output" path="tmp/classes"/>
 </classpath>
