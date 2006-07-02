@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -282,6 +283,42 @@ extends DefaultHandler
 
 
     // Code Generation 
+    private enum FileType {
+	JAVA,
+	CLP,
+	DTD
+    }
+    
+    private void generateCopyright(PrintWriter writer, FileType extension) {
+	if (copyright != null) {
+	    StringTokenizer tk = new StringTokenizer(copyright, "\n");
+	    switch (extension) {
+	    case JAVA:
+		writer.println("/**");
+		while (tk.hasMoreTokens()) {
+		    writer.print(" * ");
+		    writer.println(tk.nextToken());
+		}
+		writer.println(" */");
+		break;
+		
+	    case CLP:
+		while (tk.hasMoreTokens()) {
+		    writer.print(";; ");
+		    writer.println(tk.nextToken());
+		}
+		break;
+		
+	    case DTD:
+		while (tk.hasMoreTokens()) {
+		    writer.print("<!-- ");
+		    writer.print(tk.nextToken());
+		    writer.println(" -->");
+		}
+		break;
+	    }
+	}
+    }
 
     private void generateDTD(String domain, String root) {
 	File out = new File(root, domain+".dtd");
@@ -295,7 +332,7 @@ extends DefaultHandler
 	}
 
 	writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-
+	generateCopyright(writer, FileType.DTD);
 	Set<String> elements = new HashSet<String>();
 	elements.add("frames");
 	writer.print("<!ELEMENT "+domain+" (");
@@ -386,7 +423,7 @@ extends DefaultHandler
 	    iox.printStackTrace();
 	    System.exit(-1);
 	}
-
+	generateCopyright(writer, FileType.CLP);
         Set<String> generated = new HashSet<String>();
 	writer.println("(import " +package_name+ ".*)");
 	for (String proto : proto_slots.keySet()) {
@@ -512,9 +549,8 @@ extends DefaultHandler
 	    String parent,
 	    boolean importMetrics,
 	    boolean importSlotDescriptions) {
-	if (copyright != null) {
-	    writer.println(copyright);
-	}
+	generateCopyright(writer, FileType.JAVA);
+	
 	boolean is_root_relation = 
 	    parent == null && relation_prototypes.contains(prototype);
 	String name = fixName(prototype, true);
