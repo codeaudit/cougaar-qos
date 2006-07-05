@@ -1237,7 +1237,8 @@ extends DefaultHandler
 	    String method = "set" + fixName(slot, true) + AsObject;
 	    writer.print("      ");
 	    if (first) {
-		writer.println("       int __key = __slot.hashCode();");
+		writer.println(" int __key = __slot.hashCode();");
+		writer.print("      ");
 	    } else {
 		writer.print(" else");
 	    }
