@@ -51,24 +51,24 @@ import org.cougaar.util.log.Logging;
  */
 abstract public class DataFrame 
     extends Frame
-    implements PropertyChangeListener
-{
+    implements PropertyChangeListener {
+    
     public static final String NIL = "NIL";
     
-    private static HashMap FramePackages = new HashMap();;
+    private static Map<String,Map<String,FrameMaker>> FramePackages = 
+	new HashMap<String,Map<String,FrameMaker>>();;
     private static Logger log = 
 	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
 
 
     protected static void registerFrameMaker(String pkg,
 					     String proto,
-					     FrameMaker maker)
-    {
+					     FrameMaker maker) {
 	if (log.isDebugEnabled())
 	    log.debug("Registering FrameMaker " +maker+ " for prototype "
 		      +proto+ " in package " +pkg);
 	synchronized (FramePackages) {
-	    HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
+	    Map<String,FrameMaker> frameTypeMap = FramePackages.get(pkg);
 	    if (frameTypeMap == null) {
 		frameTypeMap = new HashMap();
 		FramePackages.put(pkg, frameTypeMap);
@@ -77,19 +77,17 @@ abstract public class DataFrame
 	}
     }
 
-    protected static FrameMaker findFrameMaker(String pkg, String proto)
-    {
+    protected static FrameMaker findFrameMaker(String pkg, String proto) {
 	synchronized (FramePackages) {
-	    HashMap frameTypeMap = (HashMap) FramePackages.get(pkg);
+	    Map<String,FrameMaker> frameTypeMap = FramePackages.get(pkg);
 	    if (frameTypeMap != null) 
-		return (FrameMaker) frameTypeMap.get(proto);
+		return frameTypeMap.get(proto);
 	    else
 		return null;
 	}
     }
 
-    protected static Logger getLogger()
-    {
+    protected static Logger getLogger() {
 	return log;
     }
 
@@ -97,8 +95,7 @@ abstract public class DataFrame
     public static DataFrame newFrame(FrameSet frameSet,
 				     String proto, 
 				     UID uid,
-				     Properties initial_values)
-    {
+				     Properties initial_values) {
 	String pkg = frameSet.getPackageName();
 	return newFrame(pkg, frameSet, proto, uid, initial_values);
     }
@@ -108,8 +105,7 @@ abstract public class DataFrame
 				     FrameSet frameSet,
 				     String proto, 
 				     UID uid,
-				     Properties values)
-    {
+				     Properties values) {
 	if (log.isDebugEnabled())
 	    log.debug("Searching for FrameMaker for prototype "
 		      +proto+ " in package " +pkg);
@@ -128,15 +124,14 @@ abstract public class DataFrame
 
     
     private Properties props;
-    private transient HashMap ddeps;
-    private transient HashMap rdeps;
-    private transient HashMap slot_map;
-    private transient HashMap path_dependents;
+    private transient Map<String,DataFrame> ddeps;
+    private transient Map<String,List<RelationFrame>> rdeps;
+    private transient Map<String,String> slot_map;
+    private transient Map<String,Set<DataFrame>> path_dependents;
     private transient Object rlock;
     private transient PropertyChangeSupport pcs;
 
-    protected DataFrame(FrameSet frameSet, UID uid)
-    {
+    protected DataFrame(FrameSet frameSet, UID uid) {
 	super(frameSet, uid);
 	initializeTransients();
     }
@@ -151,26 +146,23 @@ abstract public class DataFrame
 
     // Serialization
     private void readObject(java.io.ObjectInputStream in)
-	throws java.io.IOException, ClassNotFoundException
-    {
+	throws java.io.IOException, ClassNotFoundException {
 	in.defaultReadObject();
 	initializeTransients();
     }
     
-    private void initializeTransients()
-    {
+    private void initializeTransients() {
 	pcs = new PropertyChangeSupport(this);
-	ddeps = new HashMap();
-	rdeps = new HashMap();
-	slot_map = new HashMap();
-	path_dependents = new HashMap();
+	ddeps = new HashMap<String,DataFrame>();
+	rdeps = new HashMap<String,List<RelationFrame>>();
+	slot_map = new HashMap<String,String>();
+	path_dependents = new HashMap<String,Set<DataFrame>>();
 	rlock = new Object();
     }
 
     // PropertyChangeListener
 
-    public void propertyChange(PropertyChangeEvent event)
-    {
+    public void propertyChange(PropertyChangeEvent event) {
 	// Some frame I depend on has changed (container only, for now).
 	// Resignal to my listeners.
 	if (log.isDebugEnabled())
@@ -183,24 +175,20 @@ abstract public class DataFrame
     // Path dependencies.
 
 
-    Object get_rlock()
-    {
+    Object get_rlock() {
 	return 	rlock;
     }
 
 
     // Caller should lock rlock
-    void clearRelationDependencies(String slot)
-    {
-	List rframes = (List) rdeps.get(slot);
+    void clearRelationDependencies(String slot) {
+	List<RelationFrame> rframes = rdeps.get(slot);
 	if (rframes == null) return;
-	int count = rframes.size();
-	for (int i=0; i<count; i++) {
-	    RelationFrame rframe = (RelationFrame) rframes.get(i);
+	for (RelationFrame rframe: rframes) {
 	    rframe.removePathDependent(this, slot);
 	}
 	rdeps.remove(slot);
-	DataFrame dframe = (DataFrame) ddeps.get(slot);
+	DataFrame dframe = ddeps.get(slot);
 	dframe.removePathDependent(this, slot);
 	ddeps.remove(slot);
     }
@@ -208,8 +196,7 @@ abstract public class DataFrame
     // Caller should lock rlock
     void addRelationSlotDependency(DataFrame frame, 
 				   String my_slot, 
-				   String owner_slot)
-    {
+				   String owner_slot) {
 	ddeps.put(my_slot, frame);
 	synchronized (slot_map) {
 	    slot_map.put(owner_slot, my_slot);
@@ -218,11 +205,10 @@ abstract public class DataFrame
     }
 
     // Caller should lock rlock
-    void addRelationDependency(RelationFrame rframe, String slot)
-    {
-	List rframes = (List) rdeps.get(slot);
+    void addRelationDependency(RelationFrame rframe, String slot) {
+	List<RelationFrame> rframes = rdeps.get(slot);
 	if (rframes == null) {
-	    rframes = new ArrayList();
+	    rframes = new ArrayList<RelationFrame>();
 	    rdeps.put(slot, rframes);
 	}
 	rframes.add(rframe);
@@ -230,47 +216,43 @@ abstract public class DataFrame
     }
 
     // Caller should lock rlock
-    void removeRelationDependency(RelationFrame rframe, String slot)
-    {
+    void removeRelationDependency(RelationFrame rframe, String slot) {
 	if (log.isDebugEnabled())
 	    log.debug("Removing relation dependency " +rframe+ " on " +this+
 		     " for slot " +slot);
-	List rframes = (List) rdeps.get(slot);
+	List<RelationFrame> rframes = rdeps.get(slot);
 	if (rframes != null) rframes.remove(rframe);
 	rframe.removePathDependent(this, slot);
     }
 
 
-    void addPathDependent(DataFrame dependent, String slot)
-    {
+    void addPathDependent(DataFrame dependent, String slot) {
 	if (log.isDebugEnabled())
 	    log.debug(this + " is adding dependent " +dependent+
 		      " for slot " +slot);
 	synchronized (path_dependents) {
-	    Set dependents = (Set) path_dependents.get(slot);
+	    Set<DataFrame> dependents = path_dependents.get(slot);
 	    if (dependents == null) {
-		dependents = new HashSet();
+		dependents = new HashSet<DataFrame>();
 		path_dependents.put(slot, dependents);
 	    }
 	    dependents.add(dependent);
 	}
     }
 
-    void removePathDependent(DataFrame dependent, String slot)
-    {
+    void removePathDependent(DataFrame dependent, String slot) {
 	if (log.isDebugEnabled())
 	    log.debug(this + " is removing dependent " +dependent+
 		      " for slot " +slot);
 	synchronized (path_dependents) {
-	    Set dependents = (Set) path_dependents.get(slot);
+	    Set<DataFrame> dependents = path_dependents.get(slot);
 	    if (dependents != null) dependents.remove(dependent);
 	}
     }
 
 
 
-    void pathDependencyChange(String slot)
-    {
+    void pathDependencyChange(String slot) {
 	if (log.isInfoEnabled())
 	    log.info("Path dependency has changed for frame " +this+
 		      " and for slot " +slot);
@@ -282,52 +264,43 @@ abstract public class DataFrame
     }
 
 
-    private void notifyPathDependents(String slot, Set dependents)
-    {
-	Iterator itr = dependents.iterator();
-	while (itr.hasNext()) {
-	    DataFrame frame = (DataFrame) itr.next();
+    private void notifyPathDependents(String slot, Set<DataFrame> dependents) {
+	for (DataFrame frame : dependents) {
 	    frame.pathDependencyChange(slot);
 	}
     }
 
-    void notifyPathDependents(String owner_slot)
-    {
+    void notifyPathDependents(String owner_slot) {
 	String slot = null;
 	synchronized (slot_map) {
-	    slot = (String) slot_map.get(owner_slot);
+	    slot = slot_map.get(owner_slot);
 	}
-	Set copy = null;
+	Set<DataFrame> copy = null;
 	synchronized (path_dependents) {
-	    Set dependents = (Set) path_dependents.get(slot);
+	    Set<DataFrame> dependents = path_dependents.get(slot);
 	    if (dependents == null) return;
 	    copy = new HashSet(dependents);
 	}
 	notifyPathDependents(slot, copy);
     }
 
-    void notifyAllPathDependents()
-    {
+    void notifyAllPathDependents() {
 	synchronized (path_dependents) {
-	    Iterator itr = path_dependents.entrySet().iterator();
-	    while (itr.hasNext()) {
-		Map.Entry entry = (Map.Entry) itr.next();
-		String slot = (String) entry.getKey();
-		Set dependents = (Set) entry.getValue();
-		notifyPathDependents(slot, new HashSet(dependents));
+	    for (Map.Entry<String,Set<DataFrame>> entry : path_dependents.entrySet()) {
+		String slot = entry.getKey();
+		Set<DataFrame> dependents = entry.getValue();
+		notifyPathDependents(slot, new HashSet<DataFrame>(dependents));
 	    }
 	}
     }
 
 
     // Jess ShadowFact
-    public void addPropertyChangeListener(PropertyChangeListener pcl)
-    {
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
 	pcs.addPropertyChangeListener(pcl);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener pcl)
-    {
+    public void removePropertyChangeListener(PropertyChangeListener pcl) {
 	pcs.removePropertyChangeListener(pcl);
     }
 
@@ -337,35 +310,30 @@ abstract public class DataFrame
 
     // In this context "local" means: include slots the prototype tree
     // but not from the container tree.
-    public Properties getLocalSlots()
-    {
+    public Properties getLocalSlots() {
 	Properties props = new VisibleProperties();
 	collectSlotValues(props);
 	return props;
     }
 
-    public Properties getAllSlots()
-    {
+    public Properties getAllSlots() {
 	Properties props = new VisibleProperties();
 	collectSlotValues(props);
 	collectContainerSlotValues(props);
 	return props;
     }
 
-    public Map slotDescriptions()
-    {
-	HashMap descriptions = new HashMap();
+    public Map<String,SlotDescription> slotDescriptions() {
+	Map<String,SlotDescription> descriptions = new HashMap<String,SlotDescription>();
 	collectSlotDescriptions(descriptions);
 	return descriptions;
     }
 
-    public void setValue(String slot, Object value)
-    {
+    public void setValue(String slot, Object value) {
 	setLocalValue(slot, value);
     }
 
-    public void initializeValues(Properties values)
-    {
+    public void initializeValues(Properties values) {
 	Iterator itr = values.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
@@ -380,15 +348,13 @@ abstract public class DataFrame
 	postInitialize();
     }
 
-    public String getContainerKind()
-    {
+    public String getContainerKind() {
 	Frame container = containerFrame();
 	return container == null ? null : container.getKind();
     }
 
     // Don't use a beany name here...
-    public DataFrame containerFrame()
-    {
+    public DataFrame containerFrame() {
 	if (frameSet == null) return null;
 	DataFrame result = frameSet.getContainer(this);
 	if (result == null) {
@@ -397,20 +363,17 @@ abstract public class DataFrame
 	return result;
     }
 
-    public Set findRelations(String role, String relation)
-    {
+    public Set<DataFrame> findRelations(String role, String relation) {
 	if (frameSet == null) return null;
 	return frameSet.findRelations(this, role, relation);
     }
 
-    public Map findRelationshipFrames(String role, String relation)
-    {
+    public Map<RelationFrame,DataFrame> findRelationshipFrames(String role, String relation) {
 	if (frameSet == null) return null;
 	return frameSet.findRelationshipFrames(this, role, relation);
     }
 
-    public boolean isa(String kind)
-    {
+    public boolean isa(String kind) {
 	if (frameSet == null) return kind.equals(getKind());
 	return frameSet.descendsFrom(this, kind);
     }
@@ -423,8 +386,7 @@ abstract public class DataFrame
 				Object old_value, 
 				Object new_value,
 				boolean notify_listeners,
-				boolean notify_blackboard)
-    {
+				boolean notify_blackboard) {
 	if (notify_blackboard && frameSet != null) 
 	    frameSet.valueUpdated(this, slot, new_value);
 	if (notify_listeners) {
@@ -435,36 +397,31 @@ abstract public class DataFrame
     }
 
 
-    protected void slotInitialized(String slot, Object value)
-    {
+    protected void slotInitialized(String slot, Object value) {
 	// nothing to be done at the moment
     }
 
-    protected void postInitialize()
-    {
+    protected void postInitialize() {
 	// Nothing at this level.  Frame types with Metric-value slots
 	// should subscribe to the MetricsService here
     }
 
     //  Converters used in generated code
-    protected String force_String(Object x)
-    {
+    protected String force_String(Object x) {
 	if (x instanceof String)
 	    return ((String) x);
 	else
 	    return x.toString(); // hmm
     }
 
-    protected Metric force_Metric(Object x)
-    {
+    protected Metric force_Metric(Object x) {
 	if (x instanceof Metric)
 	    return ((Metric) x);
 	else
 	    throw new RuntimeException(x + " cannot be coerced to a Metric");
     }
 
-    protected double force_double(Object x)
-    {
+    protected double force_double(Object x) {
 	if (x instanceof String)
 	    return Double.parseDouble((String) x);
 	else if (x instanceof Double)
@@ -473,8 +430,7 @@ abstract public class DataFrame
 	    throw new RuntimeException(x + " cannot be coerced to a double");
     }
 
-    protected Double force_Double(Object x)
-    {
+    protected Double force_Double(Object x) {
 	if (x instanceof String) {
 	    return Double.valueOf((String) x);
 	} else if (x instanceof Double) {
@@ -484,8 +440,7 @@ abstract public class DataFrame
 	}
     }
 
-    protected float force_float(Object x)
-    {
+    protected float force_float(Object x) {
 	if (x instanceof String)
 	    return Float.parseFloat((String) x);
 	else if (x instanceof Float)
@@ -494,8 +449,7 @@ abstract public class DataFrame
 	    throw new RuntimeException(x + " cannot be coerced to a float");
     }
 
-    protected Float force_Float(Object x)
-    {
+    protected Float force_Float(Object x) {
 	if (x instanceof String)
 	    return Float.valueOf((String) x);
 	else if (x instanceof Float)
@@ -505,8 +459,7 @@ abstract public class DataFrame
     }
 
 
-    protected long force_long(Object x)
-    {
+    protected long force_long(Object x) {
 	if (x instanceof String)
 	    return Long.parseLong((String) x);
 	else if (x instanceof Long)
@@ -516,8 +469,7 @@ abstract public class DataFrame
     }
 
 
-    protected Long force_Long(Object x)
-    {
+    protected Long force_Long(Object x) {
 	if (x instanceof String)
 	    return Long.valueOf((String) x);
 	else if (x instanceof Long)
@@ -527,8 +479,7 @@ abstract public class DataFrame
     }
 
 
-    protected int force_int(Object x)
-    {
+    protected int force_int(Object x) {
 	if (x instanceof String)
 	    return Integer.parseInt((String) x);
 	else if (x instanceof Integer)
@@ -537,8 +488,7 @@ abstract public class DataFrame
 	    throw new RuntimeException(x + " cannot be coerced to an int");
     }
 
-    protected Integer force_Integer(Object x)
-    {
+    protected Integer force_Integer(Object x) {
 	if (x instanceof String)
 	    return Integer.valueOf((String) x);
 	else if (x instanceof Integer)
@@ -548,8 +498,7 @@ abstract public class DataFrame
     }
 
 
-    protected boolean force_boolean(Object x)
-    {
+    protected boolean force_boolean(Object x) {
 	if (x instanceof String)
 	    return ((String) x).equalsIgnoreCase("true");
 	else if (x instanceof Boolean)
@@ -559,8 +508,7 @@ abstract public class DataFrame
     }
 
 
-    protected Boolean force_Boolean(Object x)
-    {
+    protected Boolean force_Boolean(Object x) {
 	if (x instanceof String)
 	    return Boolean.valueOf((String) x);
 	else if (x instanceof Boolean)
@@ -574,8 +522,7 @@ abstract public class DataFrame
 
     protected void fireChange(String property, 
 			      Object old_value, 
-			      Object new_value)
-    {
+			      Object new_value) {
 	if (log.isDebugEnabled())
 	    log.debug("Fire PropertyChange " +property+
 		      " old value = " +old_value+
@@ -590,50 +537,41 @@ abstract public class DataFrame
     }
 
     protected void fireContainerChanges(DataFrame old_frame, 
-					DataFrame new_frame)
-    {
+					DataFrame new_frame) {
 	// default is no-op
     }
 
-    protected void fireContainerChanges(DataFrame new_frame)
-    {
+    protected void fireContainerChanges(DataFrame new_frame) {
 	// default is no-op
     }
 
-    protected void collectSlotDescriptions(Map map)
-    {
+    protected void collectSlotDescriptions(Map<String,SlotDescription> map) {
 	// default is no-op
     }
 
-    protected void collectSlotValues(Properties props)
-    {
+    protected void collectSlotValues(Properties props) {
 	// default is no-op
     }
 
-    protected void collectContainerSlotValues(Properties props)
-    {
+    protected void collectContainerSlotValues(Properties props) {
 	// default is no-op
     }
 
-    protected synchronized Object getProperty(String slot)
-    {
+    protected synchronized Object getProperty(String slot) {
 	if (props == null) props = new Properties();
 	return props.get(slot);
     }
 
-    protected synchronized void setProperty(String slot, Object value)
-    {
+    protected synchronized void setProperty(String slot, Object value) {
 	if (props == null) props = new Properties();
 	props.put(slot, value);
     }
 
-    protected synchronized void removeProperty(String slot)
-    {
+    protected synchronized void removeProperty(String slot) {
 	if (props != null) props.remove(slot);
     }
 
-    protected Object getInheritedValue(Frame origin, String slot)
-    {
+    protected Object getInheritedValue(Frame origin, String slot) {
 	Object result = super.getInheritedValue(origin, slot);
 	if (result != null) return result;
 
@@ -647,8 +585,7 @@ abstract public class DataFrame
 	}
     }
 
-    Object getValue(Frame origin, String slot)
-    {
+    Object getValue(Frame origin, String slot) {
 	Object result = getLocalValue(slot);
 	if (result != null) 
 	    return result;
@@ -656,8 +593,7 @@ abstract public class DataFrame
 	    return getInheritedValue(origin, slot);
     }
 
-    void addToFrameSet(FrameSet frameSet)
-    {
+    void addToFrameSet(FrameSet frameSet) {
 	if (this.frameSet != null && this.frameSet != frameSet) {
 	    throw new RuntimeException(this +" is already in FrameSet "
 				       +this.frameSet+
@@ -672,8 +608,7 @@ abstract public class DataFrame
 
 
 
-    void dumpLocalSlots(PrintWriter writer, int indentation, int offset)
-    {
+    void dumpLocalSlots(PrintWriter writer, int indentation, int offset) {
 	Map slots = getLocalSlots();
 	Iterator itr = slots.entrySet().iterator();
 	while (itr.hasNext()) {
@@ -686,8 +621,7 @@ abstract public class DataFrame
 	}
     }
 
-    void dump(PrintWriter writer, int indentation, int offset)
-    {
+    void dump(PrintWriter writer, int indentation, int offset) {
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("<frame prototype=\"" +getKind()+ "\">");
 	dumpLocalSlots(writer, indentation+offset, offset);
@@ -696,8 +630,7 @@ abstract public class DataFrame
     }
 
 
-    void containerChange(DataFrame old_container, DataFrame new_container)
-    {
+    void containerChange(DataFrame old_container, DataFrame new_container) {
 	if (log.isDebugEnabled())
 	    log.debug(" Old container = " +old_container+
 		      " New container = " +new_container);

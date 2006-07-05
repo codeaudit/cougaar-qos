@@ -1046,7 +1046,7 @@ extends DefaultHandler
 
 	if (slots.isEmpty() && container_slots.isEmpty()) return;
 
-	writer.println("\n\n    protected void collectSlotDescriptions(java.util.Map map) {");
+	writer.println("\n\n    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {");
 	writer.println("        super.collectSlotDescriptions(map);");
 	for (String slot : slots.keySet()) {
 	    writer.println("        map.put(\""  +slot+ "\", "

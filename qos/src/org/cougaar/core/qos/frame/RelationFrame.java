@@ -35,29 +35,25 @@ import org.cougaar.core.util.UID;
  * frame representing a relationship.
  */
 abstract public class RelationFrame
-    extends DataFrame 
-{
-    
+extends DataFrame {
+
     // This is only here to suppress useless warnings when the
     // frameset fails to find one of the relations two operands.
     private transient long failed_lookup_time;
 
-    long failed_lookup_time()
-    {
+    long failed_lookup_time() {
 	long now = System.currentTimeMillis();
 	if (failed_lookup_time == 0) failed_lookup_time = now;
 	return now - failed_lookup_time;
     }
 
-    void clear_failed_lookup_time()
-    {
+    void clear_failed_lookup_time() {
 	failed_lookup_time = 0;
     }
-	
 
 
-    protected RelationFrame(FrameSet frameSet, UID uid)
-    {
+
+    protected RelationFrame(FrameSet frameSet, UID uid) {
 	super(frameSet, uid);
     }
 
@@ -71,52 +67,46 @@ abstract public class RelationFrame
 
     // Path dependencies.
 
-    void notifyPathDependents(String slot)
-    {
+    void notifyPathDependents(String slot) {
 	notifyAllPathDependents();
-   }
+    }
 
 
-    public DataFrame relationshipParent()
-    {
+    public DataFrame relationshipParent() {
 	if (frameSet == null) return null;
 	return frameSet.getRelationshipParent(this);
     }
 
-    public DataFrame relationshipChild()
-    {
+    public DataFrame relationshipChild() {
 	if (frameSet == null) return null;
 	return frameSet.getRelationshipChild(this);
     }
 
-    protected void collectSlotValues(java.util.Properties __props)
-    {
-        super.collectSlotValues(__props);
+    protected void collectSlotValues(java.util.Properties __props) {
+	super.collectSlotValues(__props);
 	Object __value;
-        __value = getParentPrototype();
-        __props.put("parent-prototype", __value != null ? __value : NIL);
-        __value = getChildPrototype();
-        __props.put("child-prototype", __value != null ? __value : NIL);
-        __value = getParentSlot();
-        __props.put("parent-slot", __value != null ? __value : NIL);
-        __value = getChildSlot();
-        __props.put("child-slot", __value != null ? __value : NIL);
+	__value = getParentPrototype();
+	__props.put("parent-prototype", __value != null ? __value : NIL);
+	__value = getChildPrototype();
+	__props.put("child-prototype", __value != null ? __value : NIL);
+	__value = getParentSlot();
+	__props.put("parent-slot", __value != null ? __value : NIL);
+	__value = getChildSlot();
+	__props.put("child-slot", __value != null ? __value : NIL);
     }
 
-    private void makeMetaDescription(String name, Object value,	Map map)
-    {
-        SlotDescription __desc = new SlotDescription();
-        __desc.name = name;
-        __desc.prototype = "relation-frame";
-        __desc.is_writable = false;
+    private void makeMetaDescription(String name, Object value,	Map<String,SlotDescription> map)  {
+	SlotDescription __desc = new SlotDescription();
+	__desc.name = name;
+	__desc.prototype = "relation-frame";
+	__desc.is_writable = false;
 	__desc.is_overridden = true;
-        __desc.value = value;
+	__desc.value = value;
 	map.put(name, __desc);
     }
 
-    protected void collectSlotDescriptions(Map map)
-    {
-        super.collectSlotDescriptions(map);
+    protected void collectSlotDescriptions(Map<String,SlotDescription> map) {
+	super.collectSlotDescriptions(map);
 	makeMetaDescription("parent-prototype", getParentPrototype(), map);
 	makeMetaDescription("parent-slot", getParentSlot(), map);
 	makeMetaDescription("child-prototype", getChildPrototype(), map);
