@@ -753,13 +753,17 @@ extends DefaultHandler
 	}
     }
 
-
+    private String getterPrefix(String type) {
+	return type.equalsIgnoreCase("boolean") ? "is" : "get";
+    }
+    
     private void writeGetter(PrintWriter writer, 
 	    String prototype,
 	    String slot,
 	    Attributes attrs,
 	    String type,
 	    boolean warn) {
+	String prefix = getterPrefix(type);
 	String accessor_name = fixName(slot, true);
 	String fixed_name = fixName(slot, false);
 	String default_value = attrs.getValue("default-value");
@@ -772,9 +776,9 @@ extends DefaultHandler
 		writer.println("      " +doc);
 		writer.println("    **/");
 	    }
-	    writer.print("    public "+type+" get" +accessor_name);
+	    writer.print("    public "+type+" " + prefix +accessor_name);
 	} else {
-	    writer.print("\n\n    "+type+" get" +accessor_name+ NoWarn);
+	    writer.print("\n\n    "+type+" " +prefix +accessor_name+ NoWarn);
 	}
 	writer.println("() {");
 	if (memberp) {
@@ -807,7 +811,7 @@ extends DefaultHandler
 	String fixed_name = fixName(slot, false);
 	String default_value = attrs.getValue("default-value");
 	boolean memberp = isMember(prototype, slot);
-	writer.print("\n\n    Object get" +accessor_name+ AsObject);
+	writer.print("\n\n    Object " + "get" +accessor_name+ AsObject);
 	writer.println("() {");
 	if (memberp) {
 	    writer.println("        return "
@@ -838,15 +842,16 @@ extends DefaultHandler
 	    String type,
 	    boolean warn) {
 	String accessor_name = fixName(slot, true);
+	String prefix = getterPrefix(type);
 	String default_value = attrs.getValue("default-value");
 	if (warn) {
-	    writer.print("\n\n    public "+type+" get" +accessor_name);
+	    writer.print("\n\n    public "+type+" " +prefix +accessor_name);
 	} else {
-	    writer.print("\n\n    "+type+" get" +accessor_name+	 NoWarn);
+	    writer.print("\n\n    "+type+" " +prefix +accessor_name+	 NoWarn);
 	}
 	writer.println("() {");
 	String result_var = "__result";
-	writer.println("        "+type+" " +result_var+ " = super.get" 
+	writer.println("        "+type+" " +result_var+ " = super." +prefix 
 		+accessor_name+ NoWarn+ "();");
 	writer.println("        if (" +result_var+ " != null) return "
 		+result_var+ ";");
@@ -862,12 +867,13 @@ extends DefaultHandler
 	    String slot,
 	    Attributes attrs,
 	    String type) {
+	String prefix = "get";
 	String accessor_name = fixName(slot, true);
 	String default_value = attrs.getValue("default-value");
-	writer.print("\n\n    Object get" +accessor_name+ AsObject);
+	writer.print("\n\n    Object " + prefix +accessor_name+ AsObject);
 	writer.println("() {");
 	String result_var = "__result";
-	writer.println("        Object " +result_var+ " = super.get" 
+	writer.println("        Object " +result_var+ " = super." +prefix 
 		+accessor_name+ AsObject+ "();");
 	writer.println("        if (" +result_var+ " != null) return "
 		+result_var+ ";");
