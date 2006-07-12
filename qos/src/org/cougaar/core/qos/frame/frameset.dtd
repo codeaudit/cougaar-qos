@@ -23,7 +23,7 @@
 	                     doc CDATA #IMPLIED>
 <!ELEMENT path (fork*, slot-reference?)>
 <!ATTLIST path name CDATA #REQUIRED>
-<!ELEMENT slot EMPTY>
+<!ELEMENT slot (dependency)*>
 <!ATTLIST slot name CDATA #REQUIRED
 	       type CDATA #IMPLIED
 	       default-value CDATA #IMPLIED
@@ -42,3 +42,9 @@
 	       role CDATA #REQUIRED>
 <!ELEMENT slot-reference EMPTY>
 <!ATTLIST slot-reference name CDATA #REQUIRED>
+
+<!ELEMENT dependency EMPTY>
+<!ATTLIST dependency relation CDATA #REQUIRED
+          child-prototype CDATA #REQUIRED
+          updater CDATA #REQUIRED
+          child-slot CDATA #IMPLIED>
