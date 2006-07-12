@@ -69,6 +69,11 @@ public class SlotUpdaterPlugin extends ParameterizedPlugin implements FrameSetSe
     private LoggingService log;
     private FrameSet frameset;
     private IncrementalSubscription sub;
+    
+    private void getChildClass() {
+	String childPrototype = getParameter("child-prototype");
+	childClass = frameset.classForPrototype(childPrototype);
+    }
 
     public void start() {
 	ServiceBroker sb = getServiceBroker();
@@ -76,25 +81,19 @@ public class SlotUpdaterPlugin extends ParameterizedPlugin implements FrameSetSe
 	
 	this.relation = getParameter("relation");
 	this.childSlot = getParameter("child-slot");
-	String childClassName = getParameter("child-class");
-	try {
-	    childClass = Class.forName(childClassName);
-	} catch (ClassNotFoundException e) {
-	    log.error("Class not found: " + childClassName);
-	    return;
-	}
+	
 	String updaterName = getParameter("updater");
 	try {
 	    Class updateClass = Class.forName(updaterName);
 	    updater = (SlotUpdater) updateClass.newInstance();
 	} catch (ClassNotFoundException e) {
-	    log.error("Class not found: " + childClassName);
+	    log.error("Class not found: " + updaterName);
 	    return;
 	} catch (InstantiationException e) {
-	    log.error("Couldn't instantiate " + childClassName);
+	    log.error("Couldn't instantiate " + updaterName);
 	    return;
 	} catch (IllegalAccessException e) {
-	    log.error("Couldn't instantiate " + childClassName);
+	    log.error("Couldn't instantiate " + updaterName);
 	    return;
 	}
 	
@@ -104,6 +103,7 @@ public class SlotUpdaterPlugin extends ParameterizedPlugin implements FrameSetSe
 	sb.getService(this, FrameSetService.class, null);
 	if (fss != null) {
 	    frameset = fss.findFrameSet(frameSetName, this);
+	    if (frameset != null) getChildClass();
 	} else {
 	    log.error("Couldn't find FrameSetService");
 	}
@@ -114,6 +114,10 @@ public class SlotUpdaterPlugin extends ParameterizedPlugin implements FrameSetSe
 
     // Generic piece: decide which frames to update
     protected void execute() {
+	if (childClass == null) {
+	    // too early
+	    return;
+	}
 	Set<DataFrame> framesToUpdate = null;
 	// For now we're only looking at changes to hosts
 	if (sub.hasChanged()) {
@@ -152,12 +156,14 @@ public class SlotUpdaterPlugin extends ParameterizedPlugin implements FrameSetSe
 
     public void frameSetAvailable(String name, FrameSet set) {
 	frameset = set;
+	getChildClass();
     }
 
 
     private class FramePredicate implements UnaryPredicate {
 	public boolean execute(Object o) {
 	    // Boilerplate
+	    if (childClass == null) return false;
 	    if (frameset == null || !(o instanceof DataFrame)) return false;
 	    DataFrame frame = (DataFrame) o;
 	    if (frameset != frame.getFrameSet()) return false;
