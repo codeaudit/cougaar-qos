@@ -47,8 +47,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * parsing is SAX.
  */
 public class FrameSetParser
-    extends DefaultHandler
-{
+    extends DefaultHandler {
     private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
     private static final String DRIVER_DEFAULT =
 	"org.apache.crimson.parser.XMLReaderImpl";
@@ -59,115 +58,13 @@ public class FrameSetParser
 	    System.setProperty(DRIVER_PROPERTY, DRIVER_DEFAULT);
     }
 
-
-
-
-    // Helper structs
-    abstract private class FrameSpec
-    {
-	Properties props;
-	String prototype;
-	FrameSpec()
-	{
-	    props = new Properties();
-	}
-
-	void put(String attr, Object value)
-	{
-	    props.put(attr, value);
-	}
-    }
-
-    private class DataFrameSpec
-	extends FrameSpec
-    {
-	String reference;
-
-	DataFrameSpec(Attributes attrs)
-	{
-	    super();
-	    prototype = attrs.getValue("prototype");
-	    reference = attrs.getValue("reference");
-	}
-
-	DataFrameSpec(String name)
-	{
-	    super();
-	    prototype = name;
-	}
-
-	Frame makeFrame(FrameSet frameSet)
-	{
-	    Frame frame = frameSet.makeFrame(prototype, props);
-	    if (reference != null) {
-		synchronized (references) {
-		    references.put(reference, frame);
-		}
-	    }
-	    return frame;
-	}
-    }
-
-    private class PrototypeSpec
-	extends FrameSpec
-    {
-	String name;
-
-	PrototypeSpec(Attributes attrs)
-	{
-	    super();
-	    name = attrs.getValue("name");
-	    prototype = attrs.getValue("prototype");
-	}
-
-	Frame makePrototype(FrameSet frameSet)
-	{
-	    PrototypeFrame frame =
-		frameSet.makePrototype(name, prototype, props);
-	    return frame;
-	}
-
-    }
-
-    private class PathSpec
-    {
-	String name;
-	ArrayList path;
-	String slot;
-
-	PathSpec(String name)
-	{
-	    this.name = name;
-	    path = new ArrayList();
-	}
-
-	void addToPath(String role, String relation)
-	{
-	    path.add(new Path.Fork(role, relation));
-	}
-
-	void setSlot(String slot)
-	{
-	    this.slot = slot;
-	}
-
-	Path makePath(FrameSet frameSet)
-	{
-	    Path.Fork[] array = new Path.Fork[path.size()];
-	    for (int i=0; i<path.size(); i++)
-		array[i] = (Path.Fork) path.get(i);
-	    return frameSet.makePath(name, array, slot);
-	}
-
-    }
-
-
     private String frame_set_name;
     private FrameSet frame_set;
     private DataFrameSpec frame_spec;
     private PrototypeSpec proto_spec;
     private PathSpec path_spec;
-    private String current_slot;
+    private String slot_def; // slot being defined when we're parsing prototypes xml
+    private String current_slot; // slot being set when we're parsing data xml
     private HashMap path_specs;
     private HashMap references;
     private String domain;
@@ -176,8 +73,7 @@ public class FrameSetParser
     private BlackboardService bbs;
     private LoggingService log;
 
-    public FrameSetParser(ServiceBroker sb, BlackboardService bbs)
-    {
+    public FrameSetParser(ServiceBroker sb, BlackboardService bbs) {
 	this.sb = sb;
 	this.bbs = bbs;
 	this.log = (LoggingService)
@@ -185,8 +81,7 @@ public class FrameSetParser
 	path_specs = new HashMap();
     }
 
-    public FrameSet parseFrameSetFiles(String name, String[] xml_filenames)
-    {
+    public FrameSet parseFrameSetFiles(String name, String[] xml_filenames) {
 	if (xml_filenames == null || xml_filenames.length == 0)  return null;
 
 	FrameSet fset = parseFrameSetFile(name, xml_filenames[0], null);
@@ -195,15 +90,13 @@ public class FrameSetParser
 	return fset;
     }
 
-    public FrameSet parseFrameSetFile(String name, String xml_filename)
-    {
+    public FrameSet parseFrameSetFile(String name, String xml_filename) {
 	return parseFrameSetFile(name, xml_filename, null);
     }
 
     public FrameSet parseFrameSetFile(String name,
 				      String xml_filename,
-				      FrameSet frameSet)
-    {
+				      FrameSet frameSet) {
 	if (log.isInfoEnabled())
 	    log.info("FrameSet " +name+ " file " +xml_filename);
 		
@@ -231,8 +124,7 @@ public class FrameSetParser
 
 
     public void startElement(String uri, String local, String name, 
-			     Attributes attrs)
-    {
+			     Attributes attrs) {
 	try {
 	    if (frame_spec != null) {
 		// inner structures are always slot values
@@ -246,7 +138,7 @@ public class FrameSetParser
 	    } else if (name.equals("relation-prototype")) {
 		startPrototype(attrs);
 	    } else if (name.equals("slot")) {
-		slot(attrs);
+		startSlot(attrs);
 	    } else if (name.equals("slot-reference")) {
 		slot_reference(attrs);
 	    } else if (name.equals("dependency")) {
@@ -254,7 +146,7 @@ public class FrameSetParser
 		String childSlot = attrs.getValue("child-slot");
 		String relation = attrs.getValue("relation");
 		String cname = attrs.getValue("updater");
-		frame_set.addSlotDependency(childProto, childSlot, relation, cname);
+		frame_set.addSlotDependency(slot_def, childProto, childSlot, relation, cname);
 	    } else if (name.equals("fork")) {
 		fork(attrs);
 	    } else if (name.equals("frames")) {
@@ -274,8 +166,7 @@ public class FrameSetParser
 	}
     }
 
-    public void endElement(String uri, String local, String name)
-    {
+    public void endElement(String uri, String local, String name) {
 	try {
 	    if (name.equals("frameset")) {
 		endFrameset();
@@ -294,7 +185,7 @@ public class FrameSetParser
 	    } else if (name.equals("fork")) {
 		// no-op
 	    } else if (name.equals("slot")) {
-		// no-op
+		endSlot();
 	    } else if (name.equals("slot-reference")) {
 		// no-op
 	    } else if (current_slot != null) {
@@ -309,9 +200,8 @@ public class FrameSetParser
 	}
     }
 
-    // Not using this yet
-    public void characters(char buf[], int offset, int length)
-    {
+    // Only used so far for specifying slot values in data xml
+    public void characters(char buf[], int offset, int length) {
 	try {
 	    if (current_slot != null) {
 		String value = new String(buf, offset, length);
@@ -335,8 +225,7 @@ public class FrameSetParser
 
 
 
-    private void startFrameset(Attributes attrs)
-    {
+    private void startFrameset(Attributes attrs) {
 	if (log.isDebugEnabled())
 	    log.debug("startFrameset");
 	
@@ -355,16 +244,14 @@ public class FrameSetParser
     }
 
 
-    private void startPrototype(Attributes attrs)
-    {
+    private void startPrototype(Attributes attrs) {
 	if (log.isDebugEnabled())
 	    log.debug("startPrototype");
 
 	proto_spec = new PrototypeSpec(attrs);
     }
 
-    private void endPrototype()
-    {
+    private void endPrototype() {
 	if (log.isDebugEnabled())
 	    log.debug("endPrototype");
 
@@ -372,24 +259,21 @@ public class FrameSetParser
 	proto_spec = null;
     }
 
-    private void startFrame(Attributes attrs)
-    {
+    private void startFrame(Attributes attrs) {
 	if (log.isDebugEnabled())
 	    log.debug("startFrame");
 
 	frame_spec = new DataFrameSpec(attrs);
     }
 
-    private void startFrame(String name)
-    {
+    private void startFrame(String name) {
 	if (log.isDebugEnabled())
 	    log.debug("startFrame");
 
 	frame_spec = new DataFrameSpec(name);
     }
 
-    private void endFrame()
-    {
+    private void endFrame() {
 	if (log.isDebugEnabled())
 	    log.debug("endFrame");
 
@@ -399,8 +283,7 @@ public class FrameSetParser
 
 
 
-    private void startPath(Attributes attrs)
-    {
+    private void startPath(Attributes attrs) {
 	if (log.isDebugEnabled())
 	    log.debug("startPath");
 
@@ -408,15 +291,13 @@ public class FrameSetParser
 	path_spec = new PathSpec(name);
     }
 
-    private void fork(Attributes attrs)
-    {
+    private void fork(Attributes attrs) {
 	String role = attrs.getValue("role");
 	String relation = attrs.getValue("relation");
 	path_spec.addToPath(role, relation);
     }
 
-    private void endPath()
-    {
+    private void endPath() {
 	if (log.isDebugEnabled())
 	    log.debug("endPath");
 
@@ -427,21 +308,23 @@ public class FrameSetParser
 
 
 
-    private void slot(Attributes attrs)
-    {
+    private void startSlot(Attributes attrs) {
 	if (log.isDebugEnabled())
 	    log.debug("slot");
 
 	if (proto_spec != null) {
-	    String slot = attrs.getValue("name");
-	    proto_spec.put(slot, new AttributesImpl(attrs));
+	    slot_def = attrs.getValue("name");
+	    proto_spec.put(slot_def, new AttributesImpl(attrs));
 	} else {
 	    // log
 	}
     }
+    
+    private void endSlot() {
+	slot_def = null;
+    }
 
-    private void slot_reference(Attributes attrs)
-    {
+    private void slot_reference(Attributes attrs) {
 	if (log.isDebugEnabled())
 	    log.debug("slot-reference");
 
@@ -453,9 +336,96 @@ public class FrameSetParser
 	}
     }
 
-    private void endFrameset()
-    {
+    private void endFrameset() {
 	// no-op
     }
+    
+    
+    
+
+    // Helper structs
+    abstract private class FrameSpec {
+	Properties props;
+	String prototype;
+	FrameSpec() {
+	    props = new Properties();
+	}
+
+	void put(String attr, Object value) {
+	    props.put(attr, value);
+	}
+    }
+
+    private class DataFrameSpec
+	extends FrameSpec {
+	String reference;
+
+	DataFrameSpec(Attributes attrs)	{
+	    super();
+	    prototype = attrs.getValue("prototype");
+	    reference = attrs.getValue("reference");
+	}
+
+	DataFrameSpec(String name) {
+	    super();
+	    prototype = name;
+	}
+
+	Frame makeFrame(FrameSet frameSet) {
+	    Frame frame = frameSet.makeFrame(prototype, props);
+	    if (reference != null) {
+		synchronized (references) {
+		    references.put(reference, frame);
+		}
+	    }
+	    return frame;
+	}
+    }
+
+    private class PrototypeSpec
+	extends FrameSpec {
+	String name;
+
+	PrototypeSpec(Attributes attrs) {
+	    super();
+	    name = attrs.getValue("name");
+	    prototype = attrs.getValue("prototype");
+	}
+
+	Frame makePrototype(FrameSet frameSet) {
+	    PrototypeFrame frame =
+		frameSet.makePrototype(name, prototype, props);
+	    return frame;
+	}
+
+    }
+
+    private class PathSpec {
+	String name;
+	ArrayList path;
+	String slot;
+
+	PathSpec(String name) {
+	    this.name = name;
+	    path = new ArrayList();
+	}
+
+	void addToPath(String role, String relation) {
+	    path.add(new Path.Fork(role, relation));
+	}
+
+	void setSlot(String slot) {
+	    this.slot = slot;
+	}
+
+	Path makePath(FrameSet frameSet) {
+	    Path.Fork[] array = new Path.Fork[path.size()];
+	    for (int i=0; i<path.size(); i++)
+		array[i] = (Path.Fork) path.get(i);
+	    return frameSet.makePath(name, array, slot);
+	}
+
+    }
+
 
 }

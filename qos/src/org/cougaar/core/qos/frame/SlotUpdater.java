@@ -37,6 +37,6 @@ import java.util.Set;
  * some way.
  */
 public interface SlotUpdater {
-    public void updateSlotValue(DataFrame frame, Set<DataFrame>children);
+    public void updateSlotValue(DataFrame frame, String slot, Set<DataFrame>children);
 
 }

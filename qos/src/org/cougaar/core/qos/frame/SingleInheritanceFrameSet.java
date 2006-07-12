@@ -117,12 +117,13 @@ public class SingleInheritanceFrameSet
 
     // Slot dependencies
     
-    public void addSlotDependency(String childProto, String childSlot, String relation,
+    public void addSlotDependency(String slot, String childProto, String childSlot, String relation,
 	    String updaterClassName) {
 	try {
 	    Class updateClass = Class.forName(updaterClassName);
 	    SlotUpdater updater = (SlotUpdater) updateClass.newInstance();
-	    SlotDependency dep = new SlotDependency(this,childProto,childSlot,relation,updater);
+	    SlotDependency dep = 
+		new SlotDependency(this, slot, childProto, childSlot, relation, updater);
 	    dependencies.add(dep);
 	} catch (ClassNotFoundException e) {
 	    log.error("Class not found: " + updaterClassName);

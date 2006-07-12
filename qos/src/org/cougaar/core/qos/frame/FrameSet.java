@@ -243,7 +243,9 @@ public interface FrameSet {
     
     // Slot dependencies
     
-    public void addSlotDependency(String childProto, String childSlot, String relation,
+    public void addSlotDependency(String slot, 
+	    String childProto, String childSlot, 
+	    String relation,
 	    String updaterClassName);
     
     public void initializeSlotDependencies(BlackboardService bbs);

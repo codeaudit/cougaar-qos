@@ -43,6 +43,7 @@ import org.cougaar.util.UnaryPredicate;
  * 
  */
 public class SlotDependency {
+    private final String parentSlot;
     private final String childSlot;
     private final String relation;
     private final SlotUpdater updater;
@@ -50,11 +51,12 @@ public class SlotDependency {
     private final Class childClass;
     private IncrementalSubscription sub;
     
-    public SlotDependency(FrameSet frameset, 
+    public SlotDependency(FrameSet frameset, String slot, 
 	    	String childProto, String childSlot, 
 	    	String relation,
 	    	SlotUpdater updater) {
 	this.updater = updater;
+	this.parentSlot = slot;
 	this.childSlot = childSlot;
 	this.relation = relation;
 	this.frameset = frameset;
@@ -106,7 +108,7 @@ public class SlotDependency {
 	}
 	for (DataFrame frame : framesToUpdate) {
 	    Set<DataFrame> children = frame.findRelations("child", relation);
-	    updater.updateSlotValue(frame, children);
+	    updater.updateSlotValue(frame, parentSlot, children);
 	}
     }
     
