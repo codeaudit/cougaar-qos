@@ -36,6 +36,7 @@
 	       immutable (true | false) "false"
 	       notify-blackboard (true | false) "true"
 	       notify-listeners (true | false) "true"
+		   protected (true | false) "false"
 	       transient (true | false) "false">
 <!ELEMENT fork EMPTY>
 <!ATTLIST fork relation CDATA #REQUIRED

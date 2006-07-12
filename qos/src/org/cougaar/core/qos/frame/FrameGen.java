@@ -508,7 +508,7 @@ extends DefaultHandler
 	}
 	Set<String> container_slots = new HashSet<String>();
 	if (container != null) {
-	    Map<String,Attributes> container_accessors = collectSlots(container);
+	    Map<String,Attributes> container_accessors = collectContainerSlots(container);
 	    for (Map.Entry<String,Attributes> entry : container_accessors.entrySet()) {
 		String slot = entry.getKey();
 		if(!local_slots.containsKey(slot) && !inheritsSlot(prototype, slot)) {
@@ -1171,7 +1171,7 @@ extends DefaultHandler
 	boolean is_root = parent == null;
 	Map<String,Attributes> all_slots = null;
 	if (container != null) {
-	    all_slots = collectSlots(container);
+	    all_slots = collectContainerSlots(container);
 	    for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
 		String key = entry.getKey();
 		Attributes value = entry.getValue();
@@ -1498,22 +1498,32 @@ extends DefaultHandler
 	return ancestorForSlot(parent, slot);
     }
 
-    private Map<String,Attributes> collectSlots(String proto) {
+    private Map<String,Attributes> collectContainerSlots(String proto) {
 	Map<String,Attributes> slots = new HashMap<String,Attributes>();
-	collectSlots(proto, slots);
+	collectContainerSlots(proto, slots, true);
 	return slots;
     }
 
-    private void collectSlots(String proto, Map<String,Attributes> slots) {
+    private void collectContainerSlots(String proto, Map<String,Attributes> slots, boolean filter) {
 	Map<String,Attributes> local_slots = proto_slots.get(proto);
 	Attributes attrs = proto_attrs.get(proto);
 	String parent = attrs.getValue("prototype");
 	String container = attrs.getValue("container");
 	if (local_slots != null) {
-	    slots.putAll(local_slots);
+	    // if filter is true, don't include uninheritable slots
+	    if (filter) {
+		for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
+		    Attributes value = entry.getValue();
+		    String prot = value.getValue("protected");
+		    if (prot == null || !prot.equalsIgnoreCase("true"))
+			slots.put(entry.getKey(), value);
+		}
+	    } else {
+		slots.putAll(local_slots);
+	    }
 	}
-	if (parent != null) collectSlots(parent, slots);
-	if (container != null) collectSlots(container, slots);
+	if (parent != null) collectContainerSlots(parent, slots, false);
+	if (container != null) collectContainerSlots(container, slots, true);
     }
 
     static String fixName(String name, boolean is_class) {
