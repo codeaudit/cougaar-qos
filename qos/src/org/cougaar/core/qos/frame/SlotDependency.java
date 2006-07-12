@@ -63,6 +63,18 @@ public class SlotDependency {
 	this.childClass = frameset.classForPrototype(childProto); 
     }
     
+    public String getChildSlot() {
+        return childSlot;
+    }
+
+    public String getParentSlot() {
+        return parentSlot;
+    }
+
+    public String getRelation() {
+        return relation;
+    }
+
     private void addToUpdateSet(Object x, Set<DataFrame> framesToUpdate) {
 	DataFrame frame = (DataFrame) x;
 	Set<DataFrame> parents = frame.findRelations("parent", relation);
@@ -108,7 +120,7 @@ public class SlotDependency {
 	}
 	for (DataFrame frame : framesToUpdate) {
 	    Set<DataFrame> children = frame.findRelations("child", relation);
-	    updater.updateSlotValue(frame, parentSlot, children);
+	    updater.updateSlotValue(frame, children, this);
 	}
     }
     
