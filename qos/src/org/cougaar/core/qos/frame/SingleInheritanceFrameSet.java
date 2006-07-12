@@ -139,7 +139,7 @@ public class SingleInheritanceFrameSet
     
     public void executeSlotDependencies() {
 	for (SlotDependency dependency : dependencies) {
-	    dependency.execute();
+	    dependency.execute(bbs);
 	}
     }
     
@@ -699,6 +699,9 @@ public class SingleInheritanceFrameSet
     // Sometimes items are added while this is in progress and
     // execute doesn't run again.
     public void processQueue() {
+	
+	executeSlotDependencies();
+	
 	List<ChangeQueueEntry> changes = null;
 	synchronized (change_queue_lock) {
 	    changes = new ArrayList<ChangeQueueEntry>(change_queue);

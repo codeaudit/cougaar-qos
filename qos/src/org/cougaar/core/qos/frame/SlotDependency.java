@@ -34,16 +34,20 @@ import org.cougaar.core.service.BlackboardService;
 import org.cougaar.util.UnaryPredicate;
 
 /**
- * @author rshapiro
- *
+ * If a child frame is added or removed, redo all relevant calculations on
+ * related parents. Similary if childSlot was given and that slot was changed in
+ * a child frame.
+ * 
+ * For now ignore the relation frames, though if they're changing that will have
+ * to be taken into account.
+ * 
  */
 public class SlotDependency {
-    private final String childProto;
     private final String childSlot;
     private final String relation;
     private final SlotUpdater updater;
-    private FrameSet frameset;
-    private Class childClass;
+    private final FrameSet frameset;
+    private final Class childClass;
     private IncrementalSubscription sub;
     
     public SlotDependency(FrameSet frameset, 
@@ -51,52 +55,58 @@ public class SlotDependency {
 	    	String relation,
 	    	SlotUpdater updater) {
 	this.updater = updater;
-	this.childProto = childProto;
 	this.childSlot = childSlot;
 	this.relation = relation;
-	setFrameSet(frameset);
-    }
-    
-    public void setFrameSet(FrameSet frameset) {
 	this.frameset = frameset;
-	if (frameset != null) {
-	    this.childClass = frameset.classForPrototype(childProto); 
-	}
+	this.childClass = frameset.classForPrototype(childProto); 
     }
     
-    public void execute() {
-	if (childClass == null) {
-	    // too early
-	    return;
+    private void addToUpdateSet(Object x, Set<DataFrame> framesToUpdate) {
+	DataFrame frame = (DataFrame) x;
+	Set<DataFrame> parents = frame.findRelations("parent", relation);
+	if (parents != null) {
+	    framesToUpdate.addAll(parents);
 	}
-	Set<DataFrame> framesToUpdate = null;
-	// For now we're only looking at changes
+    }
+
+    /**
+     * Collect the set of changed parent frames and invoke
+     * the updater on each.
+     */ 
+    public void execute(BlackboardService bbs) {
+	if (sub == null) {
+	    setupSubscriptions(bbs);
+	}
+	Set<DataFrame> framesToUpdate = new HashSet<DataFrame>();
 	if (sub.hasChanged()) {
-	    Collection changedFrames = sub.getChangedCollection();
-	    for (Object x : changedFrames) {
-		Set changeReports = sub.getChangeReports(x);
-		boolean relevant = false;
-		for (Frame.Change change : (Set<Frame.Change>) changeReports) {
-		    if (change.getSlotName().equals(childSlot)) {
-			relevant = true;
-			break;
+	    Collection addedFrames = sub.getAddedCollection();
+	    for (Object x : addedFrames) {
+		addToUpdateSet(x, framesToUpdate);
+	    }
+
+	    Collection removedFrames = sub.getRemovedCollection();
+	    for (Object x : removedFrames) {
+		addToUpdateSet(x, framesToUpdate);
+	    }
+
+	    if (childSlot != null) {
+		Collection changedFrames = sub.getChangedCollection();
+		for (Object x : changedFrames) {
+		    Set changeReports = sub.getChangeReports(x);
+		    boolean relevant = false;
+		    for (Frame.Change change : (Set<Frame.Change>) changeReports) {
+			if (change.getSlotName().equals(childSlot)) {
+			    relevant = true;
+			    break;
+			}
 		    }
-		}
-		if (!relevant) continue;
-		
-		DataFrame frame = (DataFrame) x;
-		Set<DataFrame> parents = frame.findRelations("parent", relation);
-		if (parents != null) {
-		    if (framesToUpdate == null) framesToUpdate = new HashSet<DataFrame>();
-		    framesToUpdate.addAll(parents);
+		    if (relevant) addToUpdateSet(x, framesToUpdate);
 		}
 	    }
 	}
-	if (framesToUpdate != null) {
-	    for (DataFrame frame : framesToUpdate) {
-		Set<DataFrame> children = frame.findRelations("child", relation);
-		updater.updateSlotValue(frame, children);
-	    }
+	for (DataFrame frame : framesToUpdate) {
+	    Set<DataFrame> children = frame.findRelations("child", relation);
+	    updater.updateSlotValue(frame, children);
 	}
     }
     
@@ -106,16 +116,9 @@ public class SlotDependency {
     
     private class FramePredicate implements UnaryPredicate {
 	public boolean execute(Object o) {
-	    // Boilerplate
-	    if (childClass == null) return false;
-	    if (frameset == null || !(o instanceof DataFrame)) return false;
+	    if (!(o instanceof DataFrame)) return false;
 	    DataFrame frame = (DataFrame) o;
-	    if (frameset != frame.getFrameSet()) return false;
-	    
-	    // For now we only care about one kind of frame
-	    if (childClass.isAssignableFrom(frame.getClass())) return true;
-	    
-	    return false;
+	    return frameset == frame.getFrameSet() && childClass.isAssignableFrom(frame.getClass());
 	}
     }
 }
