@@ -26,16 +26,10 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
-import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
-import org.cougaar.util.UnaryPredicate;
+import org.cougaar.util.log.Logger;
 
 /**
  * This class implements a quasi-generalizaion of complex frame relationship. An
@@ -62,118 +56,44 @@ import org.cougaar.util.UnaryPredicate;
  * 
  */
 public class SlotUpdaterPlugin extends ParameterizedPlugin implements FrameSetService.Callback {
-    private String relation;
-    private String childSlot;
-    private Class childClass;
-    private SlotUpdater updater;
-    private LoggingService log;
-    private FrameSet frameset;
-    private IncrementalSubscription sub;
     
-    private void getChildClass() {
-	String childPrototype = getParameter("child-prototype");
-	childClass = frameset.classForPrototype(childPrototype);
+    private Logger log;
+    private FrameSet frameset;
+    private boolean initialized = false;
+    
+    public void load() {
+	super.load();
+	ServiceBroker sb = getServiceBroker();
+	this.log = (LoggingService) sb.getService(this, LoggingService.class, null);
     }
-
+    
     public void start() {
 	ServiceBroker sb = getServiceBroker();
-	log = (LoggingService) sb.getService(this, LoggingService.class, null);
-	
-	this.relation = getParameter("relation");
-	this.childSlot = getParameter("child-slot");
-	
-	String updaterName = getParameter("updater");
-	try {
-	    Class updateClass = Class.forName(updaterName);
-	    updater = (SlotUpdater) updateClass.newInstance();
-	} catch (ClassNotFoundException e) {
-	    log.error("Class not found: " + updaterName);
-	    return;
-	} catch (InstantiationException e) {
-	    log.error("Couldn't instantiate " + updaterName);
-	    return;
-	} catch (IllegalAccessException e) {
-	    log.error("Couldn't instantiate " + updaterName);
+	FrameSetService fss = (FrameSetService) sb.getService(this, FrameSetService.class, null);
+	if (fss == null) {
+	    log.error("No FrameSetService");
 	    return;
 	}
-	
 	String frameSetName = getParameter("frame-set");
-	
-	FrameSetService fss = (FrameSetService) 
-	sb.getService(this, FrameSetService.class, null);
-	if (fss != null) {
-	    frameset = fss.findFrameSet(frameSetName, this);
-	    if (frameset != null) getChildClass();
-	} else {
-	    log.error("Couldn't find FrameSetService");
-	}
-	// Defer initial execute
+	this.frameset = fss.findFrameSet(frameSetName, this);
 	super.start();
-
     }
 
-    // Generic piece: decide which frames to update
     protected void execute() {
-	if (childClass == null) {
-	    // too early
-	    return;
-	}
-	Set<DataFrame> framesToUpdate = null;
-	// For now we're only looking at changes to hosts
-	if (sub.hasChanged()) {
-	    Collection changedFrames = sub.getChangedCollection();
-	    for (Object x : changedFrames) {
-		Set changeReports = sub.getChangeReports(x);
-		boolean relevant = false;
-		for (Frame.Change change : (Set<Frame.Change>) changeReports) {
-		    if (change.getSlotName().equals(childSlot)) {
-			relevant = true;
-			break;
-		    }
-		}
-		if (!relevant) continue;
-		
-		DataFrame frame = (DataFrame) x;
-		Set<DataFrame> parents = frame.findRelations("parent", relation);
-		if (parents != null) {
-		    if (framesToUpdate == null) framesToUpdate = new HashSet<DataFrame>();
-		    framesToUpdate.addAll(parents);
-		}
-	    }
-	}
-	if (framesToUpdate != null) {
-	    for (DataFrame frame : framesToUpdate) {
-		Set<DataFrame> children = frame.findRelations("child", relation);
-		updater.updateSlotValue(frame, children);
-	    }
+	if (frameset != null) {
+	    if (!initialized) setupSubscriptions();
+	    frameset.executeSlotDependencies();
 	}
     }
 
     protected void setupSubscriptions() {
-	BlackboardService bbs = getBlackboardService();
-	sub = (IncrementalSubscription) bbs.subscribe(new FramePredicate());
-    }
-
-    public void frameSetAvailable(String name, FrameSet set) {
-	frameset = set;
-	getChildClass();
-    }
-
-
-    private class FramePredicate implements UnaryPredicate {
-	public boolean execute(Object o) {
-	    // Boilerplate
-	    if (childClass == null) return false;
-	    if (frameset == null || !(o instanceof DataFrame)) return false;
-	    DataFrame frame = (DataFrame) o;
-	    if (frameset != frame.getFrameSet()) return false;
-	    
-	    // For now we only care about one kind of frame
-	    if (childClass.isAssignableFrom(frame.getClass())) return true;
-	    
-	    return false;
+	if (frameset != null) {
+	    frameset.initializeSlotDependencies(getBlackboardService());
+	    initialized = true;
 	}
     }
-    
 
+    public void frameSetAvailable(String name, FrameSet frameset) {
+	this.frameset = frameset;
+    }
 }

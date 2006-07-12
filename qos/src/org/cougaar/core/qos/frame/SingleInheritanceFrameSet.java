@@ -79,6 +79,8 @@ public class SingleInheritanceFrameSet
     private Set<RelationFrame> pending_relations;
     private Map<DataFrame,DataFrame> containers;
     private String container_relation;
+    
+    private Set<SlotDependency> dependencies;
 
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
@@ -109,9 +111,40 @@ public class SingleInheritanceFrameSet
 
 	this.pending_relations = new HashSet<RelationFrame>();
 	this.containers = new HashMap<DataFrame,DataFrame>();
+	this.dependencies = new HashSet<SlotDependency>();
     }
 
 
+    // Slot dependencies
+    
+    public void addSlotDependency(String childProto, String childSlot, String relation,
+	    String updaterClassName) {
+	try {
+	    Class updateClass = Class.forName(updaterClassName);
+	    SlotUpdater updater = (SlotUpdater) updateClass.newInstance();
+	    SlotDependency dep = new SlotDependency(this,childProto,childSlot,relation,updater);
+	    dependencies.add(dep);
+	} catch (ClassNotFoundException e) {
+	    log.error("Class not found: " + updaterClassName);
+	} catch (Exception e) {
+	    log.error("Couldn't instantiate " + updaterClassName);
+	}
+    }
+    
+    public void initializeSlotDependencies(BlackboardService bbs) {
+	for (SlotDependency dependency : dependencies) {
+	    dependency.setupSubscriptions(bbs);
+	}
+    }
+    
+    public void executeSlotDependencies() {
+	for (SlotDependency dependency : dependencies) {
+	    dependency.execute();
+	}
+    }
+    
+    
+    
     // Object creation
     private void addObject(UniqueObject object) {
 	if (log.isInfoEnabled())

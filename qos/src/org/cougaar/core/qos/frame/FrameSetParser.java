@@ -249,6 +249,12 @@ public class FrameSetParser
 		slot(attrs);
 	    } else if (name.equals("slot-reference")) {
 		slot_reference(attrs);
+	    } else if (name.equals("dependency")) {
+		String childProto = attrs.getValue("child-prototype");
+		String childSlot = attrs.getValue("child-slot");
+		String relation = attrs.getValue("relation");
+		String cname = attrs.getValue("updater");
+		frame_set.addSlotDependency(childProto, childSlot, relation, cname);
 	    } else if (name.equals("fork")) {
 		fork(attrs);
 	    } else if (name.equals("frames")) {

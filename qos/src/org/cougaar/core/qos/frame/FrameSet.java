@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.util.UID;
 
 /**
@@ -237,6 +238,17 @@ public interface FrameSet {
 				  String path);
 
     public Metric getMetricValue(DataFrame frame, String path);
+    
+    
+    
+    // Slot dependencies
+    
+    public void addSlotDependency(String childProto, String childSlot, String relation,
+	    String updaterClassName);
+    
+    public void initializeSlotDependencies(BlackboardService bbs);
+    
+    public void executeSlotDependencies();
 
 
 }
