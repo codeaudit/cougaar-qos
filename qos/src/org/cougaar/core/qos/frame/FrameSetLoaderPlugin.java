@@ -34,30 +34,26 @@ import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 
 /**
- * This class is a simple tester for FrameSets
+ * This plugin will load a frameset from xml.  It expectes two parameters.
+ * The "frame-set" parameter specifies the name to be given to the frameset
+ * The "frame-set-files" should be a comma-separated list of files or file
+ * resources, where the first file is defines the prototypes and the rest
+ * of the files add data.
  */
-public class FrameSetTesterPlugin
-    extends ParameterizedPlugin
-{
+public class FrameSetLoaderPlugin extends ParameterizedPlugin {
     private LoggingService log;
-    private FrameSet frameSet;
+    private FrameSet frameset;
 
-    public void load()
-    {
+    public void load()    {
 	super.load();
-
 	ServiceBroker sb = getServiceBroker();
-
 	log = (LoggingService)
            sb.getService(this, LoggingService.class, null);
     }
 
-    public void start()
-    {
-
+    public void start() {
 	String files = getParameter("frame-set-files");
 	String name = getParameter("frame-set");
-
 	if (files != null) {
 	    StringTokenizer tk = new StringTokenizer(files, ",");
 	    String[] xml_filenames = new String[tk.countTokens()];
@@ -68,7 +64,7 @@ public class FrameSetTesterPlugin
 	    BlackboardService bbs = getBlackboardService();
 	    FrameSetService fss = (FrameSetService)
 		sb.getService(this, FrameSetService.class, null);
-	    frameSet = fss.loadFrameSet(name, xml_filenames, sb, bbs);
+	    frameset = fss.loadFrameSet(name, xml_filenames, sb, bbs);
 	    sb.releaseService(this, FrameSetService.class, fss);
 	} else {
 	    if (log.isWarnEnabled())
@@ -78,16 +74,14 @@ public class FrameSetTesterPlugin
     }
 
     // plugin
-    protected void execute()
-    {
-	frameSet.processQueue();
+    protected void execute() {
+	frameset.processQueue();
     }
 
-    protected void setupSubscriptions() 
-    {
+    protected void setupSubscriptions()  {
+	if (frameset != null) {
+	    frameset.initializeSlotDependencies();
+	}
     }
-
-
-
 }
 
