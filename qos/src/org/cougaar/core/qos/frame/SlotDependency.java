@@ -51,14 +51,20 @@ public class SlotDependency {
     private IncrementalSubscription sub;
     
     public SlotDependency(FrameSet frameset, String slot, String childSlot, String relation,
-	    	SlotUpdater updater) {
-	this.updater = updater;
+	    String updaterClassName) 
+    throws Exception {
+	if (updaterClassName.indexOf('.') <0) {
+	    // No package, use the frameset's
+	    updaterClassName = frameset.getPackageName() +"."+ updaterClassName;
+	}
+	Class updaterClass = Class.forName(updaterClassName);
+	this.updater = (SlotUpdater) updaterClass.newInstance();
 	this.parentSlot = slot;
 	this.childSlot = childSlot;
 	this.relation = relation;
 	this.frameset = frameset;
     }
-    
+
     public String getChildSlot() {
         return childSlot;
     }

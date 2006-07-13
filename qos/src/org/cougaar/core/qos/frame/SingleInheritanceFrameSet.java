@@ -118,17 +118,12 @@ public class SingleInheritanceFrameSet
 
     // Slot dependencies
     
-    public void addSlotDependency(String slot, String childSlot, String relation,
-	    String updaterClassName) {
+    public void addSlotDependency(String slot, String childSlot, String relation, String updater) {
 	try {
-	    Class updateClass = Class.forName(updaterClassName);
-	    SlotUpdater updater = (SlotUpdater) updateClass.newInstance();
 	    SlotDependency dep = new SlotDependency(this, slot, childSlot, relation, updater);
 	    dependencies.add(dep);
-	} catch (ClassNotFoundException e) {
-	    log.error("Class not found: " + updaterClassName);
 	} catch (Exception e) {
-	    log.error("Couldn't instantiate " + updaterClassName);
+	    log.error("Couldn't instantiate " + updater);
 	}
     }
     
