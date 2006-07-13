@@ -34,11 +34,11 @@ import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 
 /**
- * This plugin will load a frameset from xml.  It expectes two parameters.
- * The "frame-set" parameter specifies the name to be given to the frameset
- * The "frame-set-files" should be a comma-separated list of files or file
- * resources, where the first file is defines the prototypes and the rest
- * of the files add data.
+ * This plugin will load a frameset from xml.  It expects two parameters.
+ * The "frame-set" parameter specifies the name to be given to the frameset.
+ * The "frame-set-files" parameter should be a comma-separated list of files,
+ * where the first file is defines the prototypes and the rest of the files 
+ * provide data.
  */
 public class FrameSetLoaderPlugin extends ParameterizedPlugin {
     private LoggingService log;
@@ -73,13 +73,13 @@ public class FrameSetLoaderPlugin extends ParameterizedPlugin {
 	super.start();
     }
 
-    // plugin
     protected void execute() {
 	frameset.processQueue();
     }
 
     protected void setupSubscriptions()  {
 	if (frameset != null) {
+	    // Set up subscriptions for handling slot dependencies
 	    frameset.initializeSlotDependencies();
 	}
     }
