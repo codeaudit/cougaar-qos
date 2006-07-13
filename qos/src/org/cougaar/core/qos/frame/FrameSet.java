@@ -34,7 +34,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.cougaar.core.qos.metrics.Metric;
-import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.util.UID;
 
 /**
@@ -248,9 +247,6 @@ public interface FrameSet {
 	    String relation,
 	    String updaterClassName);
     
-    public void initializeSlotDependencies(BlackboardService bbs);
-    
-    public void executeSlotDependencies();
-
+    public void initializeSlotDependencies();
 
 }

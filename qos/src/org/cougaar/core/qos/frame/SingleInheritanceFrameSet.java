@@ -132,13 +132,13 @@ public class SingleInheritanceFrameSet
 	}
     }
     
-    public void initializeSlotDependencies(BlackboardService bbs) {
+    public void initializeSlotDependencies() {
 	for (SlotDependency dependency : dependencies) {
 	    dependency.setupSubscriptions(bbs);
 	}
     }
     
-    public void executeSlotDependencies() {
+    private void executeSlotDependencies() {
 	for (SlotDependency dependency : dependencies) {
 	    dependency.execute(bbs);
 	}

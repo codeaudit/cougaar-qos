@@ -125,7 +125,9 @@ public class SlotDependency {
     }
     
     public void setupSubscriptions(BlackboardService bbs) {
-	sub = (IncrementalSubscription) bbs.subscribe(new FramePredicate());
+	if (sub == null) {
+	    sub = (IncrementalSubscription) bbs.subscribe(new FramePredicate());
+	}
     }
     
     private class FramePredicate implements UnaryPredicate {
