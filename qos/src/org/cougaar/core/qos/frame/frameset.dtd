@@ -46,6 +46,5 @@
 
 <!ELEMENT dependency EMPTY>
 <!ATTLIST dependency relation CDATA #REQUIRED
-          child-prototype CDATA #REQUIRED
           updater CDATA #REQUIRED
           child-slot CDATA #IMPLIED>

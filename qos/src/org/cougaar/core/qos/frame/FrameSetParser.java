@@ -142,11 +142,10 @@ public class FrameSetParser
 	    } else if (name.equals("slot-reference")) {
 		slot_reference(attrs);
 	    } else if (name.equals("dependency")) {
-		String childProto = attrs.getValue("child-prototype");
 		String childSlot = attrs.getValue("child-slot");
 		String relation = attrs.getValue("relation");
 		String cname = attrs.getValue("updater");
-		frame_set.addSlotDependency(slot_def, childProto, childSlot, relation, cname);
+		frame_set.addSlotDependency(slot_def, childSlot, relation, cname);
 	    } else if (name.equals("fork")) {
 		fork(attrs);
 	    } else if (name.equals("frames")) {
@@ -356,8 +355,7 @@ public class FrameSetParser
 	}
     }
 
-    private class DataFrameSpec
-	extends FrameSpec {
+    private class DataFrameSpec	extends FrameSpec {
 	String reference;
 
 	DataFrameSpec(Attributes attrs)	{
@@ -382,19 +380,20 @@ public class FrameSetParser
 	}
     }
 
-    private class PrototypeSpec
-	extends FrameSpec {
+    private class PrototypeSpec	extends FrameSpec {
 	String name;
-
+	Attributes attrs;
+	
 	PrototypeSpec(Attributes attrs) {
 	    super();
 	    name = attrs.getValue("name");
 	    prototype = attrs.getValue("prototype");
+	    this.attrs = new AttributesImpl(attrs);
 	}
 
 	Frame makePrototype(FrameSet frameSet) {
 	    PrototypeFrame frame =
-		frameSet.makePrototype(name, prototype, props);
+		frameSet.makePrototype(name, prototype, attrs, props);
 	    return frame;
 	}
 

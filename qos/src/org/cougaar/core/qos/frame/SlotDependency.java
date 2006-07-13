@@ -48,19 +48,15 @@ public class SlotDependency {
     private final String relation;
     private final SlotUpdater updater;
     private final FrameSet frameset;
-    private final Class childClass;
     private IncrementalSubscription sub;
     
-    public SlotDependency(FrameSet frameset, String slot, 
-	    	String childProto, String childSlot, 
-	    	String relation,
+    public SlotDependency(FrameSet frameset, String slot, String childSlot, String relation,
 	    	SlotUpdater updater) {
 	this.updater = updater;
 	this.parentSlot = slot;
 	this.childSlot = childSlot;
 	this.relation = relation;
 	this.frameset = frameset;
-	this.childClass = frameset.classForPrototype(childProto); 
     }
     
     public String getChildSlot() {
@@ -134,7 +130,10 @@ public class SlotDependency {
 	public boolean execute(Object o) {
 	    if (!(o instanceof DataFrame)) return false;
 	    DataFrame frame = (DataFrame) o;
-	    return frameset == frame.getFrameSet() && childClass.isAssignableFrom(frame.getClass());
+	    PrototypeFrame relationProto = frameset.findPrototypeFrame(relation);
+	    String childType = relationProto.getAttribute("child-prototype");
+	    Class cClass = frameset.classForPrototype(childType);
+	    return frameset == frame.getFrameSet() && cClass.isAssignableFrom(frame.getClass());
 	}
     }
 }

@@ -49,6 +49,7 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
+import org.xml.sax.Attributes;
 
 
 /**
@@ -117,13 +118,12 @@ public class SingleInheritanceFrameSet
 
     // Slot dependencies
     
-    public void addSlotDependency(String slot, String childProto, String childSlot, String relation,
+    public void addSlotDependency(String slot, String childSlot, String relation,
 	    String updaterClassName) {
 	try {
 	    Class updateClass = Class.forName(updaterClassName);
 	    SlotUpdater updater = (SlotUpdater) updateClass.newInstance();
-	    SlotDependency dep = 
-		new SlotDependency(this, slot, childProto, childSlot, relation, updater);
+	    SlotDependency dep = new SlotDependency(this, slot, childSlot, relation, updater);
 	    dependencies.add(dep);
 	} catch (ClassNotFoundException e) {
 	    log.error("Class not found: " + updaterClassName);
@@ -195,13 +195,14 @@ public class SingleInheritanceFrameSet
     // should be a prototype of.  
     public PrototypeFrame makePrototype(String proto, 
 					String parent, 
-					Properties values) {
+					Attributes attrs, Properties values) {
 	UID uid = uids.nextUID();
-	return makePrototype(proto, parent, values, uid);
+	return makePrototype(proto, parent, attrs, values, uid);
     }
 
     public PrototypeFrame makePrototype(String proto, 
 					String parent, 
+					Attributes attrs,
 					Properties values,
 					UID uid) {
 	PrototypeFrame frame = null;
@@ -211,7 +212,7 @@ public class SingleInheritanceFrameSet
 		    log.warn("Ignoring prototype " +proto);
 		return null;
 	    } else {
-		frame = new PrototypeFrame(this, proto, parent, uid, values);
+		frame = new PrototypeFrame(this, proto, parent, uid, attrs, values);
 		if (log.isDebugEnabled())
 		    log.debug("Adding prototype " +frame+
 			      " for " +proto);

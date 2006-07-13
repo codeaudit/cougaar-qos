@@ -52,30 +52,31 @@ public class PrototypeFrame
     private final String parent_prototype;
     private transient Logger log = Logging.getLogger(getClass().getName());
     private transient Properties dynamic_values;
+    private final Attributes attrs;
     private HashMap path_cache;
     private Properties slots;
+    
 
     PrototypeFrame(FrameSet frameSet, 
 		   String prototype_name,
 		   String parent, 
 		   UID uid, 
-		   Properties slots)
-    {
+		   Attributes attrs,
+		   Properties slots) {
 	super(frameSet, uid);
 	this.parent_prototype = parent;
 	this.prototype_name = prototype_name;
 	this.slots = slots;
 	this.dynamic_values = new Properties();
+	this.attrs = attrs;
 	this.path_cache = new HashMap();
     }
 
-    public String getKind()
-    {
+    public String getKind() {
 	return parent_prototype;
     }
 
-    public Properties getSlotDefinitions()
-    {
+    public Properties getSlotDefinitions() {
 	// return a copy
 	Properties defs = new Properties();
 	Iterator itr = slots.entrySet().iterator();
@@ -89,8 +90,7 @@ public class PrototypeFrame
     }
 	
 
-    public Properties getLocalSlots()
-    {
+    public Properties getLocalSlots() {
 	Properties result = new VisibleProperties();
 	Iterator itr = slots.entrySet().iterator();
 	while (itr.hasNext()) {
@@ -108,13 +108,11 @@ public class PrototypeFrame
 	return result;
     }
 
-    public void setValue(String slot, Object value)
-    {
+    public void setValue(String slot, Object value) {
 	dynamic_values.put(slot, value);
     }
 
-    Object getValue(Frame origin, String slot_name)
-    {
+    Object getValue(Frame origin, String slot_name) {
 	// Look for a dynamically set default first.
 	Object slot_value = dynamic_values.get(slot_name);
 	if (slot_value != null) return slot_value;
@@ -157,31 +155,30 @@ public class PrototypeFrame
 	}
     }
 
-    public String getName()
-    {
+    public String getName() {
 	return prototype_name;
     }
 
-    public String getPrototypeName()
-    {
+    public String getPrototypeName() {
 	return prototype_name;
+    }
+    
+    public String getAttribute(String key) {
+	return attrs.getValue(key);
     }
 
 
-    public String toString()
-    {
+    public String toString() {
 	return "<Prototype " +prototype_name+ " " +getUID()+ ">";
     }
 
-    public boolean isa(String kind)
-    {
+    public boolean isa(String kind) {
 	if (frameSet == null) return kind.equals(prototype_name);
 	return frameSet.descendsFrom(this, kind);
     }
 
 
-    void dumpLocalSlots(PrintWriter writer, int indentation, int offset)
-    {
+    void dumpLocalSlots(PrintWriter writer, int indentation, int offset) {
 	Map slots = getLocalSlots();
 	Iterator itr = slots.entrySet().iterator();
 	while (itr.hasNext()) {
@@ -204,8 +201,7 @@ public class PrototypeFrame
 	}
     }
 
-    void dump(PrintWriter writer, int indentation, int offset)
-    {
+    void dump(PrintWriter writer, int indentation, int offset) {
 	String kind = getKind();
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.print("<prototype name=" +prototype_name);

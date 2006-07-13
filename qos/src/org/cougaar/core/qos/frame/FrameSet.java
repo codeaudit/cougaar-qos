@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
+import org.xml.sax.Attributes;
 
 /**
  * This interface is an abstract specification of an organized
@@ -150,8 +151,8 @@ public interface FrameSet {
      * frame will be generated automatically.  As a result of this
      * operation the Frame will be published to the Blackboard.
      */
-    public PrototypeFrame makePrototype(String kind, String parent, 
-					Properties properties);
+    public PrototypeFrame makePrototype(String kind, String parent,  
+	                                Attributes attrs, Properties properties);
 
     /**
      * Creates a PrototypeFrame with the given name, parent prototype,
@@ -159,8 +160,8 @@ public interface FrameSet {
      * result of this operation the Frame will be published to the
      * Blackboard.
      */
-    public PrototypeFrame makePrototype(String kind, String parent, 
-					Properties properties, UID uid);
+    public PrototypeFrame makePrototype(String kind, String parent,
+	                                Attributes attrs, Properties properties, UID uid);
 
     /**
      * Creates a Path and adds it to the FrameSet As a result of this
@@ -242,10 +243,8 @@ public interface FrameSet {
     
     // Slot dependencies
     
-    public void addSlotDependency(String slot, 
-	    String childProto, String childSlot, 
-	    String relation,
-	    String updaterClassName);
+    public void addSlotDependency(String slot, String childSlot, String relation,
+	                          String updaterClassName);
     
     public void initializeSlotDependencies();
 
