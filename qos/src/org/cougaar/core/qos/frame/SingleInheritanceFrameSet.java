@@ -81,7 +81,7 @@ public class SingleInheritanceFrameSet
     private Map<DataFrame,DataFrame> containers;
     private String container_relation;
     
-    private Set<SlotDependency> dependencies;
+    private Set<SlotAggregation> aggregations;
 
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
@@ -112,30 +112,30 @@ public class SingleInheritanceFrameSet
 
 	this.pending_relations = new HashSet<RelationFrame>();
 	this.containers = new HashMap<DataFrame,DataFrame>();
-	this.dependencies = new HashSet<SlotDependency>();
+	this.aggregations = new HashSet<SlotAggregation>();
     }
 
 
-    // Slot dependencies
+    // Slot aggregation
     
-    public void addSlotDependency(String slot, String childSlot, String relation, String updater) {
+    public void addAggregator(String slot, String childSlot, String relation, String aggregator) {
 	try {
-	    SlotDependency dep = new SlotDependency(this, slot, childSlot, relation, updater);
-	    dependencies.add(dep);
+	    SlotAggregation agg = new SlotAggregation(this, slot, childSlot, relation, aggregator);
+	    aggregations.add(agg);
 	} catch (Exception e) {
-	    log.error("Couldn't instantiate " + updater);
+	    log.error("Couldn't instantiate " + aggregator);
 	}
     }
     
-    public void initializeSlotDependencies() {
-	for (SlotDependency dependency : dependencies) {
-	    dependency.setupSubscriptions(bbs);
+    public void initializeAggregators() {
+	for (SlotAggregation aggregation : aggregations) {
+	    aggregation.setupSubscriptions(bbs);
 	}
     }
     
-    private void executeSlotDependencies() {
-	for (SlotDependency dependency : dependencies) {
-	    dependency.execute(bbs);
+    private void executeAggregators() {
+	for (SlotAggregation aggregation : aggregations) {
+	    aggregation.execute(bbs);
 	}
     }
     
@@ -697,7 +697,7 @@ public class SingleInheritanceFrameSet
     // execute doesn't run again.
     public void processQueue() {
 	
-	executeSlotDependencies();
+	executeAggregators();
 	
 	List<ChangeQueueEntry> changes = null;
 	synchronized (change_queue_lock) {

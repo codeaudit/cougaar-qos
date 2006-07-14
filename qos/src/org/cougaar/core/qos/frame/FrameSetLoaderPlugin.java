@@ -80,7 +80,7 @@ public class FrameSetLoaderPlugin extends ParameterizedPlugin {
     protected void setupSubscriptions()  {
 	if (frameset != null) {
 	    // Set up subscriptions for handling slot dependencies
-	    frameset.initializeSlotDependencies();
+	    frameset.initializeAggregators();
 	}
     }
 }

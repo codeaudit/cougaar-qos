@@ -42,23 +42,23 @@ import org.cougaar.util.UnaryPredicate;
  * to be taken into account.
  * 
  */
-public class SlotDependency {
+public class SlotAggregation {
     private final String parentSlot;
     private final String childSlot;
     private final String relation;
-    private final SlotUpdater updater;
+    private final SlotAggregator aggregator;
     private final FrameSet frameset;
     private IncrementalSubscription sub;
     
-    public SlotDependency(FrameSet frameset, String slot, String childSlot, String relation,
-	    String updaterClassName) 
+    public SlotAggregation(FrameSet frameset, String slot, String childSlot, String relation,
+	    String className) 
     throws Exception {
-	if (updaterClassName.indexOf('.') <0) {
+	if (className.indexOf('.') <0) {
 	    // No package, use the frameset's
-	    updaterClassName = frameset.getPackageName() +"."+ updaterClassName;
+	    className = frameset.getPackageName() +"."+ className;
 	}
-	Class updaterClass = Class.forName(updaterClassName);
-	this.updater = (SlotUpdater) updaterClass.newInstance();
+	Class aggregatorClass = Class.forName(className);
+	this.aggregator = (SlotAggregator) aggregatorClass.newInstance();
 	this.parentSlot = slot;
 	this.childSlot = childSlot;
 	this.relation = relation;
@@ -122,7 +122,7 @@ public class SlotDependency {
 	}
 	for (DataFrame frame : framesToUpdate) {
 	    Set<DataFrame> children = frame.findRelations("child", relation);
-	    updater.updateSlotValue(frame, children, this);
+	    aggregator.updateSlotValue(frame, children, this);
 	}
     }
     

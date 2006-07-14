@@ -141,11 +141,11 @@ public class FrameSetParser
 		startSlot(attrs);
 	    } else if (name.equals("slot-reference")) {
 		slot_reference(attrs);
-	    } else if (name.equals("dependency")) {
+	    } else if (name.equals("aggregate-by")) {
 		String childSlot = attrs.getValue("child-slot");
 		String relation = attrs.getValue("relation");
-		String cname = attrs.getValue("updater");
-		frame_set.addSlotDependency(slot_def, childSlot, relation, cname);
+		String cname = attrs.getValue("aggregator");
+		frame_set.addAggregator(slot_def, childSlot, relation, cname);
 	    } else if (name.equals("fork")) {
 		fork(attrs);
 	    } else if (name.equals("frames")) {

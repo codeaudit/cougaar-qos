@@ -243,9 +243,8 @@ public interface FrameSet {
     
     // Slot dependencies
     
-    public void addSlotDependency(String slot, String childSlot, String relation,
-	                          String updaterClassName);
+    public void addAggregator(String slot, String childSlot, String relation, String className);
     
-    public void initializeSlotDependencies();
+    public void initializeAggregators();
 
 }

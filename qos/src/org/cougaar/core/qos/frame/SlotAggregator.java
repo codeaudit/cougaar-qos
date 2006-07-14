@@ -36,6 +36,6 @@ import java.util.Set;
  * frames, at least one of which has presumably changed in 
  * some way.
  */
-public interface SlotUpdater {
-    public void updateSlotValue(DataFrame frame, Set<DataFrame>children, SlotDependency dep);
+public interface SlotAggregator {
+    public void updateSlotValue(DataFrame frame, Set<DataFrame>children, SlotAggregation dep);
 }
