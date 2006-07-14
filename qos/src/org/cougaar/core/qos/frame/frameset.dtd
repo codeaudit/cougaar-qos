@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!ELEMENT frameset (copyright | prototypes)*>
+<!ELEMENT frameset (copyright?, prototypes)>
 <!ATTLIST frameset frame-inheritance CDATA "single"
 	           package CDATA #REQUIRED
 	           container-relation CDATA #REQUIRED
