@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
+import org.cougaar.core.qos.frame.aggregator.SlotAggregator;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.util.UnaryPredicate;
 
@@ -53,11 +54,26 @@ public class SlotAggregation {
     public SlotAggregation(FrameSet frameset, String slot, String childSlot, String relation,
 	    String className) 
     throws Exception {
+	Class aggregatorClass = null;
 	if (className.indexOf('.') <0) {
-	    // No package, use the frameset's
-	    className = frameset.getPackageName() +"."+ className;
+	    // No package, check the frameset's
+	    String cname = frameset.getPackageName() +"."+ className;
+	    try {
+		aggregatorClass = Class.forName(cname);
+	    } catch (ClassNotFoundException ex) {
+		// Not in the frameset's package, try our package
+		cname = getClass().getPackage().getName() +".aggregator."+ className;
+		try {
+		    aggregatorClass = Class.forName(className);
+		} catch (ClassNotFoundException ex2) {
+		    // ignore
+		}
+	    }
 	}
-	Class aggregatorClass = Class.forName(className);
+	if (aggregatorClass == null) {
+	    // fully qualified name: allow this one to throw an Exception out of the call
+	    aggregatorClass = Class.forName(className);
+	}
 	this.aggregator = (SlotAggregator) aggregatorClass.newInstance();
 	this.parentSlot = slot;
 	this.childSlot = childSlot;

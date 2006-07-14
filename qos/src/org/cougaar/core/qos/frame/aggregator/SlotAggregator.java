@@ -1,7 +1,7 @@
 /*
  * <copyright>
  *  
- *  Copyright 1997-2004 BBNT Solutions, LLC
+ *  Copyright 1997-2006 BBNT Solutions, LLC
  *  under sponsorship of the Defense Advanced Research Projects
  *  Agency (DARPA).
  * 
@@ -23,29 +23,22 @@
  *  
  * </copyright>
  */
-package org.cougaar.core.qos.frame;
+
+package org.cougaar.core.qos.frame.aggregator;
 
 import java.util.Set;
 
-/**
- * Example of a generic slot updater
- */
-public class AvgAggregator implements SlotAggregator {
-    
-    public void updateSlotValue(DataFrame frame, Set<DataFrame> children, SlotAggregation agg) {
-	int count = children.size();
-	String pslot = agg.getParentSlot();
-	if (count == 0) {
-	    frame.setValue(pslot, 0f);
-	    return;
-	}
-	float sum = 0f;
-	String cslot = agg.getChildSlot();
-	for (DataFrame child : children) {
-	    Number n = (Number) child.getValue(cslot);
-	    sum += n.floatValue();
-	}
-	frame.setValue(pslot, sum/count);
-    }
+import org.cougaar.core.qos.frame.DataFrame;
+import org.cougaar.core.qos.frame.SlotAggregation;
 
+
+/**
+ * Part of an experiment in generalizing slot dependencies.
+ * Implementations of this interface compute and set a 
+ * slot value on some frame, given a collection of related
+ * frames, at least one of which has presumably changed in 
+ * some way.
+ */
+public interface SlotAggregator {
+    public void updateSlotValue(DataFrame frame, Set<DataFrame>children, SlotAggregation dep);
 }
