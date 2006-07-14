@@ -287,26 +287,7 @@
       <available property="junit.present" classname="junit.framework.TestCase" classpathref="junit.classpath"/>
     </target>
 
-    <!-- ========================================================== -->
-    <!-- Test for presence of PMD. Skip PMD targets if not found. -->
-    <!-- ========================================================== -->
-    <target name="pmd" depends="prepare" if="has.pmd">
-      <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
-        <classpath>
-          <pathelement location="${target.pmd}/jaxen-core-1.0-fcs.jar"/>
-          <pathelement location="${target.pmd}/pmd-1.5.jar"/>
-          <pathelement location="${target.pmd}/saxpath-1.0-fcs.jar"/>
-          <pathelement location="${target.pmd}/xercesImpl-2.0.2.jar"/>
-          <pathelement location="${target.pmd}/xmlParserAPIs-2.0.2.jar"/>
-        </classpath>
-      </taskdef>
-      <pmd rulesetfiles="rulesets/basic.xml,rulesets/braces.xml,rulesets/codesize.xml,rulesets/controversial.xml,rulesets/coupling.xml,rulesets/design.xml,rulesets/favorites.xml,rulesets/finalizers.xml,rulesets/imports.xml,rulesets/javabeans.xml,rulesets/junit.xml,rulesets/naming.xml,rulesets/newrules.xml,rulesets/scratchpad.xml,rulesets/strictexception.xml,rulesets/strings.xml,rulesets/unusedcode.xml">
-        <formatter type="html" toFile="${module}_report.html"/>
-        <fileset dir="${src}" >
-          <include name="**/*.java"/>
-        </fileset>
-      </pmd>
-    </target>
+
 
     <!-- ========================================================== -->
     <!-- Run RMIC on built classes			                -->
@@ -779,6 +760,14 @@
 	<pathelement path="${TARGETBASE}/lib/xercesImpl.jar"/>
       </classpath>
       <arg value="${TARGETBASE}/qos/src/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
+    </java>
+    	
+    <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes" dir="${ABSOLUTE_SRC_BASE}/qos">
+         <classpath>
+    		<pathelement path="${TARGETBASE}/lib/qos.jar"/>
+    		<pathelement path="${TARGETBASE}/lib/xercesImpl.jar"/>
+    	 </classpath>
+    	      <arg value="${TARGETBASE}/qos/src/org/cougaar/core/qos/frame/scale/test-scale-protos.xml" />
     </java>
   </target>
 

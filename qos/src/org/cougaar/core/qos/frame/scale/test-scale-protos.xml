@@ -1,0 +1,46 @@
+<frameset domain="testScale" frame-inheritance="single"
+	package="org.cougaar.core.qos.frame.scale" container-relation="contains">
+	
+	<!-- Root entity prototype -->
+	<prototypes>
+		<prototype name="thing">
+			<slot name="name" type="String" immutable="true"/>
+		</prototype>
+		
+		<!-- Root relationship prototype -->
+		<relation-prototype name="relationship" parent-prototype="thing"
+			parent-slot="name" child-prototype="thing" child-slot="name">
+			<slot name="parent-value"/>
+			<slot name="child-value"/>
+		</relation-prototype>
+		
+		<!-- FrameSet container-relation -->
+		<prototype name="contains" prototype="relationship">
+		</prototype>
+		
+		<prototype name="root" prototype="thing">
+			<slot name="rootSlotFloat" type="float" default-value="1.0f"/>
+			<slot name="rootSlotString" type="String" default-value="default"/>
+		</prototype>
+		
+		<prototype name="level1" prototype="thing" container="root">
+			<slot name="level1SlotFloat" type="float" default-value="1.0f"/>
+			<slot name="level1SlotString" type="String" default-value="default"/>
+		</prototype>
+		
+		<prototype name="level2" prototype="thing" container="level1">
+			<slot name="level2SlotFloat" type="float" default-value="1.0f"/>
+			<slot name="level2SlotString" type="String" default-value="default"/>
+		</prototype>
+		
+		<relation-prototype name="Level1OnRoot" prototype="contains"
+			parent-prototype="root" child-prototype="level1">
+		</relation-prototype>
+		
+		<relation-prototype name="Level2OnLevel1" prototype="contains"
+			parent-prototype="level1" child-prototype="level2">
+		</relation-prototype>
+		
+	</prototypes>
+	
+</frameset>

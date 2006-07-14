@@ -1,44 +1,44 @@
-package org.cougaar.core.qos.frame.topology;
+package org.cougaar.core.qos.frame.scale;
 
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.util.UID;
 
-public class AgentInNode
+public class Level2OnLevel1
     extends Contains {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
-                     return new AgentInNode(frameSet, uid);
+                     return new Level2OnLevel1(frameSet, uid);
                 }
             };
-            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.topology", "AgentInNode", __fm);
+            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "Level2OnLevel1", __fm);
     }
 
 
-    public AgentInNode(UID uid) {
+    public Level2OnLevel1(UID uid) {
         this(null, uid);
     }
 
 
-    public AgentInNode(FrameSet frameSet,
-                       UID uid) {
+    public Level2OnLevel1(FrameSet frameSet,
+                          UID uid) {
         super(frameSet, uid);
     }
 
 
     public String getKind() {
-        return "AgentInNode";
+        return "Level2OnLevel1";
     }
 
 
     public String getParentPrototype() {
-        return "node";
+        return "level1";
     }
 
 
     public String getChildPrototype() {
-        return "agent";
+        return "level2";
     }
 }

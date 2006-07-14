@@ -1,4 +1,4 @@
-package org.cougaar.core.qos.frame.topology;
+package org.cougaar.core.qos.frame.scale;
 
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
@@ -14,7 +14,7 @@ public class Thing
                      return new Thing(frameSet, uid);
                 }
             };
-            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.topology", "thing", __fm);
+            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "thing", __fm);
     }
     private String name;
 

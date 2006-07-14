@@ -7,8 +7,7 @@ import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 
 public class Node
-    extends Thing
-{
+    extends Thing {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
@@ -28,28 +27,24 @@ public class Node
     private transient Metric vmSize;
 
 
-    public Node(UID uid)
-    {
+    public Node(UID uid) {
         this(null, uid);
     }
 
 
     public Node(FrameSet frameSet,
-                UID uid)
-    {
+                UID uid) {
         super(frameSet, uid);
         initializeStatus("unknown");
     }
 
 
-    public String getKind()
-    {
+    public String getKind() {
         return "node";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props)
-    {
+    protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getBytesIn__AsObject();
@@ -71,8 +66,7 @@ public class Node
     }
 
 
-    protected void collectContainerSlotValues(java.util.Properties __props)
-    {
+    protected void collectContainerSlotValues(java.util.Properties __props) {
         super.collectContainerSlotValues(__props);
         Object __value;
         __value = getLoadAverage__AsObject();
@@ -86,280 +80,237 @@ public class Node
     }
 
 
-    public Metric getBytesIn()
-    {
+    public Metric getBytesIn() {
         return bytesIn;
     }
 
 
-    Metric getBytesIn__NoWarn()
-    {
+    Metric getBytesIn__NoWarn() {
         return bytesIn;
     }
 
 
-    Object getBytesIn__AsObject()
-    {
+    Object getBytesIn__AsObject() {
         return bytesIn;
     }
 
 
-    protected void initializeBytesIn(Metric new_value)
-    {
+    protected void initializeBytesIn(Metric new_value) {
         this.bytesIn = new_value;
         slotInitialized("bytesIn", new_value);
     }
 
 
-    void initializeBytesIn__AsObject(Object new_value)
-    {
+    void initializeBytesIn__AsObject(Object new_value) {
         this.bytesIn = force_Metric(new_value);
         slotInitialized("bytesIn", new_value);
     }
 
 
-    public Metric getCpuLoadAverage()
-    {
+    public Metric getCpuLoadAverage() {
         return cpuLoadAverage;
     }
 
 
-    Metric getCpuLoadAverage__NoWarn()
-    {
+    Metric getCpuLoadAverage__NoWarn() {
         return cpuLoadAverage;
     }
 
 
-    Object getCpuLoadAverage__AsObject()
-    {
+    Object getCpuLoadAverage__AsObject() {
         return cpuLoadAverage;
     }
 
 
-    protected void initializeCpuLoadAverage(Metric new_value)
-    {
+    protected void initializeCpuLoadAverage(Metric new_value) {
         this.cpuLoadAverage = new_value;
         slotInitialized("cpuLoadAverage", new_value);
     }
 
 
-    void initializeCpuLoadAverage__AsObject(Object new_value)
-    {
+    void initializeCpuLoadAverage__AsObject(Object new_value) {
         this.cpuLoadAverage = force_Metric(new_value);
         slotInitialized("cpuLoadAverage", new_value);
     }
 
 
-    public Metric getMsgIn()
-    {
+    public Metric getMsgIn() {
         return msgIn;
     }
 
 
-    Metric getMsgIn__NoWarn()
-    {
+    Metric getMsgIn__NoWarn() {
         return msgIn;
     }
 
 
-    Object getMsgIn__AsObject()
-    {
+    Object getMsgIn__AsObject() {
         return msgIn;
     }
 
 
-    protected void initializeMsgIn(Metric new_value)
-    {
+    protected void initializeMsgIn(Metric new_value) {
         this.msgIn = new_value;
         slotInitialized("msgIn", new_value);
     }
 
 
-    void initializeMsgIn__AsObject(Object new_value)
-    {
+    void initializeMsgIn__AsObject(Object new_value) {
         this.msgIn = force_Metric(new_value);
         slotInitialized("msgIn", new_value);
     }
 
 
-    public String getStatus()
-    {
+    public String getStatus() {
         return status;
     }
 
 
-    String getStatus__NoWarn()
-    {
+    String getStatus__NoWarn() {
         return status;
     }
 
 
-    Object getStatus__AsObject()
-    {
+    Object getStatus__AsObject() {
         return status;
     }
 
 
-    public void setStatus(String __new_value)
-    {
+    public void setStatus(String __new_value) {
         String __old_value = status;
         this.status = __new_value;
         slotModified("status", __old_value, __new_value, true, true);
     }
 
 
-    public void setStatus__AsObject(Object __new_value)
-    {
+    public void setStatus__AsObject(Object __new_value) {
         Object __old_value = getStatus__AsObject();
         this.status = force_String(__new_value);
         slotModified("status", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeStatus(String new_value)
-    {
+    protected void initializeStatus(String new_value) {
         this.status = new_value;
         slotInitialized("status", new_value);
     }
 
 
-    void initializeStatus__AsObject(Object new_value)
-    {
+    void initializeStatus__AsObject(Object new_value) {
         this.status = force_String(new_value);
         slotInitialized("status", new_value);
     }
 
 
-    public Metric getCpuLoadMJips()
-    {
+    public Metric getCpuLoadMJips() {
         return cpuLoadMJips;
     }
 
 
-    Metric getCpuLoadMJips__NoWarn()
-    {
+    Metric getCpuLoadMJips__NoWarn() {
         return cpuLoadMJips;
     }
 
 
-    Object getCpuLoadMJips__AsObject()
-    {
+    Object getCpuLoadMJips__AsObject() {
         return cpuLoadMJips;
     }
 
 
-    protected void initializeCpuLoadMJips(Metric new_value)
-    {
+    protected void initializeCpuLoadMJips(Metric new_value) {
         this.cpuLoadMJips = new_value;
         slotInitialized("cpuLoadMJips", new_value);
     }
 
 
-    void initializeCpuLoadMJips__AsObject(Object new_value)
-    {
+    void initializeCpuLoadMJips__AsObject(Object new_value) {
         this.cpuLoadMJips = force_Metric(new_value);
         slotInitialized("cpuLoadMJips", new_value);
     }
 
 
-    public Metric getBytesOut()
-    {
+    public Metric getBytesOut() {
         return bytesOut;
     }
 
 
-    Metric getBytesOut__NoWarn()
-    {
+    Metric getBytesOut__NoWarn() {
         return bytesOut;
     }
 
 
-    Object getBytesOut__AsObject()
-    {
+    Object getBytesOut__AsObject() {
         return bytesOut;
     }
 
 
-    protected void initializeBytesOut(Metric new_value)
-    {
+    protected void initializeBytesOut(Metric new_value) {
         this.bytesOut = new_value;
         slotInitialized("bytesOut", new_value);
     }
 
 
-    void initializeBytesOut__AsObject(Object new_value)
-    {
+    void initializeBytesOut__AsObject(Object new_value) {
         this.bytesOut = force_Metric(new_value);
         slotInitialized("bytesOut", new_value);
     }
 
 
-    public Metric getMsgOut()
-    {
+    public Metric getMsgOut() {
         return msgOut;
     }
 
 
-    Metric getMsgOut__NoWarn()
-    {
+    Metric getMsgOut__NoWarn() {
         return msgOut;
     }
 
 
-    Object getMsgOut__AsObject()
-    {
+    Object getMsgOut__AsObject() {
         return msgOut;
     }
 
 
-    protected void initializeMsgOut(Metric new_value)
-    {
+    protected void initializeMsgOut(Metric new_value) {
         this.msgOut = new_value;
         slotInitialized("msgOut", new_value);
     }
 
 
-    void initializeMsgOut__AsObject(Object new_value)
-    {
+    void initializeMsgOut__AsObject(Object new_value) {
         this.msgOut = force_Metric(new_value);
         slotInitialized("msgOut", new_value);
     }
 
 
-    public Metric getVmSize()
-    {
+    public Metric getVmSize() {
         return vmSize;
     }
 
 
-    Metric getVmSize__NoWarn()
-    {
+    Metric getVmSize__NoWarn() {
         return vmSize;
     }
 
 
-    Object getVmSize__AsObject()
-    {
+    Object getVmSize__AsObject() {
         return vmSize;
     }
 
 
-    protected void initializeVmSize(Metric new_value)
-    {
+    protected void initializeVmSize(Metric new_value) {
         this.vmSize = new_value;
         slotInitialized("vmSize", new_value);
     }
 
 
-    void initializeVmSize__AsObject(Object new_value)
-    {
+    void initializeVmSize__AsObject(Object new_value) {
         this.vmSize = force_Metric(new_value);
         slotInitialized("vmSize", new_value);
     }
 
 
-    public Metric getLoadAverage()
-    {
+    public Metric getLoadAverage() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -370,8 +321,7 @@ public class Node
     }
 
 
-    Object getLoadAverage__AsObject()
-    {
+    Object getLoadAverage__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Host)) {
@@ -383,8 +333,7 @@ public class Node
     }
 
 
-    public Metric getJips()
-    {
+    public Metric getJips() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -395,8 +344,7 @@ public class Node
     }
 
 
-    Object getJips__AsObject()
-    {
+    Object getJips__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Host)) {
@@ -408,8 +356,7 @@ public class Node
     }
 
 
-    public Metric getEffectiveMJips()
-    {
+    public Metric getEffectiveMJips() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -420,8 +367,7 @@ public class Node
     }
 
 
-    Object getEffectiveMJips__AsObject()
-    {
+    Object getEffectiveMJips__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Host)) {
@@ -433,8 +379,7 @@ public class Node
     }
 
 
-    public Metric getCount()
-    {
+    public Metric getCount() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -445,8 +390,7 @@ public class Node
     }
 
 
-    Object getCount__AsObject()
-    {
+    Object getCount__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Host)) {
@@ -458,8 +402,7 @@ public class Node
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new)
-    {
+    protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new) {
         if (!(__raw_old instanceof Host)) {
             getLogger().warn("Container of " +this+ " is not a Host: " + __raw_old);
             return;
@@ -503,8 +446,7 @@ public class Node
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw)
-    {
+    protected void fireContainerChanges(DataFrame __raw) {
         if (!(__raw instanceof Host)) {
             getLogger().warn("Container of " +this+ " is not a Host: " + __raw);
             return;
@@ -543,8 +485,7 @@ public class Node
     private static final int vmSize__HashVar__ = "vmSize".hashCode();
 
 
-    protected Object getLocalValue(String __slot)
-    {
+    protected Object getLocalValue(String __slot) {
        int __key = __slot.hashCode();
        if (bytesIn__HashVar__ == __key)
             return getBytesIn__AsObject();
@@ -578,8 +519,7 @@ public class Node
 
 
     protected void setLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (status__HashVar__ == __key)
             setStatus__AsObject(__value);
@@ -589,8 +529,7 @@ public class Node
 
 
     protected void initializeLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (bytesIn__HashVar__ == __key)
             initializeBytesIn__AsObject(__value);
@@ -613,8 +552,7 @@ public class Node
     }
 
 
-    protected void postInitialize()
-    {
+    protected void postInitialize() {
         super.postInitialize();
         java.util.Observer __observer;
         __observer = new java.util.Observer() {
@@ -683,8 +621,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__BytesIn()
-    {
+    public SlotDescription slotMetaData__BytesIn() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "bytesIn";
         __desc.prototype = "node";
@@ -701,8 +638,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__CpuLoadAverage()
-    {
+    public SlotDescription slotMetaData__CpuLoadAverage() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "cpuLoadAverage";
         __desc.prototype = "node";
@@ -719,8 +655,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__MsgIn()
-    {
+    public SlotDescription slotMetaData__MsgIn() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "msgIn";
         __desc.prototype = "node";
@@ -737,8 +672,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__Status()
-    {
+    public SlotDescription slotMetaData__Status() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "status";
         __desc.prototype = "node";
@@ -756,8 +690,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__CpuLoadMJips()
-    {
+    public SlotDescription slotMetaData__CpuLoadMJips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "cpuLoadMJips";
         __desc.prototype = "node";
@@ -774,8 +707,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__BytesOut()
-    {
+    public SlotDescription slotMetaData__BytesOut() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "bytesOut";
         __desc.prototype = "node";
@@ -792,8 +724,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__MsgOut()
-    {
+    public SlotDescription slotMetaData__MsgOut() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "msgOut";
         __desc.prototype = "node";
@@ -810,8 +741,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__VmSize()
-    {
+    public SlotDescription slotMetaData__VmSize() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "vmSize";
         __desc.prototype = "node";
@@ -828,8 +758,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__LoadAverage()
-    {
+    public SlotDescription slotMetaData__LoadAverage() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "loadAverage";
         __desc.prototype = "host";
@@ -840,8 +769,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__Jips()
-    {
+    public SlotDescription slotMetaData__Jips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "jips";
         __desc.prototype = "host";
@@ -852,8 +780,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__EffectiveMJips()
-    {
+    public SlotDescription slotMetaData__EffectiveMJips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "effectiveMJips";
         __desc.prototype = "host";
@@ -864,8 +791,7 @@ public class Node
     }
 
 
-    public SlotDescription slotMetaData__Count()
-    {
+    public SlotDescription slotMetaData__Count() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "count";
         __desc.prototype = "host";
@@ -876,8 +802,7 @@ public class Node
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map map)
-    {
+    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("bytesIn", slotMetaData__BytesIn());
         map.put("cpuLoadAverage", slotMetaData__CpuLoadAverage());

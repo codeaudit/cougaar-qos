@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT testScale (level1 | Level2OnLevel1 | Level1OnRoot | contains | thing | level2 | root | relationship)*>
+<!ELEMENT level1 (level1SlotString | name | level1SlotFloat)*>
+<!ELEMENT level1SlotString (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT level1SlotFloat (#PCDATA)>
+<!ELEMENT Level2OnLevel1 (parent-value | child-value)*>
+<!ELEMENT parent-value (#PCDATA)>
+<!ELEMENT child-value (#PCDATA)>
+<!ELEMENT Level1OnRoot (parent-value | child-value)*>
+<!ELEMENT contains (parent-value | child-value)*>
+<!ELEMENT thing (name)*>
+<!ELEMENT level2 (level2SlotString | level2SlotFloat | name)*>
+<!ELEMENT level2SlotString (#PCDATA)>
+<!ELEMENT level2SlotFloat (#PCDATA)>
+<!ELEMENT root (rootSlotFloat | name | rootSlotString)*>
+<!ELEMENT rootSlotFloat (#PCDATA)>
+<!ELEMENT rootSlotString (#PCDATA)>
+<!ELEMENT relationship (parent-value | child-value)*>

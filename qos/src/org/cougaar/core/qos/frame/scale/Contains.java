@@ -1,4 +1,4 @@
-package org.cougaar.core.qos.frame.topology;
+package org.cougaar.core.qos.frame.scale;
 
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
@@ -13,7 +13,7 @@ public class Contains
                      return new Contains(frameSet, uid);
                 }
             };
-            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.topology", "contains", __fm);
+            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "contains", __fm);
     }
 
 

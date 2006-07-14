@@ -7,8 +7,7 @@ import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 
 public class Host
-    extends Thing
-{
+    extends Thing {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
@@ -25,28 +24,24 @@ public class Host
     private transient Metric count;
 
 
-    public Host(UID uid)
-    {
+    public Host(UID uid) {
         this(null, uid);
     }
 
 
     public Host(FrameSet frameSet,
-                UID uid)
-    {
+                UID uid) {
         super(frameSet, uid);
         initializeStatus("unknown");
     }
 
 
-    public String getKind()
-    {
+    public String getKind() {
         return "host";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props)
-    {
+    protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getLoadAverage__AsObject();
@@ -62,177 +57,150 @@ public class Host
     }
 
 
-    public Metric getLoadAverage()
-    {
+    public Metric getLoadAverage() {
         return loadAverage;
     }
 
 
-    Metric getLoadAverage__NoWarn()
-    {
+    Metric getLoadAverage__NoWarn() {
         return loadAverage;
     }
 
 
-    Object getLoadAverage__AsObject()
-    {
+    Object getLoadAverage__AsObject() {
         return loadAverage;
     }
 
 
-    protected void initializeLoadAverage(Metric new_value)
-    {
+    protected void initializeLoadAverage(Metric new_value) {
         this.loadAverage = new_value;
         slotInitialized("loadAverage", new_value);
     }
 
 
-    void initializeLoadAverage__AsObject(Object new_value)
-    {
+    void initializeLoadAverage__AsObject(Object new_value) {
         this.loadAverage = force_Metric(new_value);
         slotInitialized("loadAverage", new_value);
     }
 
 
-    public Metric getJips()
-    {
+    public Metric getJips() {
         return jips;
     }
 
 
-    Metric getJips__NoWarn()
-    {
+    Metric getJips__NoWarn() {
         return jips;
     }
 
 
-    Object getJips__AsObject()
-    {
+    Object getJips__AsObject() {
         return jips;
     }
 
 
-    protected void initializeJips(Metric new_value)
-    {
+    protected void initializeJips(Metric new_value) {
         this.jips = new_value;
         slotInitialized("jips", new_value);
     }
 
 
-    void initializeJips__AsObject(Object new_value)
-    {
+    void initializeJips__AsObject(Object new_value) {
         this.jips = force_Metric(new_value);
         slotInitialized("jips", new_value);
     }
 
 
-    public Metric getEffectiveMJips()
-    {
+    public Metric getEffectiveMJips() {
         return effectiveMJips;
     }
 
 
-    Metric getEffectiveMJips__NoWarn()
-    {
+    Metric getEffectiveMJips__NoWarn() {
         return effectiveMJips;
     }
 
 
-    Object getEffectiveMJips__AsObject()
-    {
+    Object getEffectiveMJips__AsObject() {
         return effectiveMJips;
     }
 
 
-    protected void initializeEffectiveMJips(Metric new_value)
-    {
+    protected void initializeEffectiveMJips(Metric new_value) {
         this.effectiveMJips = new_value;
         slotInitialized("effectiveMJips", new_value);
     }
 
 
-    void initializeEffectiveMJips__AsObject(Object new_value)
-    {
+    void initializeEffectiveMJips__AsObject(Object new_value) {
         this.effectiveMJips = force_Metric(new_value);
         slotInitialized("effectiveMJips", new_value);
     }
 
 
-    public String getStatus()
-    {
+    public String getStatus() {
         return status;
     }
 
 
-    String getStatus__NoWarn()
-    {
+    String getStatus__NoWarn() {
         return status;
     }
 
 
-    Object getStatus__AsObject()
-    {
+    Object getStatus__AsObject() {
         return status;
     }
 
 
-    public void setStatus(String __new_value)
-    {
+    public void setStatus(String __new_value) {
         String __old_value = status;
         this.status = __new_value;
         slotModified("status", __old_value, __new_value, true, true);
     }
 
 
-    public void setStatus__AsObject(Object __new_value)
-    {
+    public void setStatus__AsObject(Object __new_value) {
         Object __old_value = getStatus__AsObject();
         this.status = force_String(__new_value);
         slotModified("status", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeStatus(String new_value)
-    {
+    protected void initializeStatus(String new_value) {
         this.status = new_value;
         slotInitialized("status", new_value);
     }
 
 
-    void initializeStatus__AsObject(Object new_value)
-    {
+    void initializeStatus__AsObject(Object new_value) {
         this.status = force_String(new_value);
         slotInitialized("status", new_value);
     }
 
 
-    public Metric getCount()
-    {
+    public Metric getCount() {
         return count;
     }
 
 
-    Metric getCount__NoWarn()
-    {
+    Metric getCount__NoWarn() {
         return count;
     }
 
 
-    Object getCount__AsObject()
-    {
+    Object getCount__AsObject() {
         return count;
     }
 
 
-    protected void initializeCount(Metric new_value)
-    {
+    protected void initializeCount(Metric new_value) {
         this.count = new_value;
         slotInitialized("count", new_value);
     }
 
 
-    void initializeCount__AsObject(Object new_value)
-    {
+    void initializeCount__AsObject(Object new_value) {
         this.count = force_Metric(new_value);
         slotInitialized("count", new_value);
     }
@@ -243,8 +211,7 @@ public class Host
     private static final int count__HashVar__ = "count".hashCode();
 
 
-    protected Object getLocalValue(String __slot)
-    {
+    protected Object getLocalValue(String __slot) {
        int __key = __slot.hashCode();
        if (loadAverage__HashVar__ == __key)
             return getLoadAverage__AsObject();
@@ -262,8 +229,7 @@ public class Host
 
 
     protected void setLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (status__HashVar__ == __key)
             setStatus__AsObject(__value);
@@ -273,8 +239,7 @@ public class Host
 
 
     protected void initializeLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (loadAverage__HashVar__ == __key)
             initializeLoadAverage__AsObject(__value);
@@ -291,8 +256,7 @@ public class Host
     }
 
 
-    protected void postInitialize()
-    {
+    protected void postInitialize() {
         super.postInitialize();
         java.util.Observer __observer;
         __observer = new java.util.Observer() {
@@ -334,8 +298,7 @@ public class Host
     }
 
 
-    public SlotDescription slotMetaData__LoadAverage()
-    {
+    public SlotDescription slotMetaData__LoadAverage() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "loadAverage";
         __desc.prototype = "host";
@@ -352,8 +315,7 @@ public class Host
     }
 
 
-    public SlotDescription slotMetaData__Jips()
-    {
+    public SlotDescription slotMetaData__Jips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "jips";
         __desc.prototype = "host";
@@ -370,8 +332,7 @@ public class Host
     }
 
 
-    public SlotDescription slotMetaData__EffectiveMJips()
-    {
+    public SlotDescription slotMetaData__EffectiveMJips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "effectiveMJips";
         __desc.prototype = "host";
@@ -388,8 +349,7 @@ public class Host
     }
 
 
-    public SlotDescription slotMetaData__Status()
-    {
+    public SlotDescription slotMetaData__Status() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "status";
         __desc.prototype = "host";
@@ -407,8 +367,7 @@ public class Host
     }
 
 
-    public SlotDescription slotMetaData__Count()
-    {
+    public SlotDescription slotMetaData__Count() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "count";
         __desc.prototype = "host";
@@ -425,8 +384,7 @@ public class Host
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map map)
-    {
+    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("loadAverage", slotMetaData__LoadAverage());
         map.put("jips", slotMetaData__Jips());

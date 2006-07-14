@@ -6,8 +6,7 @@ import org.cougaar.core.qos.frame.SlotDescription;
 import org.cougaar.core.util.UID;
 
 public class MsgInIndicator
-    extends MsgIndicator
-{
+    extends MsgIndicator {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
@@ -20,28 +19,24 @@ public class MsgInIndicator
     private String watchSlot;
 
 
-    public MsgInIndicator(UID uid)
-    {
+    public MsgInIndicator(UID uid) {
         this(null, uid);
     }
 
 
     public MsgInIndicator(FrameSet frameSet,
-                          UID uid)
-    {
+                          UID uid) {
         super(frameSet, uid);
         initializeWatchSlot("msgOut");
     }
 
 
-    public String getKind()
-    {
+    public String getKind() {
         return "msgInIndicator";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props)
-    {
+    protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getWatchSlot__AsObject();
@@ -49,57 +44,49 @@ public class MsgInIndicator
     }
 
 
-    public String getWatchSlot()
-    {
+    public String getWatchSlot() {
         return watchSlot;
     }
 
 
-    String getWatchSlot__NoWarn()
-    {
+    String getWatchSlot__NoWarn() {
         return watchSlot;
     }
 
 
-    Object getWatchSlot__AsObject()
-    {
+    Object getWatchSlot__AsObject() {
         return watchSlot;
     }
 
 
-    public void setWatchSlot(String __new_value)
-    {
+    public void setWatchSlot(String __new_value) {
         String __old_value = watchSlot;
         this.watchSlot = __new_value;
         slotModified("watchSlot", __old_value, __new_value, true, true);
     }
 
 
-    public void setWatchSlot__AsObject(Object __new_value)
-    {
+    public void setWatchSlot__AsObject(Object __new_value) {
         Object __old_value = getWatchSlot__AsObject();
         this.watchSlot = force_String(__new_value);
         slotModified("watchSlot", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeWatchSlot(String new_value)
-    {
+    protected void initializeWatchSlot(String new_value) {
         this.watchSlot = new_value;
         slotInitialized("watchSlot", new_value);
     }
 
 
-    void initializeWatchSlot__AsObject(Object new_value)
-    {
+    void initializeWatchSlot__AsObject(Object new_value) {
         this.watchSlot = force_String(new_value);
         slotInitialized("watchSlot", new_value);
     }
     private static final int watchSlot__HashVar__ = "watchSlot".hashCode();
 
 
-    protected Object getLocalValue(String __slot)
-    {
+    protected Object getLocalValue(String __slot) {
        int __key = __slot.hashCode();
        if (watchSlot__HashVar__ == __key)
             return getWatchSlot__AsObject();
@@ -109,8 +96,7 @@ public class MsgInIndicator
 
 
     protected void setLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (watchSlot__HashVar__ == __key)
             setWatchSlot__AsObject(__value);
@@ -120,8 +106,7 @@ public class MsgInIndicator
 
 
     protected void initializeLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (watchSlot__HashVar__ == __key)
             initializeWatchSlot__AsObject(__value);
@@ -130,8 +115,7 @@ public class MsgInIndicator
     }
 
 
-    public SlotDescription slotMetaData__WatchSlot()
-    {
+    public SlotDescription slotMetaData__WatchSlot() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "watchSlot";
         __desc.prototype = "msgInIndicator";
@@ -149,8 +133,7 @@ public class MsgInIndicator
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map map)
-    {
+    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("watchSlot", slotMetaData__WatchSlot());
     }

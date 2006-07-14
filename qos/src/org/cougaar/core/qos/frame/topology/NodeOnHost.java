@@ -5,8 +5,7 @@ import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.util.UID;
 
 public class NodeOnHost
-    extends Contains
-{
+    extends Contains {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
@@ -18,33 +17,28 @@ public class NodeOnHost
     }
 
 
-    public NodeOnHost(UID uid)
-    {
+    public NodeOnHost(UID uid) {
         this(null, uid);
     }
 
 
     public NodeOnHost(FrameSet frameSet,
-                      UID uid)
-    {
+                      UID uid) {
         super(frameSet, uid);
     }
 
 
-    public String getKind()
-    {
+    public String getKind() {
         return "NodeOnHost";
     }
 
 
-    public String getParentPrototype()
-    {
+    public String getParentPrototype() {
         return "host";
     }
 
 
-    public String getChildPrototype()
-    {
+    public String getChildPrototype() {
         return "node";
     }
 }

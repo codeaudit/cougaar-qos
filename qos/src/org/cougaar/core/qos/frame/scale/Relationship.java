@@ -1,4 +1,4 @@
-package org.cougaar.core.qos.frame.topology;
+package org.cougaar.core.qos.frame.scale;
 
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
@@ -15,7 +15,7 @@ public class Relationship
                      return new Relationship(frameSet, uid);
                 }
             };
-            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.topology", "relationship", __fm);
+            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "relationship", __fm);
     }
     private String parent_value;
     private String child_value;

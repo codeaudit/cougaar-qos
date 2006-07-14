@@ -6,8 +6,7 @@ import org.cougaar.core.qos.frame.SlotDescription;
 import org.cougaar.core.util.UID;
 
 public class CpuIndicator
-    extends Indicator
-{
+    extends Indicator {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
@@ -25,15 +24,13 @@ public class CpuIndicator
     private double busyThreshold;
 
 
-    public CpuIndicator(UID uid)
-    {
+    public CpuIndicator(UID uid) {
         this(null, uid);
     }
 
 
     public CpuIndicator(FrameSet frameSet,
-                        UID uid)
-    {
+                        UID uid) {
         super(frameSet, uid);
         initializeCalmThreshold(0.2);
         initializeIdleThreshold(0.0);
@@ -44,14 +41,12 @@ public class CpuIndicator
     }
 
 
-    public String getKind()
-    {
+    public String getKind() {
         return "cpuIndicator";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props)
-    {
+    protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getCalmThreshold__AsObject();
@@ -69,289 +64,247 @@ public class CpuIndicator
     }
 
 
-    public double getCalmThreshold()
-    {
+    public double getCalmThreshold() {
         return calmThreshold;
     }
 
 
-    double getCalmThreshold__NoWarn()
-    {
+    double getCalmThreshold__NoWarn() {
         return calmThreshold;
     }
 
 
-    Object getCalmThreshold__AsObject()
-    {
+    Object getCalmThreshold__AsObject() {
         return new Double(calmThreshold);
     }
 
 
-    public void setCalmThreshold(double __new_value)
-    {
+    public void setCalmThreshold(double __new_value) {
         double __old_value = calmThreshold;
         this.calmThreshold = __new_value;
         slotModified("calmThreshold", new Double(__old_value), new Double(__new_value), true, true);
     }
 
 
-    public void setCalmThreshold__AsObject(Object __new_value)
-    {
+    public void setCalmThreshold__AsObject(Object __new_value) {
         Object __old_value = getCalmThreshold__AsObject();
         this.calmThreshold = force_double(__new_value);
         slotModified("calmThreshold", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeCalmThreshold(double new_value)
-    {
+    protected void initializeCalmThreshold(double new_value) {
         this.calmThreshold = new_value;
         slotInitialized("calmThreshold", new Double(new_value));
     }
 
 
-    void initializeCalmThreshold__AsObject(Object new_value)
-    {
+    void initializeCalmThreshold__AsObject(Object new_value) {
         this.calmThreshold = force_double(new_value);
         slotInitialized("calmThreshold", new_value);
     }
 
 
-    public double getIdleThreshold()
-    {
+    public double getIdleThreshold() {
         return idleThreshold;
     }
 
 
-    double getIdleThreshold__NoWarn()
-    {
+    double getIdleThreshold__NoWarn() {
         return idleThreshold;
     }
 
 
-    Object getIdleThreshold__AsObject()
-    {
+    Object getIdleThreshold__AsObject() {
         return new Double(idleThreshold);
     }
 
 
-    public void setIdleThreshold(double __new_value)
-    {
+    public void setIdleThreshold(double __new_value) {
         double __old_value = idleThreshold;
         this.idleThreshold = __new_value;
         slotModified("idleThreshold", new Double(__old_value), new Double(__new_value), true, true);
     }
 
 
-    public void setIdleThreshold__AsObject(Object __new_value)
-    {
+    public void setIdleThreshold__AsObject(Object __new_value) {
         Object __old_value = getIdleThreshold__AsObject();
         this.idleThreshold = force_double(__new_value);
         slotModified("idleThreshold", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeIdleThreshold(double new_value)
-    {
+    protected void initializeIdleThreshold(double new_value) {
         this.idleThreshold = new_value;
         slotInitialized("idleThreshold", new Double(new_value));
     }
 
 
-    void initializeIdleThreshold__AsObject(Object new_value)
-    {
+    void initializeIdleThreshold__AsObject(Object new_value) {
         this.idleThreshold = force_double(new_value);
         slotInitialized("idleThreshold", new_value);
     }
 
 
-    public String getWatchSlot()
-    {
+    public String getWatchSlot() {
         return watchSlot;
     }
 
 
-    String getWatchSlot__NoWarn()
-    {
+    String getWatchSlot__NoWarn() {
         return watchSlot;
     }
 
 
-    Object getWatchSlot__AsObject()
-    {
+    Object getWatchSlot__AsObject() {
         return watchSlot;
     }
 
 
-    public void setWatchSlot(String __new_value)
-    {
+    public void setWatchSlot(String __new_value) {
         String __old_value = watchSlot;
         this.watchSlot = __new_value;
         slotModified("watchSlot", __old_value, __new_value, true, true);
     }
 
 
-    public void setWatchSlot__AsObject(Object __new_value)
-    {
+    public void setWatchSlot__AsObject(Object __new_value) {
         Object __old_value = getWatchSlot__AsObject();
         this.watchSlot = force_String(__new_value);
         slotModified("watchSlot", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeWatchSlot(String new_value)
-    {
+    protected void initializeWatchSlot(String new_value) {
         this.watchSlot = new_value;
         slotInitialized("watchSlot", new_value);
     }
 
 
-    void initializeWatchSlot__AsObject(Object new_value)
-    {
+    void initializeWatchSlot__AsObject(Object new_value) {
         this.watchSlot = force_String(new_value);
         slotInitialized("watchSlot", new_value);
     }
 
 
-    public double getNormalThreshold()
-    {
+    public double getNormalThreshold() {
         return normalThreshold;
     }
 
 
-    double getNormalThreshold__NoWarn()
-    {
+    double getNormalThreshold__NoWarn() {
         return normalThreshold;
     }
 
 
-    Object getNormalThreshold__AsObject()
-    {
+    Object getNormalThreshold__AsObject() {
         return new Double(normalThreshold);
     }
 
 
-    public void setNormalThreshold(double __new_value)
-    {
+    public void setNormalThreshold(double __new_value) {
         double __old_value = normalThreshold;
         this.normalThreshold = __new_value;
         slotModified("normalThreshold", new Double(__old_value), new Double(__new_value), true, true);
     }
 
 
-    public void setNormalThreshold__AsObject(Object __new_value)
-    {
+    public void setNormalThreshold__AsObject(Object __new_value) {
         Object __old_value = getNormalThreshold__AsObject();
         this.normalThreshold = force_double(__new_value);
         slotModified("normalThreshold", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeNormalThreshold(double new_value)
-    {
+    protected void initializeNormalThreshold(double new_value) {
         this.normalThreshold = new_value;
         slotInitialized("normalThreshold", new Double(new_value));
     }
 
 
-    void initializeNormalThreshold__AsObject(Object new_value)
-    {
+    void initializeNormalThreshold__AsObject(Object new_value) {
         this.normalThreshold = force_double(new_value);
         slotInitialized("normalThreshold", new_value);
     }
 
 
-    public double getFranticThreshold()
-    {
+    public double getFranticThreshold() {
         return franticThreshold;
     }
 
 
-    double getFranticThreshold__NoWarn()
-    {
+    double getFranticThreshold__NoWarn() {
         return franticThreshold;
     }
 
 
-    Object getFranticThreshold__AsObject()
-    {
+    Object getFranticThreshold__AsObject() {
         return new Double(franticThreshold);
     }
 
 
-    public void setFranticThreshold(double __new_value)
-    {
+    public void setFranticThreshold(double __new_value) {
         double __old_value = franticThreshold;
         this.franticThreshold = __new_value;
         slotModified("franticThreshold", new Double(__old_value), new Double(__new_value), true, true);
     }
 
 
-    public void setFranticThreshold__AsObject(Object __new_value)
-    {
+    public void setFranticThreshold__AsObject(Object __new_value) {
         Object __old_value = getFranticThreshold__AsObject();
         this.franticThreshold = force_double(__new_value);
         slotModified("franticThreshold", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeFranticThreshold(double new_value)
-    {
+    protected void initializeFranticThreshold(double new_value) {
         this.franticThreshold = new_value;
         slotInitialized("franticThreshold", new Double(new_value));
     }
 
 
-    void initializeFranticThreshold__AsObject(Object new_value)
-    {
+    void initializeFranticThreshold__AsObject(Object new_value) {
         this.franticThreshold = force_double(new_value);
         slotInitialized("franticThreshold", new_value);
     }
 
 
-    public double getBusyThreshold()
-    {
+    public double getBusyThreshold() {
         return busyThreshold;
     }
 
 
-    double getBusyThreshold__NoWarn()
-    {
+    double getBusyThreshold__NoWarn() {
         return busyThreshold;
     }
 
 
-    Object getBusyThreshold__AsObject()
-    {
+    Object getBusyThreshold__AsObject() {
         return new Double(busyThreshold);
     }
 
 
-    public void setBusyThreshold(double __new_value)
-    {
+    public void setBusyThreshold(double __new_value) {
         double __old_value = busyThreshold;
         this.busyThreshold = __new_value;
         slotModified("busyThreshold", new Double(__old_value), new Double(__new_value), true, true);
     }
 
 
-    public void setBusyThreshold__AsObject(Object __new_value)
-    {
+    public void setBusyThreshold__AsObject(Object __new_value) {
         Object __old_value = getBusyThreshold__AsObject();
         this.busyThreshold = force_double(__new_value);
         slotModified("busyThreshold", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeBusyThreshold(double new_value)
-    {
+    protected void initializeBusyThreshold(double new_value) {
         this.busyThreshold = new_value;
         slotInitialized("busyThreshold", new Double(new_value));
     }
 
 
-    void initializeBusyThreshold__AsObject(Object new_value)
-    {
+    void initializeBusyThreshold__AsObject(Object new_value) {
         this.busyThreshold = force_double(new_value);
         slotInitialized("busyThreshold", new_value);
     }
@@ -363,8 +316,7 @@ public class CpuIndicator
     private static final int busyThreshold__HashVar__ = "busyThreshold".hashCode();
 
 
-    protected Object getLocalValue(String __slot)
-    {
+    protected Object getLocalValue(String __slot) {
        int __key = __slot.hashCode();
        if (calmThreshold__HashVar__ == __key)
             return getCalmThreshold__AsObject();
@@ -384,8 +336,7 @@ public class CpuIndicator
 
 
     protected void setLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (calmThreshold__HashVar__ == __key)
             setCalmThreshold__AsObject(__value);
@@ -405,8 +356,7 @@ public class CpuIndicator
 
 
     protected void initializeLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (calmThreshold__HashVar__ == __key)
             initializeCalmThreshold__AsObject(__value);
@@ -425,8 +375,7 @@ public class CpuIndicator
     }
 
 
-    public SlotDescription slotMetaData__CalmThreshold()
-    {
+    public SlotDescription slotMetaData__CalmThreshold() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "calmThreshold";
         __desc.prototype = "cpuIndicator";
@@ -444,8 +393,7 @@ public class CpuIndicator
     }
 
 
-    public SlotDescription slotMetaData__IdleThreshold()
-    {
+    public SlotDescription slotMetaData__IdleThreshold() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "idleThreshold";
         __desc.prototype = "cpuIndicator";
@@ -463,8 +411,7 @@ public class CpuIndicator
     }
 
 
-    public SlotDescription slotMetaData__WatchSlot()
-    {
+    public SlotDescription slotMetaData__WatchSlot() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "watchSlot";
         __desc.prototype = "cpuIndicator";
@@ -482,8 +429,7 @@ public class CpuIndicator
     }
 
 
-    public SlotDescription slotMetaData__NormalThreshold()
-    {
+    public SlotDescription slotMetaData__NormalThreshold() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "normalThreshold";
         __desc.prototype = "cpuIndicator";
@@ -501,8 +447,7 @@ public class CpuIndicator
     }
 
 
-    public SlotDescription slotMetaData__FranticThreshold()
-    {
+    public SlotDescription slotMetaData__FranticThreshold() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "franticThreshold";
         __desc.prototype = "cpuIndicator";
@@ -520,8 +465,7 @@ public class CpuIndicator
     }
 
 
-    public SlotDescription slotMetaData__BusyThreshold()
-    {
+    public SlotDescription slotMetaData__BusyThreshold() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "busyThreshold";
         __desc.prototype = "cpuIndicator";
@@ -539,8 +483,7 @@ public class CpuIndicator
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map map)
-    {
+    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("calmThreshold", slotMetaData__CalmThreshold());
         map.put("idleThreshold", slotMetaData__IdleThreshold());

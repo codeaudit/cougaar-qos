@@ -1,0 +1,43 @@
+Main tab
+
+Project:
+qos
+
+Main class:
+org.couaar.boostrap.Boostrapper
+
+
+Arguments tab
+
+Program arguments:
+org.cougaar.core.node.Node
+
+VM arguments:
+
+-Dorg.cougaar.society.file=TopologyDemo.xml
+-Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo"
+-Dorg.cougaar.node.name=NODE1
+-Dorg.cougaar.core.logging.log4j.appender.A2.File=NODE1-events.log
+-Dorg.cougaar.core.logging.config.filename=logging.properties
+-Dorg.cougaar.name.server=NameServer@localhost:8888
+-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser
+-Dorg.cougaar.core.node.InitializationComponent=XML
+-Dorg.cougaar.core.domain.config.filename= 
+-Dorg.cougaar.install.path=${cip}
+-Dorg.cougaar.core.agent.quiet=true
+-Xbootclasspath/p:${cip}/lib/javaiopatch.jar
+-Xms1m
+-Xmx256m
+-XX:ThreadStackSize=256
+
+Working directory:
+${workspace_loc:qos/run}
+
+
+Classpath tab
+
+User Entries:
+ cougaar-lib user library
+ qos project
+ cougaar-sys user library
+

@@ -7,8 +7,7 @@ import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 
 public class Indicator
-    extends Thing
-{
+    extends Thing {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
@@ -21,28 +20,24 @@ public class Indicator
     private String status;
 
 
-    public Indicator(UID uid)
-    {
+    public Indicator(UID uid) {
         this(null, uid);
     }
 
 
     public Indicator(FrameSet frameSet,
-                     UID uid)
-    {
+                     UID uid) {
         super(frameSet, uid);
         initializeStatus("unknown");
     }
 
 
-    public String getKind()
-    {
+    public String getKind() {
         return "indicator";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props)
-    {
+    protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getStatus__AsObject();
@@ -50,8 +45,7 @@ public class Indicator
     }
 
 
-    protected void collectContainerSlotValues(java.util.Properties __props)
-    {
+    protected void collectContainerSlotValues(java.util.Properties __props) {
         super.collectContainerSlotValues(__props);
         Object __value;
         __value = getBytesIn__AsObject();
@@ -81,56 +75,48 @@ public class Indicator
     }
 
 
-    public String getStatus()
-    {
+    public String getStatus() {
         return status;
     }
 
 
-    String getStatus__NoWarn()
-    {
+    String getStatus__NoWarn() {
         return status;
     }
 
 
-    Object getStatus__AsObject()
-    {
+    Object getStatus__AsObject() {
         return status;
     }
 
 
-    public void setStatus(String __new_value)
-    {
+    public void setStatus(String __new_value) {
         String __old_value = status;
         this.status = __new_value;
         slotModified("status", __old_value, __new_value, true, true);
     }
 
 
-    public void setStatus__AsObject(Object __new_value)
-    {
+    public void setStatus__AsObject(Object __new_value) {
         Object __old_value = getStatus__AsObject();
         this.status = force_String(__new_value);
         slotModified("status", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeStatus(String new_value)
-    {
+    protected void initializeStatus(String new_value) {
         this.status = new_value;
         slotInitialized("status", new_value);
     }
 
 
-    void initializeStatus__AsObject(Object new_value)
-    {
+    void initializeStatus__AsObject(Object new_value) {
         this.status = force_String(new_value);
         slotInitialized("status", new_value);
     }
 
 
-    public Metric getBytesIn()
-    {
+    public Metric getBytesIn() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -141,8 +127,7 @@ public class Indicator
     }
 
 
-    Object getBytesIn__AsObject()
-    {
+    Object getBytesIn__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -154,8 +139,7 @@ public class Indicator
     }
 
 
-    public Metric getLoadAverage()
-    {
+    public Metric getLoadAverage() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -166,8 +150,7 @@ public class Indicator
     }
 
 
-    Object getLoadAverage__AsObject()
-    {
+    Object getLoadAverage__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -179,8 +162,7 @@ public class Indicator
     }
 
 
-    public Metric getCpuLoadAverage()
-    {
+    public Metric getCpuLoadAverage() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -191,8 +173,7 @@ public class Indicator
     }
 
 
-    Object getCpuLoadAverage__AsObject()
-    {
+    Object getCpuLoadAverage__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -204,8 +185,7 @@ public class Indicator
     }
 
 
-    public Metric getJips()
-    {
+    public Metric getJips() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -216,8 +196,7 @@ public class Indicator
     }
 
 
-    Object getJips__AsObject()
-    {
+    Object getJips__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -229,8 +208,7 @@ public class Indicator
     }
 
 
-    public Metric getPersistSizeLast()
-    {
+    public Metric getPersistSizeLast() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -241,8 +219,7 @@ public class Indicator
     }
 
 
-    Object getPersistSizeLast__AsObject()
-    {
+    Object getPersistSizeLast__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -254,8 +231,7 @@ public class Indicator
     }
 
 
-    public Metric getMsgIn()
-    {
+    public Metric getMsgIn() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -266,8 +242,7 @@ public class Indicator
     }
 
 
-    Object getMsgIn__AsObject()
-    {
+    Object getMsgIn__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -279,8 +254,7 @@ public class Indicator
     }
 
 
-    public Metric getEffectiveMJips()
-    {
+    public Metric getEffectiveMJips() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -291,8 +265,7 @@ public class Indicator
     }
 
 
-    Object getEffectiveMJips__AsObject()
-    {
+    Object getEffectiveMJips__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -304,8 +277,7 @@ public class Indicator
     }
 
 
-    public Metric getCpuLoadMJips()
-    {
+    public Metric getCpuLoadMJips() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -316,8 +288,7 @@ public class Indicator
     }
 
 
-    Object getCpuLoadMJips__AsObject()
-    {
+    Object getCpuLoadMJips__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -329,8 +300,7 @@ public class Indicator
     }
 
 
-    public Metric getBytesOut()
-    {
+    public Metric getBytesOut() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -341,8 +311,7 @@ public class Indicator
     }
 
 
-    Object getBytesOut__AsObject()
-    {
+    Object getBytesOut__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -354,8 +323,7 @@ public class Indicator
     }
 
 
-    public Metric getCount()
-    {
+    public Metric getCount() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -366,8 +334,7 @@ public class Indicator
     }
 
 
-    Object getCount__AsObject()
-    {
+    Object getCount__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -379,8 +346,7 @@ public class Indicator
     }
 
 
-    public Metric getVmSize()
-    {
+    public Metric getVmSize() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -391,8 +357,7 @@ public class Indicator
     }
 
 
-    Object getVmSize__AsObject()
-    {
+    Object getVmSize__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -404,8 +369,7 @@ public class Indicator
     }
 
 
-    public Metric getMsgOut()
-    {
+    public Metric getMsgOut() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
@@ -416,8 +380,7 @@ public class Indicator
     }
 
 
-    Object getMsgOut__AsObject()
-    {
+    Object getMsgOut__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
        if (!(__raw_container instanceof Agent)) {
@@ -429,8 +392,7 @@ public class Indicator
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new)
-    {
+    protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new) {
         if (!(__raw_old instanceof Agent)) {
             getLogger().warn("Container of " +this+ " is not a Agent: " + __raw_old);
             return;
@@ -530,8 +492,7 @@ public class Indicator
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw)
-    {
+    protected void fireContainerChanges(DataFrame __raw) {
         if (!(__raw instanceof Agent)) {
             getLogger().warn("Container of " +this+ " is not a Agent: " + __raw);
             return;
@@ -603,8 +564,7 @@ public class Indicator
     private static final int vmSize__HashVar__ = "vmSize".hashCode();
 
 
-    protected Object getLocalValue(String __slot)
-    {
+    protected Object getLocalValue(String __slot) {
        int __key = __slot.hashCode();
        if (bytesIn__HashVar__ == __key)
             return getBytesIn__AsObject();
@@ -640,8 +600,7 @@ public class Indicator
 
 
     protected void setLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (status__HashVar__ == __key)
             setStatus__AsObject(__value);
@@ -651,8 +610,7 @@ public class Indicator
 
 
     protected void initializeLocalValue(String __slot,
-                                 Object __value)
-    {
+                                 Object __value) {
        int __key = __slot.hashCode();
        if (status__HashVar__ == __key)
             initializeStatus__AsObject(__value);
@@ -661,8 +619,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__Status()
-    {
+    public SlotDescription slotMetaData__Status() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "status";
         __desc.prototype = "indicator";
@@ -680,8 +637,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__BytesIn()
-    {
+    public SlotDescription slotMetaData__BytesIn() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "bytesIn";
         __desc.prototype = "agent";
@@ -692,8 +648,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__LoadAverage()
-    {
+    public SlotDescription slotMetaData__LoadAverage() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "loadAverage";
         __desc.prototype = "host";
@@ -704,8 +659,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__CpuLoadAverage()
-    {
+    public SlotDescription slotMetaData__CpuLoadAverage() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "cpuLoadAverage";
         __desc.prototype = "agent";
@@ -716,8 +670,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__Jips()
-    {
+    public SlotDescription slotMetaData__Jips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "jips";
         __desc.prototype = "host";
@@ -728,8 +681,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__PersistSizeLast()
-    {
+    public SlotDescription slotMetaData__PersistSizeLast() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "persistSizeLast";
         __desc.prototype = "agent";
@@ -740,8 +692,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__MsgIn()
-    {
+    public SlotDescription slotMetaData__MsgIn() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "msgIn";
         __desc.prototype = "agent";
@@ -752,8 +703,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__EffectiveMJips()
-    {
+    public SlotDescription slotMetaData__EffectiveMJips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "effectiveMJips";
         __desc.prototype = "host";
@@ -764,8 +714,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__CpuLoadMJips()
-    {
+    public SlotDescription slotMetaData__CpuLoadMJips() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "cpuLoadMJips";
         __desc.prototype = "agent";
@@ -776,8 +725,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__BytesOut()
-    {
+    public SlotDescription slotMetaData__BytesOut() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "bytesOut";
         __desc.prototype = "agent";
@@ -788,8 +736,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__Count()
-    {
+    public SlotDescription slotMetaData__Count() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "count";
         __desc.prototype = "host";
@@ -800,8 +747,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__VmSize()
-    {
+    public SlotDescription slotMetaData__VmSize() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "vmSize";
         __desc.prototype = "node";
@@ -812,8 +758,7 @@ public class Indicator
     }
 
 
-    public SlotDescription slotMetaData__MsgOut()
-    {
+    public SlotDescription slotMetaData__MsgOut() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "msgOut";
         __desc.prototype = "agent";
@@ -824,8 +769,7 @@ public class Indicator
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map map)
-    {
+    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("status", slotMetaData__Status());
         map.put("bytesIn", slotMetaData__BytesIn());
