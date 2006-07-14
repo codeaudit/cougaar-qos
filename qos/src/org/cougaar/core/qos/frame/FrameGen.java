@@ -1514,8 +1514,8 @@ extends DefaultHandler
 	    if (filter) {
 		for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
 		    Attributes value = entry.getValue();
-		    String prot = value.getValue("protected");
-		    if (prot == null || !prot.equalsIgnoreCase("true"))
+		    String prot = value.getValue("inheritable-through");
+		    if (prot == null || !prot.equalsIgnoreCase("prototype-only"))
 			slots.put(entry.getKey(), value);
 		}
 	    } else {
