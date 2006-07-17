@@ -41,6 +41,7 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
     private int height;
     private int degree;
     private int maxDepth;
+    private int totalFrames;
     
     public void start() {
 	height = (int) getParameter("height", 1);
@@ -58,21 +59,22 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	super.start();
     }
     
-    private void makeNextLevel(Thing frame, int level) {
+    private void makeNextLevel(Thing parent, int level) {
 	int nextLevel = level+1;
 	boolean recurse = nextLevel < maxDepth;
 	String type = "level" + level;
 	String rtype = type + "On" + (level == 1 ? "Root" : "Level"+(level-1));
-	String parentName = frame.getName();
+	String parentName = parent.getName();
 	Properties slots = new Properties();
-	Properties empty = new Properties();
+	Properties relSlots = new Properties();
 	for (int i=1; i<=degree; i++) {
 	    String childName = parentName + "." + i;
 	    slots.put("name", childName);
 	    Thing child = (Thing) frameset.makeFrame(type, slots);
-	    Relationship r = (Relationship) frameset.makeFrame(rtype, empty);
-	    r.setChildValue(childName);
-	    r.setParentValue(parentName);
+	    relSlots.put("child-value", childName);
+	    relSlots.put("parent-value", parentName);
+	    frameset.makeRelationship(rtype, relSlots, parent, child);
+	    totalFrames += 2;
 	    if (recurse) makeNextLevel(child, nextLevel);
 	}
     }
@@ -85,8 +87,9 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	Root root = (Root) frameset.makeFrame("root", slots);
 	makeNextLevel(root, 1);
 	long duration = System.currentTimeMillis()-now;
-	log.shout("Completed data creation in " + duration/1000f+ " seconds with height="
-		+ height + " and degree=" + degree);
+	log.shout("Created " +totalFrames+ " frames in " + duration/1000f+ " seconds with height="
+		+ height + " and degree=" + degree 
+		+ " (" +(totalFrames/((float) duration))+ " frames/ms)");
 	populated = true;
     }
     
