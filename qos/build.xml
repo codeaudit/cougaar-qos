@@ -753,6 +753,7 @@
 	  >
     <!-- Fork to a new VM to allow codegen in Eclipse -->
     <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes">
+    	<jvmarg value="-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser"/>
       <classpath>
       	<pathelement path="${module.classes}"/>
       	<pathelement path="${env.COUGAAR_INSTALL_PATH}/sys/xercesImpl.jar"/>
@@ -761,6 +762,7 @@
     </java>
     	
     <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes" >
+    	<jvmarg value="-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser"/>
          <classpath>
     		<pathelement path="${module.classes}"/>
     		<pathelement path="${env.COUGAAR_INSTALL_PATH}/sys/xercesImpl.jar"/>
