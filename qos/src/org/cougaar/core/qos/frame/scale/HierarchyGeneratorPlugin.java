@@ -40,9 +40,11 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
     private boolean populated;
     private int height;
     private int degree;
+    private int maxDepth;
     
     public void start() {
-	height = (int) getParameter("height", 1)+1; // height is really max depth
+	height = (int) getParameter("height", 1);
+	maxDepth = height + 1;
 	degree = (int) getParameter("degree", 2);
 	String frameSetName = getParameter("frame-set");
 	ServiceBroker sb = getServiceBroker();
@@ -57,10 +59,8 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
     }
     
     private void makeNextLevel(Thing frame, int level) {
-	if (level == height) {
-	    // done recursion
-	    return;
-	}
+	int nextLevel = level+1;
+	boolean recurse = nextLevel < maxDepth;
 	String type = "level" + level;
 	String rtype = type + "On" + (level == 1 ? "Root" : "Level"+(level-1));
 	String parentName = frame.getName();
@@ -73,7 +73,7 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	    Relationship r = (Relationship) frameset.makeFrame(rtype, empty);
 	    r.setChildValue(childName);
 	    r.setParentValue(parentName);
-	    makeNextLevel(child, level+1);
+	    if (recurse) makeNextLevel(child, nextLevel);
 	}
     }
 
@@ -85,7 +85,8 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	Root root = (Root) frameset.makeFrame("root", slots);
 	makeNextLevel(root, 1);
 	long duration = System.currentTimeMillis()-now;
-	log.shout("Completed data creation in " + duration/1000f+ " seconds");
+	log.shout("Completed data creation in " + duration/1000f+ " seconds with height="
+		+ height + " and degree=" + degree);
 	populated = true;
     }
     
