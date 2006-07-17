@@ -85,9 +85,7 @@
     installation -->
     <property file="${TARGETBASE}/global.properties" />
 
-    <!-- Absolute path for COUGAAR_SRC_PATH installation -->
-    <property name="ABSOLUTE_SRC_BASE" value="${env.COUGAAR_SRC_PATH}" />
-
+    
 	
 
     <!-- You can also have a user-specific global properties file. -->
@@ -754,20 +752,20 @@
 	  description="Generate classes from Prototype Frames"
 	  >
     <!-- Fork to a new VM to allow codegen in Eclipse -->
-    <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes" dir="${ABSOLUTE_SRC_BASE}/qos">
+    <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes">
       <classpath>
-	<pathelement path="${TARGETBASE}/lib/qos.jar"/>
-	<pathelement path="${TARGETBASE}/lib/xercesImpl.jar"/>
+      	<pathelement path="${module.classes}"/>
+      	<pathelement path="${env.COUGAAR_INSTALL_PATH}/sys/xercesImpl.jar"/>
       </classpath>
-      <arg value="${TARGETBASE}/qos/src/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
+      <arg value="${src}/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
     </java>
     	
-    <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes" dir="${ABSOLUTE_SRC_BASE}/qos">
+    <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes" >
          <classpath>
-    		<pathelement path="${TARGETBASE}/lib/qos.jar"/>
-    		<pathelement path="${TARGETBASE}/lib/xercesImpl.jar"/>
+    		<pathelement path="${module.classes}"/>
+    		<pathelement path="${env.COUGAAR_INSTALL_PATH}/sys/xercesImpl.jar"/>
     	 </classpath>
-    	      <arg value="${TARGETBASE}/qos/src/org/cougaar/core/qos/frame/scale/test-scale-protos.xml" />
+    	      <arg value="${src}/org/cougaar/core/qos/frame/scale/test-scale-protos.xml" />
     </java>
   </target>
 
