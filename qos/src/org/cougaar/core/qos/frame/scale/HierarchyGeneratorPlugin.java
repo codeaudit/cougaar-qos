@@ -73,7 +73,9 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	    Thing child = (Thing) frameset.makeFrame(type, slots);
 	    relSlots.put("child-value", childName);
 	    relSlots.put("parent-value", parentName);
-	    frameset.makeRelationship(rtype, relSlots, parent, child);
+	    // JAZ makeRelationship is 6% faster than makeFrame
+	    // frameset.makeRelationship(rtype, relSlots, parent, child);
+	    frameset.makeFrame(rtype, relSlots);
 	    totalFrames += 2;
 	    if (recurse) makeNextLevel(child, nextLevel);
 	}

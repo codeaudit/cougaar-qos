@@ -1,5 +1,6 @@
 <frameset domain="testScale" frame-inheritance="single"
-	package="org.cougaar.core.qos.frame.scale" container-relation="contains">
+	package="org.cougaar.core.qos.frame.scale" container-relation="contains"
+	index-slot="name">
 	
 	<!-- Root entity prototype -->
 	<prototypes>
