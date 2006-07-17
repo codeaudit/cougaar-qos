@@ -4,7 +4,8 @@
 <!ATTLIST frameset frame-inheritance CDATA "single"
 	           package CDATA #REQUIRED
 	           container-relation CDATA #REQUIRED
-	           domain CDATA #REQUIRED>
+	           domain CDATA #REQUIRED
+			   index-slot CDATA #IMPLIED>
 <!ELEMENT copyright (#PCDATA)>
 <!ELEMENT prototypes (prototype | relation-prototype | path)*>
 <!ELEMENT prototype (slot*)>

@@ -68,6 +68,9 @@ public class SingleInheritanceFrameSet
     private final BlackboardService bbs;
     private final MetricsService metrics;
     private final Object change_queue_lock, relation_lock;
+    //  This slot is assumed to be immutable
+    private final String primaryIndexSlot;
+    
     private List<ChangeQueueEntry> change_queue;
     private Map<UID,Object> kb; // values can be either Frames or Paths
     private Map<String,Class> cached_classes;
@@ -81,20 +84,27 @@ public class SingleInheritanceFrameSet
     private Map<DataFrame,DataFrame> containers;
     private String container_relation;
     
+    private Map<PrototypeFrame,Map<Object,DataFrame>> primaryIndexCache;
+    
+    
+    
     private Set<SlotAggregation> aggregations;
 
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
 				     BlackboardService bbs,
 				     String name,
-				     String container_relation) {
+				     String container_relation,
+				     String primaryIndexSlot) {
 	this.name = name;
+	this.primaryIndexSlot = primaryIndexSlot;
 	this.container_relation = container_relation;
 	this.cached_classes = new HashMap<String,Class>();
 	this.parent_cache = new HashMap<RelationFrame,DataFrame>();
 	this.child_cache = new HashMap<RelationFrame,DataFrame>();
 	this.paths = new HashMap<String,Path>();
 	this.frames = new HashSet<DataFrame>();
+	this.primaryIndexCache = new HashMap<PrototypeFrame,Map<Object, DataFrame>>();
 	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
@@ -175,6 +185,16 @@ public class SingleInheritanceFrameSet
 
     public DataFrame makeFrame(String proto, Properties values, UID uid) {
 	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
+	PrototypeFrame pframe = frame.getPrototype();
+	Object key = values.get(primaryIndexSlot);
+	if (key != null) {
+	    Map<Object,DataFrame> cache = primaryIndexCache.get(pframe);
+	    if (cache == null) {
+		cache = new HashMap<Object,DataFrame>();
+		primaryIndexCache.put(pframe, cache);
+	    }
+	    cache.put(key, frame);
+	}
 	addObject(frame);
 	publishAdd(frame);
 	return frame;
@@ -545,11 +565,31 @@ public class SingleInheritanceFrameSet
 		return null;
 	}
     }
+    
+    private DataFrame getIndexedFrame(String proto, Object key) {
+	PrototypeFrame pframe = findPrototypeFrame(proto);
+	Map<Object,DataFrame> cache = primaryIndexCache.get(pframe);
+	if (cache != null) {
+	    DataFrame value = cache.get(key);
+	    if (value != null) return value;
+	}
+	// walk up the proto hierarchy
+	String parent = pframe.getKind();
+	if (parent != null) {
+	    return getIndexedFrame(parent, key);
+	} else {
+	    return null;
+	}
+    }
 
     public DataFrame findFrame(String proto, String slot, Object value) {
 	if (slot == null || proto == null || value == null) return null;
-
-	    
+	if (slot.equals(primaryIndexSlot)) {
+	    DataFrame frame = getIndexedFrame(proto, value);
+	    if (frame != null) {
+		return frame;
+	    }
+	}
 	Class klass = classForPrototype(proto);
 	if (klass == null) return null;
 

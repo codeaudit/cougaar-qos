@@ -234,12 +234,13 @@ public class FrameSetParser
 	String pkg = attrs.getValue("package");
 	String container_relation = attrs.getValue("container-relation");
 	String inheritance = attrs.getValue("frame-inheritance");
+	String indexSlot = attrs.getValue("index-slot");
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
 
 	frame_set = new SingleInheritanceFrameSet(pkg, sb, bbs, frame_set_name,
-						  container_relation);
+						  container_relation, indexSlot);
     }
 
 
