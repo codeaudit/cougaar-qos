@@ -31,4 +31,48 @@
 		<child-value>level 2</child-value>
 	</Level2OnLevel1>
 	
+	<level3>
+		<name>level 3</name>
+		<level3SlotFloat>13.0</level3SlotFloat>
+		<level3SlotString> Level 3 String </level3SlotString>
+	</level3>
+	
+	<Level3OnLevel2>
+		<parent-value>level 2</parent-value>
+		<child-value>level 3</child-value>
+	</Level3OnLevel2>
+	
+	<level4>
+		<name>level 4</name>
+		<level4SlotFloat>14.0</level4SlotFloat>
+		<level4SlotString> Level 4 String </level4SlotString>
+	</level4>
+	
+	<Level4OnLevel3>
+		<parent-value>level 3</parent-value>
+		<child-value>level 4</child-value>
+	</Level4OnLevel3>
+	
+	<level5>
+		<name>level 5</name>
+		<level5SlotFloat>15.0</level5SlotFloat>
+		<level5SlotString> Level 5 String </level5SlotString>
+	</level5>
+	
+	<Level5OnLevel4>
+		<parent-value>level 4</parent-value>
+		<child-value>level 5</child-value>
+	</Level5OnLevel4>
+	
+	<level6>
+		<name>level 6</name>
+		<level6SlotFloat>16.0</level6SlotFloat>
+		<level6SlotString> Level 6 String </level6SlotString>
+	</level6>
+	
+	<Level6OnLevel5>
+		<parent-value>level 5</parent-value>
+		<child-value>level 6</child-value>
+	</Level6OnLevel5>
+	
 </testScale>

@@ -5,46 +5,46 @@ import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.SlotDescription;
 import org.cougaar.core.util.UID;
 
-public class Level2
+public class Level3
     extends Thing {
     static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
-                     return new Level2(frameSet, uid);
+                     return new Level3(frameSet, uid);
                 }
             };
-            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "level2", __fm);
+            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "level3", __fm);
     }
-    private String level2SlotString;
-    private float level2SlotFloat;
+    private String level3SlotString;
+    private float level3SlotFloat;
 
 
-    public Level2(UID uid) {
+    public Level3(UID uid) {
         this(null, uid);
     }
 
 
-    public Level2(FrameSet frameSet,
+    public Level3(FrameSet frameSet,
                   UID uid) {
         super(frameSet, uid);
-        initializeLevel2SlotString("Two");
-        initializeLevel2SlotFloat(2.0f);
+        initializeLevel3SlotString("Three");
+        initializeLevel3SlotFloat(3.0f);
     }
 
 
     public String getKind() {
-        return "level2";
+        return "level3";
     }
 
 
     protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
-        __value = getLevel2SlotString__AsObject();
-        __props.put("level2SlotString", __value != null ? __value : NIL);
-        __value = getLevel2SlotFloat__AsObject();
-        __props.put("level2SlotFloat", __value != null ? __value : NIL);
+        __value = getLevel3SlotString__AsObject();
+        __props.put("level3SlotString", __value != null ? __value : NIL);
+        __value = getLevel3SlotFloat__AsObject();
+        __props.put("level3SlotFloat", __value != null ? __value : NIL);
     }
 
 
@@ -55,6 +55,10 @@ public class Level2
         __props.put("level1SlotString", __value != null ? __value : NIL);
         __value = getRootSlotFloat__AsObject();
         __props.put("rootSlotFloat", __value != null ? __value : NIL);
+        __value = getLevel2SlotString__AsObject();
+        __props.put("level2SlotString", __value != null ? __value : NIL);
+        __value = getLevel2SlotFloat__AsObject();
+        __props.put("level2SlotFloat", __value != null ? __value : NIL);
         __value = getLevel1SlotFloat__AsObject();
         __props.put("level1SlotFloat", __value != null ? __value : NIL);
         __value = getRootSlotString__AsObject();
@@ -62,85 +66,85 @@ public class Level2
     }
 
 
-    public String getLevel2SlotString() {
-        return level2SlotString;
+    public String getLevel3SlotString() {
+        return level3SlotString;
     }
 
 
-    String getLevel2SlotString__NoWarn() {
-        return level2SlotString;
+    String getLevel3SlotString__NoWarn() {
+        return level3SlotString;
     }
 
 
-    Object getLevel2SlotString__AsObject() {
-        return level2SlotString;
+    Object getLevel3SlotString__AsObject() {
+        return level3SlotString;
     }
 
 
-    public void setLevel2SlotString(String __new_value) {
-        String __old_value = level2SlotString;
-        this.level2SlotString = __new_value;
-        slotModified("level2SlotString", __old_value, __new_value, true, true);
+    public void setLevel3SlotString(String __new_value) {
+        String __old_value = level3SlotString;
+        this.level3SlotString = __new_value;
+        slotModified("level3SlotString", __old_value, __new_value, true, true);
     }
 
 
-    public void setLevel2SlotString__AsObject(Object __new_value) {
-        Object __old_value = getLevel2SlotString__AsObject();
-        this.level2SlotString = force_String(__new_value);
-        slotModified("level2SlotString", __old_value, __new_value, true, true);
+    public void setLevel3SlotString__AsObject(Object __new_value) {
+        Object __old_value = getLevel3SlotString__AsObject();
+        this.level3SlotString = force_String(__new_value);
+        slotModified("level3SlotString", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeLevel2SlotString(String new_value) {
-        this.level2SlotString = new_value;
-        slotInitialized("level2SlotString", new_value);
+    protected void initializeLevel3SlotString(String new_value) {
+        this.level3SlotString = new_value;
+        slotInitialized("level3SlotString", new_value);
     }
 
 
-    void initializeLevel2SlotString__AsObject(Object new_value) {
-        this.level2SlotString = force_String(new_value);
-        slotInitialized("level2SlotString", new_value);
+    void initializeLevel3SlotString__AsObject(Object new_value) {
+        this.level3SlotString = force_String(new_value);
+        slotInitialized("level3SlotString", new_value);
     }
 
 
-    public float getLevel2SlotFloat() {
-        return level2SlotFloat;
+    public float getLevel3SlotFloat() {
+        return level3SlotFloat;
     }
 
 
-    float getLevel2SlotFloat__NoWarn() {
-        return level2SlotFloat;
+    float getLevel3SlotFloat__NoWarn() {
+        return level3SlotFloat;
     }
 
 
-    Object getLevel2SlotFloat__AsObject() {
-        return new Float(level2SlotFloat);
+    Object getLevel3SlotFloat__AsObject() {
+        return new Float(level3SlotFloat);
     }
 
 
-    public void setLevel2SlotFloat(float __new_value) {
-        float __old_value = level2SlotFloat;
-        this.level2SlotFloat = __new_value;
-        slotModified("level2SlotFloat", new Float(__old_value), new Float(__new_value), true, true);
+    public void setLevel3SlotFloat(float __new_value) {
+        float __old_value = level3SlotFloat;
+        this.level3SlotFloat = __new_value;
+        slotModified("level3SlotFloat", new Float(__old_value), new Float(__new_value), true, true);
     }
 
 
-    public void setLevel2SlotFloat__AsObject(Object __new_value) {
-        Object __old_value = getLevel2SlotFloat__AsObject();
-        this.level2SlotFloat = force_float(__new_value);
-        slotModified("level2SlotFloat", __old_value, __new_value, true, true);
+    public void setLevel3SlotFloat__AsObject(Object __new_value) {
+        Object __old_value = getLevel3SlotFloat__AsObject();
+        this.level3SlotFloat = force_float(__new_value);
+        slotModified("level3SlotFloat", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeLevel2SlotFloat(float new_value) {
-        this.level2SlotFloat = new_value;
-        slotInitialized("level2SlotFloat", new Float(new_value));
+    protected void initializeLevel3SlotFloat(float new_value) {
+        this.level3SlotFloat = new_value;
+        slotInitialized("level3SlotFloat", new Float(new_value));
     }
 
 
-    void initializeLevel2SlotFloat__AsObject(Object new_value) {
-        this.level2SlotFloat = force_float(new_value);
-        slotInitialized("level2SlotFloat", new_value);
+    void initializeLevel3SlotFloat__AsObject(Object new_value) {
+        this.level3SlotFloat = force_float(new_value);
+        slotInitialized("level3SlotFloat", new_value);
     }
 
 
@@ -148,9 +152,9 @@ public class Level2
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
-       if (!(__raw_container instanceof Level1))
+       if (!(__raw_container instanceof Level2))
             throw new RuntimeException("Bogus container!");
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getLevel1SlotString();
     }
 
@@ -158,11 +162,11 @@ public class Level2
     Object getLevel1SlotString__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
-       if (!(__raw_container instanceof Level1)) {
-            getLogger().warn("Container of " +this+ " is not a Level1: " + __raw_container);
+       if (!(__raw_container instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_container);
             return null;
        }
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getLevel1SlotString__AsObject();
     }
 
@@ -171,9 +175,9 @@ public class Level2
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
-       if (!(__raw_container instanceof Level1))
+       if (!(__raw_container instanceof Level2))
             throw new RuntimeException("Bogus container!");
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getRootSlotFloat();
     }
 
@@ -181,12 +185,58 @@ public class Level2
     Object getRootSlotFloat__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
-       if (!(__raw_container instanceof Level1)) {
-            getLogger().warn("Container of " +this+ " is not a Level1: " + __raw_container);
+       if (!(__raw_container instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_container);
             return null;
        }
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getRootSlotFloat__AsObject();
+    }
+
+
+    public String getLevel2SlotString() {
+       Object __raw_container = containerFrame();
+       if ( __raw_container == null)
+            throw new RuntimeException("No container!");
+       if (!(__raw_container instanceof Level2))
+            throw new RuntimeException("Bogus container!");
+       Level2 __container = (Level2) __raw_container;
+       return __container.getLevel2SlotString();
+    }
+
+
+    Object getLevel2SlotString__AsObject() {
+       Object __raw_container = containerFrame();
+       if ( __raw_container == null) return null;
+       if (!(__raw_container instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_container);
+            return null;
+       }
+       Level2 __container = (Level2) __raw_container;
+       return __container.getLevel2SlotString__AsObject();
+    }
+
+
+    public float getLevel2SlotFloat() {
+       Object __raw_container = containerFrame();
+       if ( __raw_container == null)
+            throw new RuntimeException("No container!");
+       if (!(__raw_container instanceof Level2))
+            throw new RuntimeException("Bogus container!");
+       Level2 __container = (Level2) __raw_container;
+       return __container.getLevel2SlotFloat();
+    }
+
+
+    Object getLevel2SlotFloat__AsObject() {
+       Object __raw_container = containerFrame();
+       if ( __raw_container == null) return null;
+       if (!(__raw_container instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_container);
+            return null;
+       }
+       Level2 __container = (Level2) __raw_container;
+       return __container.getLevel2SlotFloat__AsObject();
     }
 
 
@@ -194,9 +244,9 @@ public class Level2
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
-       if (!(__raw_container instanceof Level1))
+       if (!(__raw_container instanceof Level2))
             throw new RuntimeException("Bogus container!");
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getLevel1SlotFloat();
     }
 
@@ -204,11 +254,11 @@ public class Level2
     Object getLevel1SlotFloat__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
-       if (!(__raw_container instanceof Level1)) {
-            getLogger().warn("Container of " +this+ " is not a Level1: " + __raw_container);
+       if (!(__raw_container instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_container);
             return null;
        }
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getLevel1SlotFloat__AsObject();
     }
 
@@ -217,9 +267,9 @@ public class Level2
        Object __raw_container = containerFrame();
        if ( __raw_container == null)
             throw new RuntimeException("No container!");
-       if (!(__raw_container instanceof Level1))
+       if (!(__raw_container instanceof Level2))
             throw new RuntimeException("Bogus container!");
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getRootSlotString();
     }
 
@@ -227,26 +277,26 @@ public class Level2
     Object getRootSlotString__AsObject() {
        Object __raw_container = containerFrame();
        if ( __raw_container == null) return null;
-       if (!(__raw_container instanceof Level1)) {
-            getLogger().warn("Container of " +this+ " is not a Level1: " + __raw_container);
+       if (!(__raw_container instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_container);
             return null;
        }
-       Level1 __container = (Level1) __raw_container;
+       Level2 __container = (Level2) __raw_container;
        return __container.getRootSlotString__AsObject();
     }
 
 
     protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new) {
-        if (!(__raw_old instanceof Level1)) {
-            getLogger().warn("Container of " +this+ " is not a Level1: " + __raw_old);
+        if (!(__raw_old instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_old);
             return;
         }
-        if (!(__raw_new instanceof Level1)) {
-            getLogger().warn("Container of " +this+ " is not a Level1: " + __raw_new);
+        if (!(__raw_new instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw_new);
             return;
         }
-        Level1 __old_frame = (Level1) __raw_old;
-        Level1 __new_frame = (Level1) __raw_new;
+        Level2 __old_frame = (Level2) __raw_old;
+        Level2 __new_frame = (Level2) __raw_new;
         Object __old;
         Object __new;
         __old = __old_frame.getLevel1SlotString__AsObject();
@@ -261,6 +311,20 @@ public class Level2
         if (__new != null) {
             if (__old == null || !__old.equals(__new)) {
                 fireChange("rootSlotFloat", __old, __new);
+            }
+        }
+        __old = __old_frame.getLevel2SlotString__AsObject();
+        __new = __new_frame.getLevel2SlotString__AsObject();
+        if (__new != null) {
+            if (__old == null || !__old.equals(__new)) {
+                fireChange("level2SlotString", __old, __new);
+            }
+        }
+        __old = __old_frame.getLevel2SlotFloat__AsObject();
+        __new = __new_frame.getLevel2SlotFloat__AsObject();
+        if (__new != null) {
+            if (__old == null || !__old.equals(__new)) {
+                fireChange("level2SlotFloat", __old, __new);
             }
         }
         __old = __old_frame.getLevel1SlotFloat__AsObject();
@@ -281,11 +345,11 @@ public class Level2
 
 
     protected void fireContainerChanges(DataFrame __raw) {
-        if (!(__raw instanceof Level1)) {
-            getLogger().warn("Container of " +this+ " is not a Level1: " + __raw);
+        if (!(__raw instanceof Level2)) {
+            getLogger().warn("Container of " +this+ " is not a Level2: " + __raw);
             return;
         }
-        Level1 __new_frame = (Level1) __raw;
+        Level2 __new_frame = (Level2) __raw;
         Object __new;
         __new = __new_frame.getLevel1SlotString__AsObject();
         if (__new != null) {
@@ -294,6 +358,14 @@ public class Level2
         __new = __new_frame.getRootSlotFloat__AsObject();
         if (__new != null) {
             fireChange("rootSlotFloat", null, __new);
+        }
+        __new = __new_frame.getLevel2SlotString__AsObject();
+        if (__new != null) {
+            fireChange("level2SlotString", null, __new);
+        }
+        __new = __new_frame.getLevel2SlotFloat__AsObject();
+        if (__new != null) {
+            fireChange("level2SlotFloat", null, __new);
         }
         __new = __new_frame.getLevel1SlotFloat__AsObject();
         if (__new != null) {
@@ -308,8 +380,10 @@ public class Level2
     private static final int level1SlotString__HashVar__ = "level1SlotString".hashCode();
     private static final int level2SlotString__HashVar__ = "level2SlotString".hashCode();
     private static final int level2SlotFloat__HashVar__ = "level2SlotFloat".hashCode();
-    private static final int name__HashVar__ = "name".hashCode();
+    private static final int level3SlotString__HashVar__ = "level3SlotString".hashCode();
     private static final int level1SlotFloat__HashVar__ = "level1SlotFloat".hashCode();
+    private static final int name__HashVar__ = "name".hashCode();
+    private static final int level3SlotFloat__HashVar__ = "level3SlotFloat".hashCode();
     private static final int rootSlotString__HashVar__ = "rootSlotString".hashCode();
 
 
@@ -323,10 +397,14 @@ public class Level2
             return getLevel2SlotString__AsObject();
        else if (level2SlotFloat__HashVar__ == __key)
             return getLevel2SlotFloat__AsObject();
-       else if (name__HashVar__ == __key)
-            return getName__AsObject();
+       else if (level3SlotString__HashVar__ == __key)
+            return getLevel3SlotString__AsObject();
        else if (level1SlotFloat__HashVar__ == __key)
             return getLevel1SlotFloat__AsObject();
+       else if (name__HashVar__ == __key)
+            return getName__AsObject();
+       else if (level3SlotFloat__HashVar__ == __key)
+            return getLevel3SlotFloat__AsObject();
        else if (rootSlotString__HashVar__ == __key)
             return getRootSlotString__AsObject();
        else
@@ -337,10 +415,10 @@ public class Level2
     protected void setLocalValue(String __slot,
                                  Object __value) {
        int __key = __slot.hashCode();
-       if (level2SlotString__HashVar__ == __key)
-            setLevel2SlotString__AsObject(__value);
-       else if (level2SlotFloat__HashVar__ == __key)
-            setLevel2SlotFloat__AsObject(__value);
+       if (level3SlotString__HashVar__ == __key)
+            setLevel3SlotString__AsObject(__value);
+       else if (level3SlotFloat__HashVar__ == __key)
+            setLevel3SlotFloat__AsObject(__value);
        else
             super.setLocalValue(__slot, __value);
     }
@@ -349,46 +427,46 @@ public class Level2
     protected void initializeLocalValue(String __slot,
                                  Object __value) {
        int __key = __slot.hashCode();
-       if (level2SlotString__HashVar__ == __key)
-            initializeLevel2SlotString__AsObject(__value);
-       else if (level2SlotFloat__HashVar__ == __key)
-            initializeLevel2SlotFloat__AsObject(__value);
+       if (level3SlotString__HashVar__ == __key)
+            initializeLevel3SlotString__AsObject(__value);
+       else if (level3SlotFloat__HashVar__ == __key)
+            initializeLevel3SlotFloat__AsObject(__value);
        else
             super.initializeLocalValue(__slot, __value);
     }
 
 
-    public SlotDescription slotMetaData__Level2SlotString() {
+    public SlotDescription slotMetaData__Level3SlotString() {
         SlotDescription __desc = new SlotDescription();
-        __desc.name = "level2SlotString";
-        __desc.prototype = "level2";
+        __desc.name = "level3SlotString";
+        __desc.prototype = "level3";
         __desc.is_writable = true;
         Object __value;
-        __value = level2SlotString;
+        __value = level3SlotString;
         if (__value != null) {
             __desc.is_overridden = true;
             __desc.value = __value;
         } else {
             __desc.is_overridden = false;
-            __desc.value = "Two";
+            __desc.value = "Three";
         }
         return __desc;
     }
 
 
-    public SlotDescription slotMetaData__Level2SlotFloat() {
+    public SlotDescription slotMetaData__Level3SlotFloat() {
         SlotDescription __desc = new SlotDescription();
-        __desc.name = "level2SlotFloat";
-        __desc.prototype = "level2";
+        __desc.name = "level3SlotFloat";
+        __desc.prototype = "level3";
         __desc.is_writable = true;
         Object __value;
-        __value = new Float(level2SlotFloat);
+        __value = new Float(level3SlotFloat);
         if (__value != null) {
             __desc.is_overridden = true;
             __desc.value = __value;
         } else {
             __desc.is_overridden = false;
-            __desc.value = new Float(2.0f);
+            __desc.value = new Float(3.0f);
         }
         return __desc;
     }
@@ -410,6 +488,28 @@ public class Level2
         __desc.name = "rootSlotFloat";
         __desc.prototype = "root";
         __desc.value = getRootSlotFloat__AsObject();
+        __desc.is_overridden = false;
+        __desc.is_writable = false;
+        return __desc;
+    }
+
+
+    public SlotDescription slotMetaData__Level2SlotString() {
+        SlotDescription __desc = new SlotDescription();
+        __desc.name = "level2SlotString";
+        __desc.prototype = "level2";
+        __desc.value = getLevel2SlotString__AsObject();
+        __desc.is_overridden = false;
+        __desc.is_writable = false;
+        return __desc;
+    }
+
+
+    public SlotDescription slotMetaData__Level2SlotFloat() {
+        SlotDescription __desc = new SlotDescription();
+        __desc.name = "level2SlotFloat";
+        __desc.prototype = "level2";
+        __desc.value = getLevel2SlotFloat__AsObject();
         __desc.is_overridden = false;
         __desc.is_writable = false;
         return __desc;
@@ -440,10 +540,12 @@ public class Level2
 
     protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
-        map.put("level2SlotString", slotMetaData__Level2SlotString());
-        map.put("level2SlotFloat", slotMetaData__Level2SlotFloat());
+        map.put("level3SlotString", slotMetaData__Level3SlotString());
+        map.put("level3SlotFloat", slotMetaData__Level3SlotFloat());
         map.put("level1SlotString", slotMetaData__Level1SlotString());
         map.put("rootSlotFloat", slotMetaData__RootSlotFloat());
+        map.put("level2SlotString", slotMetaData__Level2SlotString());
+        map.put("level2SlotFloat", slotMetaData__Level2SlotFloat());
         map.put("level1SlotFloat", slotMetaData__Level1SlotFloat());
         map.put("rootSlotString", slotMetaData__RootSlotString());
     }

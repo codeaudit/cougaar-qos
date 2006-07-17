@@ -28,7 +28,7 @@ public class Level1
     public Level1(FrameSet frameSet,
                   UID uid) {
         super(frameSet, uid);
-        initializeLevel1SlotString("default");
+        initializeLevel1SlotString("One");
         initializeLevel1SlotFloat(1.0f);
     }
 
@@ -292,7 +292,7 @@ public class Level1
             __desc.value = __value;
         } else {
             __desc.is_overridden = false;
-            __desc.value = "default";
+            __desc.value = "One";
         }
         return __desc;
     }

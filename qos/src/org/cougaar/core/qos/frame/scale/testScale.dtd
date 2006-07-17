@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT testScale (level1 | Level2OnLevel1 | Level1OnRoot | contains | thing | level2 | root | relationship)*>
-<!ELEMENT level1 (level1SlotString | name | level1SlotFloat)*>
-<!ELEMENT level1SlotString (#PCDATA)>
-<!ELEMENT name (#PCDATA)>
-<!ELEMENT level1SlotFloat (#PCDATA)>
+<!ELEMENT testScale (Level2OnLevel1 | contains | Level3OnLevel2 | level2 | Level5OnLevel4 | relationship | level1 | Level1OnRoot | level5 | Level6OnLevel5 | thing | level4 | Level4OnLevel3 | root | level6 | level3)*>
 <!ELEMENT Level2OnLevel1 (parent-value | child-value)*>
 <!ELEMENT parent-value (#PCDATA)>
 <!ELEMENT child-value (#PCDATA)>
-<!ELEMENT Level1OnRoot (parent-value | child-value)*>
 <!ELEMENT contains (parent-value | child-value)*>
-<!ELEMENT thing (name)*>
+<!ELEMENT Level3OnLevel2 (parent-value | child-value)*>
 <!ELEMENT level2 (level2SlotString | level2SlotFloat | name)*>
 <!ELEMENT level2SlotString (#PCDATA)>
 <!ELEMENT level2SlotFloat (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT Level5OnLevel4 (parent-value | child-value)*>
+<!ELEMENT relationship (parent-value | child-value)*>
+<!ELEMENT level1 (level1SlotString | name | level1SlotFloat)*>
+<!ELEMENT level1SlotString (#PCDATA)>
+<!ELEMENT level1SlotFloat (#PCDATA)>
+<!ELEMENT Level1OnRoot (parent-value | child-value)*>
+<!ELEMENT level5 (level5SlotFloat | level5SlotString | name)*>
+<!ELEMENT level5SlotFloat (#PCDATA)>
+<!ELEMENT level5SlotString (#PCDATA)>
+<!ELEMENT Level6OnLevel5 (parent-value | child-value)*>
+<!ELEMENT thing (name)*>
+<!ELEMENT level4 (level4SlotFloat | level4SlotString | name)*>
+<!ELEMENT level4SlotFloat (#PCDATA)>
+<!ELEMENT level4SlotString (#PCDATA)>
+<!ELEMENT Level4OnLevel3 (parent-value | child-value)*>
 <!ELEMENT root (rootSlotFloat | name | rootSlotString)*>
 <!ELEMENT rootSlotFloat (#PCDATA)>
 <!ELEMENT rootSlotString (#PCDATA)>
-<!ELEMENT relationship (parent-value | child-value)*>
+<!ELEMENT level6 (level6SlotFloat | name | level6SlotString)*>
+<!ELEMENT level6SlotFloat (#PCDATA)>
+<!ELEMENT level6SlotString (#PCDATA)>
+<!ELEMENT level3 (level3SlotString | name | level3SlotFloat)*>
+<!ELEMENT level3SlotString (#PCDATA)>
+<!ELEMENT level3SlotFloat (#PCDATA)>

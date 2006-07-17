@@ -19,18 +19,38 @@
 		</prototype>
 		
 		<prototype name="root" prototype="thing">
-			<slot name="rootSlotFloat" type="float" default-value="1.0f"/>
-			<slot name="rootSlotString" type="String" default-value="default"/>
+			<slot name="rootSlotFloat" type="float" default-value="0.0f"/>
+			<slot name="rootSlotString" type="String" default-value="Zero"/>
 		</prototype>
 		
 		<prototype name="level1" prototype="thing" container="root">
 			<slot name="level1SlotFloat" type="float" default-value="1.0f"/>
-			<slot name="level1SlotString" type="String" default-value="default"/>
+			<slot name="level1SlotString" type="String" default-value="One"/>
 		</prototype>
 		
 		<prototype name="level2" prototype="thing" container="level1">
-			<slot name="level2SlotFloat" type="float" default-value="1.0f"/>
-			<slot name="level2SlotString" type="String" default-value="default"/>
+			<slot name="level2SlotFloat" type="float" default-value="2.0f"/>
+			<slot name="level2SlotString" type="String" default-value="Two"/>
+		</prototype>
+		
+		<prototype name="level3" prototype="thing" container="level2">
+			<slot name="level3SlotFloat" type="float" default-value="3.0f"/>
+			<slot name="level3SlotString" type="String" default-value="Three"/>
+		</prototype>
+		
+		<prototype name="level4" prototype="thing" container="level3">
+			<slot name="level4SlotFloat" type="float" default-value="4.0f"/>
+			<slot name="level4SlotString" type="String" default-value="Four"/>
+		</prototype>
+		
+		<prototype name="level5" prototype="thing" container="level4">
+			<slot name="level5SlotFloat" type="float" default-value="5.0f"/>
+			<slot name="level5SlotString" type="String" default-value="Five"/>
+		</prototype>
+		
+		<prototype name="level6" prototype="thing" container="level5">
+			<slot name="level6SlotFloat" type="float" default-value="6.0f"/>
+			<slot name="level6SlotString" type="String" default-value="Six"/>
 		</prototype>
 		
 		<relation-prototype name="Level1OnRoot" prototype="contains"
@@ -39,6 +59,22 @@
 		
 		<relation-prototype name="Level2OnLevel1" prototype="contains"
 			parent-prototype="level1" child-prototype="level2">
+		</relation-prototype>
+		
+		<relation-prototype name="Level3OnLevel2" prototype="contains"
+			parent-prototype="level2" child-prototype="level3">
+		</relation-prototype>
+		
+		<relation-prototype name="Level4OnLevel3" prototype="contains"
+			parent-prototype="level3" child-prototype="level4">
+		</relation-prototype>
+		
+		<relation-prototype name="Level5OnLevel4" prototype="contains"
+			parent-prototype="level4" child-prototype="level5">
+		</relation-prototype>
+		
+		<relation-prototype name="Level6OnLevel5" prototype="contains"
+			parent-prototype="level5" child-prototype="level6">
 		</relation-prototype>
 		
 	</prototypes>

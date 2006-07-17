@@ -28,8 +28,8 @@ public class Root
     public Root(FrameSet frameSet,
                 UID uid) {
         super(frameSet, uid);
-        initializeRootSlotFloat(1.0f);
-        initializeRootSlotString("default");
+        initializeRootSlotFloat(0.0f);
+        initializeRootSlotString("Zero");
     }
 
 
@@ -179,7 +179,7 @@ public class Root
             __desc.value = __value;
         } else {
             __desc.is_overridden = false;
-            __desc.value = new Float(1.0f);
+            __desc.value = new Float(0.0f);
         }
         return __desc;
     }
@@ -197,7 +197,7 @@ public class Root
             __desc.value = __value;
         } else {
             __desc.is_overridden = false;
-            __desc.value = "default";
+            __desc.value = "Zero";
         }
         return __desc;
     }
