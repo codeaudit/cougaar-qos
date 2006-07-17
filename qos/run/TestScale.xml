@@ -286,9 +286,10 @@
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
 			<argument>frame-set=testScale</argument>
-			<argument>height=5</argument>
-			<argument>degree=10</argument>
+			<argument>height=1</argument>
+			<argument>degree=2</argument>
         </component>
+		 
 		  
 		<component
           name='org.cougaar.core.qos.frame.scale.WatcherPlugin'
@@ -306,13 +307,15 @@
 			<argument>frame-set=testScale</argument>
         </component>
 		   
+	    
+		  		
         <component
           name='org.cougaar.core.thread.LimitThreadsPlugin'
           class='org.cougaar.core.thread.LimitThreadsPlugin'
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
           <argument>
-            maxThreads=1
+            maxThreads=3
           </argument>
         </component>
         <component

@@ -61,7 +61,9 @@ implements FrameSetService.Callback, PropertyChangeListener {
     private FrameSet frameset;
     private LoggingService log;
     private IncrementalSubscription rsub, tsub;
-    private int changeCount;
+    private int propertyChangeCount;
+    private int blackboardChangeCount;
+    private long lastLog = 0;
     
 
     public void start() {
@@ -78,20 +80,30 @@ implements FrameSetService.Callback, PropertyChangeListener {
     }
     
     protected void execute() {
-	log.shout(rsub.getAddedCollection().size() + " Relations added");
-	log.shout(rsub.getRemovedCollection().size() + " Relations removed");
-	log.shout(rsub.getChangedCollection().size() + " Relations changed");
-	
-	log.shout(changeCount + " slot changes");
-	changeCount = 0;
-	
 	Collection added = tsub.getAddedCollection();
 	for (Object a : added) {
 	    ((Thing) a).addPropertyChangeListener(this);
 	}
-	log.shout(added.size() + " Things added");
-	log.shout(tsub.getRemovedCollection().size() + " Things removed");
-	log.shout(tsub.getChangedCollection().size() + " Things changed");
+	
+	Collection changed = tsub.getChangedCollection();
+	blackboardChangeCount += changed.size();
+	
+	log.debug(rsub.getAddedCollection().size() + " Relations added");
+	log.debug(rsub.getRemovedCollection().size() + " Relations removed");
+	log.debug(rsub.getChangedCollection().size() + " Relations changed");
+	log.debug(added.size() + " Things added");
+	log.debug(tsub.getRemovedCollection().size() + " Things removed");
+	log.debug(changed.size() + " Things changed");
+	
+	long now = System.currentTimeMillis();
+	long deltaT = (now - lastLog);
+	if (deltaT > 10000) {
+	    log.shout(propertyChangeCount + " property changes in "+ deltaT/1000f + " seconds");
+	    log.shout(blackboardChangeCount + " blackboard changes in "+ deltaT/1000f + " seconds");
+	    lastLog = now;
+	    blackboardChangeCount =0;
+	    propertyChangeCount = 0;
+	}
 	
     }
 
@@ -107,7 +119,7 @@ implements FrameSetService.Callback, PropertyChangeListener {
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-	++changeCount;
+	++propertyChangeCount;
     }
 
 }
