@@ -13,7 +13,7 @@ public class Level3OnLevel2
                      return new Level3OnLevel2(frameSet, uid);
                 }
             };
-            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "Level3OnLevel2", __fm);
+            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "level3OnLevel2", __fm);
     }
 
 
@@ -29,7 +29,7 @@ public class Level3OnLevel2
 
 
     public String getKind() {
-        return "Level3OnLevel2";
+        return "level3OnLevel2";
     }
 
 

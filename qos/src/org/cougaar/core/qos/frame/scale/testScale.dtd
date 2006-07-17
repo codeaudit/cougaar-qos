@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT testScale (Level2OnLevel1 | contains | Level3OnLevel2 | level2 | Level5OnLevel4 | relationship | level1 | Level1OnRoot | level5 | Level6OnLevel5 | thing | level4 | Level4OnLevel3 | root | level6 | level3)*>
-<!ELEMENT Level2OnLevel1 (parent-value | child-value)*>
+<!ELEMENT testScale (contains | level3OnLevel2 | level2 | level6OnLevel5 | relationship | level1 | level5OnLevel4 | level5 | level1OnRoot | level2OnLevel1 | thing | level4 | level4OnLevel3 | root | level6 | level3)*>
+<!ELEMENT contains (parent-value | child-value)*>
 <!ELEMENT parent-value (#PCDATA)>
 <!ELEMENT child-value (#PCDATA)>
-<!ELEMENT contains (parent-value | child-value)*>
-<!ELEMENT Level3OnLevel2 (parent-value | child-value)*>
+<!ELEMENT level3OnLevel2 (parent-value | child-value)*>
 <!ELEMENT level2 (level2SlotString | level2SlotFloat | name)*>
 <!ELEMENT level2SlotString (#PCDATA)>
 <!ELEMENT level2SlotFloat (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
-<!ELEMENT Level5OnLevel4 (parent-value | child-value)*>
+<!ELEMENT level6OnLevel5 (parent-value | child-value)*>
 <!ELEMENT relationship (parent-value | child-value)*>
 <!ELEMENT level1 (level1SlotString | name | level1SlotFloat)*>
 <!ELEMENT level1SlotString (#PCDATA)>
 <!ELEMENT level1SlotFloat (#PCDATA)>
-<!ELEMENT Level1OnRoot (parent-value | child-value)*>
+<!ELEMENT level5OnLevel4 (parent-value | child-value)*>
 <!ELEMENT level5 (level5SlotFloat | level5SlotString | name)*>
 <!ELEMENT level5SlotFloat (#PCDATA)>
 <!ELEMENT level5SlotString (#PCDATA)>
-<!ELEMENT Level6OnLevel5 (parent-value | child-value)*>
+<!ELEMENT level1OnRoot (parent-value | child-value)*>
+<!ELEMENT level2OnLevel1 (parent-value | child-value)*>
 <!ELEMENT thing (name)*>
 <!ELEMENT level4 (level4SlotFloat | level4SlotString | name)*>
 <!ELEMENT level4SlotFloat (#PCDATA)>
 <!ELEMENT level4SlotString (#PCDATA)>
-<!ELEMENT Level4OnLevel3 (parent-value | child-value)*>
+<!ELEMENT level4OnLevel3 (parent-value | child-value)*>
 <!ELEMENT root (rootSlotFloat | name | rootSlotString)*>
 <!ELEMENT rootSlotFloat (#PCDATA)>
 <!ELEMENT rootSlotString (#PCDATA)>

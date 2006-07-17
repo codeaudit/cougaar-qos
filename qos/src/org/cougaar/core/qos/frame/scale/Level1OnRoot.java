@@ -13,7 +13,7 @@ public class Level1OnRoot
                      return new Level1OnRoot(frameSet, uid);
                 }
             };
-            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "Level1OnRoot", __fm);
+            DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "level1OnRoot", __fm);
     }
 
 
@@ -29,7 +29,7 @@ public class Level1OnRoot
 
 
     public String getKind() {
-        return "Level1OnRoot";
+        return "level1OnRoot";
     }
 
 

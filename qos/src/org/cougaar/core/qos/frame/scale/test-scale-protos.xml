@@ -53,27 +53,27 @@
 			<slot name="level6SlotString" type="String" default-value="Six"/>
 		</prototype>
 		
-		<relation-prototype name="Level1OnRoot" prototype="contains"
+		<relation-prototype name="level1OnRoot" prototype="contains"
 			parent-prototype="root" child-prototype="level1">
 		</relation-prototype>
 		
-		<relation-prototype name="Level2OnLevel1" prototype="contains"
+		<relation-prototype name="level2OnLevel1" prototype="contains"
 			parent-prototype="level1" child-prototype="level2">
 		</relation-prototype>
 		
-		<relation-prototype name="Level3OnLevel2" prototype="contains"
+		<relation-prototype name="level3OnLevel2" prototype="contains"
 			parent-prototype="level2" child-prototype="level3">
 		</relation-prototype>
 		
-		<relation-prototype name="Level4OnLevel3" prototype="contains"
+		<relation-prototype name="level4OnLevel3" prototype="contains"
 			parent-prototype="level3" child-prototype="level4">
 		</relation-prototype>
 		
-		<relation-prototype name="Level5OnLevel4" prototype="contains"
+		<relation-prototype name="level5OnLevel4" prototype="contains"
 			parent-prototype="level4" child-prototype="level5">
 		</relation-prototype>
 		
-		<relation-prototype name="Level6OnLevel5" prototype="contains"
+		<relation-prototype name="level6OnLevel5" prototype="contains"
 			parent-prototype="level5" child-prototype="level6">
 		</relation-prototype>
 		
