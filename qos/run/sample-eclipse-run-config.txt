@@ -46,6 +46,6 @@ User Entries:
   $CIP/lib/quo.jar
   $CIP/lib/webserver.jar
   $CIP/lib/webtomcat.jar
- as well as the workspace jar tomcat_40.jar from jars/lib
+ as well as the internal workspace jar tomcat_40.jar from jars/lib
   
 
