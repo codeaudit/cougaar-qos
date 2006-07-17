@@ -85,7 +85,7 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	Root root = (Root) frameset.makeFrame("root", slots);
 	makeNextLevel(root, 1);
 	long duration = System.currentTimeMillis()-now;
-	log.shout("Completed data creation in " + duration/1000+ " seconds");
+	log.shout("Completed data creation in " + duration/1000f+ " seconds");
 	populated = true;
     }
     
