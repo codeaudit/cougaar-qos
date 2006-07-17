@@ -14,8 +14,8 @@ org.cougaar.core.node.Node
 
 VM arguments:
 
--Dorg.cougaar.society.file=TopologyDemo.xml
--Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo"
+-Dorg.cougaar.society.file=TopologyDemo.xml [or whatever]
+-Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo" [or whatever]
 -Dorg.cougaar.node.name=NODE1
 -Dorg.cougaar.core.logging.log4j.appender.A2.File=NODE1-events.log
 -Dorg.cougaar.core.logging.config.filename=logging.properties
@@ -39,7 +39,7 @@ Bootstrap Entries
  add $CIP/lib/javaiopatch.jar as an "external jar" BEFORE the jre
 
 User Entries:
- add the following "external jars" after the qos project:
+ add the following "external jars":
   $CIP/lib/community.jar
   $CIP/lib/ping.jar
   $CIP/lib/planning.jar
