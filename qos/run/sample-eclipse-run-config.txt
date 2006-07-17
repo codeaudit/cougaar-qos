@@ -23,9 +23,8 @@ VM arguments:
 -Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser
 -Dorg.cougaar.core.node.InitializationComponent=XML
 -Dorg.cougaar.core.domain.config.filename= 
--Dorg.cougaar.install.path=${cip}
+-Dorg.cougaar.install.path=[your $CIP here]
 -Dorg.cougaar.core.agent.quiet=true
--Xbootclasspath/p:${cip}/lib/javaiopatch.jar
 -Xms1m
 -Xmx256m
 -XX:ThreadStackSize=256
@@ -36,8 +35,17 @@ ${workspace_loc:qos/run}
 
 Classpath tab
 
+Bootstrap Entries
+ add $CIP/lib/javaiopatch.jar as an "external jar" BEFORE the jre
+
 User Entries:
- cougaar-lib user library
- qos project
- cougaar-sys user library
+ add the following "external jars" after the qos project:
+  $CIP/lib/community.jar
+  $CIP/lib/ping.jar
+  $CIP/lib/planning.jar
+  $CIP/lib/quo.jar
+  $CIP/lib/webserver.jar
+  $CIP/lib/webtomcat.jar
+ as well as the workspace jar tomcat_40.jar from jars/lib
+  
 
