@@ -144,6 +144,10 @@ public interface FrameSet {
      * published to the Blackboard.
      */
     public DataFrame makeFrame(String kind, Properties slots, UID uid);
+    
+    
+    public RelationFrame makeRelationship(String kind, Properties slots,
+	    DataFrame parent, DataFrame child);
 
     /**
      * Creates a PrototypeFrame with the given name, parent prototype

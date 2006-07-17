@@ -185,6 +185,20 @@ public class SingleInheritanceFrameSet
 	publishAdd(frame);
 	return frame;
     }
+    
+    public RelationFrame makeRelationship(String kind, Properties values, DataFrame parent, DataFrame child) {
+	UID uid = uids.nextUID();
+	RelationFrame rel = (RelationFrame) DataFrame.newFrame(this, kind, uid, values);
+	cacheRelation(rel, parent, child);
+	synchronized (kb) {
+	    kb.put(uid, rel);
+	}
+	synchronized (frames) {
+	    frames.add(rel);
+	}
+	publishAdd(rel);
+	return rel;
+    }
 
     // In this case the proto argument refers to what the prototype
     // should be a prototype of.  
@@ -457,6 +471,10 @@ public class SingleInheritanceFrameSet
 		    
 	DataFrame parent = getRelationshipParent(relationship);
 	DataFrame child = getRelationshipChild(relationship);
+	return cacheRelation(relationship, parent, child);
+    }
+    
+    private boolean cacheRelation(RelationFrame relationship, DataFrame parent, DataFrame child) {
 
 	    
 	if (parent == null || child == null) {
