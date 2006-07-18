@@ -186,14 +186,16 @@ public class SingleInheritanceFrameSet
     public DataFrame makeFrame(String proto, Properties values, UID uid) {
 	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
 	PrototypeFrame pframe = frame.getPrototype();
-	Object key = values.get(primaryIndexSlot);
-	if (key != null) {
-	    Map<Object,DataFrame> cache = primaryIndexCache.get(pframe);
-	    if (cache == null) {
-		cache = new HashMap<Object,DataFrame>();
-		primaryIndexCache.put(pframe, cache);
+	if (primaryIndexSlot != null) {
+	    Object key = values.get(primaryIndexSlot);
+	    if (key != null) {
+		Map<Object,DataFrame> cache = primaryIndexCache.get(pframe);
+		if (cache == null) {
+		    cache = new HashMap<Object,DataFrame>();
+		    primaryIndexCache.put(pframe, cache);
+		}
+		cache.put(key, frame);
 	    }
-	    cache.put(key, frame);
 	}
 	addObject(frame);
 	publishAdd(frame);
@@ -584,7 +586,7 @@ public class SingleInheritanceFrameSet
 
     public DataFrame findFrame(String proto, String slot, Object value) {
 	if (slot == null || proto == null || value == null) return null;
-	if (slot.equals(primaryIndexSlot)) {
+	if (primaryIndexSlot != null && slot.equals(primaryIndexSlot)) {
 	    DataFrame frame = getIndexedFrame(proto, value);
 	    if (frame != null) {
 		return frame;
