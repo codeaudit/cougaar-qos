@@ -235,6 +235,7 @@
       <include name="**/*.properties"/>
       <include name="**/*.xml"/>
       <include name="**/*.dtd"/>
+      <include name="**/*.clp"/>
       <include name="**/*.wav"/>
       <include name="**/*.au"/>
     </patternset>
