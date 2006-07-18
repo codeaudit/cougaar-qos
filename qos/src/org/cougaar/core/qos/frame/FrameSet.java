@@ -33,6 +33,7 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
 
+import org.cougaar.core.qos.frame.aggregator.SlotAggregator;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 import org.xml.sax.Attributes;
@@ -145,7 +146,10 @@ public interface FrameSet {
      */
     public DataFrame makeFrame(String kind, Properties slots, UID uid);
     
-    
+    /**
+     * Optimized way to create a new relationship that avoids the lookup
+     * of the parent and child.
+     */
     public RelationFrame makeRelationship(String kind, Properties slots,
 	    DataFrame parent, DataFrame child);
 
@@ -240,15 +244,38 @@ public interface FrameSet {
     public void subscribeToMetric(DataFrame frame, 
 				  Observer observer, 
 				  String path);
-
+    /**
+     * 
+     * Queries the metric service for a value relative to a frame
+     */
     public Metric getMetricValue(DataFrame frame, String path);
     
     
     
     // Slot dependencies
     
+    /**
+     * Create an aggregator to compute and update the given slot.  Ordinarily this happens
+     * automatically as part of loading the prototypes and wouldn't need to be called
+     * explicitly in user code.
+     * 
+     * @param slot The slot whose value is computed by a {@link SlotAggregator}.
+     * @param childSlot  If non-null, and the value of this slot changes in a related entity, 
+     * the {@link SlotAggregator} will be reinvoked.
+     * @param relation The name of the RelationPrototype that's used to collect the related
+     * entites.
+     * @param className The name of the {@link SlotAggregator}.  If it's qualified with
+     * a package the name is used as is.  If not, the class should be in the frameset
+     * package, or in org.cougaar.core.qos.frame.aggregator.
+     */
     public void addAggregator(String slot, String childSlot, String relation, String className);
     
+    /**
+     * Set up subscriptions for all aggregators that haven't done so already.
+     * Ordinarily this only needs to be called once after the prototypes are
+     * loaded.  This is usually handled by {@link FrameSetLoaderPlugin}.
+     *
+     */
     public void initializeAggregators();
 
 }
