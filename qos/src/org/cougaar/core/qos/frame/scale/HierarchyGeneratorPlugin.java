@@ -87,6 +87,7 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	Properties slots = new Properties();
 	slots.put("name", "1");
 	Root root = (Root) frameset.makeFrame("root", slots);
+	++totalFrames;
 	makeNextLevel(root, 1);
 	long duration = System.currentTimeMillis()-now;
 	log.shout("Created " +totalFrames+ " frames in " + duration/1000f+ " seconds with height="
