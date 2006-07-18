@@ -758,7 +758,7 @@
       	<pathelement path="${module.classes}"/>
       	<pathelement path="${env.COUGAAR_INSTALL_PATH}/sys/xercesImpl.jar"/>
       </classpath>
-      <arg value="${src}/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
+      <arg path="${src}/org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml" />
     </java>
     	
     <java classname="org.cougaar.core.qos.frame.FrameGen" fork="yes" >
@@ -767,7 +767,9 @@
     		<pathelement path="${module.classes}"/>
     		<pathelement path="${env.COUGAAR_INSTALL_PATH}/sys/xercesImpl.jar"/>
     	 </classpath>
-    	      <arg value="${src}/org/cougaar/core/qos/frame/scale/test-scale-protos.xml" />
+	    	<arg value="-clp"/>
+    		<arg path="${src}/org/cougaar/core/qos/frame/scale"/>
+    	    <arg path="${src}/org/cougaar/core/qos/frame/scale/test-scale-protos.xml" />
     </java>
   </target>
 
