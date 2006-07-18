@@ -169,6 +169,7 @@ abstract public class DataFrame
 	    log.debug("Propagate PropertyChange " +event.getPropertyName()+
 		      " old value = " +event.getOldValue()+
 		      " new value = " +event.getNewValue());
+	event.setPropagationId(this);
 	pcs.firePropertyChange(event);
     }
 
