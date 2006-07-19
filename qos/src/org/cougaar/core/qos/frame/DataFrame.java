@@ -169,8 +169,11 @@ abstract public class DataFrame
 	    log.debug("Propagate PropertyChange " +event.getPropertyName()+
 		      " old value = " +event.getOldValue()+
 		      " new value = " +event.getNewValue());
-	event.setPropagationId(this);
+	ResourceablePropertyChangeEvent evt = (ResourceablePropertyChangeEvent) event;
+	Object source = evt.getSource();
+	evt.setSource(this);
 	pcs.firePropertyChange(event);
+	evt.setSource(source);
     }
 
     // Path dependencies.
@@ -256,10 +259,12 @@ abstract public class DataFrame
     void pathDependencyChange(String slot) {
 	if (log.isInfoEnabled())
 	    log.info("Path dependency has changed for frame " +this+
-		      " and for slot " +slot);
+		    " and for slot " +slot);
 	Object new_value = getValue(slot);
-	pcs.firePropertyChange(FrameGen.fixName(slot, true, true),
-			       null, new_value);
+	PropertyChangeEvent evt = new ResourceablePropertyChangeEvent(this,
+		FrameGen.fixName(slot, true, true),
+		null, new_value);
+	pcs.firePropertyChange(evt);
 	notifyPathDependents(slot);
 	// slotModified(slot, null, new_value, true, true);
     }
@@ -533,8 +538,11 @@ abstract public class DataFrame
 
 	if (old_value == null || new_value == null // One null, one not
 	    || !old_value.equals(new_value) // Different non-nulls
-	    )
-	    pcs.firePropertyChange(property, old_value, new_value);
+	    ) {
+	    PropertyChangeEvent evt = new ResourceablePropertyChangeEvent(this,
+			property, old_value, new_value);
+	    pcs.firePropertyChange(evt);
+	}
     }
 
     protected void fireContainerChanges(DataFrame old_frame, 
