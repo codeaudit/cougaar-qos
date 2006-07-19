@@ -187,6 +187,8 @@ public class FrameSetParser
 		endSlot();
 	    } else if (name.equals("slot-reference")) {
 		// no-op
+	    } else if (name.equals("aggregate-by")) {
+		// no-op
 	    } else if (current_slot != null) {
 		current_slot = null;
 	    } else if (domain != null && domain.equals(name)) {
