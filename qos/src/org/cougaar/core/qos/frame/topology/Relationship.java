@@ -182,6 +182,13 @@ public class Relationship
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("parent-value");
+        slots.add("child-value");
+    }
+
+
     public SlotDescription slotMetaData__ParentValue() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "parent-value";

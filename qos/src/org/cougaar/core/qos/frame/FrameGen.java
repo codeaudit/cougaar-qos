@@ -533,6 +533,7 @@ extends DefaultHandler
 	}
 	writeDynamicAccessors(writer, prototype, parent,local_slots, container);
 	writePostInitializer(writer, prototype, local_slots);
+	writeSlotList(writer, prototype, container, local_slots, container_slots);
 	writeDescriptionGetters(writer, prototype, container,
 		local_slots, 
 		container_slots, 
@@ -542,6 +543,8 @@ extends DefaultHandler
 	writer.close();
 	System.out.println("Wrote " +out);
     }
+    
+   
 
     private void writeDecl(PrintWriter writer,
 	    String prototype, 
@@ -1020,6 +1023,23 @@ extends DefaultHandler
 	}
 	writer.println("        slotInitialized(\"" +slot+ "\", new_value);");
 	writer.println("    }");
+    }
+    
+    private void writeSlotList(PrintWriter writer,
+	    String prototype,
+	    String container,
+	    Map<String,Attributes> slots,
+	    Set<String> container_slots) {
+	writer.println("\n\n    protected void collectSlotNames(java.util.Set<String> slots) {");
+	writer.println("        super.collectSlotNames(slots);");
+	for (String slot : slots.keySet()) {
+	    writer.println("        slots.add(\"" +slot+ "\");");
+	}
+	for (String slot : container_slots) {
+	    writer.println("        slots.add(\"" +slot+ "\");");
+	}
+	writer.println("    }");
+	
     }
 
     private String slotDescriptionMethod(String slot) {

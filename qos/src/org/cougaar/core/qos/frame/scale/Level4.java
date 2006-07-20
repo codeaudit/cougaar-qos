@@ -514,6 +514,21 @@ public class Level4
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("level4SlotFloat");
+        slots.add("level4SlotString");
+        slots.add("level1SlotString");
+        slots.add("rootSlotFloat");
+        slots.add("level2SlotString");
+        slots.add("level2SlotFloat");
+        slots.add("level3SlotString");
+        slots.add("level1SlotFloat");
+        slots.add("level3SlotFloat");
+        slots.add("rootSlotString");
+    }
+
+
     public SlotDescription slotMetaData__Level4SlotFloat() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "level4SlotFloat";

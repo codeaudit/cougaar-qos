@@ -670,6 +670,25 @@ public class Level6
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("level6SlotFloat");
+        slots.add("level6SlotString");
+        slots.add("level4SlotFloat");
+        slots.add("rootSlotFloat");
+        slots.add("level1SlotString");
+        slots.add("level2SlotString");
+        slots.add("level5SlotFloat");
+        slots.add("level4SlotString");
+        slots.add("level2SlotFloat");
+        slots.add("level3SlotString");
+        slots.add("level5SlotString");
+        slots.add("level1SlotFloat");
+        slots.add("rootSlotString");
+        slots.add("level3SlotFloat");
+    }
+
+
     public SlotDescription slotMetaData__Level6SlotFloat() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "level6SlotFloat";

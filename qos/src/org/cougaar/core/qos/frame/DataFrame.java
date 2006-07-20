@@ -306,9 +306,14 @@ abstract public class DataFrame
 	// IF the listener is a DataFrame, don't listen on
 	// uninherited slots
 	if (pcl instanceof DataFrame) {
-	    List<String> slots = getPrototype().getInheritedSlots();
-	    for (String slot : slots) {
-		pcs.addPropertyChangeListener(slot, pcl);
+	    DataFrame subscriber = (DataFrame) pcl;
+	    Set<String> subfields = new HashSet<String>();
+	    subscriber.collectSlotNames(subfields);
+	    Set<String> allfields = new HashSet<String>();
+	    collectSlotNames(allfields);
+	    for (String slot : allfields) {
+		if (subfields.contains(slot))
+		    pcs.addPropertyChangeListener(slot, pcl);
 	    }
 	} else {
 	    pcs.addPropertyChangeListener(pcl);
@@ -317,8 +322,9 @@ abstract public class DataFrame
 
     public void removePropertyChangeListener(PropertyChangeListener pcl) {
 	if (pcl instanceof DataFrame) {
-	    List<String> slots = getPrototype().getInheritedSlots();
-	    for (String slot : slots) {
+	    Map<String,SlotDescription> descriptions = new HashMap<String,SlotDescription>();
+	    collectSlotDescriptions(descriptions);
+	    for (String slot : descriptions.keySet()) {
 		pcs.removePropertyChangeListener(slot, pcl);
 	    }
 	} else {
@@ -426,6 +432,10 @@ abstract public class DataFrame
     protected void postInitialize() {
 	// Nothing at this level.  Frame types with Metric-value slots
 	// should subscribe to the MetricsService here
+    }
+    
+    protected void collectSlotNames(Set<String> slots) {
+	
     }
 
     //  Converters used in generated code

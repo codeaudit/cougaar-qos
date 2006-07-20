@@ -41,4 +41,9 @@ public class NodeOnHost
     public String getChildPrototype() {
         return "node";
     }
+
+
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+    }
 }

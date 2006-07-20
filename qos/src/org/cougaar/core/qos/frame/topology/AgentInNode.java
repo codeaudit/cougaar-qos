@@ -41,4 +41,9 @@ public class AgentInNode
     public String getChildPrototype() {
         return "agent";
     }
+
+
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+    }
 }

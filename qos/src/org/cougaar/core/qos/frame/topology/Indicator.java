@@ -619,6 +619,24 @@ public class Indicator
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("status");
+        slots.add("bytesIn");
+        slots.add("loadAverage");
+        slots.add("cpuLoadAverage");
+        slots.add("jips");
+        slots.add("persistSizeLast");
+        slots.add("msgIn");
+        slots.add("effectiveMJips");
+        slots.add("cpuLoadMJips");
+        slots.add("bytesOut");
+        slots.add("count");
+        slots.add("vmSize");
+        slots.add("msgOut");
+    }
+
+
     public SlotDescription slotMetaData__Status() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "status";

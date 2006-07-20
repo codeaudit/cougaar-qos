@@ -41,4 +41,9 @@ public class Level1OnRoot
     public String getChildPrototype() {
         return "level1";
     }
+
+
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+    }
 }

@@ -621,6 +621,23 @@ public class Node
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("bytesIn");
+        slots.add("cpuLoadAverage");
+        slots.add("msgIn");
+        slots.add("status");
+        slots.add("cpuLoadMJips");
+        slots.add("bytesOut");
+        slots.add("msgOut");
+        slots.add("vmSize");
+        slots.add("loadAverage");
+        slots.add("jips");
+        slots.add("effectiveMJips");
+        slots.add("count");
+    }
+
+
     public SlotDescription slotMetaData__BytesIn() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "bytesIn";

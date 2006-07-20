@@ -93,6 +93,12 @@ public class Thing
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("name");
+    }
+
+
     public SlotDescription slotMetaData__Name() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "name";

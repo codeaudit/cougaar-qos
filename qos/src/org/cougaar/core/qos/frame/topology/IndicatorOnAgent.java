@@ -41,4 +41,9 @@ public class IndicatorOnAgent
     public String getChildPrototype() {
         return "indicator";
     }
+
+
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+    }
 }

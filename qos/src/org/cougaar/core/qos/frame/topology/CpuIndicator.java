@@ -375,6 +375,17 @@ public class CpuIndicator
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("calmThreshold");
+        slots.add("idleThreshold");
+        slots.add("watchSlot");
+        slots.add("normalThreshold");
+        slots.add("franticThreshold");
+        slots.add("busyThreshold");
+    }
+
+
     public SlotDescription slotMetaData__CalmThreshold() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "calmThreshold";

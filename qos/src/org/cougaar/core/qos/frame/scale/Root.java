@@ -167,6 +167,13 @@ public class Root
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("rootSlotFloat");
+        slots.add("rootSlotString");
+    }
+
+
     public SlotDescription slotMetaData__RootSlotFloat() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "rootSlotFloat";

@@ -31,4 +31,9 @@ public class Contains
     public String getKind() {
         return "contains";
     }
+
+
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+    }
 }

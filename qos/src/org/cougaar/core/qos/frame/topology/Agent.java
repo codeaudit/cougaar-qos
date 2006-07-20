@@ -660,6 +660,24 @@ public class Agent
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("bytesIn");
+        slots.add("cpuLoadAverage");
+        slots.add("persistSizeLast");
+        slots.add("msgIn");
+        slots.add("status");
+        slots.add("cpuLoadMJips");
+        slots.add("bytesOut");
+        slots.add("msgOut");
+        slots.add("loadAverage");
+        slots.add("jips");
+        slots.add("effectiveMJips");
+        slots.add("count");
+        slots.add("vmSize");
+    }
+
+
     public SlotDescription slotMetaData__BytesIn() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "bytesIn";

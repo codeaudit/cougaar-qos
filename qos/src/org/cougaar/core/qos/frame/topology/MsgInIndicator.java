@@ -115,6 +115,12 @@ public class MsgInIndicator
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("watchSlot");
+    }
+
+
     public SlotDescription slotMetaData__WatchSlot() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "watchSlot";

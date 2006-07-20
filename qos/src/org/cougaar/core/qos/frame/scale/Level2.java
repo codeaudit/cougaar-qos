@@ -358,6 +358,17 @@ public class Level2
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("level2SlotString");
+        slots.add("level2SlotFloat");
+        slots.add("level1SlotString");
+        slots.add("rootSlotFloat");
+        slots.add("level1SlotFloat");
+        slots.add("rootSlotString");
+    }
+
+
     public SlotDescription slotMetaData__Level2SlotString() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "level2SlotString";

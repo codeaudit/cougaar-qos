@@ -298,6 +298,16 @@ public class Host
     }
 
 
+    protected void collectSlotNames(java.util.Set<String> slots) {
+        super.collectSlotNames(slots);
+        slots.add("loadAverage");
+        slots.add("jips");
+        slots.add("effectiveMJips");
+        slots.add("status");
+        slots.add("count");
+    }
+
+
     public SlotDescription slotMetaData__LoadAverage() {
         SlotDescription __desc = new SlotDescription();
         __desc.name = "loadAverage";
