@@ -24,8 +24,10 @@
 <!ELEMENT level4SlotFloat (#PCDATA)>
 <!ELEMENT level4SlotString (#PCDATA)>
 <!ELEMENT level4OnLevel3 (parent-value | child-value)*>
-<!ELEMENT root (rootSlotFloat | name | rootSlotString)*>
+<!ELEMENT root (rootSlotFloat | avgLevel1 | name | count | rootSlotString)*>
 <!ELEMENT rootSlotFloat (#PCDATA)>
+<!ELEMENT avgLevel1 (#PCDATA)>
+<!ELEMENT count (#PCDATA)>
 <!ELEMENT rootSlotString (#PCDATA)>
 <!ELEMENT level6 (level6SlotFloat | name | level6SlotString)*>
 <!ELEMENT level6SlotFloat (#PCDATA)>

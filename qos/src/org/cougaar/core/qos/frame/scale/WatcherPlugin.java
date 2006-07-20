@@ -29,9 +29,11 @@ package org.cougaar.core.qos.frame.scale;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Set;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.qos.frame.Frame;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
@@ -58,12 +60,22 @@ implements FrameSetService.Callback, PropertyChangeListener {
         }
     };
     
+    private final UnaryPredicate rootPredicate = new UnaryPredicate() {
+        public boolean execute(Object o) {
+            if (!(o instanceof Root)) return false;
+            Thing thing = (Thing) o;
+            return thing.getFrameSet() == frameset;
+        }
+    };
+    
     private FrameSet frameset;
     private LoggingService log;
-    private IncrementalSubscription rsub, tsub;
+    private IncrementalSubscription rsub, tsub, rootSub;
     private int propertyChangeCount;
     private int blackboardChangeCount;
     private long lastLog = 0;
+
+    private int rootChangeCount;
     
 
     public void start() {
@@ -88,21 +100,49 @@ implements FrameSetService.Callback, PropertyChangeListener {
 	Collection changed = tsub.getChangedCollection();
 	blackboardChangeCount += changed.size();
 	
-	log.debug(rsub.getAddedCollection().size() + " Relations added");
-	log.debug(rsub.getRemovedCollection().size() + " Relations removed");
-	log.debug(rsub.getChangedCollection().size() + " Relations changed");
-	log.debug(added.size() + " Things added");
-	log.debug(tsub.getRemovedCollection().size() + " Things removed");
-	log.debug(changed.size() + " Things changed");
+	Collection rootCollection = rootSub.getChangedCollection();
+	Root root = null;
+	int changeCount = 0;
+	for (Object r : rootCollection) {
+	    root = (Root) r; // there's only one Root
+	    Set changeReports = rootSub.getChangeReports(r);
+	    for (Object rawChange : changeReports) {
+		if (rawChange instanceof Frame.Change) {
+		    Frame.Change change = (Frame.Change) rawChange;
+		    if (change.getSlotName().equals("rootSlotFloat")) {
+			++changeCount;
+		    }
+		}
+	    }
+	}
+	if (changeCount > 0) {
+	    root.setCount(root.getCount() + 1);
+	    ++rootChangeCount;
+	    if (changeCount > 1) {
+		log.shout(changeCount + " changes to Root in a single execute");
+	    }
+	}
+	
 	
 	long now = System.currentTimeMillis();
 	long deltaT = (now - lastLog);
 	if (deltaT > 10000) {
+	    log.shout(rootChangeCount + " execute cycles with changes to base rootSlotFloat in "+ deltaT/1000f + " seconds");
 	    log.shout(propertyChangeCount + " property changes in "+ deltaT/1000f + " seconds");
 	    log.shout(blackboardChangeCount + " blackboard changes in "+ deltaT/1000f + " seconds");
 	    lastLog = now;
+	    rootChangeCount =0;
 	    blackboardChangeCount =0;
 	    propertyChangeCount = 0;
+	}
+	
+	if (log.isDebugEnabled()) {
+	    log.debug(rsub.getAddedCollection().size() + " Relations added");
+	    log.debug(rsub.getRemovedCollection().size() + " Relations removed");
+	    log.debug(rsub.getChangedCollection().size() + " Relations changed");
+	    log.debug(added.size() + " Things added");
+	    log.debug(tsub.getRemovedCollection().size() + " Things removed");
+	    log.debug(changed.size() + " Things changed");
 	}
 	
     }
@@ -111,6 +151,7 @@ implements FrameSetService.Callback, PropertyChangeListener {
 	BlackboardService bbs = getBlackboardService();
 	rsub = (IncrementalSubscription) bbs.subscribe(relationPredicate);
 	tsub = (IncrementalSubscription) bbs.subscribe(thingPredicate);
+	rootSub = (IncrementalSubscription) bbs.subscribe(rootPredicate);
     }
     
     public void frameSetAvailable(String name, FrameSet set) {

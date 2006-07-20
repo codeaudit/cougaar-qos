@@ -17,6 +17,8 @@ public class Root
             DataFrame.registerFrameMaker("org.cougaar.core.qos.frame.scale", "root", __fm);
     }
     private float rootSlotFloat;
+    private float avgLevel1;
+    private int count;
     private String rootSlotString;
 
 
@@ -29,6 +31,7 @@ public class Root
                 UID uid) {
         super(frameSet, uid);
         initializeRootSlotFloat(0.0f);
+        initializeCount(0);
         initializeRootSlotString("Zero");
     }
 
@@ -43,6 +46,10 @@ public class Root
         Object __value;
         __value = getRootSlotFloat__AsObject();
         __props.put("rootSlotFloat", __value != null ? __value : NIL);
+        __value = getAvgLevel1__AsObject();
+        __props.put("avgLevel1", __value != null ? __value : NIL);
+        __value = getCount__AsObject();
+        __props.put("count", __value != null ? __value : NIL);
         __value = getRootSlotString__AsObject();
         __props.put("rootSlotString", __value != null ? __value : NIL);
     }
@@ -89,6 +96,88 @@ public class Root
     }
 
 
+    public float getAvgLevel1() {
+        return avgLevel1;
+    }
+
+
+    float getAvgLevel1__NoWarn() {
+        return avgLevel1;
+    }
+
+
+    Object getAvgLevel1__AsObject() {
+        return new Float(avgLevel1);
+    }
+
+
+    public void setAvgLevel1(float __new_value) {
+        float __old_value = avgLevel1;
+        this.avgLevel1 = __new_value;
+        slotModified("avgLevel1", new Float(__old_value), new Float(__new_value), true, true);
+    }
+
+
+    public void setAvgLevel1__AsObject(Object __new_value) {
+        Object __old_value = getAvgLevel1__AsObject();
+        this.avgLevel1 = force_float(__new_value);
+        slotModified("avgLevel1", __old_value, __new_value, true, true);
+    }
+
+
+    protected void initializeAvgLevel1(float new_value) {
+        this.avgLevel1 = new_value;
+        slotInitialized("avgLevel1", new Float(new_value));
+    }
+
+
+    void initializeAvgLevel1__AsObject(Object new_value) {
+        this.avgLevel1 = force_float(new_value);
+        slotInitialized("avgLevel1", new_value);
+    }
+
+
+    public int getCount() {
+        return count;
+    }
+
+
+    int getCount__NoWarn() {
+        return count;
+    }
+
+
+    Object getCount__AsObject() {
+        return new Integer(count);
+    }
+
+
+    public void setCount(int __new_value) {
+        int __old_value = count;
+        this.count = __new_value;
+        slotModified("count", new Integer(__old_value), new Integer(__new_value), true, true);
+    }
+
+
+    public void setCount__AsObject(Object __new_value) {
+        Object __old_value = getCount__AsObject();
+        this.count = force_int(__new_value);
+        slotModified("count", __old_value, __new_value, true, true);
+    }
+
+
+    protected void initializeCount(int new_value) {
+        this.count = new_value;
+        slotInitialized("count", new Integer(new_value));
+    }
+
+
+    void initializeCount__AsObject(Object new_value) {
+        this.count = force_int(new_value);
+        slotInitialized("count", new_value);
+    }
+
+
     public String getRootSlotString() {
         return rootSlotString;
     }
@@ -129,6 +218,8 @@ public class Root
         slotInitialized("rootSlotString", new_value);
     }
     private static final int rootSlotFloat__HashVar__ = "rootSlotFloat".hashCode();
+    private static final int avgLevel1__HashVar__ = "avgLevel1".hashCode();
+    private static final int count__HashVar__ = "count".hashCode();
     private static final int rootSlotString__HashVar__ = "rootSlotString".hashCode();
 
 
@@ -136,6 +227,10 @@ public class Root
        int __key = __slot.hashCode();
        if (rootSlotFloat__HashVar__ == __key)
             return getRootSlotFloat__AsObject();
+       else if (avgLevel1__HashVar__ == __key)
+            return getAvgLevel1__AsObject();
+       else if (count__HashVar__ == __key)
+            return getCount__AsObject();
        else if (rootSlotString__HashVar__ == __key)
             return getRootSlotString__AsObject();
        else
@@ -148,6 +243,10 @@ public class Root
        int __key = __slot.hashCode();
        if (rootSlotFloat__HashVar__ == __key)
             setRootSlotFloat__AsObject(__value);
+       else if (avgLevel1__HashVar__ == __key)
+            setAvgLevel1__AsObject(__value);
+       else if (count__HashVar__ == __key)
+            setCount__AsObject(__value);
        else if (rootSlotString__HashVar__ == __key)
             setRootSlotString__AsObject(__value);
        else
@@ -160,6 +259,10 @@ public class Root
        int __key = __slot.hashCode();
        if (rootSlotFloat__HashVar__ == __key)
             initializeRootSlotFloat__AsObject(__value);
+       else if (avgLevel1__HashVar__ == __key)
+            initializeAvgLevel1__AsObject(__value);
+       else if (count__HashVar__ == __key)
+            initializeCount__AsObject(__value);
        else if (rootSlotString__HashVar__ == __key)
             initializeRootSlotString__AsObject(__value);
        else
@@ -170,6 +273,8 @@ public class Root
     protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("rootSlotFloat");
+        slots.add("avgLevel1");
+        slots.add("count");
         slots.add("rootSlotString");
     }
 
@@ -187,6 +292,41 @@ public class Root
         } else {
             __desc.is_overridden = false;
             __desc.value = new Float(0.0f);
+        }
+        return __desc;
+    }
+
+
+    public SlotDescription slotMetaData__AvgLevel1() {
+        SlotDescription __desc = new SlotDescription();
+        __desc.name = "avgLevel1";
+        __desc.prototype = "root";
+        __desc.is_writable = true;
+        Object __value;
+        __value = new Float(avgLevel1);
+        if (__value != null) {
+            __desc.is_overridden = true;
+            __desc.value = __value;
+        } else {
+            __desc.is_overridden = false;
+        }
+        return __desc;
+    }
+
+
+    public SlotDescription slotMetaData__Count() {
+        SlotDescription __desc = new SlotDescription();
+        __desc.name = "count";
+        __desc.prototype = "root";
+        __desc.is_writable = true;
+        Object __value;
+        __value = new Integer(count);
+        if (__value != null) {
+            __desc.is_overridden = true;
+            __desc.value = __value;
+        } else {
+            __desc.is_overridden = false;
+            __desc.value = new Integer(0);
         }
         return __desc;
     }
@@ -213,6 +353,8 @@ public class Root
     protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("rootSlotFloat", slotMetaData__RootSlotFloat());
+        map.put("avgLevel1", slotMetaData__AvgLevel1());
+        map.put("count", slotMetaData__Count());
         map.put("rootSlotString", slotMetaData__RootSlotString());
     }
 }
