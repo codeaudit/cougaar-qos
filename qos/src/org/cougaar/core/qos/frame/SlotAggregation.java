@@ -64,7 +64,7 @@ public class SlotAggregation {
 		// Not in the frameset's package, try our package
 		cname = getClass().getPackage().getName() +".aggregator."+ className;
 		try {
-		    aggregatorClass = Class.forName(className);
+		    aggregatorClass = Class.forName(cname);
 		} catch (ClassNotFoundException ex2) {
 		    // ignore
 		}
@@ -115,12 +115,12 @@ public class SlotAggregation {
 	    for (Object x : addedFrames) {
 		addToUpdateSet(x, framesToUpdate);
 	    }
-
+	    
 	    Collection removedFrames = sub.getRemovedCollection();
 	    for (Object x : removedFrames) {
 		addToUpdateSet(x, framesToUpdate);
 	    }
-
+	    
 	    if (childSlot != null) {
 		Collection changedFrames = sub.getChangedCollection();
 		for (Object x : changedFrames) {
@@ -135,10 +135,13 @@ public class SlotAggregation {
 		    if (relevant) addToUpdateSet(x, framesToUpdate);
 		}
 	    }
-	}
-	for (DataFrame frame : framesToUpdate) {
-	    Set<DataFrame> children = frame.findRelations("child", relation);
-	    aggregator.updateSlotValue(frame, children, this);
+	    
+	    
+	    for (DataFrame frame : framesToUpdate) {
+		Set<DataFrame> children = frame.findRelations("child", relation);
+		aggregator.updateSlotValue(frame, children, this);
+	    }
+	    
 	}
     }
     
