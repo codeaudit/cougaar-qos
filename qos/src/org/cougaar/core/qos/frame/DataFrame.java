@@ -303,11 +303,27 @@ abstract public class DataFrame
 
     // Jess ShadowFact
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
-	pcs.addPropertyChangeListener(pcl);
+	// IF the listener is a DataFrame, don't listen on
+	// uninherited slots
+	if (pcl instanceof DataFrame) {
+	    List<String> slots = getPrototype().getInheritedSlots();
+	    for (String slot : slots) {
+		pcs.addPropertyChangeListener(slot, pcl);
+	    }
+	} else {
+	    pcs.addPropertyChangeListener(pcl);
+	}
     }
 
     public void removePropertyChangeListener(PropertyChangeListener pcl) {
-	pcs.removePropertyChangeListener(pcl);
+	if (pcl instanceof DataFrame) {
+	    List<String> slots = getPrototype().getInheritedSlots();
+	    for (String slot : slots) {
+		pcs.removePropertyChangeListener(slot, pcl);
+	    }
+	} else {
+	    pcs.removePropertyChangeListener(pcl);
+	}
     }
 
 

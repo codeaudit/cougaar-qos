@@ -160,7 +160,7 @@ public interface FrameSet {
      * operation the Frame will be published to the Blackboard.
      */
     public PrototypeFrame makePrototype(String kind, String parent,  
-	                                Attributes attrs, Properties properties);
+	                                Attributes attrs, Map<String,Attributes> slots);
 
     /**
      * Creates a PrototypeFrame with the given name, parent prototype,
@@ -169,7 +169,8 @@ public interface FrameSet {
      * Blackboard.
      */
     public PrototypeFrame makePrototype(String kind, String parent,
-	                                Attributes attrs, Properties properties, UID uid);
+	                                Attributes attrs,  Map<String,Attributes> slots, 
+	                                UID uid);
 
     /**
      * Creates a Path and adds it to the FrameSet As a result of this

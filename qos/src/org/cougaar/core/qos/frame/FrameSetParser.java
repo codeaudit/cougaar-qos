@@ -29,6 +29,7 @@ package org.cougaar.core.qos.frame;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
@@ -346,34 +347,28 @@ public class FrameSetParser
     
 
     // Helper structs
-    abstract private class FrameSpec {
-	Properties props;
-	String prototype;
-	FrameSpec() {
-	    props = new Properties();
-	}
-
-	void put(String attr, Object value) {
-	    props.put(attr, value);
-	}
-    }
-
-    private class DataFrameSpec	extends FrameSpec {
+    private class DataFrameSpec {
 	String reference;
-
+	String prototype;
+	Properties slotValues;
+	
 	DataFrameSpec(Attributes attrs)	{
-	    super();
+	    slotValues = new Properties();
 	    prototype = attrs.getValue("prototype");
 	    reference = attrs.getValue("reference");
 	}
 
 	DataFrameSpec(String name) {
-	    super();
+	    slotValues = new Properties();
 	    prototype = name;
+	}
+	
+	void put(String slot, String value) {
+	    slotValues.put(slot, value);
 	}
 
 	Frame makeFrame(FrameSet frameSet) {
-	    Frame frame = frameSet.makeFrame(prototype, props);
+	    Frame frame = frameSet.makeFrame(prototype, slotValues);
 	    if (reference != null) {
 		synchronized (references) {
 		    references.put(reference, frame);
@@ -383,20 +378,26 @@ public class FrameSetParser
 	}
     }
 
-    private class PrototypeSpec	extends FrameSpec {
+    private class PrototypeSpec	{
 	String name;
 	Attributes attrs;
+	Map<String,Attributes> slots;
+	String prototype;
 	
 	PrototypeSpec(Attributes attrs) {
-	    super();
+	    slots = new HashMap<String,Attributes>();
 	    name = attrs.getValue("name");
 	    prototype = attrs.getValue("prototype");
 	    this.attrs = new AttributesImpl(attrs);
 	}
+	
+	void put(String slot, Attributes attrs) {
+	    slots.put(slot, attrs);
+	}
 
 	Frame makePrototype(FrameSet frameSet) {
 	    PrototypeFrame frame =
-		frameSet.makePrototype(name, prototype, attrs, props);
+		frameSet.makePrototype(name, prototype, attrs, slots);
 	    return frame;
 	}
 

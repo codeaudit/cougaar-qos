@@ -27,17 +27,18 @@
 package org.cougaar.core.qos.frame;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
 
 import org.cougaar.core.util.UID;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * This extension to {@link Frame} is the runtime representation of a
@@ -50,11 +51,12 @@ public class PrototypeFrame
 {
     private final String prototype_name;
     private final String parent_prototype;
+    private final transient List<String> inheritableSlots;
     private transient Logger log = Logging.getLogger(getClass().getName());
-    private transient Properties dynamic_values;
+    private final transient Map<String,Object> dynamic_values;
     private final Attributes attrs;
-    private HashMap path_cache;
-    private Properties slots;
+    private final Map<String,Path> path_cache;
+    private final Map<String,Attributes> slots;
     
 
     PrototypeFrame(FrameSet frameSet, 
@@ -62,14 +64,21 @@ public class PrototypeFrame
 		   String parent, 
 		   UID uid, 
 		   Attributes attrs,
-		   Properties slots) {
+		   Map<String,Attributes> slots) {
 	super(frameSet, uid);
+	this.inheritableSlots = new ArrayList<String>();
+	for (Map.Entry<String,Attributes> entry : slots.entrySet()) {
+	    String inheritance = entry.getValue().getValue("inheritable-through");
+	    if (inheritance == null || inheritance.equals("all")) {
+		inheritableSlots.add(entry.getKey());
+	    }
+	}
 	this.parent_prototype = parent;
 	this.prototype_name = prototype_name;
 	this.slots = slots;
-	this.dynamic_values = new Properties();
+	this.dynamic_values = new HashMap<String,Object>();
 	this.attrs = attrs;
-	this.path_cache = new HashMap();
+	this.path_cache = new HashMap<String,Path>();
     }
 
     public String getKind() {
@@ -87,6 +96,10 @@ public class PrototypeFrame
 	    defs.put(key, new AttributesImpl(attrs));
 	}
 	return defs;
+    }
+    
+    public List<String> getInheritedSlots() {
+	return inheritableSlots;
     }
 	
 
@@ -117,7 +130,7 @@ public class PrototypeFrame
 	Object slot_value = dynamic_values.get(slot_name);
 	if (slot_value != null) return slot_value;
 
-	Attributes attrs = (Attributes) slots.get(slot_name);
+	Attributes attrs = slots.get(slot_name);
 	if (attrs != null) {
 	    // Declared at this level -- either get a real value or
 	    // complain and return null.
@@ -134,7 +147,7 @@ public class PrototypeFrame
 		}
 		Path path;
 		synchronized (path_cache) {
-		    path = (Path) path_cache.get(path_name);
+		    path = path_cache.get(path_name);
 		    if (path == null) {
 			path = getFrameSet().findPath(path_name);
 			path_cache.put(path_name, path);

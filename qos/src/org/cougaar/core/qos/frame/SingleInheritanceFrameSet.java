@@ -226,15 +226,16 @@ public class SingleInheritanceFrameSet
     // should be a prototype of.  
     public PrototypeFrame makePrototype(String proto, 
 					String parent, 
-					Attributes attrs, Properties values) {
+					Attributes attrs, 
+					Map<String,Attributes> slots) {
 	UID uid = uids.nextUID();
-	return makePrototype(proto, parent, attrs, values, uid);
+	return makePrototype(proto, parent, attrs, slots, uid);
     }
 
     public PrototypeFrame makePrototype(String proto, 
 					String parent, 
 					Attributes attrs,
-					Properties values,
+					Map<String,Attributes> slots,
 					UID uid) {
 	PrototypeFrame frame = null;
 	synchronized (prototypes) { 
@@ -243,7 +244,7 @@ public class SingleInheritanceFrameSet
 		    log.warn("Ignoring prototype " +proto);
 		return null;
 	    } else {
-		frame = new PrototypeFrame(this, proto, parent, uid, attrs, values);
+		frame = new PrototypeFrame(this, proto, parent, uid, attrs, slots);
 		if (log.isDebugEnabled())
 		    log.debug("Adding prototype " +frame+
 			      " for " +proto);
