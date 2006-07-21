@@ -22,7 +22,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import org.cougaar.core.qos.frame.visualizer.tree.ContainerTreeView;
-import org.cougaar.core.qos.frame.visualizer.tree.FrameTreeView;
 import org.cougaar.core.qos.frame.visualizer.util.HTMLTreeWriter;
 import org.cougaar.core.qos.frame.visualizer.util.ViewConfigParser;
 import org.cougaar.core.service.ThreadService;
@@ -37,7 +36,10 @@ import org.cougaar.core.service.ThreadService;
 public class DisplayWindow extends JFrame { //implements ChangeListener  {
     Display display;
     ContainerTreeView containerView;
-    FrameTreeView frameView;
+    
+    // This view can't handle relation cycles, so remove it for now
+    // FrameTreeView frameView;
+    
     FrameSnapshotView frameSnapshotView;
     JTabbedPane tabbedPane;
     FrameModel frameModel;
@@ -53,12 +55,12 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         displPanel.add(display, BorderLayout.CENTER);
         displPanel.add(controlPanel, BorderLayout.SOUTH);
         containerView = new ContainerTreeView(frameModel, display);
-        frameView = new FrameTreeView(frameModel);
-        frameSnapshotView = new FrameSnapshotView(frameView, containerView);
+        // frameView = new FrameTreeView(frameModel);
+        frameSnapshotView = new FrameSnapshotView(containerView);
 
         tabbedPane.addTab("Graphic", displPanel);
         tabbedPane.addTab("View Tree", containerView);
-        tabbedPane.addTab("Frames", frameView);
+        // tabbedPane.addTab("Frames", frameView);
         tabbedPane.addTab("Snapshots", frameSnapshotView);
 
         ViewConfigParser.WindowSpec w = display.getWindowSpec();
@@ -99,15 +101,15 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
 
 
     class FrameSnapshotView extends JPanel {
-        FrameTreeView frameTreeView;
+        // FrameTreeView frameTreeView;
         ContainerTreeView containerView;
         JLabel htmlView;
         JRadioButton frameTree, containerTree;
         boolean showFrameView =  true;
 
-        public FrameSnapshotView(FrameTreeView frameView, ContainerTreeView containerView) {
+        public FrameSnapshotView(/*FrameTreeView frameView, */ ContainerTreeView containerView) {
             super(new BorderLayout());
-            this.frameTreeView = frameView;
+            // this.frameTreeView = frameView;
             this.containerView = containerView;
 
             Box buttonBox = Box.createHorizontalBox();
@@ -135,12 +137,14 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
             //TreeNode root = frameTreeView.getRootNode();
             StringWriter sw = new StringWriter();
             PrintWriter w = new PrintWriter(sw);
-            if (showFrameView)
-               frameTreeView.rebuildTree();
-            else
+            if (showFrameView) {
+               // frameTreeView.rebuildTree();
+        	// HTMLTreeWriter.write(w, frameTreeView.getRootNode(), 5,5);
+            } else {
                 containerView.rebuildTree();
-
-            HTMLTreeWriter.write(w, (showFrameView ? frameTreeView.getRootNode() : containerView.getRootNode()), 5,5);
+                HTMLTreeWriter.write(w, containerView.getRootNode(), 5,5);
+            }
+            
             htmlView.setText(sw.toString());
         }
 
