@@ -76,6 +76,7 @@ public class SingleInheritanceFrameSet
     private Map<String,Class> cached_classes;
     private Map<String,PrototypeFrame> prototypes;
     private Map<RelationFrame,DataFrame> parent_cache, child_cache;
+    private Map<DataFrame,Set<RelationFrame>> inverse_parent_cache, inverse_child_cache;
     private Map<String,Path> paths;
     private Set<DataFrame> frames;
 
@@ -102,6 +103,8 @@ public class SingleInheritanceFrameSet
 	this.cached_classes = new HashMap<String,Class>();
 	this.parent_cache = new HashMap<RelationFrame,DataFrame>();
 	this.child_cache = new HashMap<RelationFrame,DataFrame>();
+	this.inverse_child_cache = new HashMap<DataFrame,Set<RelationFrame>>();
+	this.inverse_parent_cache = new HashMap<DataFrame,Set<RelationFrame>>();
 	this.paths = new HashMap<String,Path>();
 	this.frames = new HashSet<DataFrame>();
 	this.primaryIndexCache = new HashMap<PrototypeFrame,Map<Object, DataFrame>>();
@@ -423,6 +426,7 @@ public class SingleInheritanceFrameSet
     // Caller should synchronize on relation_lock
     private DataFrame getRelate(RelationFrame relationship,
 				Map<RelationFrame,DataFrame> cache,
+				Map<DataFrame,Set<RelationFrame>> inverseCache,
 				String proto,
 				String slot,
 				Object value) {
@@ -452,6 +456,12 @@ public class SingleInheritanceFrameSet
 			  "in " +name);
 	    relationship.clear_failed_lookup_time();
 	    cache.put(relationship, result);
+	    Set<RelationFrame> rframes = inverseCache.get(result);
+	    if (rframes == null) {
+		rframes = new HashSet<RelationFrame>();
+		inverseCache.put(result, rframes);
+	    }
+	    rframes.add(relationship);
 	}
 	return result;
     }
@@ -469,7 +479,7 @@ public class SingleInheritanceFrameSet
 	    String proto = relationship.getParentPrototype();
 	    String slot = relationship.getParentSlot();
 	    Object value = relationship.getParentValue();
-	    return getRelate(relationship, parent_cache, proto, slot, value);
+	    return getRelate(relationship, parent_cache, inverse_parent_cache, proto, slot, value);
 	}
     }
 
@@ -485,7 +495,7 @@ public class SingleInheritanceFrameSet
 	    String proto = relationship.getChildPrototype();
 	    String slot = relationship.getChildSlot();
 	    Object value = relationship.getChildValue();
-	    return getRelate(relationship, child_cache, proto, slot, value);
+	    return getRelate(relationship, child_cache, inverse_child_cache, proto, slot, value);
 	}
     }
 
@@ -498,8 +508,6 @@ public class SingleInheritanceFrameSet
     }
     
     private boolean cacheRelation(RelationFrame relationship, DataFrame parent, DataFrame child) {
-
-	    
 	if (parent == null || child == null) {
 	    // Queue for later
 	    synchronized (pending_relations) {
@@ -523,6 +531,20 @@ public class SingleInheritanceFrameSet
 
     private void decacheRelation(RelationFrame relationship) {
 	synchronized (relation_lock) {
+	    DataFrame child = child_cache.get(relationship);
+	    if (child != null) {
+		Set<RelationFrame> rframes = inverse_child_cache.get(child);
+		if (rframes != null) {
+		    rframes.remove(relationship);
+		}
+	    }
+	    DataFrame parent = parent_cache.get(relationship);
+	    if (parent != null) {
+		Set<RelationFrame> rframes = inverse_parent_cache.get(child);
+		if (rframes != null) {
+		    rframes.remove(relationship);
+		}
+	    }
 	    child_cache.remove(relationship);
 	    parent_cache.remove(relationship);
 	}
@@ -630,16 +652,17 @@ public class SingleInheritanceFrameSet
 	if (klass == null) return null;
 	Set<DataFrame> results = map != null ? null : new HashSet<DataFrame>();
 	synchronized (relation_lock) {
-	    for (Map.Entry<RelationFrame,DataFrame> entry : parent_cache.entrySet()) {
-		if (entry.getValue().equals(parent)) {
-		    RelationFrame relation = entry.getKey();
-		    DataFrame child = child_cache.get(relation);
-		    if (child != null &&
-			descendsFrom(relation, klass, relation_prototype)) {
-			if (map != null)
-			    map.put(relation, child);
-			else
-			    results.add(child);
+	    Set<RelationFrame> rframes = inverse_parent_cache.get(parent);
+	    if (rframes != null) {
+		for (RelationFrame rframe : rframes) {
+		    if (descendsFrom(rframe, klass, relation_prototype)) {
+			DataFrame child = child_cache.get(rframe);
+			if (child != null) {
+			    if (map != null)
+				map.put(rframe, child);
+			    else
+				results.add(child);
+			}
 		    }
 		}
 	    }
@@ -652,19 +675,19 @@ public class SingleInheritanceFrameSet
 	    Map<RelationFrame,DataFrame> map) {
 	Class klass = classForPrototype(relation_prototype);
 	if (klass == null) return null;
-
 	Set<DataFrame> results = map != null ? null : new HashSet<DataFrame>();
 	synchronized (relation_lock) {
-	    for (Map.Entry<RelationFrame,DataFrame> entry : child_cache.entrySet()) {
-		if (entry.getValue().equals(child)) {
-		    RelationFrame relation = entry.getKey();
-		    DataFrame parent = parent_cache.get(relation);
-		    if (parent != null &&
-			descendsFrom(relation, klass, relation_prototype)) {
-			if (map != null)
-			    map.put(relation, parent);
-			else
-			    results.add(parent);
+	    Set<RelationFrame> rframes = inverse_child_cache.get(child);
+	    if (rframes != null) {
+		for (RelationFrame rframe : rframes) {
+		    if (descendsFrom(rframe, klass, relation_prototype)) {
+			DataFrame parent = parent_cache.get(rframe);
+			if (parent != null) {
+			    if (map != null)
+				map.put(rframe, parent);
+			    else
+				results.add(parent);
+			}
 		    }
 		}
 	    }
