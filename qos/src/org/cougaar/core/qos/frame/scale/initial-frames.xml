@@ -2,31 +2,8 @@
 <!-- Copyright 2006 BBN Technologies Corp.  All Rights Reserved.  -->
 
 <testScale>
-	
-	<root name="root" rootSlotFloat="10.0" rootSlotString="Root String"/>
-	
-	<level1 name="level 1" level1SlotFloat="11.0" level1SlotString="Level 1 String"/>
-	
-	<level1OnRoot parent-value="root" child-value="level 1"/>
-	
-	<level2 name="level 2" level2SlotFloat="12.0" level2SlotString="Level 2 String"/>
-	
-	<level2OnLevel1 parent-value="level 1" child-value="level 2"/>
-	
-	<level3  name="level 3" level3SlotFloat="13.0" level3SlotString="Level 3 String"/>
-	
-	<level3OnLevel2 parent-value="level 2" child-value="level 3"/>
-	
-	<level4 name="level 4" level4SlotFloat="14.0" level4SlotString="Level 4 String"/>
-	
-	<level4OnLevel3 parent-value="level 3" child-value="level 4"/>
-	
-	<level5 name="level 5" level5SlotFloat="15.0" level5SlotString="Level 5 String"/>
-	
-	<level5OnLevel4 parent-value="level 4" child-value="level 5"/>
-	
-	<level6 name="level 6" level6SlotFloat="16.0" level6SlotString="Level 6 String"/>
-	
-	<level6OnLevel5 parent-value="level 5" child-value="level 6"/>
-	
+	<antilevel1 name="a1"/>
+	<antilevel2 name="a1.a1"/>
+	<antilevel1OnRoot child-value="a1"  parent-value="1"/>
+	<antilevel2OnAntilevel1 child-value="a1.a1" parent-value="a1"/>
 </testScale>

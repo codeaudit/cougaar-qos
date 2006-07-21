@@ -58,6 +58,21 @@
 			<slot name="level6SlotString" type="String" default-value="Six"/>
 		</prototype>
 		
+		<prototype name="antilevel1" prototype="thing" >
+		</prototype>
+		
+		<prototype name="antilevel2" prototype="thing" >
+			<slot name="level2Path" type="Float" path="rootCount"/>
+		</prototype>
+	
+		<path name="rootCount">
+			<fork role="parent" relation="antilevel2OnAntilevel1"/>
+			<fork role="parent" relation="antilevel1OnRoot"/>
+			<slot-reference name="count"/>
+		</path>
+		
+		
+		
 		<relation-prototype name="level1OnRoot" prototype="contains"
 			parent-prototype="root" child-prototype="level1">
 		</relation-prototype>
@@ -80,6 +95,15 @@
 		
 		<relation-prototype name="level6OnLevel5" prototype="contains"
 			parent-prototype="level5" child-prototype="level6">
+		</relation-prototype>
+		
+		<relation-prototype name="antilevel1OnRoot" prototype="relationship"
+			parent-prototype="root" child-prototype="antilevel1">
+		</relation-prototype>
+		
+			
+		<relation-prototype name="antilevel2OnAntilevel1" prototype="relationship"
+			parent-prototype="antilevel1" child-prototype="antilevel2">
 		</relation-prototype>
 		
 	</prototypes>

@@ -76,6 +76,8 @@ implements FrameSetService.Callback, PropertyChangeListener {
     private long lastLog = 0;
 
     private int rootChangeCount;
+
+    private long pathChangeCount;
     
 
     public void start() {
@@ -130,6 +132,7 @@ implements FrameSetService.Callback, PropertyChangeListener {
 	    log.shout(rootChangeCount + " execute cycles with changes to base rootSlotFloat in "+ deltaT/1000f + " seconds");
 	    log.shout(propertyChangeCount + " property changes in "+ deltaT/1000f + " seconds");
 	    log.shout(blackboardChangeCount + " blackboard changes in "+ deltaT/1000f + " seconds");
+	    log.shout(pathChangeCount + " path changes in "+ deltaT/1000f + " seconds");
 	    lastLog = now;
 	    rootChangeCount =0;
 	    blackboardChangeCount =0;
@@ -161,6 +164,9 @@ implements FrameSetService.Callback, PropertyChangeListener {
 
     public void propertyChange(PropertyChangeEvent evt) {
 	++propertyChangeCount;
+	if (evt.getSource() instanceof Antilevel2 ) {
+	    ++pathChangeCount;
+	}
     }
 
 }

@@ -273,7 +273,7 @@
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
           <argument>
-            frame-set-files=org/cougaar/core/qos/frame/scale/test-scale-protos.xml
+            frame-set-files=org/cougaar/core/qos/frame/scale/test-scale-protos.xml,org/cougaar/core/qos/frame/scale/initial-frames.xml
           </argument>
           <argument>
             frame-set=testScale

@@ -41,7 +41,7 @@
 	       transient (true | false) "false">
 <!ELEMENT fork EMPTY>
 <!ATTLIST fork relation CDATA #REQUIRED
-	       role CDATA #REQUIRED>
+	       role (child | parent) #REQUIRED>
 <!ELEMENT slot-reference EMPTY>
 <!ATTLIST slot-reference name CDATA #REQUIRED>
 

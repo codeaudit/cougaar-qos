@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT testScale (contains | level3OnLevel2 | level2 | level6OnLevel5 | relationship | level1 | level5OnLevel4 | level5 | level1OnRoot | level2OnLevel1 | thing | level4 | level4OnLevel3 | root | level6 | level3)*>
-<!ELEMENT contains EMPTY>
-<!ATTLIST contains
-          parent-value CDATA #IMPLIED
-          child-value CDATA #IMPLIED>
+<!ELEMENT testScale (level3OnLevel2 | contains | level2 | antilevel2 | level6OnLevel5 | relationship | level1 | level5OnLevel4 | level2OnLevel1 | level5 | antilevel1 | level1OnRoot | thing | level4 | antilevel1OnRoot | level4OnLevel3 | root | level6 | level3 | antilevel2OnAntilevel1)*>
 <!ELEMENT level3OnLevel2 EMPTY>
 <!ATTLIST level3OnLevel2
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT contains EMPTY>
+<!ATTLIST contains
           parent-value CDATA #IMPLIED
           child-value CDATA #IMPLIED>
 <!ELEMENT level2 EMPTY>
@@ -13,6 +13,10 @@
           level2SlotString CDATA #IMPLIED
           level2SlotFloat CDATA #IMPLIED
           name CDATA #REQUIRED>
+<!ELEMENT antilevel2 EMPTY>
+<!ATTLIST antilevel2
+          name CDATA #REQUIRED
+          level2Path CDATA #IMPLIED>
 <!ELEMENT level6OnLevel5 EMPTY>
 <!ATTLIST level6OnLevel5
           parent-value CDATA #IMPLIED
@@ -30,17 +34,20 @@
 <!ATTLIST level5OnLevel4
           parent-value CDATA #IMPLIED
           child-value CDATA #IMPLIED>
+<!ELEMENT level2OnLevel1 EMPTY>
+<!ATTLIST level2OnLevel1
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
 <!ELEMENT level5 EMPTY>
 <!ATTLIST level5
           level5SlotFloat CDATA #IMPLIED
           level5SlotString CDATA #IMPLIED
           name CDATA #REQUIRED>
+<!ELEMENT antilevel1 EMPTY>
+<!ATTLIST antilevel1
+          name CDATA #REQUIRED>
 <!ELEMENT level1OnRoot EMPTY>
 <!ATTLIST level1OnRoot
-          parent-value CDATA #IMPLIED
-          child-value CDATA #IMPLIED>
-<!ELEMENT level2OnLevel1 EMPTY>
-<!ATTLIST level2OnLevel1
           parent-value CDATA #IMPLIED
           child-value CDATA #IMPLIED>
 <!ELEMENT thing EMPTY>
@@ -51,6 +58,10 @@
           level4SlotFloat CDATA #IMPLIED
           level4SlotString CDATA #IMPLIED
           name CDATA #REQUIRED>
+<!ELEMENT antilevel1OnRoot EMPTY>
+<!ATTLIST antilevel1OnRoot
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
 <!ELEMENT level4OnLevel3 EMPTY>
 <!ATTLIST level4OnLevel3
           parent-value CDATA #IMPLIED
@@ -72,3 +83,7 @@
           level3SlotString CDATA #IMPLIED
           name CDATA #REQUIRED
           level3SlotFloat CDATA #IMPLIED>
+<!ELEMENT antilevel2OnAntilevel1 EMPTY>
+<!ATTLIST antilevel2OnAntilevel1
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
