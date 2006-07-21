@@ -166,11 +166,13 @@ public class SingleInheritanceFrameSet
 		frames.add((DataFrame) object);
 	    }
 	    if (object instanceof RelationFrame) {
-		cacheRelation((RelationFrame) object);
+		synchronized (relation_lock) {
+		    cacheRelation((RelationFrame) object);
+		}		
 	    } else {
 		// Any new DataFrame could potentially resolve as yet
 		// unfilled values in relations.
-		synchronized (pending_relations) {
+		synchronized (relation_lock) {
 		    Iterator<RelationFrame> itr = pending_relations.iterator();
 		    while (itr.hasNext()) {
 			boolean success = cacheRelation(itr.next());
@@ -214,7 +216,9 @@ public class SingleInheritanceFrameSet
     public RelationFrame makeRelationship(String kind, Properties values, DataFrame parent, DataFrame child) {
 	UID uid = uids.nextUID();
 	RelationFrame rel = (RelationFrame) DataFrame.newFrame(this, kind, uid, values);
-	cacheRelation(rel, parent, child);
+	synchronized (relation_lock) {
+	    cacheRelation(rel, parent, child);
+	}	
 	synchronized (kb) {
 	    kb.put(uid, rel);
 	}
@@ -276,12 +280,18 @@ public class SingleInheritanceFrameSet
 	    RelationFrame rframe = (RelationFrame) frame;
 	    synchronized (relation_lock) {
 		if (slot.startsWith("child")) {
-		    child_cache.remove(frame);
+		    DataFrame child = child_cache.get(rframe);
+		    child_cache.remove(rframe);
+		    Set<RelationFrame> rframes = inverse_child_cache.get(child);
+		    rframes.remove(rframe);
 		} else if (slot.startsWith("parent")) {
+		    DataFrame parent = child_cache.get(rframe);
 		    parent_cache.remove(frame);
+		    Set<RelationFrame> rframes = inverse_child_cache.get(parent);
+		    rframes.remove(rframe);
 		}
+		cacheRelation(rframe);
 	    }
-	    cacheRelation(rframe);
 	}
 	    
 
@@ -301,6 +311,26 @@ public class SingleInheritanceFrameSet
 	if (frame instanceof RelationFrame) {
 	    RelationFrame rframe = (RelationFrame) frame;
 	    decacheRelation(rframe);
+	} else {
+	    // TODO: If frame is some other frame's container, that other frame needs to be told!
+	    synchronized(relation_lock) {
+		Set<RelationFrame> rframes = inverse_child_cache.get(frame);
+		inverse_child_cache.remove(frame);
+		if (rframes != null) {
+		    for (RelationFrame rframe : rframes) {
+			child_cache.remove(rframe);
+			pending_relations.add(rframe);
+		    }
+		}
+		rframes = inverse_parent_cache.get(frame);
+		inverse_parent_cache.remove(frame);
+		if (rframes != null) {
+		    for (RelationFrame rframe : rframes) {
+			parent_cache.remove(rframe);
+			pending_relations.add(rframe);
+		    } 
+		}
+	    }
 	}
 
 	publishRemove(frame);
@@ -547,8 +577,7 @@ public class SingleInheritanceFrameSet
 	    }
 	    child_cache.remove(relationship);
 	    parent_cache.remove(relationship);
-	}
-	synchronized (pending_relations) {
+	
 	    pending_relations.remove(relationship);
 	}
 	if (isContainmentRelation(relationship)) {
