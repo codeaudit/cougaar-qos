@@ -394,7 +394,7 @@ extends DefaultHandler
             generateShadowClass(writer, base, generated);
         }
         String class_name = fixName(proto, true);
-        writer.print("(defclass " +proto+ " " +class_name);
+        writer.print("(defclass " +proto+ " " +package_name+ "." +class_name);
         if (base != null) {
             writer.print(" extends " + base);
         }
@@ -413,7 +413,6 @@ extends DefaultHandler
 	}
 	generateCopyright(writer, FileType.CLP);
         Set<String> generated = new HashSet<String>();
-	writer.println("(import " +package_name+ ".*)");
 	for (String proto : proto_slots.keySet()) {
             generateShadowClass(writer, proto, generated);
 	}
