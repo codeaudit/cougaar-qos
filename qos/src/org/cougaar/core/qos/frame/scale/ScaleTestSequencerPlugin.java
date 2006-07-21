@@ -37,7 +37,7 @@ import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
 
-public class RootBoyPlugin extends ParameterizedPlugin implements FrameSetService.Callback {
+public class ScaleTestSequencerPlugin extends ParameterizedPlugin implements FrameSetService.Callback {
     private FrameSet frameset;
     private Root root;
     private LoggingService log;

@@ -19,6 +19,15 @@
 		<prototype name="contains" prototype="relationship">
 		</prototype>
 		
+		<prototype name="time" prototype="thing">
+			<slot name="step" type="integer" default-value="0"/>
+			<slot name="epoch" type="integer" default-value="Zero"/>
+			<slot name="count" type="int" default-value="0" inheritable-through="prototype-only"/>
+			<slot name="avgLevel1" type="float" inheritable-through="prototype-only">
+				<aggregate-by relation="level1OnRoot" aggregator="Average" child-slot="level1SlotFloat"/>
+			</slot>
+		</prototype>
+		
 		<prototype name="root" prototype="thing">
 			<slot name="rootSlotFloat" type="float" default-value="0.0f"/>
 			<slot name="rootSlotString" type="String" default-value="Zero"/>
