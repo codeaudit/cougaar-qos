@@ -3,76 +3,30 @@
 
 <testScale>
 	
-	<root>
-		<name>root</name>
-		<rootSlotFloat>10.0</rootSlotFloat>
-		<rootSlotString>Root String</rootSlotString>
-	</root>
+	<root name="root" rootSlotFloat="10.0" rootSlotString="Root String"/>
 	
-	<level1>
-		<name>level 1</name>
-		<level1SlotFloat>11.0</level1SlotFloat>
-		<level1SlotString> Level 1 String </level1SlotString>
-	</level1>
+	<level1 name="level 1" level1SlotFloat="11.0" level1SlotString="Level 1 String"/>
 	
-	<level1OnRoot>
-		<parent-value>root</parent-value>
-		<child-value>level 1</child-value>
-	</level1OnRoot>
+	<level1OnRoot parent-value="root" child-value="level 1"/>
 	
-	<level2>
-		<name>level 2</name>
-		<level2SlotFloat>12.0</level2SlotFloat>
-		<level2SlotString> Level 2 String </level2SlotString>
-	</level2>
+	<level2 name="level 2" level2SlotFloat="12.0" level2SlotString="Level 2 String"/>
 	
-	<level2OnLevel1>
-		<parent-value>level 1</parent-value>
-		<child-value>level 2</child-value>
-	</level2OnLevel1>
+	<level2OnLevel1 parent-value="level 1" child-value="level 2"/>
 	
-	<level3>
-		<name>level 3</name>
-		<level3SlotFloat>13.0</level3SlotFloat>
-		<level3SlotString> Level 3 String </level3SlotString>
-	</level3>
+	<level3  name="level 3" level3SlotFloat="13.0" level3SlotString="Level 3 String"/>
 	
-	<level3OnLevel2>
-		<parent-value>level 2</parent-value>
-		<child-value>level 3</child-value>
-	</level3OnLevel2>
+	<level3OnLevel2 parent-value="level 2" child-value="level 3"/>
 	
-	<level4>
-		<name>level 4</name>
-		<level4SlotFloat>14.0</level4SlotFloat>
-		<level4SlotString> Level 4 String </level4SlotString>
-	</level4>
+	<level4 name="level 4" level4SlotFloat="14.0" level4SlotString="Level 4 String"/>
 	
-	<level4OnLevel3>
-		<parent-value>level 3</parent-value>
-		<child-value>level 4</child-value>
-	</level4OnLevel3>
+	<level4OnLevel3 parent-value="level 3" child-value="level 4"/>
 	
-	<level5>
-		<name>level 5</name>
-		<level5SlotFloat>15.0</level5SlotFloat>
-		<level5SlotString> Level 5 String </level5SlotString>
-	</level5>
+	<level5 name="level 5" level5SlotFloat="15.0" level5SlotString="Level 5 String"/>
 	
-	<level5OnLevel4>
-		<parent-value>level 4</parent-value>
-		<child-value>level 5</child-value>
-	</level5OnLevel4>
+	<level5OnLevel4 parent-value="level 4" child-value="level 5"/>
 	
-	<level6>
-		<name>level 6</name>
-		<level6SlotFloat>16.0</level6SlotFloat>
-		<level6SlotString> Level 6 String </level6SlotString>
-	</level6>
+	<level6 name="level 6" level6SlotFloat="16.0" level6SlotString="Level 6 String"/>
 	
-	<level6OnLevel5>
-		<parent-value>level 5</parent-value>
-		<child-value>level 6</child-value>
-	</level6OnLevel5>
+	<level6OnLevel5 parent-value="level 5" child-value="level 6"/>
 	
 </testScale>

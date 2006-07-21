@@ -61,14 +61,11 @@ public class FrameSetParser
 
     private String frame_set_name;
     private FrameSet frame_set;
-    private DataFrameSpec frame_spec;
     private PrototypeSpec proto_spec;
     private PathSpec path_spec;
     private String slot_def; // slot being defined when we're parsing prototypes xml
-    private String current_slot; // slot being set when we're parsing data xml
     private HashMap path_specs;
     private HashMap references;
-    private String domain;
 
     private ServiceBroker sb;
     private BlackboardService bbs;
@@ -127,10 +124,7 @@ public class FrameSetParser
     public void startElement(String uri, String local, String name, 
 			     Attributes attrs) {
 	try {
-	    if (frame_spec != null) {
-		// inner structures are always slot values
-		current_slot = name;
-	    } else  if (name.equals("frameset")) {
+	    if (name.equals("frameset")) {
 		startFrameset(attrs);
 	    } else if (name.equals("prototypes")) {
 		// no-op
@@ -149,17 +143,13 @@ public class FrameSetParser
 		frame_set.addAggregator(slot_def, childSlot, relation, cname);
 	    } else if (name.equals("fork")) {
 		fork(attrs);
-	    } else if (name.equals("frames")) {
-		references = new HashMap();
-	    } else if (name.equals("frame")) {
-		startFrame(attrs);
 	    } else if (name.equals("path")) {
 		startPath(attrs);
-	    } else if (domain == null) { 
-		domain = name;
+	    } else if (name.equals("copyright")) {
+		// no-op
 	    } else {
-		// implicit frame
-		startFrame(name);
+		// implicit data frame
+		makeFrame(name, attrs);
 	    }
 	} catch (Exception ex) {
 	    log.error("startElement " +name, ex);
@@ -176,10 +166,6 @@ public class FrameSetParser
 		endPrototype();
 	    } else if (name.equals("relation-prototype")) {
 		endPrototype();
-	    } else if (name.equals("frames")) {
-		references = null;
-	    } else if (name.equals("frame")) {
-		endFrame();
 	    } else if (name.equals("path")) {
 		endPath();
 	    } else if (name.equals("fork")) {
@@ -190,38 +176,18 @@ public class FrameSetParser
 		// no-op
 	    } else if (name.equals("aggregate-by")) {
 		// no-op
-	    } else if (current_slot != null) {
-		current_slot = null;
-	    } else if (domain != null && domain.equals(name)) {
-		domain = null;
+	    } else if (name.equals("copyright")) {
+		// no-op
 	    } else {
-		endFrame();
+		// implicit data frame
 	    }
 	} catch (Exception ex) {
 	    log.error("endElement " +name, ex);
 	}
     }
 
-    // Only used so far for specifying slot values in data xml
     public void characters(char buf[], int offset, int length) {
-	try {
-	    if (current_slot != null) {
-		String value = new String(buf, offset, length);
-		if (value.startsWith("?")) {
-		    // Better to look up the slot in the prototype to see
-		    // if its type is 'reference'.  Do that later.
-		    Frame ref;
-		    synchronized (references) {
-			ref = (Frame) references.get(value);
-		    }
-		    log.shout("Resolved " +value+ " to " +ref);
-		    if (ref != null) value = ref.getUID().toString();
-		}
-		frame_spec.put(current_slot, value);
-	    }
-	} catch (Exception ex) {
-	    log.error(null, ex);
-	}
+	// no-op
     }
 
 
@@ -262,29 +228,13 @@ public class FrameSetParser
 	proto_spec = null;
     }
 
-    private void startFrame(Attributes attrs) {
+    private void makeFrame(String name, Attributes attrs) {
 	if (log.isDebugEnabled())
 	    log.debug("startFrame");
 
-	frame_spec = new DataFrameSpec(attrs);
-    }
-
-    private void startFrame(String name) {
-	if (log.isDebugEnabled())
-	    log.debug("startFrame");
-
-	frame_spec = new DataFrameSpec(name);
-    }
-
-    private void endFrame() {
-	if (log.isDebugEnabled())
-	    log.debug("endFrame");
-
+	DataFrameSpec frame_spec = new DataFrameSpec(name, attrs);
 	frame_spec.makeFrame(frame_set);
-	frame_spec = null;
     }
-
-
 
     private void startPath(Attributes attrs) {
 	if (log.isDebugEnabled())
@@ -352,22 +302,20 @@ public class FrameSetParser
 	String prototype;
 	Properties slotValues;
 	
-	DataFrameSpec(Attributes attrs)	{
-	    slotValues = new Properties();
-	    prototype = attrs.getValue("prototype");
-	    reference = attrs.getValue("reference");
-	}
-
-	DataFrameSpec(String name) {
+	DataFrameSpec(String name, Attributes attrs)	{
 	    slotValues = new Properties();
 	    prototype = name;
-	}
-	
-	void put(String slot, String value) {
-	    slotValues.put(slot, value);
+	    for (int i=0; i<attrs.getLength(); i++) {
+		String pname = attrs.getLocalName(i);
+		String value = attrs.getValue(i);
+		slotValues.put(pname, value);
+	    }
 	}
 
 	Frame makeFrame(FrameSet frameSet) {
+	    PrototypeFrame pframe = frameSet.findPrototypeFrame(prototype);
+	    if (pframe == null) return null;
+	    
 	    Frame frame = frameSet.makeFrame(prototype, slotValues);
 	    if (reference != null) {
 		synchronized (references) {

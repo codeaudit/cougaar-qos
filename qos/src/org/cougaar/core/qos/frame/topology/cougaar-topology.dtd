@@ -1,38 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT cougaar-topology (indicator | contains | node | msgOutIndicator | IndicatorOnAgent | relationship | NodeOnHost | agent | msgInIndicator | thing | host | cpuIndicator | AgentInNode | msgIndicator)*>
-<!ELEMENT indicator (status | name)*>
-<!ELEMENT status (#PCDATA)>
-<!ELEMENT name (#PCDATA)>
-<!ELEMENT contains (parent-value | child-value)*>
-<!ELEMENT parent-value (#PCDATA)>
-<!ELEMENT child-value (#PCDATA)>
-<!ELEMENT node (bytesIn | cpuLoadAverage | msgIn | status | cpuLoadMJips | name | bytesOut | msgOut | vmSize)*>
-<!ELEMENT bytesIn (#PCDATA)>
-<!ELEMENT cpuLoadAverage (#PCDATA)>
-<!ELEMENT msgIn (#PCDATA)>
-<!ELEMENT cpuLoadMJips (#PCDATA)>
-<!ELEMENT bytesOut (#PCDATA)>
-<!ELEMENT msgOut (#PCDATA)>
-<!ELEMENT vmSize (#PCDATA)>
-<!ELEMENT msgOutIndicator (calmThreshold | idleThreshold | watchSlot | status | normalThreshold | name | franticThreshold | busyThreshold)*>
-<!ELEMENT calmThreshold (#PCDATA)>
-<!ELEMENT idleThreshold (#PCDATA)>
-<!ELEMENT watchSlot (#PCDATA)>
-<!ELEMENT normalThreshold (#PCDATA)>
-<!ELEMENT franticThreshold (#PCDATA)>
-<!ELEMENT busyThreshold (#PCDATA)>
-<!ELEMENT IndicatorOnAgent (parent-value | child-value)*>
-<!ELEMENT relationship (parent-value | child-value)*>
-<!ELEMENT NodeOnHost (parent-value | child-value)*>
-<!ELEMENT agent (bytesIn | cpuLoadAverage | persistSizeLast | msgIn | status | cpuLoadMJips | name | bytesOut | msgOut)*>
-<!ELEMENT persistSizeLast (#PCDATA)>
-<!ELEMENT msgInIndicator (calmThreshold | idleThreshold | watchSlot | status | normalThreshold | name | franticThreshold | busyThreshold)*>
-<!ELEMENT thing (name)*>
-<!ELEMENT host (loadAverage | jips | effectiveMJips | status | name | count)*>
-<!ELEMENT loadAverage (#PCDATA)>
-<!ELEMENT jips (#PCDATA)>
-<!ELEMENT effectiveMJips (#PCDATA)>
-<!ELEMENT count (#PCDATA)>
-<!ELEMENT cpuIndicator (calmThreshold | idleThreshold | watchSlot | status | normalThreshold | name | franticThreshold | busyThreshold)*>
-<!ELEMENT AgentInNode (parent-value | child-value)*>
-<!ELEMENT msgIndicator (calmThreshold | idleThreshold | status | normalThreshold | name | franticThreshold | busyThreshold)*>
+<!ELEMENT indicator EMPTY>
+<!ATTLIST indicator
+          status CDATA #IMPLIED
+          name CDATA #REQUIRED>
+<!ELEMENT contains EMPTY>
+<!ATTLIST contains
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT node EMPTY>
+<!ATTLIST node
+          bytesIn CDATA #IMPLIED
+          cpuLoadAverage CDATA #IMPLIED
+          msgIn CDATA #IMPLIED
+          status CDATA #IMPLIED
+          cpuLoadMJips CDATA #IMPLIED
+          name CDATA #REQUIRED
+          bytesOut CDATA #IMPLIED
+          msgOut CDATA #IMPLIED
+          vmSize CDATA #IMPLIED>
+<!ELEMENT msgOutIndicator EMPTY>
+<!ATTLIST msgOutIndicator
+          calmThreshold CDATA #IMPLIED
+          idleThreshold CDATA #IMPLIED
+          watchSlot CDATA #IMPLIED
+          status CDATA #IMPLIED
+          normalThreshold CDATA #IMPLIED
+          name CDATA #REQUIRED
+          franticThreshold CDATA #IMPLIED
+          busyThreshold CDATA #IMPLIED>
+<!ELEMENT IndicatorOnAgent EMPTY>
+<!ATTLIST IndicatorOnAgent
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT relationship EMPTY>
+<!ATTLIST relationship
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT NodeOnHost EMPTY>
+<!ATTLIST NodeOnHost
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT agent EMPTY>
+<!ATTLIST agent
+          bytesIn CDATA #IMPLIED
+          cpuLoadAverage CDATA #IMPLIED
+          persistSizeLast CDATA #IMPLIED
+          msgIn CDATA #IMPLIED
+          status CDATA #IMPLIED
+          cpuLoadMJips CDATA #IMPLIED
+          name CDATA #REQUIRED
+          bytesOut CDATA #IMPLIED
+          msgOut CDATA #IMPLIED>
+<!ELEMENT msgInIndicator EMPTY>
+<!ATTLIST msgInIndicator
+          calmThreshold CDATA #IMPLIED
+          idleThreshold CDATA #IMPLIED
+          watchSlot CDATA #IMPLIED
+          status CDATA #IMPLIED
+          normalThreshold CDATA #IMPLIED
+          name CDATA #REQUIRED
+          franticThreshold CDATA #IMPLIED
+          busyThreshold CDATA #IMPLIED>
+<!ELEMENT thing EMPTY>
+<!ATTLIST thing
+          name CDATA #REQUIRED>
+<!ELEMENT host EMPTY>
+<!ATTLIST host
+          loadAverage CDATA #IMPLIED
+          jips CDATA #IMPLIED
+          effectiveMJips CDATA #IMPLIED
+          status CDATA #IMPLIED
+          name CDATA #REQUIRED
+          count CDATA #IMPLIED>
+<!ELEMENT cpuIndicator EMPTY>
+<!ATTLIST cpuIndicator
+          calmThreshold CDATA #IMPLIED
+          idleThreshold CDATA #IMPLIED
+          watchSlot CDATA #IMPLIED
+          status CDATA #IMPLIED
+          normalThreshold CDATA #IMPLIED
+          name CDATA #REQUIRED
+          franticThreshold CDATA #IMPLIED
+          busyThreshold CDATA #IMPLIED>
+<!ELEMENT AgentInNode EMPTY>
+<!ATTLIST AgentInNode
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT msgIndicator EMPTY>
+<!ATTLIST msgIndicator
+          calmThreshold CDATA #IMPLIED
+          idleThreshold CDATA #IMPLIED
+          status CDATA #IMPLIED
+          normalThreshold CDATA #IMPLIED
+          name CDATA #REQUIRED
+          franticThreshold CDATA #IMPLIED
+          busyThreshold CDATA #IMPLIED>

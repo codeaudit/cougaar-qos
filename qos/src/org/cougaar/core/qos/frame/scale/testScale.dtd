@@ -1,37 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT testScale (contains | level3OnLevel2 | level2 | level6OnLevel5 | relationship | level1 | level5OnLevel4 | level5 | level1OnRoot | level2OnLevel1 | thing | level4 | level4OnLevel3 | root | level6 | level3)*>
-<!ELEMENT contains (parent-value | child-value)*>
-<!ELEMENT parent-value (#PCDATA)>
-<!ELEMENT child-value (#PCDATA)>
-<!ELEMENT level3OnLevel2 (parent-value | child-value)*>
-<!ELEMENT level2 (level2SlotString | level2SlotFloat | name)*>
-<!ELEMENT level2SlotString (#PCDATA)>
-<!ELEMENT level2SlotFloat (#PCDATA)>
-<!ELEMENT name (#PCDATA)>
-<!ELEMENT level6OnLevel5 (parent-value | child-value)*>
-<!ELEMENT relationship (parent-value | child-value)*>
-<!ELEMENT level1 (level1SlotString | name | level1SlotFloat)*>
-<!ELEMENT level1SlotString (#PCDATA)>
-<!ELEMENT level1SlotFloat (#PCDATA)>
-<!ELEMENT level5OnLevel4 (parent-value | child-value)*>
-<!ELEMENT level5 (level5SlotFloat | level5SlotString | name)*>
-<!ELEMENT level5SlotFloat (#PCDATA)>
-<!ELEMENT level5SlotString (#PCDATA)>
-<!ELEMENT level1OnRoot (parent-value | child-value)*>
-<!ELEMENT level2OnLevel1 (parent-value | child-value)*>
-<!ELEMENT thing (name)*>
-<!ELEMENT level4 (level4SlotFloat | level4SlotString | name)*>
-<!ELEMENT level4SlotFloat (#PCDATA)>
-<!ELEMENT level4SlotString (#PCDATA)>
-<!ELEMENT level4OnLevel3 (parent-value | child-value)*>
-<!ELEMENT root (rootSlotFloat | avgLevel1 | name | count | rootSlotString)*>
-<!ELEMENT rootSlotFloat (#PCDATA)>
-<!ELEMENT avgLevel1 (#PCDATA)>
-<!ELEMENT count (#PCDATA)>
-<!ELEMENT rootSlotString (#PCDATA)>
-<!ELEMENT level6 (level6SlotFloat | name | level6SlotString)*>
-<!ELEMENT level6SlotFloat (#PCDATA)>
-<!ELEMENT level6SlotString (#PCDATA)>
-<!ELEMENT level3 (level3SlotString | name | level3SlotFloat)*>
-<!ELEMENT level3SlotString (#PCDATA)>
-<!ELEMENT level3SlotFloat (#PCDATA)>
+<!ELEMENT contains EMPTY>
+<!ATTLIST contains
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT level3OnLevel2 EMPTY>
+<!ATTLIST level3OnLevel2
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT level2 EMPTY>
+<!ATTLIST level2
+          level2SlotString CDATA #IMPLIED
+          level2SlotFloat CDATA #IMPLIED
+          name CDATA #REQUIRED>
+<!ELEMENT level6OnLevel5 EMPTY>
+<!ATTLIST level6OnLevel5
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT relationship EMPTY>
+<!ATTLIST relationship
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT level1 EMPTY>
+<!ATTLIST level1
+          level1SlotString CDATA #IMPLIED
+          name CDATA #REQUIRED
+          level1SlotFloat CDATA #IMPLIED>
+<!ELEMENT level5OnLevel4 EMPTY>
+<!ATTLIST level5OnLevel4
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT level5 EMPTY>
+<!ATTLIST level5
+          level5SlotFloat CDATA #IMPLIED
+          level5SlotString CDATA #IMPLIED
+          name CDATA #REQUIRED>
+<!ELEMENT level1OnRoot EMPTY>
+<!ATTLIST level1OnRoot
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT level2OnLevel1 EMPTY>
+<!ATTLIST level2OnLevel1
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT thing EMPTY>
+<!ATTLIST thing
+          name CDATA #REQUIRED>
+<!ELEMENT level4 EMPTY>
+<!ATTLIST level4
+          level4SlotFloat CDATA #IMPLIED
+          level4SlotString CDATA #IMPLIED
+          name CDATA #REQUIRED>
+<!ELEMENT level4OnLevel3 EMPTY>
+<!ATTLIST level4OnLevel3
+          parent-value CDATA #IMPLIED
+          child-value CDATA #IMPLIED>
+<!ELEMENT root EMPTY>
+<!ATTLIST root
+          rootSlotFloat CDATA #IMPLIED
+          avgLevel1 CDATA #IMPLIED
+          name CDATA #REQUIRED
+          count CDATA #IMPLIED
+          rootSlotString CDATA #IMPLIED>
+<!ELEMENT level6 EMPTY>
+<!ATTLIST level6
+          level6SlotFloat CDATA #IMPLIED
+          name CDATA #REQUIRED
+          level6SlotString CDATA #IMPLIED>
+<!ELEMENT level3 EMPTY>
+<!ATTLIST level3
+          level3SlotString CDATA #IMPLIED
+          name CDATA #REQUIRED
+          level3SlotFloat CDATA #IMPLIED>

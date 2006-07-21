@@ -333,8 +333,6 @@ extends DefaultHandler
 
 	writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 	generateCopyright(writer, FileType.DTD);
-	Set<String> elements = new HashSet<String>();
-	elements.add("frames");
 	writer.print("<!ELEMENT "+domain+" (");
 	boolean first = true;
 	for (String proto : proto_slots.keySet()) {
@@ -345,55 +343,45 @@ extends DefaultHandler
 	writer.println(")*>");
 
 	for (String proto : proto_slots.keySet()) {
-	    write_prototype_dtd(writer, proto, elements);
+	    write_prototype_dtd(writer, proto);
 	}
 
 	writer.close();
 	System.out.println("Wrote " + out);
     }
 
-    private void write_slots_dtd(PrintWriter writer, 
-	    String proto,
-	    Set<String> slots,
-	    Set<String> elements) {
-	for (String slot : slots) {
-	    if (!elements.contains(slot) && !proto_slots.containsKey(slot)) {
-		writer.println("<!ELEMENT " +slot+ " (#PCDATA)>");
-		elements.add(slot);
+    private void write_slots_dtd(PrintWriter writer, String proto, Map<String,Attributes> slots) {
+	writer.print("<!ATTLIST " +proto);
+	for (Map.Entry<String,Attributes> slot : slots.entrySet()) {
+	    Attributes attrs = slot.getValue();
+	    boolean readonly = "true".equalsIgnoreCase(attrs.getValue("immutable"));
+	    writer.print("\n          " +slot.getKey()+ " CDATA ");
+	    if (readonly) {
+		writer.print("#REQUIRED");
+	    } else {
+		writer.print("#IMPLIED");
 	    }
 	}
+	writer.println(">");
     }
 
-    private void collectProtoSlots(String proto, Set<String> slots) {
+    private void collectProtoSlots(String proto, Map<String,Attributes> slots) {
 	Map<String,Attributes> local_slots = proto_slots.get(proto);
-	if (local_slots != null) slots.addAll(local_slots.keySet());
+	if (local_slots != null) {
+	    for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
+		slots.put(entry.getKey(), entry.getValue());
+	    }
+	}
 	Attributes attrs = proto_attrs.get(proto);
 	String parent = attrs.getValue("prototype");
 	if (parent != null) collectProtoSlots(parent, slots);
     }
 
-    private void write_prototype_dtd (PrintWriter writer, 
-	    String proto,
-	    Set<String> elements) {
-	if (elements.contains(proto)) return;
-	elements.add(proto);
-	writer.print("<!ELEMENT " +proto+ " ");
-	Set<String> slots = new HashSet<String>();
+    private void write_prototype_dtd (PrintWriter writer, String proto) {
+	writer.println("<!ELEMENT " +proto+ " EMPTY>");
+	Map<String,Attributes> slots = new HashMap<String,Attributes>();
 	collectProtoSlots(proto, slots);
-	if (slots.isEmpty()) {
-	    writer.print("EMPTY");
-	} else {
-	    writer.print("(");
-	    boolean first = true;
-	    for (String slot : slots) {
-		if (!first) writer.print(" | ");
-		first = false;
-		writer.print(slot);
-	    }
-	    writer.print(")*");
-	}
-	writer.println(">");
-	write_slots_dtd(writer, proto, slots, elements);
+	if (!slots.isEmpty()) write_slots_dtd(writer, proto, slots);
     }
 
     private void generateShadowClass(PrintWriter writer, String proto, Set<String> generated) {
