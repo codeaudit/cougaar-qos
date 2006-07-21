@@ -15,10 +15,10 @@
 		<level1SlotString> Level 1 String </level1SlotString>
 	</level1>
 	
-	<Level1OnRoot>
+	<level1OnRoot>
 		<parent-value>root</parent-value>
 		<child-value>level 1</child-value>
-	</Level1OnRoot>
+	</level1OnRoot>
 	
 	<level2>
 		<name>level 2</name>
@@ -26,10 +26,10 @@
 		<level2SlotString> Level 2 String </level2SlotString>
 	</level2>
 	
-	<Level2OnLevel1>
+	<level2OnLevel1>
 		<parent-value>level 1</parent-value>
 		<child-value>level 2</child-value>
-	</Level2OnLevel1>
+	</level2OnLevel1>
 	
 	<level3>
 		<name>level 3</name>
@@ -37,10 +37,10 @@
 		<level3SlotString> Level 3 String </level3SlotString>
 	</level3>
 	
-	<Level3OnLevel2>
+	<level3OnLevel2>
 		<parent-value>level 2</parent-value>
 		<child-value>level 3</child-value>
-	</Level3OnLevel2>
+	</level3OnLevel2>
 	
 	<level4>
 		<name>level 4</name>
@@ -48,10 +48,10 @@
 		<level4SlotString> Level 4 String </level4SlotString>
 	</level4>
 	
-	<Level4OnLevel3>
+	<level4OnLevel3>
 		<parent-value>level 3</parent-value>
 		<child-value>level 4</child-value>
-	</Level4OnLevel3>
+	</level4OnLevel3>
 	
 	<level5>
 		<name>level 5</name>
@@ -59,10 +59,10 @@
 		<level5SlotString> Level 5 String </level5SlotString>
 	</level5>
 	
-	<Level5OnLevel4>
+	<level5OnLevel4>
 		<parent-value>level 4</parent-value>
 		<child-value>level 5</child-value>
-	</Level5OnLevel4>
+	</level5OnLevel4>
 	
 	<level6>
 		<name>level 6</name>
@@ -70,9 +70,9 @@
 		<level6SlotString> Level 6 String </level6SlotString>
 	</level6>
 	
-	<Level6OnLevel5>
+	<level6OnLevel5>
 		<parent-value>level 5</parent-value>
 		<child-value>level 6</child-value>
-	</Level6OnLevel5>
+	</level6OnLevel5>
 	
 </testScale>
