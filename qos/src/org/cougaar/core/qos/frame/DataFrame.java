@@ -50,86 +50,37 @@ import org.cougaar.util.log.Logging;
  * indirectly.
  */
 abstract public class DataFrame 
-    extends Frame
-    implements PropertyChangeListener {
-    
+extends Frame
+implements PropertyChangeListener {
+
     public static final String NIL = "NIL";
-    
+
     private static Map<String,Map<String,FrameMaker>> FramePackages = 
-	new HashMap<String,Map<String,FrameMaker>>();;
-    private static Logger log = 
-	Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
+	new HashMap<String,Map<String,FrameMaker>>();
 
+    private static Logger log =  Logging.getLogger(org.cougaar.core.qos.frame.DataFrame.class);
 
-    protected static void registerFrameMaker(String pkg,
-					     String proto,
-					     FrameMaker maker) {
-	if (log.isDebugEnabled())
-	    log.debug("Registering FrameMaker " +maker+ " for prototype "
-		      +proto+ " in package " +pkg);
-	synchronized (FramePackages) {
-	    Map<String,FrameMaker> frameTypeMap = FramePackages.get(pkg);
-	    if (frameTypeMap == null) {
-		frameTypeMap = new HashMap();
-		FramePackages.put(pkg, frameTypeMap);
-	    }
-	    frameTypeMap.put(proto, maker);
-	}
-    }
-
-    protected static FrameMaker findFrameMaker(String pkg, String proto) {
-	synchronized (FramePackages) {
-	    Map<String,FrameMaker> frameTypeMap = FramePackages.get(pkg);
-	    if (frameTypeMap != null) 
-		return frameTypeMap.get(proto);
-	    else
-		return null;
-	}
-    }
-
-    protected static Logger getLogger() {
-	return log;
-    }
-
-
-    public static DataFrame newFrame(FrameSet frameSet,
-				     String proto, 
-				     UID uid,
-				     Properties initial_values) {
-	String pkg = frameSet.getPackageName();
-	return newFrame(pkg, frameSet, proto, uid, initial_values);
-    }
-
-
-    public static DataFrame newFrame(String pkg,
-				     FrameSet frameSet,
-				     String proto, 
-				     UID uid,
-				     Properties values) {
-	if (log.isDebugEnabled())
-	    log.debug("Searching for FrameMaker for prototype "
-		      +proto+ " in package " +pkg);
-	// force a class load (ugh)
-	frameSet.classForPrototype(proto);
-	DataFrame frame = null;
-	FrameMaker maker = findFrameMaker(pkg, proto);
-	if (maker != null) {
-	    frame = maker.makeFrame(frameSet, uid);
-	    frame.initializeValues(values);
-	} else {
-	    log.error("No FrameMaker for " +proto+ " in package " +pkg);
-	}
-	return frame;
-    }
-
-    
     private Properties props;
-    private transient Map<String,DataFrame> ddeps;
-    private transient Map<String,List<RelationFrame>> rdeps;
-    private transient Map<String,String> slot_map;
-    private transient Map<String,Set<DataFrame>> path_dependents;
-    private transient Object rlock;
     private transient PropertyChangeSupport pcs;
+    
+    // Support for path dependencies
+    
+    // Next two are inverse dependencies: frame this frame depends on for path-derived
+    // slot values.  We need to remember the inverse dependencies in order to clear
+    // the obsolete forward dependencies.  Any given path-derived slot depends on
+    // exactly one data frame (ddeps) and one or moe relation frames (rdeps).
+    private transient Map<String,DataFrame> ddeps; 
+    private transient Map<String,List<RelationFrame>> rdeps;
+    
+    // Next two are in support of forward path dependencies: frames with path-derived
+    // slots that depend on this frame.  When some slot of this frame change, dependents need
+    // to be notified that one of its slots is out of date.
+    private transient Map<String,Set<DataFrame>> path_dependents; 
+    private transient Map<String,String> slot_map;
+    
+    //  lock for synchronized manipulation of path dependencies
+    private transient Object rlock; 
+    
 
     protected DataFrame(FrameSet frameSet, UID uid) {
 	super(frameSet, uid);
@@ -139,18 +90,18 @@ abstract public class DataFrame
     // Subclass responsibility
     abstract protected Object getLocalValue(String slot);
     abstract protected void setLocalValue(String slot, Object value);
-//     abstract protected void removeLocalValue(String slot);
+//  abstract protected void removeLocalValue(String slot);
     abstract protected void initializeLocalValue(String slot, Object value);
 
 
 
     // Serialization
     private void readObject(java.io.ObjectInputStream in)
-	throws java.io.IOException, ClassNotFoundException {
+    throws java.io.IOException, ClassNotFoundException {
 	in.defaultReadObject();
 	initializeTransients();
     }
-    
+
     private void initializeTransients() {
 	pcs = new PropertyChangeSupport(this);
 	ddeps = new HashMap<String,DataFrame>();
@@ -167,8 +118,8 @@ abstract public class DataFrame
 	// Resignal to my listeners.
 	if (log.isDebugEnabled())
 	    log.debug("Propagate PropertyChange " +event.getPropertyName()+
-		      " old value = " +event.getOldValue()+
-		      " new value = " +event.getNewValue());
+		    " old value = " +event.getOldValue()+
+		    " new value = " +event.getNewValue());
 	ResourceablePropertyChangeEvent evt = (ResourceablePropertyChangeEvent) event;
 	Object source = evt.getSource();
 	evt.setSource(this);
@@ -184,7 +135,10 @@ abstract public class DataFrame
     }
 
 
-    // Caller should lock rlock
+    /**
+     * Clear all inverse path dependencies for the given slot.
+     * Caller should lock rlock
+     */
     void clearRelationDependencies(String slot) {
 	List<RelationFrame> rframes = rdeps.get(slot);
 	if (rframes == null) return;
@@ -193,14 +147,26 @@ abstract public class DataFrame
 	}
 	rdeps.remove(slot);
 	DataFrame dframe = ddeps.get(slot);
-	dframe.removePathDependent(this, slot);
+	synchronized(slot_map) {
+	    for (Map.Entry<String,String> entry : slot_map.entrySet()) {
+		if (entry.getValue().equals(slot)) {
+		    dframe.removePathDependent(this, entry.getKey());
+		    break;
+		}
+	    }
+	}
 	ddeps.remove(slot);
     }
 
-    // Caller should lock rlock
+    /**
+     * Informs this frame that the path-derived value
+     * of the my_slot depends on the value of 
+     * owner_slot in the given frame (ie if the owner_slot
+     * changes in frame, my_slot will change).
+     */
     void addRelationSlotDependency(DataFrame frame, 
-				   String my_slot, 
-				   String owner_slot) {
+	    String my_slot, 
+	    String owner_slot) {
 	ddeps.put(my_slot, frame);
 	synchronized (slot_map) {
 	    slot_map.put(owner_slot, my_slot);
@@ -208,7 +174,12 @@ abstract public class DataFrame
 	frame.addPathDependent(this, owner_slot);
     }
 
-    // Caller should lock rlock
+    /**
+     * Informs this frame that the path-derived value of the given slot
+     * depends on the given relationship (ie, if the relationship changes,
+     * the value of the slot will change because the path will be different).
+     * Caller should lock rlock.
+     */
     void addRelationDependency(RelationFrame rframe, String slot) {
 	List<RelationFrame> rframes = rdeps.get(slot);
 	if (rframes == null) {
@@ -219,21 +190,35 @@ abstract public class DataFrame
 	rframe.addPathDependent(this, slot);
     }
 
-    // Caller should lock rlock
+    /**
+     * Informs this frame that the path-derived value of the given slot
+     * no longer depends on the given relationship.
+     * Caller should lock rlock.
+     */
     void removeRelationDependency(RelationFrame rframe, String slot) {
 	if (log.isDebugEnabled())
 	    log.debug("Removing relation dependency " +rframe+ " on " +this+
-		     " for slot " +slot);
+		    " for slot " +slot);
 	List<RelationFrame> rframes = rdeps.get(slot);
 	if (rframes != null) rframes.remove(rframe);
 	rframe.removePathDependent(this, slot);
     }
+    
+    
 
-
+    /**
+     * Informs this frame that the given data frame depends on it (ie, 
+     * if this frame changes, a dependent slot will change because the
+     * path will be different).  If this frame is a relation, the 
+     * slot arg is the dependent slot, since any change at all to
+     * a relations frame triggers a dependency change.  If this frame
+     * is the final data frame in a path, the slot arg is that frame's
+     * slot: only changes to that slot are relevant.
+     */
     void addPathDependent(DataFrame dependent, String slot) {
 	if (log.isDebugEnabled())
-	    log.debug(this + " is adding dependent " +dependent+
-		      " for slot " +slot);
+	    log.debug(this + " is adding dependent " + dependent + " for slot "
+		    + slot);
 	synchronized (path_dependents) {
 	    Set<DataFrame> dependents = path_dependents.get(slot);
 	    if (dependents == null) {
@@ -244,10 +229,13 @@ abstract public class DataFrame
 	}
     }
 
+    /**
+     * Informs this frame that the given data frame no longer depends on it.
+     */
     void removePathDependent(DataFrame dependent, String slot) {
 	if (log.isDebugEnabled())
 	    log.debug(this + " is removing dependent " +dependent+
-		      " for slot " +slot);
+		    " for slot " +slot);
 	synchronized (path_dependents) {
 	    Set<DataFrame> dependents = path_dependents.get(slot);
 	    if (dependents != null) dependents.remove(dependent);
@@ -270,32 +258,34 @@ abstract public class DataFrame
     }
 
 
-    private void notifyPathDependents(String slot, Set<DataFrame> dependents) {
+    private void notifyPathDependents(String owner_slot, Set<DataFrame> dependents) {
 	for (DataFrame frame : dependents) {
-	    frame.pathDependencyChange(slot);
+	    String frame_slot = frame.slot_map.get(owner_slot);
+	    frame.pathDependencyChange(frame_slot);
 	}
     }
 
+    // RelationFrame overrides this to invoke notifyAllPathDependents,
+    // since in this case the slot doesn't matter:  changing any
+    // slot invalidates the relationship.
     void notifyPathDependents(String owner_slot) {
-	String slot = null;
-	synchronized (slot_map) {
-	    slot = slot_map.get(owner_slot);
-	}
 	Set<DataFrame> copy = null;
 	synchronized (path_dependents) {
-	    Set<DataFrame> dependents = path_dependents.get(slot);
+	    Set<DataFrame> dependents = path_dependents.get(owner_slot);
 	    if (dependents == null) return;
 	    copy = new HashSet(dependents);
 	}
-	notifyPathDependents(slot, copy);
+	notifyPathDependents(owner_slot, copy);
     }
 
     void notifyAllPathDependents() {
 	synchronized (path_dependents) {
 	    for (Map.Entry<String,Set<DataFrame>> entry : path_dependents.entrySet()) {
-		String slot = entry.getKey();
+		String slot = entry.getKey(); // in this case it's the dependent's slot
 		Set<DataFrame> dependents = entry.getValue();
-		notifyPathDependents(slot, new HashSet<DataFrame>(dependents));
+		for (DataFrame frame : dependents) {
+		    frame.pathDependencyChange(slot);
+		}
 	    }
 	}
     }
@@ -333,7 +323,7 @@ abstract public class DataFrame
     }
 
 
-    
+
     // Public accesssors
 
     // In this context "local" means: include slots the prototype tree
@@ -369,8 +359,8 @@ abstract public class DataFrame
 		initializeLocalValue((String) entry.getKey(), entry.getValue());
 	    } catch (Throwable t) {
 		log.error("Error initializing slot " +entry.getKey()+
-			  " of " +this+ " to "+entry.getValue(),
-			  t);
+			" of " +this+ " to "+entry.getValue(),
+			t);
 	    }
 	}
 	postInitialize();
@@ -411,10 +401,10 @@ abstract public class DataFrame
     // Support
 
     protected void slotModified(String slot, 
-				Object old_value, 
-				Object new_value,
-				boolean notify_listeners,
-				boolean notify_blackboard) {
+	    Object old_value, 
+	    Object new_value,
+	    boolean notify_listeners,
+	    boolean notify_blackboard) {
 	if (notify_blackboard && frameSet != null) 
 	    frameSet.valueUpdated(this, slot, new_value);
 	if (notify_listeners) {
@@ -433,9 +423,9 @@ abstract public class DataFrame
 	// Nothing at this level.  Frame types with Metric-value slots
 	// should subscribe to the MetricsService here
     }
-    
+
     protected void collectSlotNames(Set<String> slots) {
-	
+
     }
 
     //  Converters used in generated code
@@ -553,26 +543,26 @@ abstract public class DataFrame
 
 
     protected void fireChange(String property, 
-			      Object old_value, 
-			      Object new_value) {
+	    Object old_value, 
+	    Object new_value) {
 	if (log.isDebugEnabled())
 	    log.debug("Fire PropertyChange " +property+
-		      " old value = " +old_value+
-		      " new value = " +new_value);
+		    " old value = " +old_value+
+		    " new value = " +new_value);
 	// Both null: no change
 	if (old_value == null && new_value == null) return;
 
 	if (old_value == null || new_value == null // One null, one not
-	    || !old_value.equals(new_value) // Different non-nulls
-	    ) {
+		|| !old_value.equals(new_value) // Different non-nulls
+	) {
 	    PropertyChangeEvent evt = new ResourceablePropertyChangeEvent(this,
-			property, old_value, new_value);
+		    property, old_value, new_value);
 	    pcs.firePropertyChange(evt);
 	}
     }
 
     protected void fireContainerChanges(DataFrame old_frame, 
-					DataFrame new_frame) {
+	    DataFrame new_frame) {
 	// default is no-op
     }
 
@@ -631,9 +621,9 @@ abstract public class DataFrame
     void addToFrameSet(FrameSet frameSet) {
 	if (this.frameSet != null && this.frameSet != frameSet) {
 	    throw new RuntimeException(this +" is already in FrameSet "
-				       +this.frameSet+
-				       ".  It can't be added to FrameSet "
-				       +frameSet);
+		    +this.frameSet+
+		    ".  It can't be added to FrameSet "
+		    +frameSet);
 	} else {
 	    this.frameSet = frameSet;
 	    frameSet.makeFrame(this);
@@ -643,7 +633,7 @@ abstract public class DataFrame
 
 
 
-    void dumpLocalSlots(PrintWriter writer, int indentation, int offset) {
+    void writeLocalSlots(PrintWriter writer, int indentation, int offset) {
 	Map slots = getLocalSlots();
 	Iterator itr = slots.entrySet().iterator();
 	while (itr.hasNext()) {
@@ -651,24 +641,23 @@ abstract public class DataFrame
 	    String slot_name = (String) entry.getKey();
 	    Object slot_value = entry.getValue();
 	    for (int i=0; i<indentation; i++) writer.print(' ');
-	    writer.println("<" +slot_name+ ">" +slot_value+ "</"
-			   +slot_name+ ">");
+	    writer.println(" " + slot_name+ "=\"" +slot_value+ "\"");
 	}
     }
 
-    void dump(PrintWriter writer, int indentation, int offset) {
+    void write(PrintWriter writer, int indentation, int offset) {
 	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frame prototype=\"" +getKind()+ "\">");
-	dumpLocalSlots(writer, indentation+offset, offset);
+	writer.println("<" + getKind());
+	writeLocalSlots(writer, indentation+offset, offset);
 	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("</frame>");
+	writer.println("/>");
     }
 
 
     void containerChange(DataFrame old_container, DataFrame new_container) {
 	if (log.isDebugEnabled())
 	    log.debug(" Old container = " +old_container+
-		      " New container = " +new_container);
+		    " New container = " +new_container);
 	if (old_container != null) {
 	    // No longer subscribe to changes on old container
 	    old_container.removePropertyChangeListener(this);
@@ -683,5 +672,68 @@ abstract public class DataFrame
 		fireContainerChanges(new_container);
 	}
     }
+
+
+    protected static void registerFrameMaker(String pkg,
+	    String proto,
+	    FrameMaker maker) {
+	if (log.isDebugEnabled())
+	    log.debug("Registering FrameMaker " +maker+ " for prototype "
+		    +proto+ " in package " +pkg);
+	synchronized (FramePackages) {
+	    Map<String,FrameMaker> frameTypeMap = FramePackages.get(pkg);
+	    if (frameTypeMap == null) {
+		frameTypeMap = new HashMap();
+		FramePackages.put(pkg, frameTypeMap);
+	    }
+	    frameTypeMap.put(proto, maker);
+	}
+    }
+
+    protected static FrameMaker findFrameMaker(String pkg, String proto) {
+	synchronized (FramePackages) {
+	    Map<String,FrameMaker> frameTypeMap = FramePackages.get(pkg);
+	    if (frameTypeMap != null) 
+		return frameTypeMap.get(proto);
+	    else
+		return null;
+	}
+    }
+
+    protected static Logger getLogger() {
+	return log;
+    }
+
+
+    public static DataFrame newFrame(FrameSet frameSet,
+	    String proto, 
+	    UID uid,
+	    Properties initial_values) {
+	String pkg = frameSet.getPackageName();
+	return newFrame(pkg, frameSet, proto, uid, initial_values);
+    }
+
+
+    public static DataFrame newFrame(String pkg,
+	    FrameSet frameSet,
+	    String proto, 
+	    UID uid,
+	    Properties values) {
+	if (log.isDebugEnabled())
+	    log.debug("Searching for FrameMaker for prototype "
+		    +proto+ " in package " +pkg);
+//	force a class load (ugh)
+	frameSet.classForPrototype(proto);
+	DataFrame frame = null;
+	FrameMaker maker = findFrameMaker(pkg, proto);
+	if (maker != null) {
+	    frame = maker.makeFrame(frameSet, uid);
+	    frame.initializeValues(values);
+	} else {
+	    log.error("No FrameMaker for " +proto+ " in package " +pkg);
+	}
+	return frame;
+    }
+
 
 }
