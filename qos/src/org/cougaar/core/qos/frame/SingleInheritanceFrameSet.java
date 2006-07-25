@@ -285,9 +285,9 @@ public class SingleInheritanceFrameSet
 		    Set<RelationFrame> rframes = inverse_child_cache.get(child);
 		    rframes.remove(rframe);
 		} else if (slot.startsWith("parent")) {
-		    DataFrame parent = child_cache.get(rframe);
+		    DataFrame parent = parent_cache.get(rframe);
 		    parent_cache.remove(frame);
-		    Set<RelationFrame> rframes = inverse_child_cache.get(parent);
+		    Set<RelationFrame> rframes = inverse_parent_cache.get(parent);
 		    rframes.remove(rframe);
 		}
 		cacheRelation(rframe);
@@ -570,7 +570,7 @@ public class SingleInheritanceFrameSet
 	    }
 	    DataFrame parent = parent_cache.get(relationship);
 	    if (parent != null) {
-		Set<RelationFrame> rframes = inverse_parent_cache.get(child);
+		Set<RelationFrame> rframes = inverse_parent_cache.get(parent);
 		if (rframes != null) {
 		    rframes.remove(relationship);
 		}
