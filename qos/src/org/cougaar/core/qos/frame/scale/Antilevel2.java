@@ -42,17 +42,17 @@ public class Antilevel2
     }
 
 
-    public Float getLevel2Path() {
-        Float __result = (Float) getProperty("level2Path");
+    public Integer getLevel2Path() {
+        Integer __result = (Integer) getProperty("level2Path");
         if (__result != null) return __result;
-        return (Float) getInheritedValue(this, "level2Path");
+        return (Integer) getInheritedValue(this, "level2Path");
     }
 
 
-    Float getLevel2Path__NoWarn() {
-        Float __result = (Float) getProperty("level2Path");
+    Integer getLevel2Path__NoWarn() {
+        Integer __result = (Integer) getProperty("level2Path");
         if (__result != null) return __result;
-        return (Float) getInheritedValue(this, "level2Path");
+        return (Integer) getInheritedValue(this, "level2Path");
     }
 
 
@@ -63,8 +63,8 @@ public class Antilevel2
     }
 
 
-    public void setLevel2Path(Float __new_value) {
-        Float __old_value = (Float) getProperty("level2Path");
+    public void setLevel2Path(Integer __new_value) {
+        Integer __old_value = (Integer) getProperty("level2Path");
         setProperty("level2Path", __new_value);
         slotModified("level2Path", __old_value, __new_value, true, true);
     }
@@ -72,19 +72,19 @@ public class Antilevel2
 
     public void setLevel2Path__AsObject(Object __new_value) {
         Object __old_value = getProperty("level2Path");
-        setProperty("level2Path", force_Float(__new_value));
+        setProperty("level2Path", force_Integer(__new_value));
         slotModified("level2Path", __old_value, __new_value, true, true);
     }
 
 
-    protected void initializeLevel2Path(Float new_value) {
+    protected void initializeLevel2Path(Integer new_value) {
         setProperty("level2Path", new_value);
         slotInitialized("level2Path", new_value);
     }
 
 
     void initializeLevel2Path__AsObject(Object new_value) {
-        setProperty("level2Path", force_Float(new_value));
+        setProperty("level2Path", force_Integer(new_value));
         slotInitialized("level2Path", new_value);
     }
 

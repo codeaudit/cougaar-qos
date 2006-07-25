@@ -62,7 +62,7 @@
 		</prototype>
 		
 		<prototype name="antilevel2" prototype="thing" >
-			<slot name="level2Path" type="Float" path="rootCount"/>
+			<slot name="level2Path" type="Integer" path="rootCount"/>
 		</prototype>
 	
 		<path name="rootCount">
