@@ -890,7 +890,7 @@ public class SingleInheritanceFrameSet
 
     // XML dumping
 
-    void dumpDataFrames(PrintWriter writer, int indentation, int offset) {
+    void writeDataFrames(PrintWriter writer, int indentation, int offset) {
 	synchronized (kb) {
 	    for (Object raw : kb.values()) {
 		if (raw instanceof DataFrame) {
@@ -901,7 +901,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    void dumpData(File file, int indentation, int offset)
+    void writeData(File file, int indentation, int offset)
     throws java.io.IOException {
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
@@ -911,7 +911,7 @@ public class SingleInheritanceFrameSet
 	writer.println("<frames>");
 	indentation += offset;
 
-	dumpDataFrames(writer, indentation, offset);
+	writeDataFrames(writer, indentation, offset);
 
 	indentation -= offset;
 	writer.println("</frames>");
@@ -921,61 +921,9 @@ public class SingleInheritanceFrameSet
     }
 
 
-
-    void dumpProtoFrames(PrintWriter writer, int indentation, int offset) {
-	synchronized (prototypes) {
-	    for (PrototypeFrame frame : prototypes.values()) {
-		frame.dump(writer, indentation, offset);
-	    }
-	}
-    }
-
-    void dumpPaths(PrintWriter writer, int indentation, int offset) {
-	synchronized (kb) {
-	    for (Object raw : kb.values()) {
-		if (raw instanceof Path) {
-		    Path path = (Path) raw;
-		    path.dump(writer, indentation, offset);
-		}
-	    }
-	}
-    }
-
-    void dumpPrototypes(File file, int indentation, int offset)
+    public  void write(File file)
 	throws java.io.IOException {
-	FileWriter fwriter = new FileWriter(file);
-	PrintWriter writer = new PrintWriter(fwriter);
-
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frameset"); 
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  frame-inheritance=\"single\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  package=\"" +pkg+ "\"");
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("  container-relation=\"" +container_relation+ "\"");
-	writer.println(">");
-
-
-	indentation += offset;
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<prototypes>");
-	indentation += offset;
-	dumpPaths(writer, indentation, offset);
-	dumpProtoFrames(writer, indentation, offset);
-	indentation -= offset;
-	writer.println("</prototypes>");
-	indentation -= offset;
-	writer.println("</frameset>");
-
-	writer.close();
-    }
-
-
-    public  void dump(File proto_file, File data_file)
-	throws java.io.IOException {
-	dumpPrototypes(proto_file, 0, 2);
-	dumpData(data_file, 0, 2);
+	writeData(file, 0, 2);
     }
 
 

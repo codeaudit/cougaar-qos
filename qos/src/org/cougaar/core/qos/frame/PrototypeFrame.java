@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -189,41 +188,5 @@ public class PrototypeFrame
 	if (frameSet == null) return kind.equals(prototype_name);
 	return frameSet.descendsFrom(this, kind);
     }
-
-
-    void dumpLocalSlots(PrintWriter writer, int indentation, int offset) {
-	Map slots = getLocalSlots();
-	Iterator itr = slots.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    String slot_name = (String) entry.getKey();
-	    Attributes attrs = (Attributes) entry.getValue();
-	    String slot_value = attrs.getValue("default-value");
-	    String path = attrs.getValue("path");
-	    String staticp = attrs.getValue("static");
-	    String memberp = attrs.getValue("member");
-	    for (int i=0; i<indentation; i++) writer.print(' ');
-	    writer.print("<slot name=\"" +slot_name+ "\"");
-	    if (slot_value != null)
-		writer.print(" value=\"" +slot_value+ "\"");
-	    else if (path != null)
-		writer.print(" path=" +path+ "\"");
-	    if (staticp != null) writer.print(" static=\"" +staticp+ "\"");
-	    if (memberp != null) writer.print(" member=\"" +memberp+ "\"");
-	    writer.println("/>");
-	}
-    }
-
-    void dump(PrintWriter writer, int indentation, int offset) {
-	String kind = getKind();
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.print("<prototype name=" +prototype_name);
-	if (kind != null) writer.print(" prototype=\"" +kind+ "\"");
-	writer.println(">");
-	dumpLocalSlots(writer, indentation+offset, offset);
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("</frame>");
-    }
-
 
 }

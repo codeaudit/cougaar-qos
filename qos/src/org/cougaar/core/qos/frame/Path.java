@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.frame;
 
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -44,27 +43,16 @@ import org.cougaar.util.log.Logging;
  * reached, the given slot value is retrieved.
  */
 public class Path
-    implements UniqueObject
-
-{
+    implements UniqueObject {
     private transient Logger log = Logging.getLogger(getClass().getName());
 
     static class Fork implements java.io.Serializable {
 	private String role;
 	private String relation;
 
-	Fork(String role, String relation)
-	{
+	Fork(String role, String relation) {
 	    this.role = role;
 	    this.relation = relation;
-	}
-
-	void dump(PrintWriter writer, int indentation, int offset)
-	{
-	    for (int i=0; i<indentation; i++) writer.print(' ');
-	    writer.println("<fork relation=\"" +relation+
-			   " role=\"" +role+
-			   "\"/>");
 	}
     }
 
@@ -73,21 +61,18 @@ public class Path
     private Fork[] forks;
     private String override_slot;
 
-    public Path(UID uid, String name, Fork[] forks, String slot)
-    {
+    public Path(UID uid, String name, Fork[] forks, String slot) {
 	this.name = name;
 	this.forks = forks;
 	this.override_slot = slot;
 	this.uid = uid;
     }
 
-    String getName()
-    {
+    String getName() {
 	return name;
     }
 
-    Object getValue(DataFrame root, String requestor_slot)
-    {
+    Object getValue(DataFrame root, String requestor_slot)  {
 	synchronized (root.get_rlock()) {
 	    root.clearRelationDependencies(requestor_slot);
 	    return
@@ -98,8 +83,7 @@ public class Path
     private Object getNextValue(DataFrame root, 
 				DataFrame frame, 
 				int index, 
-				String requestor_slot)
-    {
+				String requestor_slot) {
 	String slot = override_slot != null ? override_slot : requestor_slot;
 	if (log.isDebugEnabled())
 	    log.debug("Walking path " +name+
@@ -152,30 +136,12 @@ public class Path
     }
 
     // UniqueObject
-    public UID getUID()
-    {
+    public UID getUID() {
 	return uid;
     }
 
-    public void setUID(UID uid)
-    {
+    public void setUID(UID uid) {
 	if (!uid.equals(this.uid))
 	    throw new RuntimeException("UID already set");
-    }
-
-    void dump(PrintWriter writer, int indentation, int offset)
-    {
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<path name=\"" +name+ "\">");
-	indentation += offset;
-	for (int i=0; i<forks.length; i++) {
-	    Fork fork = forks[i];
-	    fork.dump(writer, indentation, offset);
-	}
-	if (override_slot != null)
-	    writer.println("<slot-reference name=\"" +override_slot+ "\"/>");
-	indentation -= offset;
-	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("</path>");
     }
 }

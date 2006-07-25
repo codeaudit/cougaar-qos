@@ -236,7 +236,7 @@ public interface FrameSet {
     /**
      * Dump the DataFrames as XML.
      */
-    public void dump(File proto_file, File data_file)
+    public void write(File file)
 	throws java.io.IOException;
 
     /**
