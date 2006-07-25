@@ -897,7 +897,7 @@ public class SingleInheritanceFrameSet
 	    for (Object raw : kb.values()) {
 		if (raw instanceof DataFrame) {
 		    DataFrame frame = (DataFrame) raw;
-		    frame.dump(writer, indentation, offset);
+		    frame.write(writer, indentation, offset);
 		}
 	    }
 	}
