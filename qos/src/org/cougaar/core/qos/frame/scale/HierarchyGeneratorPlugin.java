@@ -27,10 +27,8 @@
 package org.cougaar.core.qos.frame.scale;
 
 import java.util.Properties;
-import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
@@ -97,12 +95,6 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 		+ " (" +(totalFrames/((float) duration))+ " frames/ms)");
 	populated = true;
 	
-	// touch every path slot in order to create dependencies
-	Set<DataFrame> a2frames = frameset.findFrames("antilevel2", null);
-	for (DataFrame frame : a2frames) {
-	    Antilevel2 a2frame = (Antilevel2) frame;
-	    a2frame.getLevel2Path();
-	}
     }
     
     protected void execute() {
