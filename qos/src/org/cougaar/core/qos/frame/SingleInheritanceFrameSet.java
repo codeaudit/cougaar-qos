@@ -666,9 +666,11 @@ public class SingleInheritanceFrameSet
 	Set<DataFrame> results = new HashSet<DataFrame>();
 	synchronized (frames) {
 	    for (DataFrame frame : frames) {
-		if (descendsFrom(frame, klass, proto) &&
-		    frame.matchesSlots(slot_value_pairs))
-		    results.add(frame);
+		if (descendsFrom(frame, klass, proto)) {
+		    if (slot_value_pairs == null || frame.matchesSlots(slot_value_pairs)) {
+			results.add(frame);
+		    }
+		}
 	    }
 	}
 	return results;
