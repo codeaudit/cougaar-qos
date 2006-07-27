@@ -8,7 +8,7 @@
 	<vm_parameter>-Dorg.cougaar.name.server=NameServer@cranberry.dsl.bbn.com:8888</vm_parameter>
 	<vm_parameter>-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.jar.path=../tmp/qos.jar,$CIP/lib,$CIP/sys</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.core.agent.quiet=true</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.core.agent.quiet=false</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.wp.server.successTTD=90000</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.wp.server.failTTD=1000</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.wp.resolver.rmi.minLookup=500</vm_parameter>
@@ -115,12 +115,39 @@
           /wp
         </argument>
       </component>
+		
+	  
+	
+	
+		
+	<component
+        name='org.cougaar.mts.base.LoopbackLinkProtocol()'
+        class='org.cougaar.mts.base.LoopbackLinkProtocol'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
+      </component>	
+		
+		<component
+        name='org.cougaar.mts.base.RMILinkProtocol()'
+        class='org.cougaar.mts.base.RMILinkProtocol'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
+      </component>	
+		
+		<component
+        name='org.cougaar.mts.jms.JMSLinkProtocol()'
+        class='org.cougaar.mts.jms.JMSLinkProtocol'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
+		
+		
       <component
         name='org.cougaar.mts.std.StatisticsAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
         class='org.cougaar.mts.std.StatisticsAspect'
         priority='COMPONENT'
         insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
       </component>
+		
       <component
         name='org.cougaar.mts.std.DeliveryVerificationAspect_Node.AgentManager.Agent.MessageTransport.Aspect(info-time=9,warn-time=99)'
         class='org.cougaar.mts.std.DeliveryVerificationAspect'
@@ -439,6 +466,28 @@
           /wp
         </argument>
       </component>
+		
+	 <component
+        name='org.cougaar.mts.jms.JMSLinkProtocol()'
+        class='org.cougaar.mts.jms.JMSLinkProtocol'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
+      </component>	
+		
+	<component
+        name='org.cougaar.mts.base.RMILinkProtocol()'
+        class='org.cougaar.mts.base.RMILinkProtocol'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
+      </component>	
+		
+	<component
+        name='org.cougaar.mts.base.LoopbackLinkProtocol()'
+        class='org.cougaar.mts.base.LoopbackLinkProtocol'
+        priority='COMPONENT'
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
+      </component>	
+		
       <component
         name='org.cougaar.mts.std.StatisticsAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
         class='org.cougaar.mts.std.StatisticsAspect'
