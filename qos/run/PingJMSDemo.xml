@@ -15,6 +15,8 @@
     <vm_parameter>-Dorg.cougaar.core.wp.resolver.rmi.maxLookup=2000</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.initialTimeout=250</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.maxTimeout=666</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.mts.jms.url=tcp://fig.bbn.com:3035</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.mts.jms.jndi.factory=org.exolab.jms.jndi.InitialContextFactory</vm_parameter>
 
   <host name='esb.dsl.bbn.com'>
     <facet enclave='REAR'  />
