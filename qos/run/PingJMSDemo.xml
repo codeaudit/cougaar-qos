@@ -7,7 +7,7 @@
 	<vm_parameter>-Dorg.cougaar.core.logging.config.filename=logging.properties</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.name.server=NameServer@cranberry.dsl.bbn.com:8888</vm_parameter>
 	<vm_parameter>-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.jar.path=../tmp/qos.jar,$CIP/lib,$CIP/sys</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.jar.path=../tmp/qos.jar,../../mtsstd/tmp/mtsstd.jar,$CIP/lib,$CIP/sys,$OPENJMS_HOME/lib</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.quiet=false</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.wp.server.successTTD=90000</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.wp.server.failTTD=1000</vm_parameter>
