@@ -5,7 +5,7 @@
   xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
 	<vm_parameter>-Xmx1024m</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.logging.config.filename=logging.properties</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.name.server=NameServer@localhost:8888</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.name.server=NameServer@cranberry.dsl.bbn.com:8888</vm_parameter>
 	<vm_parameter>-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.jar.path=../tmp/qos.jar,$CIP/lib,$CIP/sys</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.quiet=true</vm_parameter>
@@ -257,7 +257,7 @@
           insertionpoint='Node.AgentManager.Agent.WPServer'>
         </component>
      </agent>		  
-	 <agent name='AgentA'>
+	 <agent name='Source1'>
         <!-- optional agent mobility support -->
 
         <component
@@ -320,11 +320,11 @@
 	See the javadocs for additional options.
         -->
         <component
-          name='org.cougaar.ping.PingAdderPlugin(target=AgentB, delayMillis=1000)'
+          name='org.cougaar.ping.PingAdderPlugin(target=Sink1, delayMillis=1000)'
           class='org.cougaar.ping.PingAdderPlugin'
           priority='COMPONENT'
           insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>target=AgentB</argument>
+          <argument>target=Sink1</argument>
           <argument>delayMillis=1000</argument>
 	  <argument>eventMillis=10000</argument>
         </component>
@@ -520,7 +520,7 @@
           mobility
         </argument>
       </component>
-     <agent name='AgentB' >
+     <agent name='Sink1' >
         <!-- optional agent mobility support -->
         <component
           name='mobility'
