@@ -1,18 +1,18 @@
 The ping/config/ping directory contains example Ping societies which 
-work with XSLNode
+work with cougaar script
 
 
 MiniPing.xml the standard node configuration with agent mobility,
 metric serivice, and system inspection servlets. To run:
   cd $CIP/ping/config/ping
-  $CIP/bin/XSLNode MiniPing.xml NodeA
+  $CIP/bin/cougaar MiniPing.xml NodeA
 
 MiniPing-minimum.xml is a full throttle single-ping with all the
 survivability featurs of Cougaar disabled. This "single node"
 configuration is fast and small, but one mistake and you're road
 kill. To run:
   cd $CIP/ping/config/ping
-  $CIP/bin/XSLNode MiniPing-minimum.xml NodeA
+  $CIP/bin/cougaar MiniPing-minimum.xml NodeA
 
 MiniPing-2nodes.xml is the standard configurtion with the ping agents 
 on two differnent nodes. This allows the society to be run one or two
@@ -21,10 +21,10 @@ hosts. To run"
    -Dorg.cougaar.name.server=NodeA@localhost:8888</vm_parameter>
   On the nameserver host:
     cd $CIP/ping/config/ping
-    $CIP/bin/XSLNode MiniPing-2nodes.xml NodeA
+    $CIP/bin/cougaar MiniPing-2nodes.xml NodeA
   On the other host:
     cd $CIP/ping/config/ping
-    $CIP/bin/XSLNode MiniPing-2nodes.xml NodeA
+    $CIP/bin/cougaar MiniPing-2nodes.xml NodeB
 
 MiniPing-2nodeMin.xml is the minimum configurtion with the ping agents 
 on two differnent nodes. This allows the society to be run one or two hosts.
