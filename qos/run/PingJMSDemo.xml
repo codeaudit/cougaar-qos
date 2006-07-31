@@ -5,10 +5,12 @@
   xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
 	<vm_parameter>-Xmx1024m</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.logging.config.filename=logging.properties</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.name.server=NameServer@localhost:8888</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.name.server=NameServer@</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.name.server.NameServer=-JMS:jms://NODE1.NameServer@</vm_parameter>
 	<vm_parameter>-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.jar.path=../tmp,../../mtsstd/tmp,$CIP/lib,$CIP/sys,$OPENJMS_HOME/lib</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.quiet=false</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.core.agent.heartbeat=false</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.wp.server.successTTD=90000</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.wp.server.failTTD=1000</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.wp.resolver.rmi.minLookup=500</vm_parameter>
@@ -16,7 +18,7 @@
     <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.initialTimeout=250</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.maxTimeout=666</vm_parameter>
 	<!-- OPENJMS flags -->
-	<vm_parameter>-Dorg.cougaar.mts.jms.url=tcp://localhost:3035</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.mts.jms.url=tcp://fig.dsl.bbn.com:3035</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.mts.jms.factory=ConnectionFactory</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.mts.jms.jndi.factory=org.exolab.jms.jndi.InitialContextFactory</vm_parameter>
 
@@ -128,15 +130,13 @@
         name='org.cougaar.mts.base.LoopbackLinkProtocol()'
         class='org.cougaar.mts.base.LoopbackLinkProtocol'
         priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
-      </component>	
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
 		
-		<component
+		<!-- component
         name='org.cougaar.mts.base.RMILinkProtocol()'
         class='org.cougaar.mts.base.RMILinkProtocol'
         priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
-      </component>	
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/ -->
 		
 		<component
         name='org.cougaar.mts.jms.JMSLinkProtocol()'
@@ -475,22 +475,19 @@
         name='org.cougaar.mts.jms.JMSLinkProtocol()'
         class='org.cougaar.mts.jms.JMSLinkProtocol'
         priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
-      </component>	
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
 		
-	<component
+	<!-- component
         name='org.cougaar.mts.base.RMILinkProtocol()'
         class='org.cougaar.mts.base.RMILinkProtocol'
         priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
-      </component>	
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/ -->	
 		
 	<component
         name='org.cougaar.mts.base.LoopbackLinkProtocol()'
         class='org.cougaar.mts.base.LoopbackLinkProtocol'
         priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'>
-      </component>	
+        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
 		
       <component
         name='org.cougaar.mts.std.StatisticsAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
