@@ -49,6 +49,7 @@ import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.UIDService;
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
+import org.cougaar.util.UnaryPredicate;
 import org.xml.sax.Attributes;
 
 
@@ -895,16 +896,24 @@ public class SingleInheritanceFrameSet
 
     // XML dumping
 
-    void writeDataFrames(PrintWriter writer, int indentation, int offset) {
+    void writeDataFrames(PrintWriter writer, int indentation, int offset, UnaryPredicate filter) {
 	synchronized (kb) {
 	    for (Object raw : kb.values()) {
 		if (raw instanceof DataFrame && !(raw instanceof RelationFrame)) {
+		    if (filter != null && !filter.execute(raw)) {
+			// wrong kind of frame
+			continue;
+		    }
 		    DataFrame frame = (DataFrame) raw;
 		    frame.write(writer, indentation, offset);
 		}
 	    }
 	    for (Object raw : kb.values()) {
 		if (raw instanceof RelationFrame) {
+		    if (filter != null && !filter.execute(raw)) {
+			// wrong kind of frame
+			continue;
+		    }
 		    DataFrame frame = (DataFrame) raw;
 		    frame.write(writer, indentation, offset);
 		}
@@ -912,7 +921,7 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    void writeData(File file, int indentation, int offset)
+    void writeData(File file, int indentation, int offset, UnaryPredicate filter)
     throws java.io.IOException {
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
@@ -923,7 +932,7 @@ public class SingleInheritanceFrameSet
 	writer.println("<" + domain+ ">");
 	indentation += offset;
 
-	writeDataFrames(writer, indentation, offset);
+	writeDataFrames(writer, indentation, offset, filter);
 
 	indentation -= offset;
 	writer.println("</" + domain+ ">");
@@ -933,10 +942,32 @@ public class SingleInheritanceFrameSet
     }
 
 
-    public  void write(File file)
+    public void write(File file)
 	throws java.io.IOException {
-	writeData(file, 0, 2);
+	writeData(file, 0, 2, null);
     }
+    
+    public void write(File file, Set<String> prototypes)
+	throws java.io.IOException {
+	Set<Class> classes = new HashSet<Class>();
+	for (String prototype : prototypes) {
+	    classes.add(classForPrototype(prototype));
+	}
+	final Class[] pclasses = new Class[classes.size()];
+	classes.toArray(pclasses);
+	UnaryPredicate filter = new UnaryPredicate() {
+	    public boolean execute(Object o) {
+		Class cls = o.getClass();
+		for (Class cl : pclasses) {
+		    if (cl.isAssignableFrom(cls)) {
+			return true;
+		    }
+		}
+		return false;
+	    }
+	};
+	writeData(file, 0, 2, filter);
+}
 
 
 }

@@ -234,10 +234,16 @@ public interface FrameSet {
     public Class classForPrototype(PrototypeFrame prototype);
 
     /**
-     * Dump the DataFrames as XML.
+     * Dump all DataFrames as XML.
      */
     public void write(File file)
 	throws java.io.IOException;
+    
+    /**
+     * Dump all DataFrames of the given prototypes as XML
+     */
+    public void write(File file, Set<String> prototypes)
+    throws java.io.IOException;
 
     /**
      * Subscribes a DataFrame to a value in the MetricsService
