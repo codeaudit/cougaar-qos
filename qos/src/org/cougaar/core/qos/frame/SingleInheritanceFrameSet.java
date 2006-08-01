@@ -61,6 +61,7 @@ public class SingleInheritanceFrameSet
     implements FrameSet {
     private static final long LOOKUP_WARN_TIME = 10000;
 
+    private final String domain;
     private final String name;
     private final String pkg;
     private final LoggingService log;
@@ -94,9 +95,11 @@ public class SingleInheritanceFrameSet
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
 				     BlackboardService bbs,
+				     String domain,
 				     String name,
 				     String container_relation,
 				     String primaryIndexSlot) {
+	this.domain = domain;
 	this.name = name;
 	this.primaryIndexSlot = primaryIndexSlot;
 	this.container_relation = container_relation;
@@ -895,7 +898,13 @@ public class SingleInheritanceFrameSet
     void writeDataFrames(PrintWriter writer, int indentation, int offset) {
 	synchronized (kb) {
 	    for (Object raw : kb.values()) {
-		if (raw instanceof DataFrame) {
+		if (raw instanceof DataFrame && !(raw instanceof RelationFrame)) {
+		    DataFrame frame = (DataFrame) raw;
+		    frame.write(writer, indentation, offset);
+		}
+	    }
+	    for (Object raw : kb.values()) {
+		if (raw instanceof RelationFrame) {
 		    DataFrame frame = (DataFrame) raw;
 		    frame.write(writer, indentation, offset);
 		}
@@ -909,14 +918,15 @@ public class SingleInheritanceFrameSet
 	PrintWriter writer = new PrintWriter(fwriter);
 
 	indentation += offset;
+	writer.println("<!-- !DOCTYPE " +domain+ " SYSTEM \"" +domain+ ".dtd\" -->");
 	for (int i=0; i<indentation; i++) writer.print(' ');
-	writer.println("<frames>");
+	writer.println("<" + domain+ ">");
 	indentation += offset;
 
 	writeDataFrames(writer, indentation, offset);
 
 	indentation -= offset;
-	writer.println("</frames>");
+	writer.println("</" + domain+ ">");
 
 
 	writer.close();

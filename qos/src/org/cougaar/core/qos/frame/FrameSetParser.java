@@ -26,6 +26,7 @@
 
 package org.cougaar.core.qos.frame;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,6 +114,11 @@ public class FrameSetParser
 	    producer.setContentHandler(consumer);
 	    producer.setErrorHandler(consumer);
 	    URL url = loader.getResource(xml_filename); // xml_file.toURL();
+	    if (url == null) {
+		// Try it as a file
+		File file = new File(xml_filename);
+		url = file.toURL();
+	    }
 	    producer.parse(url.toString());
 	} catch (Throwable ex) {
 	    log.error("Error parsing FrameSet file " + xml_filename, ex);
@@ -207,8 +213,9 @@ public class FrameSetParser
 	if (!inheritance.equals("single")) {
 	    throw new RuntimeException("Only single-inheritance FrameSets are supported!");
 	}
+	String domain = attrs.getValue("domain");
 
-	frame_set = new SingleInheritanceFrameSet(pkg, sb, bbs, frame_set_name,
+	frame_set = new SingleInheritanceFrameSet(pkg, sb, bbs, domain, frame_set_name,
 						  container_relation, indexSlot);
     }
 
