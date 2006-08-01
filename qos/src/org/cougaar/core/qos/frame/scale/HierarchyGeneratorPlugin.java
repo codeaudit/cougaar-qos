@@ -26,10 +26,15 @@
 
 package org.cougaar.core.qos.frame.scale;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.frame.FrameSet;
+import org.cougaar.core.qos.frame.FrameSetParser;
 import org.cougaar.core.qos.frame.FrameSetService;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.LoggingService;
@@ -81,6 +86,28 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	}
     }
 
+    void loadFileExample() {
+	File file = new File(getParameter("dump-file", "generated-scale.xml"));
+	FrameSetParser parser = new FrameSetParser(getServiceBroker(), getBlackboardService());
+	parser.parseFrameSetFile(frameset.getName(), file.getAbsolutePath(), frameset);
+    }
+    
+    void saveSubsetExample() {
+	Set<String> protos = new HashSet();
+	protos.add("root");
+	protos.add("antilevel1");
+	protos.add("antilevel2");
+	protos.add("antilevel1OnRoot");
+	protos.add("antilevel2OnAntilevel1");
+	File file = new File(getParameter("dump-file", "generated-scale.xml"));
+	try {
+	    frameset.write(file, protos);
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+    }
+    
     private void populateFrameSet() {
 	log.shout("Starting data creation");
 	long now = System.currentTimeMillis();
@@ -94,7 +121,6 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 		+ height + " and degree=" + degree 
 		+ " (" +(totalFrames/((float) duration))+ " frames/ms)");
 	populated = true;
-	
     }
     
     protected void execute() {
