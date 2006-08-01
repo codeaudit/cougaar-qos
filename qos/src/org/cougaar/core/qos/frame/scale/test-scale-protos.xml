@@ -1,7 +1,7 @@
 <frameset domain="testScale" frame-inheritance="single"
 	package="org.cougaar.core.qos.frame.scale" container-relation="contains"
 	index-slot="name">
-	
+	<copyright>Copyright BBN Technologies 2006</copyright>
 	<!-- Root entity prototype -->
 	<prototypes>
 		<prototype name="thing">

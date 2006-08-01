@@ -3,7 +3,8 @@
    frame-inheritance="single"
    package="org.cougaar.core.qos.frame.topology"
    container-relation="contains">
-  
+	
+  <copyright>Copyright BBN Technologies 2006</copyright>
 
   <!-- Root entity prototype -->
   <prototypes>

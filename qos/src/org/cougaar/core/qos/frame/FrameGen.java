@@ -295,7 +295,7 @@ extends DefaultHandler
 	DTD
     }
     
-    private void generateComment(PrintWriter writer, FileType extension) {
+    private void generateCopyright(PrintWriter writer, FileType extension) {
 	Date date = new Date(System.currentTimeMillis());
 	DateFormat dformat = DateFormat.getDateTimeInstance();
 	String[] comments =  { 
@@ -303,12 +303,24 @@ extends DefaultHandler
 		"  from " +xml_file,
 		"  at "+ dformat.format(date)
 	};
+	StringTokenizer tk = null;
+	if (copyright != null) {
+	    tk = new StringTokenizer(copyright, "\n");
+	}
 	switch (extension) {
 	case JAVA:
 	    writer.println("/*");
 	    for (String comment : comments) {
 		writer.print(" * ");
 		writer.println(comment);
+	    }
+	    if (tk != null) {
+		writer.println(" *");
+		while (tk.hasMoreTokens()) {
+		    writer.print(" * ");
+		    writer.println(tk.nextToken());
+		}
+		writer.println(" *");
 	    }
 	    writer.println(" */");
 	    break;
@@ -318,6 +330,14 @@ extends DefaultHandler
 		writer.print(";; ");
 		writer.println(comment);
 	    }
+	    if (tk != null) {
+		writer.println(";;");
+		while (tk.hasMoreTokens()) {
+		    writer.print(";; ");
+		    writer.println(tk.nextToken());
+		}
+		writer.println(";;");
+	    }
 	    break;
 
 	case DTD:
@@ -326,41 +346,17 @@ extends DefaultHandler
 		writer.print(comment);
 		writer.println(" -->");
 	    }
-	    break;
-	}
-    }
-    
-    
-    private void generateCopyright(PrintWriter writer, FileType extension) {
-	if (copyright != null) {
-	    StringTokenizer tk = new StringTokenizer(copyright, "\n");
-	    switch (extension) {
-	    case JAVA:
-		writer.println("/**");
-		while (tk.hasMoreTokens()) {
-		    writer.print(" * ");
-		    writer.println(tk.nextToken());
-		}
-		writer.println(" */");
-		break;
-		
-	    case CLP:
-		while (tk.hasMoreTokens()) {
-		    writer.print(";; ");
-		    writer.println(tk.nextToken());
-		}
-		break;
-		
-	    case DTD:
+	    if (tk != null) {
+		writer.println();
 		while (tk.hasMoreTokens()) {
 		    writer.print("<!-- ");
 		    writer.print(tk.nextToken());
 		    writer.println(" -->");
 		}
-		break;
+		writer.println();
 	    }
+	    break;
 	}
-	generateComment(writer, extension);
     }
 
     private void generateDTD(String domain, String root) {
