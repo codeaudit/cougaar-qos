@@ -308,6 +308,14 @@ public class SingleInheritanceFrameSet
 
     public void removeFrame(DataFrame frame) {
 	synchronized (kb) { 
+	    if (primaryIndexSlot != null) {
+		PrototypeFrame pframe = frame.getPrototype();
+		Map<Object,DataFrame> cache = primaryIndexCache.get(pframe);
+		if (cache != null) {
+		    Object key = frame.getValue(primaryIndexSlot);
+		    cache.remove(key);
+		}
+	    }
 	    kb.remove(frame.getUID());
 	}
 
