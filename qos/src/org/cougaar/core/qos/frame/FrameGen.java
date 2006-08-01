@@ -1200,15 +1200,15 @@ extends DefaultHandler
 
     }
 
-    private String slotHashVar(String slot) {
-	return fixName(slot, false) +"__HashVar__";
+    private String slotVar(String slot) {
+	return fixName(slot, false) +"__SlotVar__";
     }
 
     private void generateHashConstants(PrintWriter writer, Map<String,Attributes> slots) {
 	for (String slot : slots.keySet()) {
-	    String slot_hash_var = slotHashVar(slot);
-	    writer.println("    private static final int " +slot_hash_var+
-		    " = \"" +slot+ "\".hashCode();");
+	    String slot_hash_var = slotVar(slot);
+	    writer.println("    private static final String " +slot_hash_var+
+		    " = \"" +slot+ "\".intern();");
 	}
     }
 
@@ -1217,13 +1217,13 @@ extends DefaultHandler
 	    Map<String,Attributes> slots,
 	    boolean is_root) {
 	writer.println("\n\n    protected Object getLocalValue(String __slot) {");
-	writer.println("       int __key = __slot.hashCode();");
+	writer.println("       String __key = __slot.intern();");
 	writer.print("      ");
 	for(Map.Entry<String,Attributes> entry : slots.entrySet()) {
 	    String slot = entry.getKey();
-	    String slot_hash_var = slotHashVar(slot);
+	    String slot_var = slotVar(slot);
 	    String method = "get" + fixName(slot, true) + AsObject;
-	    writer.println(" if (" +slot_hash_var+ " == __key)");
+	    writer.println(" if (" +slot_var+ " == __key)");
 	    writer.println("            return " +method+ "();");
 	    writer.print("       else");
 	}
@@ -1246,16 +1246,16 @@ extends DefaultHandler
 	for(Map.Entry<String,Attributes> entry : slots.entrySet()) {
 	    String slot = entry.getKey();
 	    if (isReadOnly(prototype, slot)) continue;
-	    String slot_hash_var = slotHashVar(slot);
+	    String slot_var = slotVar(slot);
 	    String method = "set" + fixName(slot, true) + AsObject;
 	    writer.print("      ");
 	    if (first) {
-		writer.println(" int __key = __slot.hashCode();");
+		writer.println(" String __key = __slot.intern();");
 		writer.print("      ");
 	    } else {
 		writer.print(" else");
 	    }
-	    writer.println(" if (" +slot_hash_var+ " == __key)");
+	    writer.println(" if (" +slot_var+ " == __key)");
 	    writer.println("            " +method+ "(__value);");
 	    first = false;
 	}
@@ -1277,11 +1277,11 @@ extends DefaultHandler
 	    boolean is_root) {
 	writer.println("\n\n    protected void initializeLocalValue(String __slot,");
 	writer.println("                                 Object __value) {");
-	writer.println("       int __key = __slot.hashCode();");
+	writer.println("       String __key = __slot.intern();");
 	boolean first = true;
 	for(Map.Entry<String,Attributes> entry : slots.entrySet()) {
 	    String slot = entry.getKey();
-	    String slot_hash_var = slotHashVar(slot);
+	    String slot_hash_var = slotVar(slot);
 	    String method = "initialize" + fixName(slot, true) +AsObject;
 	    writer.print("      ");
 	    if (!first) writer.print(" else");
