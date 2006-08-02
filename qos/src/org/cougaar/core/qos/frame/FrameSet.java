@@ -274,7 +274,7 @@ public interface FrameSet {
      * explicitly in user code.
      * 
      * @param slot The slot whose value is computed by a {@link SlotAggregator}.
-     * @param childSlot  If non-null, and the value of this slot changes in a related entity, 
+     * @param relatedSlot  If non-null, and the value of this slot changes in a related entity, 
      * the {@link SlotAggregator} will be reinvoked.
      * @param relation The name of the RelationPrototype that's used to collect the related
      * entites.
@@ -282,7 +282,8 @@ public interface FrameSet {
      * a package the name is used as is.  If not, the class should be in the frameset
      * package, or in org.cougaar.core.qos.frame.aggregator.
      */
-    public void addAggregator(String slot, String childSlot, String relation, String className);
+    public void addAggregator(String slot, String relatedSlot, String relation, String role,
+	    String className);
     
     /**
      * Set up subscriptions for all aggregators that haven't done so already.

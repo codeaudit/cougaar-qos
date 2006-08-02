@@ -37,13 +37,13 @@ public class Average implements SlotAggregator {
     
     public void updateSlotValue(DataFrame frame, Set<DataFrame> children, SlotAggregation agg) {
 	int count = children.size();
-	String pslot = agg.getParentSlot();
+	String pslot = agg.getSlot();
 	if (count == 0) {
 	    frame.setValue(pslot, 0f);
 	    return;
 	}
 	float sum = 0f;
-	String cslot = agg.getChildSlot();
+	String cslot = agg.getRelatedSlot();
 	for (DataFrame child : children) {
 	    Number n = (Number) child.getValue(cslot);
 	    sum += n.floatValue();

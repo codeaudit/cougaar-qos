@@ -44,16 +44,22 @@ import org.cougaar.util.UnaryPredicate;
  * 
  */
 public class SlotAggregation {
-    private final String parentSlot;
-    private final String childSlot;
+    private final String slot;
+    private final String relatedSlot;
     private final String relation;
     private final SlotAggregator aggregator;
     private final FrameSet frameset;
+    private final String role;
+    private final String otherRole;
     private IncrementalSubscription sub;
     
-    public SlotAggregation(FrameSet frameset, String slot, String childSlot, String relation,
-	    String className) 
+    public SlotAggregation(FrameSet frameset, String slot, String relatedSlot, String relation,
+	    String role, String className) 
     throws Exception {
+	// Assume "parent" role for now
+	this.role = role == null ? "parent" : role;
+	this.otherRole = this.role.equals("parent") ? "child" : "parent";
+	
 	Class aggregatorClass = null;
 	if (className.indexOf('.') <0) {
 	    // No package, check the frameset's
@@ -75,27 +81,31 @@ public class SlotAggregation {
 	    aggregatorClass = Class.forName(className);
 	}
 	this.aggregator = (SlotAggregator) aggregatorClass.newInstance();
-	this.parentSlot = slot;
-	this.childSlot = childSlot;
+	this.slot = slot;
+	this.relatedSlot = relatedSlot;
 	this.relation = relation;
 	this.frameset = frameset;
     }
 
-    public String getChildSlot() {
-        return childSlot;
+    public String getRelatedSlot() {
+        return relatedSlot;
     }
 
-    public String getParentSlot() {
-        return parentSlot;
+    public String getSlot() {
+        return slot;
     }
 
     public String getRelation() {
         return relation;
     }
+    
+    public String getRole() {
+	return role;
+    }
 
     private void addToUpdateSet(Object x, Set<DataFrame> framesToUpdate) {
 	DataFrame frame = (DataFrame) x;
-	Set<DataFrame> parents = frame.findRelations("parent", relation);
+	Set<DataFrame> parents = frame.findRelations(role, relation);
 	if (parents != null) {
 	    framesToUpdate.addAll(parents);
 	}
@@ -121,13 +131,13 @@ public class SlotAggregation {
 		addToUpdateSet(x, framesToUpdate);
 	    }
 	    
-	    if (childSlot != null) {
+	    if (relatedSlot != null) {
 		Collection changedFrames = sub.getChangedCollection();
 		for (Object x : changedFrames) {
 		    Set changeReports = sub.getChangeReports(x);
 		    boolean relevant = false;
 		    for (Frame.Change change : (Set<Frame.Change>) changeReports) {
-			if (change.getSlotName().equals(childSlot)) {
+			if (change.getSlotName().equals(relatedSlot)) {
 			    relevant = true;
 			    break;
 			}
@@ -138,7 +148,7 @@ public class SlotAggregation {
 	    
 	    
 	    for (DataFrame frame : framesToUpdate) {
-		Set<DataFrame> children = frame.findRelations("child", relation);
+		Set<DataFrame> children = frame.findRelations(otherRole, relation);
 		aggregator.updateSlotValue(frame, children, this);
 	    }
 	    
@@ -152,13 +162,20 @@ public class SlotAggregation {
     }
     
     private class FramePredicate implements UnaryPredicate {
+	private final String attribute = otherRole + "-prototype";
+	private Class klass;
+	
 	public boolean execute(Object o) {
 	    if (!(o instanceof DataFrame)) return false;
 	    DataFrame frame = (DataFrame) o;
-	    PrototypeFrame relationProto = frameset.findPrototypeFrame(relation);
-	    String childType = relationProto.getAttribute("child-prototype");
-	    Class cClass = frameset.classForPrototype(childType);
-	    return frameset == frame.getFrameSet() && cClass.isAssignableFrom(frame.getClass());
+	    if (frameset != frame.getFrameSet()) return false;
+	    
+	    if (klass == null) {
+		PrototypeFrame relationProto = frameset.findPrototypeFrame(relation);
+		String type = relationProto.getAttribute(attribute);
+		klass = frameset.classForPrototype(type);
+	    }
+	    return klass.isAssignableFrom(frame.getClass());
 	}
     }
 }

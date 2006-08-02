@@ -137,9 +137,10 @@ public class SingleInheritanceFrameSet
 
     // Slot aggregation
     
-    public void addAggregator(String slot, String childSlot, String relation, String aggregator) {
+    public void addAggregator(String slot, String relatedSlot, String relation, 
+	    String role, String aggregator) {
 	try {
-	    SlotAggregation agg = new SlotAggregation(this, slot, childSlot, relation, aggregator);
+	    SlotAggregation agg = new SlotAggregation(this, slot, relatedSlot, relation, role, aggregator);
 	    aggregations.add(agg);
 	} catch (Exception e) {
 	    log.error("Couldn't instantiate " + aggregator);

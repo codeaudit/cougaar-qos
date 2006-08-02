@@ -1,3 +1,4 @@
+<!DOCTYPE frameset SYSTEM "../frameset.dtd">
 <frameset domain="testScale" frame-inheritance="single"
 	package="org.cougaar.core.qos.frame.scale" container-relation="contains"
 	index-slot="name">
@@ -24,7 +25,7 @@
 			<slot name="rootSlotString" type="String" default-value="Zero"/>
 			<slot name="count" type="int" default-value="0" inheritable-through="prototype-only"/>
 			<slot name="avgLevel1" type="float" inheritable-through="prototype-only">
-				<aggregate-by relation="level1OnRoot" aggregator="Average" child-slot="level1SlotFloat"/>
+				<aggregate-by relation="level1OnRoot" aggregator="Average" related-slot="level1SlotFloat"/>
 			</slot>
 		</prototype>
 		

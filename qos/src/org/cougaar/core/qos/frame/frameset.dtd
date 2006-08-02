@@ -47,5 +47,6 @@
 
 <!ELEMENT aggregate-by EMPTY>
 <!ATTLIST aggregate-by relation CDATA #REQUIRED
+		  role CDATA #IMPLIED
           aggregator CDATA #REQUIRED
-          child-slot CDATA #IMPLIED>
+          related-slot CDATA #IMPLIED>
