@@ -1224,31 +1224,17 @@ extends DefaultHandler
 		all_slots.put(key, value);
 	    }
 	    if (!all_slots.isEmpty()) {
-		generateHashConstants(writer, all_slots);
 		writeDynamicGetter(writer, prototype, all_slots, is_root);
 	    }
 	}
 	if (!local_slots.isEmpty()) {
 	    if (container == null) {
-		generateHashConstants(writer, local_slots);
 		writeDynamicGetter(writer, prototype, local_slots, is_root);
 	    }
 	    writeDynamicSetter(writer, prototype, local_slots, is_root);
 	    writeDynamicInitializer(writer, prototype, local_slots, is_root);
 	}
 
-    }
-
-    private String slotVar(String slot) {
-	return fixName(slot, false) +"__SlotVar__";
-    }
-
-    private void generateHashConstants(PrintWriter writer, Map<String,Attributes> slots) {
-	for (String slot : slots.keySet()) {
-	    String slot_hash_var = slotVar(slot);
-	    writer.println("    private static final String " +slot_hash_var+
-		    " = \"" +slot+ "\".intern();");
-	}
     }
 
     private void writeDynamicGetter(PrintWriter writer, 
@@ -1260,9 +1246,8 @@ extends DefaultHandler
 	writer.print("      ");
 	for(Map.Entry<String,Attributes> entry : slots.entrySet()) {
 	    String slot = entry.getKey();
-	    String slot_var = slotVar(slot);
 	    String method = "get" + fixName(slot, true) + AsObject;
-	    writer.println(" if (" +slot_var+ " == __key)");
+	    writer.println(" if (\"" +slot+ "\" == __key)");
 	    writer.println("            return " +method+ "();");
 	    writer.print("       else");
 	}
@@ -1285,7 +1270,6 @@ extends DefaultHandler
 	for(Map.Entry<String,Attributes> entry : slots.entrySet()) {
 	    String slot = entry.getKey();
 	    if (isReadOnly(prototype, slot)) continue;
-	    String slot_var = slotVar(slot);
 	    String method = "set" + fixName(slot, true) + AsObject;
 	    writer.print("      ");
 	    if (first) {
@@ -1294,7 +1278,7 @@ extends DefaultHandler
 	    } else {
 		writer.print(" else");
 	    }
-	    writer.println(" if (" +slot_var+ " == __key)");
+	    writer.println(" if (\"" +slot+ "\" == __key)");
 	    writer.println("            " +method+ "(__value);");
 	    first = false;
 	}
@@ -1320,11 +1304,10 @@ extends DefaultHandler
 	boolean first = true;
 	for(Map.Entry<String,Attributes> entry : slots.entrySet()) {
 	    String slot = entry.getKey();
-	    String slot_hash_var = slotVar(slot);
 	    String method = "initialize" + fixName(slot, true) +AsObject;
 	    writer.print("      ");
 	    if (!first) writer.print(" else");
-	    writer.println(" if (" +slot_hash_var+ " == __key)");
+	    writer.println(" if (\"" +slot+ "\" == __key)");
 	    writer.println("            " +method+ "(__value);");
 	    first = false;
 	}
