@@ -28,7 +28,9 @@ package org.cougaar.core.qos.frame;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -949,14 +951,19 @@ public class SingleInheritanceFrameSet
 	writer.close();
     }
 
+    public void importFrames(URL location) 
+    throws IOException{
+	FrameSetParser parser = new FrameSetParser();
+	parser.parseFrameSetData(name, location, this);
+    }
 
-    public void write(File file)
-	throws java.io.IOException {
+    public void exportFrames(File file)
+	throws IOException {
 	writeData(file, 0, 2, null);
     }
     
-    public void write(File file, Set<String> prototypes)
-	throws java.io.IOException {
+    public void exportFrames(File file, Set<String> prototypes)
+	throws IOException {
 	Set<Class> classes = new HashSet<Class>();
 	for (String prototype : prototypes) {
 	    classes.add(classForPrototype(prototype));

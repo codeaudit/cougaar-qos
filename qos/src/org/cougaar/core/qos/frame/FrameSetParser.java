@@ -27,6 +27,7 @@
 package org.cougaar.core.qos.frame;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +36,8 @@ import java.util.Properties;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.BlackboardService;
-import org.cougaar.core.service.LoggingService;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
@@ -65,19 +67,18 @@ public class FrameSetParser
     private PrototypeSpec proto_spec;
     private PathSpec path_spec;
     private String slot_def; // slot being defined when we're parsing prototypes xml
-    private HashMap path_specs;
-    private HashMap references;
-
     private ServiceBroker sb;
     private BlackboardService bbs;
-    private LoggingService log;
+    private Logger log;
+    
+    public FrameSetParser() {
+	this.log = Logging.getLogger(getClass().getName());
+    }
 
     public FrameSetParser(ServiceBroker sb, BlackboardService bbs) {
+	this();
 	this.sb = sb;
 	this.bbs = bbs;
-	this.log = (LoggingService)
-	    sb.getService(this, LoggingService.class, null);
-	path_specs = new HashMap();
     }
 
     public FrameSet parseFrameSetFiles(String name, String[] xml_filenames) {
@@ -96,32 +97,35 @@ public class FrameSetParser
     public FrameSet parseFrameSetFile(String name,
 				      String xml_filename,
 				      FrameSet frameSet) {
+	ClassLoader loader = FrameSetParser.class.getClassLoader();
+	URL url = loader.getResource(xml_filename);
+	if (url == null) {
+	    // Try it as a file
+	    File file = new File(xml_filename);
+	    try {
+		url = file.toURL();
+	    } catch (MalformedURLException e) {
+		log.error("Bogus FrameSet data location " + xml_filename, e);
+		return frameSet;
+	    }
+	}
+	return parseFrameSetData(name, url, frameSet);
+    }
+    
+    public FrameSet parseFrameSetData(String name, URL url, FrameSet frameSet) {
 	if (log.isInfoEnabled())
-	    log.info("FrameSet " +name+ " file " +xml_filename);
+	    log.info("Loading FrameSet" +name+ " from " +url);
 		
 	this.frame_set = frameSet;
 	this.frame_set_name = name;
-// 	File xml_file = ConfigFinder.getInstance().locateFile(xml_filename);
-// 	if (xml_file == null) {
-// 	    if (log.isWarnEnabled())
-// 		log.warn("Can't find FrameSet file " + xml_filename);
-// 	    return null;
-// 	}
-	ClassLoader loader = FrameSetParser.class.getClassLoader();
 	try {
 	    XMLReader producer = XMLReaderFactory.createXMLReader();
 	    DefaultHandler consumer = this; 
 	    producer.setContentHandler(consumer);
 	    producer.setErrorHandler(consumer);
-	    URL url = loader.getResource(xml_filename); // xml_file.toURL();
-	    if (url == null) {
-		// Try it as a file
-		File file = new File(xml_filename);
-		url = file.toURL();
-	    }
 	    producer.parse(url.toString());
 	} catch (Throwable ex) {
-	    log.error("Error parsing FrameSet file " + xml_filename, ex);
+	    log.error("Error parsing FrameSet file " + url, ex);
 	}
 	return frame_set;
     }
@@ -260,8 +264,6 @@ public class FrameSetParser
     private void endPath() {
 	if (log.isDebugEnabled())
 	    log.debug("endPath");
-
-	path_specs.put(path_spec.name, path_spec.makePath(frame_set));
 	path_spec = null;
     }
 
@@ -305,7 +307,6 @@ public class FrameSetParser
 
     // Helper structs
     private class DataFrameSpec {
-	String reference;
 	String prototype;
 	Properties slotValues;
 	
@@ -324,11 +325,6 @@ public class FrameSetParser
 	    if (pframe == null) return null;
 	    
 	    Frame frame = frameSet.makeFrame(prototype, slotValues);
-	    if (reference != null) {
-		synchronized (references) {
-		    references.put(reference, frame);
-		}
-	    }
 	    return frame;
 	}
     }

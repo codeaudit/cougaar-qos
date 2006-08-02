@@ -27,6 +27,8 @@
 package org.cougaar.core.qos.frame;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Observer;
@@ -236,15 +238,20 @@ public interface FrameSet {
     /**
      * Dump all DataFrames as XML.
      */
-    public void write(File file)
-	throws java.io.IOException;
+    public void exportFrames(File file) throws IOException;
     
     /**
      * Dump all DataFrames of the given prototypes as XML
      */
-    public void write(File file, Set<String> prototypes)
-    throws java.io.IOException;
+    public void exportFrames(File file, Set<String> prototypes) throws IOException;
 
+    /**
+     * Load DataFrames at the given location
+     * 
+     * @param location A file or resource path
+     */
+    public void importFrames(URL location) throws IOException;
+    
     /**
      * Subscribes a DataFrame to a value in the MetricsService
      */

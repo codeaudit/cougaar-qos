@@ -34,7 +34,6 @@ import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.frame.FrameSet;
-import org.cougaar.core.qos.frame.FrameSetParser;
 import org.cougaar.core.qos.frame.FrameSetService;
 import org.cougaar.core.qos.metrics.ParameterizedPlugin;
 import org.cougaar.core.service.LoggingService;
@@ -88,8 +87,12 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 
     void loadFileExample() {
 	File file = new File(getParameter("dump-file", "generated-scale.xml"));
-	FrameSetParser parser = new FrameSetParser(getServiceBroker(), getBlackboardService());
-	parser.parseFrameSetFile(frameset.getName(), file.getAbsolutePath(), frameset);
+	try {
+	    frameset.importFrames(file.toURL());
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
     }
     
     void saveSubsetExample() {
@@ -101,7 +104,7 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	protos.add("antilevel2OnAntilevel1");
 	File file = new File(getParameter("dump-file", "generated-scale.xml"));
 	try {
-	    frameset.write(file, protos);
+	    frameset.exportFrames(file, protos);
 	} catch (IOException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
