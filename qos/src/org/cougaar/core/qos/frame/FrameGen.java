@@ -1328,6 +1328,15 @@ extends DefaultHandler
 	    writeContainerReaderAsObject(writer, container, slot);
 	}
     }
+    
+    private String getDefaultValue(String container, String slot) {
+	String type = getSlotType(container, slot);
+	String defaultValue = getSlotValue(container, slot);
+	if (type.equals("java.lang.String") || type.equals("String")) {
+	    defaultValue = "\"" + defaultValue+ "\""; 
+	}
+	return defaultValue;
+    }
 
     private void writeContainerReader(PrintWriter writer, 
 	    String container,
@@ -1339,9 +1348,10 @@ extends DefaultHandler
 	String container_var = "__container";
 	writer.println("\n\n    public "+type+ " " +reader_name+ "() {");
 	writer.println("       Object " +raw_container_var+ " = containerFrame();");
-	writer.println("       if ( " + raw_container_var + 
+	writer.print("       if ( " + raw_container_var + 
 	" == null)");
-	writer.println("            throw new RuntimeException(\"No container!\");");
+	String defaultValue = getDefaultValue(container, slot);
+	writer.println(" return " +defaultValue+ ";");
 	writer.println("       if (!("  +raw_container_var+ " instanceof "
 		+container_class+ "))");
 	writer.println("            throw new RuntimeException(\"Bogus container!\");");
@@ -1360,7 +1370,8 @@ extends DefaultHandler
 	String container_var = "__container";
 	writer.println("\n\n    Object " +reader_name+ "() {");
 	writer.println("       Object " +raw_container_var+ " = containerFrame();");
-	writer.println("       if ( " + raw_container_var + " == null) return null;");
+	String defaultValue = getDefaultValue(container, slot);
+	writer.println("       if ( " + raw_container_var + " == null) return " +defaultValue+ ";");
 	writer.println("       if (!("  +raw_container_var+ " instanceof "
 		+container_class+ ")) {");
 	writer.println("            getLogger().warn(\"Container of \" +this+ \" is not a " +container_class+ ": \" + " +raw_container_var+ ");");
@@ -1693,6 +1704,38 @@ extends DefaultHandler
 	    return getSlotType(container, slot);
 	} else {
 	    return "String";
+	}
+    }
+    
+    
+    private String getSlotValueFromPrototypeTree(String prototype, String slot) {
+	Map<String,Attributes> slots = proto_slots.get(prototype);
+	Attributes attrs = slots.get(slot);
+	String attrstr = attrs != null ? attrs.getValue("default-value") : null;
+	if (attrstr == null) {
+	    Attributes p_attrs = proto_attrs.get(prototype);
+	    String parent = p_attrs.getValue("prototype");
+	    if (parent != null) {
+		return getSlotValueFromPrototypeTree(parent, slot);
+	    } else {
+		return null;
+	    }
+	} else {
+	    return attrstr;
+	}
+    }
+
+    private String getSlotValue(String prototype, String slot) {
+	String type = getSlotValueFromPrototypeTree(prototype, slot);
+	if (type != null) return type;
+
+	// Try the containment hierarchy
+	Attributes p_attrs = proto_attrs.get(prototype);
+	String container = p_attrs.getValue("container");
+	if (container != null) {
+	    return getSlotValue(container, slot);
+	} else {
+	    return null;
 	}
     }
 
