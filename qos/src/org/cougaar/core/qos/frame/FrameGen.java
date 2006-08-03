@@ -461,8 +461,7 @@ extends DefaultHandler
     }
 
     private void generatePrototypes(String pkg, String root) {
-	String output_directory = root + File.separator+ 
-	pkg.replaceAll("\\.", File.separator);
+	String output_directory = root + File.separator+pkg.replace('.', File.separatorChar);
 
 	for (Map.Entry<String,Map<String,Attributes>> entry : proto_slots.entrySet()) {
 	    String prototype = entry.getKey();
