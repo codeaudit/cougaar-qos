@@ -715,7 +715,7 @@ public class SingleInheritanceFrameSet
 	}
 	return results;
     }
-
+    
     Set<DataFrame> findParents(DataFrame child, 
 	    String relation_prototype,
 	    Map<RelationFrame,DataFrame> map) {
@@ -741,6 +741,88 @@ public class SingleInheritanceFrameSet
 	return results;
     }
 
+
+    int countChildren(DataFrame parent, String relation_prototype) {
+	Class klass = classForPrototype(relation_prototype);
+	if (klass == null) return 0;
+	int count = 0;
+	synchronized (relation_lock) {
+	    Set<RelationFrame> rframes = inverse_parent_cache.get(parent);
+	    if (rframes != null) {
+		for (RelationFrame rframe : rframes) {
+		    if (descendsFrom(rframe, klass, relation_prototype)) {
+			DataFrame child = child_cache.get(rframe);
+			if (child != null) {
+			    ++count;
+			}
+		    }
+		}
+	    }
+	}
+	return count;
+    }
+
+    int countParents(DataFrame child, String relation_prototype) {
+	Class klass = classForPrototype(relation_prototype);
+	if (klass == null) return 0;
+	int count = 0;
+	synchronized (relation_lock) {
+	    Set<RelationFrame> rframes = inverse_child_cache.get(child);
+	    if (rframes != null) {
+		for (RelationFrame rframe : rframes) {
+		    if (descendsFrom(rframe, klass, relation_prototype)) {
+			DataFrame parent = parent_cache.get(rframe);
+			if (parent != null) {
+			    ++count;
+			}
+		    }
+		}
+	    }
+	}
+	return count;
+    }
+    
+    DataFrame findFirstChild(DataFrame parent, String relation_prototype) {
+	Class klass = classForPrototype(relation_prototype);
+	if (klass == null) return null;
+	synchronized (relation_lock) {
+	    Set<RelationFrame> rframes = inverse_parent_cache.get(parent);
+	    if (rframes != null) {
+		for (RelationFrame rframe : rframes) {
+		    if (descendsFrom(rframe, klass, relation_prototype)) {
+			DataFrame child = child_cache.get(rframe);
+			if (child != null) {
+			    return child;
+			}
+		    }
+		}
+	    }
+	}
+	return null;
+    }
+
+    DataFrame findFirstParent(DataFrame child, String relation_prototype) {
+	Class klass = classForPrototype(relation_prototype);
+	if (klass == null) return null;
+	synchronized (relation_lock) {
+	    Set<RelationFrame> rframes = inverse_child_cache.get(child);
+	    if (rframes != null) {
+		for (RelationFrame rframe : rframes) {
+		    if (descendsFrom(rframe, klass, relation_prototype)) {
+			DataFrame parent = parent_cache.get(rframe);
+			if (parent != null) {
+			    return parent;
+			}
+		    }
+		}
+	    }
+	}
+	return null;
+    }
+    
+   
+
+    
     public Set<DataFrame> findRelations(Frame frame, // should be DataFrame
 	    String role,
 	    String relation_proto) {
@@ -753,7 +835,34 @@ public class SingleInheritanceFrameSet
 		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
 	    return null;
 	}
-				
+    }
+    
+    public DataFrame findFirstRelation(Frame frame, // should be DataFrame
+	    String role,
+	    String relation_proto) {
+	if (role.equals("parent")) {
+	    return findFirstParent((DataFrame) frame, relation_proto);
+	} else if (role.equals("child")) {
+	    return findFirstChild((DataFrame) frame, relation_proto);
+	} else {
+	    if (log.isWarnEnabled())
+		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+	    return null;
+	}
+    }
+    
+    public int countRelations(Frame frame, // should be DataFrame
+	    String role,
+	    String relation_proto) {
+	if (role.equals("parent")) {
+	    return countParents((DataFrame) frame, relation_proto);
+	} else if (role.equals("child")) {
+	    return countChildren((DataFrame) frame, relation_proto);
+	} else {
+	    if (log.isWarnEnabled())
+		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+	    return 0;
+	}
     }
 
     public Map<RelationFrame,DataFrame> findRelationshipFrames(DataFrame frame, 

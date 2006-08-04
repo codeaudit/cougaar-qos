@@ -115,6 +115,30 @@ public interface FrameSet {
     public Set<DataFrame> findRelations(Frame frame, // should be DataFrame
 	    String role,
 	    String relation_proto);
+    /**
+     * Returns a {@link DataFrame} that's related to the given one
+     * via a relationship matching the given prototype, and in which 
+     * the given frame plays the given role ("parent" or "child").
+     * 
+     * If there's more than one such frame, a random one will be
+     * returne.  If there are no such frames, the return value
+     * is null.
+     */
+    public DataFrame findFirstRelation(Frame frame, // should be DataFrame
+	    String role,
+	    String relation_proto);
+    
+    /**
+     * Returns a count of frames that are related to the given one
+     * via a relationship matching the given prototype, and in which 
+     * the given frame plays the given role ("parent" or "child").
+     * 
+     */
+    public int countRelations(Frame frame, // should be DataFrame
+	    String role,
+	    String relation_proto);
+    
+    
 
     /**
      * Returns a collection of {@link RelationFrame}s representing

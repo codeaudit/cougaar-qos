@@ -385,6 +385,16 @@ implements PropertyChangeListener {
 	if (frameSet == null) return null;
 	return frameSet.findRelations(this, role, relation);
     }
+    
+    public DataFrame findFirstRelation(String role, String relation) {
+	if (frameSet == null) return null;
+	return frameSet.findFirstRelation(this, role, relation);
+    }
+    
+    public int countRelations(String role, String relation) {
+	if (frameSet == null) return 0;
+	return frameSet.countRelations(this, role, relation);
+    }
 
     public Map<RelationFrame,DataFrame> findRelationshipFrames(String role, String relation) {
 	if (frameSet == null) return null;
