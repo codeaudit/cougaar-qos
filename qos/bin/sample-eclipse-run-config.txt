@@ -30,7 +30,7 @@ VM arguments:
 -XX:ThreadStackSize=256
 
 Working directory:
-${workspace_loc:qos/run}
+${workspace_loc:qos/bin}
 
 
 Classpath tab
