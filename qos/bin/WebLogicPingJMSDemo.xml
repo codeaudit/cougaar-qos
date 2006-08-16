@@ -8,7 +8,7 @@
 	<vm_parameter>-Dorg.cougaar.name.server=NameServer@</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.name.server.NameServer=-JMS:jms://NODE1.NameServer@</vm_parameter>
 	<vm_parameter>-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.jar.path=../tmp,../../mtsstd/tmp,$CIP/lib,$CIP/sys,$OPENJMS_HOME/lib</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.jar.path=../tmp,../../mtsstd/tmp,$CIP/lib,$CIP/sys,weblogic.jar</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.quiet=false</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.heartbeat=false</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.wp.server.successTTD=90000</vm_parameter>
@@ -18,7 +18,7 @@
     <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.initialTimeout=250</vm_parameter>
     <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.maxTimeout=666</vm_parameter>
 	<!-- Weblogic flags -->
-	<vm_parameter>-Dorg.cougaar.mts.jms.weblogic.server=mmpcServer</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.mts.jms.weblogic.server=mmpcJMS</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.mts.jms.url=t3://fig.bbn.com:7070</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.mts.jms.factory=weblogic.jms.ConnectionFactory</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.mts.jms.jndi.factory=weblogic.jndi.WLInitialContextFactory</vm_parameter>
