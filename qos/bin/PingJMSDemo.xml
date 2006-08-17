@@ -24,11 +24,19 @@
 		-Dorg.cougaar.core.mts.destq.retry.initialTimeout=250</vm_parameter>
 	<vm_parameter>
 		-Dorg.cougaar.core.mts.destq.retry.maxTimeout=666</vm_parameter>
+	
 	<!-- OPENJMS flags -->
 	<vm_parameter>-Dorg.cougaar.mts.jms.url=tcp://localhost:3035</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.mts.jms.factory=ConnectionFactory</vm_parameter>
 	<vm_parameter>
 		-Dorg.cougaar.mts.jms.jndi.factory=org.exolab.jms.jndi.InitialContextFactory</vm_parameter>
+	
+	<!-- WEBLOGIC flags 
+	<vm_parameter>-Dorg.cougaar.mts.jms.url=t3://fig.bbn.com:7070</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.mts.jms.factory=weblogic.jms.ConnectionFactory</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.mts.jms.jndi.factory=weblogic.jndi.WLInitialContextFactory</vm_parameter>
+	-->
 	
 	<host name='esb.dsl.bbn.com'>
 		<facet enclave='REAR'/>
