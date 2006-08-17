@@ -1,614 +1,653 @@
 <?xml version='1.0'?>
 <!-- Copyright 2006 BBN Technologies Corp.  All Rights Reserved.  -->
-<society name='MiniPing'
-  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-  xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
+<society name='MiniPing' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
 	<vm_parameter>-Xmx1024m</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.core.logging.config.filename=logging.properties</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.core.logging.config.filename=logging.properties</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.name.server=NameServer@</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.name.server.NameServer=-JMS:jms://NODE1.NameServer@</vm_parameter>
-	<vm_parameter>-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.jar.path=../tmp,../../mtsstd/tmp,$CIP/lib,$CIP/sys,$OPENJMS_HOME/lib</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.name.server.NameServer=-JMS:jms://NODE1.NameServer@</vm_parameter>
+	<vm_parameter>
+		-Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.jar.path=../tmp,../../mtsstd/tmp,$CIP/lib,$CIP/sys,$OPENJMS_HOME/lib</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.quiet=false</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.heartbeat=false</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.wp.server.successTTD=90000</vm_parameter>
-    <vm_parameter>-Dorg.cougaar.core.wp.server.failTTD=1000</vm_parameter>
-    <vm_parameter>-Dorg.cougaar.core.wp.resolver.rmi.minLookup=500</vm_parameter>
-    <vm_parameter>-Dorg.cougaar.core.wp.resolver.rmi.maxLookup=2000</vm_parameter>
-    <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.initialTimeout=250</vm_parameter>
-    <vm_parameter>-Dorg.cougaar.core.mts.destq.retry.maxTimeout=666</vm_parameter>
+	<vm_parameter>-Dorg.cougaar.core.wp.server.failTTD=1000</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.core.wp.resolver.rmi.minLookup=500</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.core.wp.resolver.rmi.maxLookup=2000</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.core.mts.destq.retry.initialTimeout=250</vm_parameter>
+	<vm_parameter>
+		-Dorg.cougaar.core.mts.destq.retry.maxTimeout=666</vm_parameter>
 	<!-- OPENJMS flags -->
 	<vm_parameter>-Dorg.cougaar.mts.jms.url=tcp://localhost:3035</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.mts.jms.factory=ConnectionFactory</vm_parameter>
-	<vm_parameter>-Dorg.cougaar.mts.jms.jndi.factory=org.exolab.jms.jndi.InitialContextFactory</vm_parameter>
-
-  <host name='esb.dsl.bbn.com'>
-    <facet enclave='REAR'  />
-    <node name='NODE1'>
-		<vm_parameter>-Dorg.cougaar.core.logging.log4j.appender.A2.File=NODE1-events.log</vm_parameter>
-		<vm_parameter>-Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo"</vm_parameter>
-      <component
-        name='org.cougaar.core.thread.AgentLoadRatePlugin'
-        class='org.cougaar.core.thread.AgentLoadRatePlugin'
-        priority='LOW'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
-        class='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.metrics.MetricsServletPlugin'
-        class='org.cougaar.core.qos.metrics.MetricsServletPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.thread.AgentLoadSensorPlugin'
-        class='org.cougaar.core.thread.AgentLoadSensorPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
-        class='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.mts.std.StatisticsPlugin'
-        class='org.cougaar.mts.std.StatisticsPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.thread.TopPlugin'
-        class='org.cougaar.core.thread.TopPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      
-      <component
-        name='org.cougaar.core.util.ComponentViewServlet_Node.AgentManager.Agent.PluginManager.Plugin(/components)'
-        class='org.cougaar.core.util.ComponentViewServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          /components
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.mobility.service.RootMobilityPlugin'
-        class='org.cougaar.core.mobility.service.RootMobilityPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.mobility.servlet.MoveAgentServlet'
-        class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.servlet.SimpleServletComponent_Node.AgentManager.Agent.PluginManager.Plugin(org.cougaar.planning.servlet.PlanViewServlet,/tasks)'
-        class='org.cougaar.core.servlet.SimpleServletComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          org.cougaar.planning.servlet.PlanViewServlet
-        </argument>
-        <argument>
-          /tasks
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.adaptivity.AEViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/ae)'
-        class='org.cougaar.core.adaptivity.AEViewerServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          /ae
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.wp.WhitePagesServlet_Node.AgentManager.Agent.PluginManager.Plugin(/wp)'
-        class='org.cougaar.core.wp.WhitePagesServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          /wp
-        </argument>
-      </component>
-		
-	  
+	<vm_parameter>
+		-Dorg.cougaar.mts.jms.jndi.factory=org.exolab.jms.jndi.InitialContextFactory</vm_parameter>
 	
-	
-		
-	<component
-        name='org.cougaar.mts.base.LoopbackLinkProtocol()'
-        class='org.cougaar.mts.base.LoopbackLinkProtocol'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
-		
-		<!-- component
-        name='org.cougaar.mts.base.RMILinkProtocol()'
-        class='org.cougaar.mts.base.RMILinkProtocol'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/ -->
-		
-		<component
-        name='org.cougaar.mts.jms.JMSLinkProtocol()'
-        class='org.cougaar.mts.jms.JMSLinkProtocol'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
-		
-		
-      <component
-        name='org.cougaar.mts.std.StatisticsAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.mts.std.StatisticsAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-		
-      <component
-        name='org.cougaar.mts.std.DeliveryVerificationAspect_Node.AgentManager.Agent.MessageTransport.Aspect(info-time=9,warn-time=99)'
-        class='org.cougaar.mts.std.DeliveryVerificationAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-        <argument>
-          info-time=9
-        </argument>
-        <argument>
-          warn-time=99
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.core.qos.gossip.GossipAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.mts.std.DestinationThreadConstrictor_Node.AgentManager.Agent.MessageTransport.Aspect(MaxPerNode=2,MaxThreads=15)'
-        class='org.cougaar.mts.std.DestinationThreadConstrictor'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-        <argument>
-          MaxPerNode=2
-        </argument>
-        <argument>
-          MaxThreads=15
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.mts.std.DestinationQueueMonitorPlugin_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.rss.AgentHostUpdaterComponent_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.core.qos.rss.AgentHostUpdaterComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
-      <component
-        name='org.cougaar.lib.mquo.SyscondFactory_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.lib.mquo.SyscondFactory'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipFeedComponent_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.core.qos.gossip.GossipFeedComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
-      <component
-        name='org.cougaar.core.mobility.ldm.MobilityDomain_Node.AgentManager.Agent.DomainManager.Domain(mobility)'
-        class='org.cougaar.core.mobility.ldm.MobilityDomain'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
-        <argument>
-          mobility
-        </argument>
-      </component>
-      <agent name='NameServer' class='org.cougaar.core.agent.SimpleAgent'>
-        <facet role='NameServer'  />
-        <component
-          name='org.cougaar.core.qos.frame.FrameSetServicePlugin_Node.AgentManager.Agent.PluginManager.Plugin()'
-          class='org.cougaar.core.qos.frame.FrameSetServicePlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        </component>
-        <component
-          name='org.cougaar.core.qos.frame.FrameViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/frames)'
-          class='org.cougaar.core.qos.frame.FrameViewerServlet'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>
-            /frames
-          </argument>
-        </component>
-        
-        <component
-          name='org.cougaar.core.thread.LimitThreadsPlugin'
-          class='org.cougaar.core.thread.LimitThreadsPlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>
-            maxThreads=1
-          </argument>
-        </component>
-        <component
-          name='org.cougaar.core.qos.metrics.PersistenceAdapterPlugin'
-          class='org.cougaar.core.qos.metrics.PersistenceAdapterPlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        </component>
-        <component
-          name='org.cougaar.core.servlet.SimpleServletComponent_Node.AgentManager.Agent.PluginManager.Plugin(org.cougaar.planning.servlet.PlanViewServlet,/tasks)'
-          class='org.cougaar.core.servlet.SimpleServletComponent'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>
-            org.cougaar.planning.servlet.PlanViewServlet
-          </argument>
-          <argument>
-            /tasks
-          </argument>
-        </component>
-        <component
-          name='org.cougaar.core.adaptivity.AEViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/ae)'
-          class='org.cougaar.core.adaptivity.AEViewerServlet'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>
-            /ae
-          </argument>
-        </component>
-        <component
-          name='org.cougaar.core.wp.server.Server_Node.AgentManager.Agent.WPServer()'
-          class='org.cougaar.core.wp.server.Server'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.WPServer'>
-        </component>
-     </agent>		  
-	 <agent name='Source1'>
-        <!-- optional agent mobility support -->
-
-        <component
-          name='mobility'
-          class='org.cougaar.core.mobility.ldm.MobilityDomain'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
-          <argument>mobility</argument>
-        </component>
-        <component
-          name='org.cougaar.core.mobility.service.RedirectMovePlugin()'
-          class='org.cougaar.core.mobility.service.RedirectMovePlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
-        <component
-          name='org.cougaar.core.mobility.servlet.MoveAgentServlet()'
-          class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
-
-
-        <!-- optional servlets -->
-        <component
-          name='org.cougaar.core.wp.WhitePagesServlet(/wp)'
-          class='org.cougaar.core.wp.WhitePagesServlet'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>/wp</argument>
-        </component>
-        <component
-          name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
-          class='org.cougaar.core.servlet.SimpleServletComponent'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>org.cougaar.planning.servlet.PlanViewServlet</argument>
-          <argument>/tasks</argument>
-        </component>
-
-        <!-- 
-        Ping specific plugins.
-
-        See the package javadocs for core/src/org/cougaar/core/mobility/ping
-        for important usage notes.
-        -->
-
-        <!-- required ping timer, set for every second-->
-        <component
-          name='org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)'
-          class='org.cougaar.ping.PingTimerPlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>wakeMillis=1000</argument>
-        </component>
-
-        <!--
-        Config plugin that defines the pings.
-
-        Creates an endless series of pings from this agent to AgentB,
-        sent one per second and statistics reports every 10 seconds
-	See the javadocs for additional options.
-        -->
-        <component
-          name='org.cougaar.ping.PingAdderPlugin(target=Sink1, delayMillis=1000)'
-          class='org.cougaar.ping.PingAdderPlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>target=Sink1</argument>
-          <argument>delayMillis=1000</argument>
-	  <argument>eventMillis=10000</argument>
-        </component>
-
-        <!-- optional "/ping" servlet -->
-        <component
-          name='org.cougaar.ping.PingServlet(/ping)'
-          class='org.cougaar.ping.PingServlet'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>/ping</argument>
-        </component>
-
-      </agent>
-   
-    </node>
-    <node name='NODE2'>
-      <vm_parameter>-Dorg.cougaar.core.logging.log4j.appender.A2.File=NODE2-events.log</vm_parameter>
-		<vm_parameter>-Dcom.apple.mrj.application.apple.menu.about.name="May Demo #2"</vm_parameter>
-      
-      <component
-        name='org.cougaar.core.thread.AgentLoadRatePlugin'
-        class='org.cougaar.core.thread.AgentLoadRatePlugin'
-        priority='LOW'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
-        class='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.metrics.MetricsServletPlugin'
-        class='org.cougaar.core.qos.metrics.MetricsServletPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.thread.AgentLoadSensorPlugin'
-        class='org.cougaar.core.thread.AgentLoadSensorPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
-        class='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.mts.std.StatisticsPlugin'
-        class='org.cougaar.mts.std.StatisticsPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.thread.TopPlugin'
-        class='org.cougaar.core.thread.TopPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      
-      <component
-        name='org.cougaar.core.util.ComponentViewServlet_Node.AgentManager.Agent.PluginManager.Plugin(/components)'
-        class='org.cougaar.core.util.ComponentViewServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          /components
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.mobility.service.RootMobilityPlugin'
-        class='org.cougaar.core.mobility.service.RootMobilityPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.mobility.servlet.MoveAgentServlet'
-        class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-      </component>
-      <component
-        name='org.cougaar.core.servlet.SimpleServletComponent_Node.AgentManager.Agent.PluginManager.Plugin(org.cougaar.planning.servlet.PlanViewServlet,/tasks)'
-        class='org.cougaar.core.servlet.SimpleServletComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          org.cougaar.planning.servlet.PlanViewServlet
-        </argument>
-        <argument>
-          /tasks
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.adaptivity.AEViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/ae)'
-        class='org.cougaar.core.adaptivity.AEViewerServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          /ae
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.wp.WhitePagesServlet_Node.AgentManager.Agent.PluginManager.Plugin(/wp)'
-        class='org.cougaar.core.wp.WhitePagesServlet'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-        <argument>
-          /wp
-        </argument>
-      </component>
-		
-	 <component
-        name='org.cougaar.mts.jms.JMSLinkProtocol()'
-        class='org.cougaar.mts.jms.JMSLinkProtocol'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
-		
-	<!-- component
-        name='org.cougaar.mts.base.RMILinkProtocol()'
-        class='org.cougaar.mts.base.RMILinkProtocol'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/ -->	
-		
-	<component
-        name='org.cougaar.mts.base.LoopbackLinkProtocol()'
-        class='org.cougaar.mts.base.LoopbackLinkProtocol'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>	
-		
-      <component
-        name='org.cougaar.mts.std.StatisticsAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.mts.std.StatisticsAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.mts.std.DeliveryVerificationAspect_Node.AgentManager.Agent.MessageTransport.Aspect(info-time=9,warn-time=99)'
-        class='org.cougaar.mts.std.DeliveryVerificationAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-        <argument>
-          info-time=9
-        </argument>
-        <argument>
-          warn-time=99
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.core.qos.gossip.GossipAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.mts.std.DestinationThreadConstrictor_Node.AgentManager.Agent.MessageTransport.Aspect(MaxPerNode=2,MaxThreads=15)'
-        class='org.cougaar.mts.std.DestinationThreadConstrictor'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-        <argument>
-          MaxPerNode=2
-        </argument>
-        <argument>
-          MaxThreads=15
-        </argument>
-      </component>
-      <component
-        name='org.cougaar.mts.std.DestinationQueueMonitorPlugin_Node.AgentManager.Agent.MessageTransport.Aspect()'
-        class='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.rss.AgentHostUpdaterComponent_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.core.qos.rss.AgentHostUpdaterComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
-      <component
-        name='org.cougaar.lib.mquo.SyscondFactory_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.lib.mquo.SyscondFactory'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
-      <component
-        name='org.cougaar.core.qos.gossip.GossipFeedComponent_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.core.qos.gossip.GossipFeedComponent'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
-      <component
-        name='org.cougaar.core.mobility.ldm.MobilityDomain_Node.AgentManager.Agent.DomainManager.Domain(mobility)'
-        class='org.cougaar.core.mobility.ldm.MobilityDomain'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
-        <argument>
-          mobility
-        </argument>
-      </component>
-     <agent name='Sink1' >
-        <!-- optional agent mobility support -->
-        <component
-          name='mobility'
-          class='org.cougaar.core.mobility.ldm.MobilityDomain'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
-          <argument>mobility</argument>
-        </component>
-        <component
-          name='org.cougaar.core.mobility.service.RedirectMovePlugin()'
-          class='org.cougaar.core.mobility.service.RedirectMovePlugin'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
-        <component
-          name='org.cougaar.core.mobility.servlet.MoveAgentServlet()'
-          class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
-
-        <!-- optional servlets -->
-        <component
-          name='org.cougaar.core.wp.WhitePagesServlet(/wp)'
-          class='org.cougaar.core.wp.WhitePagesServlet'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>/wp</argument>
-        </component>
-        <component
-          name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
-          class='org.cougaar.core.servlet.SimpleServletComponent'
-          priority='COMPONENT'
-          insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
-          <argument>org.cougaar.planning.servlet.PlanViewServlet</argument>
-          <argument>/tasks</argument>
-        </component>
-
-        <!-- no ping plugins needed on the target agent -->
-      </agent>
-    </node>
-  </host>
+	<host name='esb.dsl.bbn.com'>
+		<facet enclave='REAR'/>
+		<node name='NODE1'>
+			<vm_parameter>
+				-Dorg.cougaar.core.logging.log4j.appender.A2.File=NODE1-events.log</vm_parameter>
+			<vm_parameter>
+				-Dcom.apple.mrj.application.apple.menu.about.name="Topology
+				Demo"</vm_parameter>
+			<component name='org.cougaar.core.thread.AgentLoadRatePlugin'
+				class='org.cougaar.core.thread.AgentLoadRatePlugin'
+				priority='LOW'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
+				class='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.qos.metrics.MetricsServletPlugin'
+				class='org.cougaar.core.qos.metrics.MetricsServletPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.thread.AgentLoadSensorPlugin'
+				class='org.cougaar.core.thread.AgentLoadSensorPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
+				class='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.mts.std.StatisticsPlugin'
+				class='org.cougaar.mts.std.StatisticsPlugin' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.thread.TopPlugin'
+				class='org.cougaar.core.thread.TopPlugin' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			
+			<component
+				name='org.cougaar.core.util.ComponentViewServlet_Node.AgentManager.Agent.PluginManager.Plugin(/components)'
+				class='org.cougaar.core.util.ComponentViewServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> /components </argument>
+			</component>
+			<component
+				name='org.cougaar.core.mobility.service.RootMobilityPlugin'
+				class='org.cougaar.core.mobility.service.RootMobilityPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+				class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component
+				name='org.cougaar.core.servlet.SimpleServletComponent_Node.AgentManager.Agent.PluginManager.Plugin(org.cougaar.planning.servlet.PlanViewServlet,/tasks)'
+				class='org.cougaar.core.servlet.SimpleServletComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> org.cougaar.planning.servlet.PlanViewServlet
+					</argument>
+				<argument> /tasks </argument>
+			</component>
+			<component
+				name='org.cougaar.core.adaptivity.AEViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/ae)'
+				class='org.cougaar.core.adaptivity.AEViewerServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> /ae </argument>
+			</component>
+			<component
+				name='org.cougaar.core.wp.WhitePagesServlet_Node.AgentManager.Agent.PluginManager.Plugin(/wp)'
+				class='org.cougaar.core.wp.WhitePagesServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> /wp </argument>
+			</component>
+			
+			<component name='org.cougaar.mts.base.LoopbackLinkProtocol()'
+				class='org.cougaar.mts.base.LoopbackLinkProtocol'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>
+			
+			<!-- component
+			name='org.cougaar.mts.base.RMILinkProtocol()'
+			class='org.cougaar.mts.base.RMILinkProtocol'
+			priority='COMPONENT'
+			
+			insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/ -->
+			
+			<component name='org.cougaar.mts.jms.JMSLinkProtocol()'
+				class='org.cougaar.mts.jms.JMSLinkProtocol' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>
+			
+			<component
+				name='org.cougaar.mts.std.StatisticsAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.mts.std.StatisticsAspect' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			
+			<component
+				name='org.cougaar.mts.std.DeliveryVerificationAspect_Node.AgentManager.Agent.MessageTransport.Aspect(info-time=9,warn-time=99)'
+				class='org.cougaar.mts.std.DeliveryVerificationAspect'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+				<argument> info-time=9 </argument>
+				<argument> warn-time=99 </argument>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.GossipAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.core.qos.gossip.GossipAspect'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.mts.std.DestinationThreadConstrictor_Node.AgentManager.Agent.MessageTransport.Aspect(MaxPerNode=2,MaxThreads=15)'
+				class='org.cougaar.mts.std.DestinationThreadConstrictor'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+				<argument> MaxPerNode=2 </argument>
+				<argument> MaxThreads=15 </argument>
+			</component>
+			<component
+				name='org.cougaar.mts.std.DestinationQueueMonitorPlugin_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.rss.AgentHostUpdaterComponent_Node.AgentManager.Agent.MetricsServices.Component()'
+				class='org.cougaar.core.qos.rss.AgentHostUpdaterComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+			</component>
+			<component
+				name='org.cougaar.lib.mquo.SyscondFactory_Node.AgentManager.Agent.MetricsServices.Component()'
+				class='org.cougaar.lib.mquo.SyscondFactory' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.GossipFeedComponent_Node.AgentManager.Agent.MetricsServices.Component()'
+				class='org.cougaar.core.qos.gossip.GossipFeedComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+			</component>
+			<component
+				name='org.cougaar.core.mobility.ldm.MobilityDomain_Node.AgentManager.Agent.DomainManager.Domain(mobility)'
+				class='org.cougaar.core.mobility.ldm.MobilityDomain'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
+				<argument> mobility </argument>
+			</component>
+			<agent name='NameServer' class='org.cougaar.core.agent.SimpleAgent'>
+				<facet role='NameServer'/>
+				<component
+					name='org.cougaar.core.qos.frame.FrameSetServicePlugin_Node.AgentManager.Agent.PluginManager.Plugin()'
+					class='org.cougaar.core.qos.frame.FrameSetServicePlugin'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				</component>
+				<component
+					name='org.cougaar.core.qos.frame.FrameViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/frames)'
+					class='org.cougaar.core.qos.frame.FrameViewerServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument> /frames </argument>
+				</component>
+				
+				<component name='org.cougaar.core.thread.LimitThreadsPlugin'
+					class='org.cougaar.core.thread.LimitThreadsPlugin'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument> maxThreads=1 </argument>
+				</component>
+				<component
+					name='org.cougaar.core.qos.metrics.PersistenceAdapterPlugin'
+					class='org.cougaar.core.qos.metrics.PersistenceAdapterPlugin'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				</component>
+				<component
+					name='org.cougaar.core.servlet.SimpleServletComponent_Node.AgentManager.Agent.PluginManager.Plugin(org.cougaar.planning.servlet.PlanViewServlet,/tasks)'
+					class='org.cougaar.core.servlet.SimpleServletComponent'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument> org.cougaar.planning.servlet.PlanViewServlet
+						</argument>
+					<argument> /tasks </argument>
+				</component>
+				<component
+					name='org.cougaar.core.adaptivity.AEViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/ae)'
+					class='org.cougaar.core.adaptivity.AEViewerServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument> /ae </argument>
+				</component>
+				<component
+					name='org.cougaar.core.wp.server.Server_Node.AgentManager.Agent.WPServer()'
+					class='org.cougaar.core.wp.server.Server'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.WPServer'>
+				</component>
+			</agent>
+			<agent name='Source1'>
+				<!-- optional agent mobility support -->
+				
+				<component name='mobility'
+					class='org.cougaar.core.mobility.ldm.MobilityDomain'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
+					<argument>mobility</argument>
+				</component>
+				<component
+					name='org.cougaar.core.mobility.service.RedirectMovePlugin()'
+					class='org.cougaar.core.mobility.service.RedirectMovePlugin'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				<component
+					name='org.cougaar.core.mobility.servlet.MoveAgentServlet()'
+					class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				
+				<!-- optional servlets -->
+				<component name='org.cougaar.core.wp.WhitePagesServlet(/wp)'
+					class='org.cougaar.core.wp.WhitePagesServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>/wp</argument>
+				</component>
+				<component
+					name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
+					class='org.cougaar.core.servlet.SimpleServletComponent'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>
+						org.cougaar.planning.servlet.PlanViewServlet</argument>
+					<argument>/tasks</argument>
+				</component>
+				
+				<!-- 
+				Ping specific plugins.
+				
+				See the package javadocs for core/src/org/cougaar/core/mobility/ping
+				for important usage notes.
+				-->
+				
+				<!-- required ping timer, set for every second-->
+				<component
+					name='org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)'
+					class='org.cougaar.ping.PingTimerPlugin' priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>wakeMillis=1000</argument>
+				</component>
+				
+				<!--
+				Config plugin that defines the pings.
+				
+				Creates an endless series of pings from this agent to AgentB,
+				sent one per second and statistics reports every 10 seconds
+				See the javadocs for additional options.
+				-->
+				<component
+					name='org.cougaar.ping.PingAdderPlugin(target=Sink1, delayMillis=1000)'
+					class='org.cougaar.ping.PingAdderPlugin' priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>target=Sink1</argument>
+					<argument>delayMillis=1000</argument>
+					<argument>eventMillis=10000</argument>
+				</component>
+				
+				<!-- optional "/ping" servlet -->
+				<component name='org.cougaar.ping.PingServlet(/ping)'
+					class='org.cougaar.ping.PingServlet' priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>/ping</argument>
+				</component>
+				
+			</agent>
+			<agent name='Sink2'>
+				<!-- optional agent mobility support -->
+				<component name='mobility'
+					class='org.cougaar.core.mobility.ldm.MobilityDomain'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
+					<argument>mobility</argument>
+				</component>
+				<component
+					name='org.cougaar.core.mobility.service.RedirectMovePlugin()'
+					class='org.cougaar.core.mobility.service.RedirectMovePlugin'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				<component
+					name='org.cougaar.core.mobility.servlet.MoveAgentServlet()'
+					class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				
+				<!-- optional servlets -->
+				<component name='org.cougaar.core.wp.WhitePagesServlet(/wp)'
+					class='org.cougaar.core.wp.WhitePagesServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>/wp</argument>
+				</component>
+				<component
+					name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
+					class='org.cougaar.core.servlet.SimpleServletComponent'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>
+						org.cougaar.planning.servlet.PlanViewServlet</argument>
+					<argument>/tasks</argument>
+				</component>
+				
+				<!-- no ping plugins needed on the target agent -->
+			</agent>
+			
+		</node>
+		<node name='NODE2'>
+			<vm_parameter>
+				-Dorg.cougaar.core.logging.log4j.appender.A2.File=NODE2-events.log</vm_parameter>
+			<vm_parameter>-Dcom.apple.mrj.application.apple.menu.about.name="May
+				Demo #2"</vm_parameter>
+			
+			<component name='org.cougaar.core.thread.AgentLoadRatePlugin'
+				class='org.cougaar.core.thread.AgentLoadRatePlugin'
+				priority='LOW'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
+				class='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.qos.metrics.MetricsServletPlugin'
+				class='org.cougaar.core.qos.metrics.MetricsServletPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.thread.AgentLoadSensorPlugin'
+				class='org.cougaar.core.thread.AgentLoadSensorPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
+				class='org.cougaar.core.qos.gossip.GossipStatisticsPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.mts.std.StatisticsPlugin'
+				class='org.cougaar.mts.std.StatisticsPlugin' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.thread.TopPlugin'
+				class='org.cougaar.core.thread.TopPlugin' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			
+			<component
+				name='org.cougaar.core.util.ComponentViewServlet_Node.AgentManager.Agent.PluginManager.Plugin(/components)'
+				class='org.cougaar.core.util.ComponentViewServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> /components </argument>
+			</component>
+			<component
+				name='org.cougaar.core.mobility.service.RootMobilityPlugin'
+				class='org.cougaar.core.mobility.service.RootMobilityPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component name='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+				class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+			</component>
+			<component
+				name='org.cougaar.core.servlet.SimpleServletComponent_Node.AgentManager.Agent.PluginManager.Plugin(org.cougaar.planning.servlet.PlanViewServlet,/tasks)'
+				class='org.cougaar.core.servlet.SimpleServletComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> org.cougaar.planning.servlet.PlanViewServlet
+					</argument>
+				<argument> /tasks </argument>
+			</component>
+			<component
+				name='org.cougaar.core.adaptivity.AEViewerServlet_Node.AgentManager.Agent.PluginManager.Plugin(/ae)'
+				class='org.cougaar.core.adaptivity.AEViewerServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> /ae </argument>
+			</component>
+			<component
+				name='org.cougaar.core.wp.WhitePagesServlet_Node.AgentManager.Agent.PluginManager.Plugin(/wp)'
+				class='org.cougaar.core.wp.WhitePagesServlet'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+				<argument> /wp </argument>
+			</component>
+			
+			<component name='org.cougaar.mts.jms.JMSLinkProtocol()'
+				class='org.cougaar.mts.jms.JMSLinkProtocol' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>
+			
+			<!-- component
+			name='org.cougaar.mts.base.RMILinkProtocol()'
+			class='org.cougaar.mts.base.RMILinkProtocol'
+			priority='COMPONENT'
+			
+			insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/ -->
+			
+			<component name='org.cougaar.mts.base.LoopbackLinkProtocol()'
+				class='org.cougaar.mts.base.LoopbackLinkProtocol'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Component'/>
+			
+			<component
+				name='org.cougaar.mts.std.StatisticsAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.mts.std.StatisticsAspect' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.mts.std.DeliveryVerificationAspect_Node.AgentManager.Agent.MessageTransport.Aspect(info-time=9,warn-time=99)'
+				class='org.cougaar.mts.std.DeliveryVerificationAspect'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+				<argument> info-time=9 </argument>
+				<argument> warn-time=99 </argument>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.GossipAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.core.qos.gossip.GossipAspect'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.core.qos.gossip.GossipStatisticsServiceAspect'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.core.qos.gossip.SimpleGossipQualifierComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.mts.std.DestinationThreadConstrictor_Node.AgentManager.Agent.MessageTransport.Aspect(MaxPerNode=2,MaxThreads=15)'
+				class='org.cougaar.mts.std.DestinationThreadConstrictor'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+				<argument> MaxPerNode=2 </argument>
+				<argument> MaxThreads=15 </argument>
+			</component>
+			<component
+				name='org.cougaar.mts.std.DestinationQueueMonitorPlugin_Node.AgentManager.Agent.MessageTransport.Aspect()'
+				class='org.cougaar.mts.std.DestinationQueueMonitorPlugin'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.rss.AgentHostUpdaterComponent_Node.AgentManager.Agent.MetricsServices.Component()'
+				class='org.cougaar.core.qos.rss.AgentHostUpdaterComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+			</component>
+			<component
+				name='org.cougaar.lib.mquo.SyscondFactory_Node.AgentManager.Agent.MetricsServices.Component()'
+				class='org.cougaar.lib.mquo.SyscondFactory' priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+			</component>
+			<component
+				name='org.cougaar.core.qos.gossip.GossipFeedComponent_Node.AgentManager.Agent.MetricsServices.Component()'
+				class='org.cougaar.core.qos.gossip.GossipFeedComponent'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
+			</component>
+			<component
+				name='org.cougaar.core.mobility.ldm.MobilityDomain_Node.AgentManager.Agent.DomainManager.Domain(mobility)'
+				class='org.cougaar.core.mobility.ldm.MobilityDomain'
+				priority='COMPONENT'
+				insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
+				<argument> mobility </argument>
+			</component>
+			<agent name='Sink1'>
+				<!-- optional agent mobility support -->
+				<component name='mobility'
+					class='org.cougaar.core.mobility.ldm.MobilityDomain'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
+					<argument>mobility</argument>
+				</component>
+				<component
+					name='org.cougaar.core.mobility.service.RedirectMovePlugin()'
+					class='org.cougaar.core.mobility.service.RedirectMovePlugin'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				<component
+					name='org.cougaar.core.mobility.servlet.MoveAgentServlet()'
+					class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				
+				<!-- optional servlets -->
+				<component name='org.cougaar.core.wp.WhitePagesServlet(/wp)'
+					class='org.cougaar.core.wp.WhitePagesServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>/wp</argument>
+				</component>
+				<component
+					name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
+					class='org.cougaar.core.servlet.SimpleServletComponent'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>
+						org.cougaar.planning.servlet.PlanViewServlet</argument>
+					<argument>/tasks</argument>
+				</component>
+				
+				<!-- no ping plugins needed on the target agent -->
+			</agent>
+			<agent name='Source2'>
+				<!-- optional agent mobility support -->
+				
+				<component name='mobility'
+					class='org.cougaar.core.mobility.ldm.MobilityDomain'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.DomainManager.Domain'>
+					<argument>mobility</argument>
+				</component>
+				<component
+					name='org.cougaar.core.mobility.service.RedirectMovePlugin()'
+					class='org.cougaar.core.mobility.service.RedirectMovePlugin'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				<component
+					name='org.cougaar.core.mobility.servlet.MoveAgentServlet()'
+					class='org.cougaar.core.mobility.servlet.MoveAgentServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'/>
+				
+				<!-- optional servlets -->
+				<component name='org.cougaar.core.wp.WhitePagesServlet(/wp)'
+					class='org.cougaar.core.wp.WhitePagesServlet'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>/wp</argument>
+				</component>
+				<component
+					name='org.cougaar.core.servlet.SimpleServletComponent(org.cougaar.planning.servlet.PlanViewServlet, /tasks)'
+					class='org.cougaar.core.servlet.SimpleServletComponent'
+					priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>
+						org.cougaar.planning.servlet.PlanViewServlet</argument>
+					<argument>/tasks</argument>
+				</component>
+				
+				<!-- 
+				Ping specific plugins.
+				
+				See the package javadocs for core/src/org/cougaar/core/mobility/ping
+				for important usage notes.
+				-->
+				
+				<!-- required ping timer, set for every second-->
+				<component
+					name='org.cougaar.ping.PingTimerPlugin(wakeMillis=1000)'
+					class='org.cougaar.ping.PingTimerPlugin' priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>wakeMillis=1000</argument>
+				</component>
+				
+				<!--
+				Config plugin that defines the pings.
+				
+				Creates an endless series of pings from this agent to AgentB,
+				sent one per second and statistics reports every 10 seconds
+				See the javadocs for additional options.
+				-->
+				<component
+					name='org.cougaar.ping.PingAdderPlugin(target=Sink2, delayMillis=666)'
+					class='org.cougaar.ping.PingAdderPlugin' priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>target=Sink2</argument>
+					<argument>delayMillis=666</argument>
+					<argument>eventMillis=10000</argument>
+				</component>
+				
+				<!-- optional "/ping" servlet -->
+				<component name='org.cougaar.ping.PingServlet(/ping)'
+					class='org.cougaar.ping.PingServlet' priority='COMPONENT'
+					insertionpoint='Node.AgentManager.Agent.PluginManager.Plugin'>
+					<argument>/ping</argument>
+				</component>
+				
+			</agent>
+		</node>
+	</host>
 </society>
