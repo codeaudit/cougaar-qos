@@ -744,6 +744,14 @@ implements PropertyChangeListener {
 	}
 	return frame;
     }
+    
+    protected String displayString() {
+	return getUID().toString();
+    }
+    
+    public String toString() {
+	return "<" +getPrototype().getName()+ " " + displayString() + ">";
+    }
 
 
 }

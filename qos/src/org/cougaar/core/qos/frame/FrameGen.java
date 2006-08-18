@@ -547,6 +547,7 @@ extends DefaultHandler
 	writeRegisterer(writer, pkg, prototype);
 	writeSlots(writer, prototype, local_slots);
 	writeConstructors(writer, prototype, local_slots);
+	writeDisplayString(writer, prototype);
 	writeKind(writer, prototype);
 	writeCollector(writer, prototype, local_slots, container_slots);
 	if (relation_prototypes.contains(prototype))
@@ -683,6 +684,16 @@ extends DefaultHandler
 	}
 	writer.println("    }");
 
+    }
+    
+    private void writeDisplayString(PrintWriter writer, String prototype) {
+	String slot = proto_attrs.get(prototype).getValue("displaySlot");
+	if (slot != null) {
+	    String accessor_name = fixName(slot, true);
+	    writer.println("    protected String displayString() {");
+	    writer.println("        return get" +accessor_name+ "();");
+	    writer.println("    }");
+	}
     }
 
     private void writeCollector(PrintWriter writer,
