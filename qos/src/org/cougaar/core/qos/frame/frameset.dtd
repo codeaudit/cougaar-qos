@@ -12,7 +12,8 @@
 <!ATTLIST prototype name CDATA #REQUIRED
 	            prototype CDATA #IMPLIED
 	            container CDATA #IMPLIED
-	            doc CDATA #IMPLIED>
+	            doc CDATA #IMPLIED
+				displaySlot CDATA #IMPLIED>
 <!ELEMENT relation-prototype (slot*)>
 <!ATTLIST relation-prototype name CDATA #REQUIRED
 	                     prototype CDATA #IMPLIED
