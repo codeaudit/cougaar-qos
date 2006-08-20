@@ -1808,22 +1808,30 @@ extends DefaultHandler
 
     private boolean isObjectType(String type) {
 	return 
-	type.equals("String") ||
-	type.equals("Double") ||
-	type.equals("Float") ||
-	type.equals("Long") ||
+	!type.equals("double") &&
+	!type.equals("float") &&
+	!type.equals("long") &&
+	!type.equals("int") &&
+	!type.equals("boolean");
+    }
+    
+    private boolean isCoercibleType(String type) {
+	return 
+	type.equalsIgnoreCase("Double") ||
+	type.equalsIgnoreCase("Float") ||
+	type.equalsIgnoreCase("Long") ||
 	type.equals("Integer") ||
-	type.equals("Boolean") ||
-	type.equals(Metric_Type) ||
-	proto_attrs.containsKey(type);
+	type.equals("int") ||
+	type.equalsIgnoreCase("Boolean") ||
+	type.equals("String") ||
+	type.equals(Metric_Type);
     }
 
-
     private String objectToType(String slotType, String javaType, String var) {
-	if (proto_attrs.containsKey(slotType)) {
-	    return "(" + javaType+ ") " + var;
-	} else {
+	if (isCoercibleType(slotType)) {
 	    return "force_"+slotType+"(" +var+ ")";
+	} else {
+	    return "(" + javaType+ ") " + var;
 	}
     }
 
@@ -1842,7 +1850,7 @@ extends DefaultHandler
 	else if (type.equalsIgnoreCase("boolean"))
 	    return "new Boolean(" +var+ ")";
 	else
-	    return null;
+	    return var;
     }
 
     private String typeToObject(String type, String var) {
