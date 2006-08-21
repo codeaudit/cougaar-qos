@@ -265,6 +265,7 @@ public class FrameSetParser
     private void endPath() {
 	if (log.isDebugEnabled())
 	    log.debug("endPath");
+	path_spec.makePath(frame_set);
 	path_spec = null;
     }
 
