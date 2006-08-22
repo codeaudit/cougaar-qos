@@ -592,7 +592,7 @@ extends DefaultHandler
 	    System.out.println("Wrote " +sout);
 	    
 	    // now write toStruct in the frame class
-	    writeToStructMethod(writer, structs_pkg, prototype, local_slots, container_slots);
+	    writeToStructMethod(writer, structs_pkg, prototype, parent, local_slots, container_slots);
 	}
 	
 	writer.println("}");
@@ -824,6 +824,7 @@ extends DefaultHandler
     private void writeToStructMethod(PrintWriter writer,
 	    String pkg,
 	    String prototype, 
+	    String parent,
 	    Map<String,Attributes> local_slots,
 	    Set<String> container_slots) {
 	String cname = pkg+"."+fixName(prototype, true);
@@ -831,6 +832,15 @@ extends DefaultHandler
 	writer.println();
 	writer.println("    public " +cname+ " toStruct() {");
 	writer.println("        " +cname+ " "+var+ " = new " +cname+ "();");
+	writer.println("        populateStruct(" +var+ ");");
+	writer.println("        return " +var+ ";");
+	writer.println("    }");
+	
+	writer.println();
+	writer.println("    void populateStruct(" +cname+ " " +var+ ") {");
+	if (parent != null) {
+	    writer.println("        super.populateStruct(" +var+ ");");
+	}
 	for (String slot : local_slots.keySet()) {
 	    String sname = fixName(slot, true);
 	    String type = getSlotType(prototype, slot);
@@ -843,7 +853,7 @@ extends DefaultHandler
 	    String prefix = type.equalsIgnoreCase("boolean") ? "is" : "get";
 	    writer.println("        " +var+ ".set" +sname+"(" +prefix+sname+ "());");
 	}
-	writer.println("        return " +var+ ";");
+	
 	writer.println("    }");
     }
     
