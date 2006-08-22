@@ -569,7 +569,7 @@ extends DefaultHandler
 		units_override_slots);
 	
 	if (structs != null) {
-	    // write toStruct method?
+	    // TODO: write toStruct method?
 	}
 	
 	writer.println("}");
@@ -592,7 +592,6 @@ extends DefaultHandler
 		iox.printStackTrace();
 		System.exit(-1);
 	    }
-	    // Might need to import metrics
 	    writeStructDecl(swriter, prototype, structs_pkg, doc, parent);
 	    writeStructSlots(swriter, prototype, local_slots, container_slots);
 	    writeStructAccessors(swriter, prototype, local_slots, container_slots);
