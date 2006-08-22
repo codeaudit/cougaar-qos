@@ -567,6 +567,11 @@ extends DefaultHandler
 		local_slots, 
 		container_slots, 
 		units_override_slots);
+	
+	if (structs != null) {
+	    // write toStruct method?
+	}
+	
 	writer.println("}");
 
 	writer.close();
@@ -587,10 +592,10 @@ extends DefaultHandler
 		iox.printStackTrace();
 		System.exit(-1);
 	    }
-	    
+	    // Might need to import metrics
 	    writeStructDecl(swriter, prototype, structs_pkg, doc, parent);
-	    writeStructSlots(swriter, prototype, local_slots);
-	    writeStructAccessors(swriter, prototype, local_slots);
+	    writeStructSlots(swriter, prototype, local_slots, container_slots);
+	    writeStructAccessors(swriter, prototype, local_slots, container_slots);
 	    swriter.println("}");
 	    swriter.close();
 	    System.out.println("Wrote " +sout);
@@ -659,16 +664,31 @@ extends DefaultHandler
 
     private void writeStructSlots(PrintWriter writer,
 	    String prototype, 
-	    Map<String,Attributes> local_slots) {
+	    Map<String,Attributes> local_slots,
+	    Set<String> container_slots) {
 	for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
 	    String slot = entry.getKey();
 	    String fixed_name = fixName(slot, false);
 	    writer.print("    private");
 	    String type = getSlotType(prototype, slot);
-	    if (proto_attrs.containsKey(type)) type = fixName(type, true);
-	    boolean transientp = isTransient(prototype, slot);
-	    if (transientp) writer.print(" transient");
+	    if (type.equals(Metric_Type)) {
+		type = "Object";
+	    } else if (proto_attrs.containsKey(type)) {
+		type = fixName(type, true);
+	    }
+	   
 	    writer.println(" "+type+" " +fixed_name+ ";");
+	}
+	for (String slot : container_slots) {
+	    String fixed_name = fixName(slot, false);
+	    writer.print("    private");
+	    String type = getSlotType(prototype, slot);
+	    if (type.equals(Metric_Type)) {
+		type = "Object";
+	    } else if (proto_attrs.containsKey(type)) {
+		type = fixName(type, true);
+	    }
+	    writer.println(" "+type+" " +fixed_name+ ";"); 
 	}
     }
     
@@ -801,17 +821,22 @@ extends DefaultHandler
     
     private void writeStructAccessors(PrintWriter writer,
 	    String prototype, 
-	    Map<String,Attributes> local_slots) {
+	    Map<String,Attributes> local_slots,
+	    Set<String> container_slots) {
 	for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
 	    String slot = entry.getKey();
 	    String sname = fixName(slot, false);
 	    String fixed_name = fixName(slot, true);
 	    String type = getSlotType(prototype, slot);
+	    if (type.equals(Metric_Type)) {
+		type = "Object";
+	    } else if (proto_attrs.containsKey(type)) {
+		type = fixName(type, true);
+	    }
 	    String prefix = "get";
 	    if (type.equalsIgnoreCase("boolean")) {
 		prefix = "is";
-	    }
-	    if (proto_attrs.containsKey(type)) type = fixName(type, true);
+	    } 
 
 	    writer.println();
 	    writer.println("    public " +type+" " +prefix+fixed_name+ "() {");
@@ -821,6 +846,29 @@ extends DefaultHandler
 	    writer.println("    public void set" +fixed_name+ "("+type+" " +sname+ ") {");
 	    writer.println("        this." + sname+ " = " +sname+ ";");
 	    writer.println("    }");
+	}
+	for (String slot : container_slots) {
+	    String sname = fixName(slot, false);
+	    String fixed_name = fixName(slot, true);
+	    String type = getSlotType(prototype, slot);
+	    if (type.equals(Metric_Type)) {
+		type = "Object";
+	    } else if (proto_attrs.containsKey(type)) {
+		type = fixName(type, true);
+	    }
+	    String prefix = "get";
+	    if (type.equalsIgnoreCase("boolean")) {
+		prefix = "is";
+	    }
+
+	    writer.println();
+	    writer.println("    public " +type+" " +prefix+fixed_name+ "() {");
+	    writer.println("        return " + sname+ ";");
+	    writer.println("    }");
+	    writer.println();
+	    writer.println("    public void set" +fixed_name+ "("+type+" " +sname+ ") {");
+	    writer.println("        this." + sname+ " = " +sname+ ";");
+	    writer.println("    }"); 
 	}
     }
 
