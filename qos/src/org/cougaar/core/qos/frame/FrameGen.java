@@ -568,14 +568,6 @@ extends DefaultHandler
 		container_slots, 
 		units_override_slots);
 	
-	if (structs != null) {
-	    // TODO: write toStruct method?
-	}
-	
-	writer.println("}");
-
-	writer.close();
-	System.out.println("Wrote " +out);
 	
 	if (structs != null) {
 	    String structs_pkg = pkg +"."+ structs;
@@ -598,7 +590,16 @@ extends DefaultHandler
 	    swriter.println("}");
 	    swriter.close();
 	    System.out.println("Wrote " +sout);
+	    
+	    // now write toStruct in the frame class
+	    writeToStructMethod(writer, structs_pkg, prototype, local_slots, container_slots);
 	}
+	
+	writer.println("}");
+
+	writer.close();
+	System.out.println("Wrote " +out);
+	
     }
     
     private void writeStructDecl(PrintWriter writer,
@@ -815,6 +816,32 @@ extends DefaultHandler
     private void writeKind(PrintWriter writer, String prototype) {
 	writer.println("\n\n    public String getKind() {");
 	writer.println("        return \"" +prototype+ "\";");
+	writer.println("    }");
+    }
+    
+    private void writeToStructMethod(PrintWriter writer,
+	    String pkg,
+	    String prototype, 
+	    Map<String,Attributes> local_slots,
+	    Set<String> container_slots) {
+	String cname = pkg+"."+fixName(prototype, true);
+	String var = fixName(prototype, false);
+	writer.println();
+	writer.println("    public " +cname+ " toStruct() {");
+	writer.println("        " +cname+ " "+var+ " = new " +cname+ "();");
+	for (String slot : local_slots.keySet()) {
+	    String sname = fixName(slot, true);
+	    String type = getSlotType(prototype, slot);
+	    String prefix = type.equalsIgnoreCase("boolean") ? "is" : "get";
+	    writer.println("        " +var+ ".set" +sname+"(" +prefix+sname+ "());");
+	}
+	for (String slot : container_slots) {
+	    String sname = fixName(slot, true);
+	    String type = getSlotType(prototype, slot);
+	    String prefix = type.equalsIgnoreCase("boolean") ? "is" : "get";
+	    writer.println("        " +var+ ".set" +sname+"(" +prefix+sname+ "());");
+	}
+	writer.println("        return " +var+ ";");
 	writer.println("    }");
     }
     
