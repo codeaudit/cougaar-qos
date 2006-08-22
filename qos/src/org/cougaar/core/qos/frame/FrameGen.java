@@ -610,17 +610,19 @@ extends DefaultHandler
 	String name = fixName(prototype, true);
 	generateCopyright(writer, FileType.JAVA);
 	writer.println("package " +pkg+ ";\n");
+	writer.println();
+	writer.println("import java.io.Serializable;");
+	writer.println();
 	if (doc != null) {
 	    writer.println("\n/**");
 	    writer.println(doc);
 	    writer.print("*/");
 	}
-	writer.print("\npublic class " +name+ " ");
+	writer.print("\npublic class " +name);
 	if (parent != null) {
-	    writer.println("extends " +fixName(parent, true)+ " {");
-	} else {
-	    writer.println("{");
-	}
+	    writer.print(" extends " +fixName(parent, true));
+	} 
+	writer.println(" implements Serializable {");
     }
 
     private void writeDecl(PrintWriter writer,
