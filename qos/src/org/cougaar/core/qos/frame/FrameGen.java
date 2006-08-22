@@ -83,6 +83,7 @@ extends DefaultHandler
     private String java_output_root;
     private String jess_output_root;
     private String dtd_output_root;
+    private String structs; // subpackage for struct classes
 
     // The prototype currently being parsed
     private String current_prototype;
@@ -116,10 +117,11 @@ extends DefaultHandler
     // All defined relations
     private Set<String> relation_prototypes;
 
-    public FrameGen(String java_path, String clp_path, String dtd_path) {
+    public FrameGen(String java_path, String clp_path, String dtd_path, String structs) {
 	this.java_output_root = java_path;
 	this.jess_output_root = clp_path;
 	this.dtd_output_root = dtd_path;
+	this.structs = structs;
     }
 
     public void parseProtoFile(File xml_file) {
@@ -461,8 +463,7 @@ extends DefaultHandler
     }
 
     private void generatePrototypes(String pkg, String root) {
-	String output_directory = root + File.separator+pkg.replace('.', File.separatorChar);
-
+	String output_dir = root + File.separator+pkg.replace('.', File.separatorChar);
 	for (Map.Entry<String,Map<String,Attributes>> entry : proto_slots.entrySet()) {
 	    String prototype = entry.getKey();
 	    Attributes attrs = proto_attrs.get(prototype);
@@ -489,7 +490,8 @@ extends DefaultHandler
 	    }
 
 
-	    generatePrototype(prototype, output_directory, pkg, doc,
+	    generatePrototype(prototype, output_dir, pkg,
+		    doc,
 		    parent, container, 
 		    local_slots, override_slots,
 		    units_override_slots);
@@ -507,6 +509,7 @@ extends DefaultHandler
 	    Map<String,String> units_override_slots) {
 	String name = fixName(prototype, true);
 	File out = new File(output_directory, name+".java");
+	
 	PrintWriter writer = null;
 	try {
 	    FileWriter fw = new FileWriter(out);
@@ -568,9 +571,52 @@ extends DefaultHandler
 
 	writer.close();
 	System.out.println("Wrote " +out);
+	
+	if (structs != null) {
+	    String structs_pkg = pkg +"."+ structs;
+	    File structs_dir = new File(output_directory, structs);
+	    if (!structs_dir.exists()) {
+		structs_dir.mkdir();
+	    }
+	    File sout = new File(structs_dir, name + ".java");
+	    PrintWriter swriter = null;
+	    try {
+		FileWriter fw = new FileWriter(sout);
+		swriter = new PrintWriter(fw);
+	    } catch (java.io.IOException iox) {
+		iox.printStackTrace();
+		System.exit(-1);
+	    }
+	    
+	    writeStructDecl(swriter, prototype, structs_pkg, doc, parent);
+	    writeStructSlots(swriter, prototype, local_slots);
+	    writeStructAccessors(swriter, prototype, local_slots);
+	    swriter.println("}");
+	    swriter.close();
+	    System.out.println("Wrote " +sout);
+	}
     }
     
-   
+    private void writeStructDecl(PrintWriter writer,
+	    String prototype, 
+	    String pkg,
+	    String doc,
+	    String parent) {
+	String name = fixName(prototype, true);
+	generateCopyright(writer, FileType.JAVA);
+	writer.println("package " +pkg+ ";\n");
+	if (doc != null) {
+	    writer.println("\n/**");
+	    writer.println(doc);
+	    writer.print("*/");
+	}
+	writer.print("\npublic class " +name+ " ");
+	if (parent != null) {
+	    writer.println("extends " +fixName(parent, true)+ " {");
+	} else {
+	    writer.println("{");
+	}
+    }
 
     private void writeDecl(PrintWriter writer,
 	    String prototype, 
@@ -611,7 +657,22 @@ extends DefaultHandler
 	}
     }
 
-
+    private void writeStructSlots(PrintWriter writer,
+	    String prototype, 
+	    Map<String,Attributes> local_slots) {
+	for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
+	    String slot = entry.getKey();
+	    String fixed_name = fixName(slot, false);
+	    writer.print("    private");
+	    String type = getSlotType(prototype, slot);
+	    if (proto_attrs.containsKey(type)) type = fixName(type, true);
+	    boolean transientp = isTransient(prototype, slot);
+	    if (transientp) writer.print(" transient");
+	    writer.println(" "+type+" " +fixed_name+ ";");
+	}
+    }
+    
+    
     private void writeSlots(PrintWriter writer,
 	    String prototype, 
 	    Map<String,Attributes> local_slots) {
@@ -653,7 +714,6 @@ extends DefaultHandler
 		+pkg+ "\", \"" +prototype+ "\", __fm);");
 	writer.println("    }");
     }
-
 
     private void writeConstructors(PrintWriter writer,
 	    String prototype,
@@ -737,6 +797,31 @@ extends DefaultHandler
 	writer.println("\n\n    public String getKind() {");
 	writer.println("        return \"" +prototype+ "\";");
 	writer.println("    }");
+    }
+    
+    private void writeStructAccessors(PrintWriter writer,
+	    String prototype, 
+	    Map<String,Attributes> local_slots) {
+	for (Map.Entry<String,Attributes> entry : local_slots.entrySet()) {
+	    String slot = entry.getKey();
+	    String sname = fixName(slot, false);
+	    String fixed_name = fixName(slot, true);
+	    String type = getSlotType(prototype, slot);
+	    String prefix = "get";
+	    if (type.equalsIgnoreCase("boolean")) {
+		prefix = "is";
+	    }
+	    if (proto_attrs.containsKey(type)) type = fixName(type, true);
+
+	    writer.println();
+	    writer.println("    public " +type+" " +prefix+fixed_name+ "() {");
+	    writer.println("        return " + sname+ ";");
+	    writer.println("    }");
+	    writer.println();
+	    writer.println("    public void set" +fixed_name+ "("+type+" " +sname+ ") {");
+	    writer.println("        this." + sname+ " = " +sname+ ";");
+	    writer.println("    }");
+	}
     }
 
     private void writeRelationAccessor(PrintWriter writer, 
@@ -1875,6 +1960,7 @@ extends DefaultHandler
 	String java_path = null;
 	String clp_path = null;
 	String dtd_path = null;
+	String structs = null;
 	int i = 0;
 	while (i < args.length) {
 	    String arg = args[i];
@@ -1887,10 +1973,12 @@ extends DefaultHandler
 	    } else if (arg.equals("-dtd")) {
 		dtd_path = args[++i];
 		System.out.println("DTD root path is " + dtd_path);
+	    } else if (arg.equals("-structs")) {
+		structs = args[++i];
 	    } else if (arg.endsWith(".xml")) {
 		System.out.println("XML file is " + arg);
 		File file = new File(arg);
-		FrameGen generator = new FrameGen(java_path, clp_path,dtd_path);
+		FrameGen generator = new FrameGen(java_path, clp_path, dtd_path, structs);
 		generator.parseProtoFile(file);
 	    }
 	    ++i;
