@@ -509,7 +509,7 @@ extends DefaultHandler
 	    Map<String,String> units_override_slots) {
 	String name = fixName(prototype, true);
 	File out = new File(output_directory, name+".java");
-	
+	System.out.println("Writing " + out);
 	PrintWriter writer = null;
 	try {
 	    FileWriter fw = new FileWriter(out);
@@ -576,6 +576,7 @@ extends DefaultHandler
 		structs_dir.mkdir();
 	    }
 	    File sout = new File(structs_dir, name + ".java");
+	    System.out.println("Writing " +sout);
 	    PrintWriter swriter = null;
 	    try {
 		FileWriter fw = new FileWriter(sout);
