@@ -91,6 +91,8 @@ public class SingleInheritanceFrameSet
     
     private Map<PrototypeFrame,Map<Object,DataFrame>> primaryIndexCache;
     
+    private final Object transactionLock = new Object();
+    
     
     
     private Set<SlotAggregation> aggregations;
@@ -930,39 +932,45 @@ public class SingleInheritanceFrameSet
 	}
     }
 
+    public void runInTransaction(Runnable r) {
+	synchronized (transactionLock) {
+	    r.run();
+	}	
+    }
 
     // Synchronized for a shorter time but doesn't work reliably.
     // Sometimes items are added while this is in progress and
     // execute doesn't run again.
     public void processQueue() {
 	
-	executeAggregators();
-	
-	List<ChangeQueueEntry> changes = null;
-	synchronized (change_queue_lock) {
-	    changes = new ArrayList<ChangeQueueEntry>(change_queue);
-	    change_queue = new ArrayList<ChangeQueueEntry>();
-	}
-	int count = changes.size();
-	for (int i=0; i<count; i++) {
-	    ChangeQueueEntry change = changes.get(i);
-	    if (log.isDebugEnabled())
-		log.debug("about to publish " + change);
-	    if (change instanceof Change) {
-		Change chng = (Change) change;
-		List<Object> changes_list = new ArrayList<Object>(1);
-		changes_list.add(chng.change);
-		if (log.isDebugEnabled())
-		    log.debug("Publish change " + chng.change);
-		bbs.publishChange(chng.object, changes_list);
-	    } else  if (change instanceof Add) {
-		Add add = (Add) change;
-		bbs.publishAdd(add.object);
-	    } else  if (change instanceof Remove) {
-		Remove rem = (Remove) change;
-		bbs.publishRemove(rem.object);
+	synchronized (transactionLock) {
+	    executeAggregators();
+	    List<ChangeQueueEntry> changes = null;
+	    synchronized (change_queue_lock) {
+		changes = new ArrayList<ChangeQueueEntry>(change_queue);
+		change_queue = new ArrayList<ChangeQueueEntry>();
 	    }
-	}
+	    int count = changes.size();
+	    for (int i = 0; i < count; i++) {
+		ChangeQueueEntry change = changes.get(i);
+		if (log.isDebugEnabled())
+		    log.debug("about to publish " + change);
+		if (change instanceof Change) {
+		    Change chng = (Change) change;
+		    List<Object> changes_list = new ArrayList<Object>(1);
+		    changes_list.add(chng.change);
+		    if (log.isDebugEnabled())
+			log.debug("Publish change " + chng.change);
+		    bbs.publishChange(chng.object, changes_list);
+		} else if (change instanceof Add) {
+		    Add add = (Add) change;
+		    bbs.publishAdd(add.object);
+		} else if (change instanceof Remove) {
+		    Remove rem = (Remove) change;
+		    bbs.publishRemove(rem.object);
+		}
+	    }
+	}	
     }
 
     // Old version

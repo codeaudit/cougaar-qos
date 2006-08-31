@@ -241,8 +241,17 @@ public interface FrameSet {
 
     /**
      * Force the FrameSet to process any queued Blackboard operations.
+     * This call will block if a transaction is in progress.
+     * 
+     * @see #runInTransaction(Runnable)
      */
     public void processQueue();
+    
+    /**
+     * Run a body of code using a lock that prevents a
+     * simultaneous invocation of {@link #processQueue}.
+     */
+    public void runInTransaction(Runnable r);
 
     /**
      * Returns a collection of all PrototypeFrames in the FrameSet,
