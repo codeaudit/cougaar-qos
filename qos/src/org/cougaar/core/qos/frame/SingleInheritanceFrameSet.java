@@ -222,6 +222,12 @@ public class SingleInheritanceFrameSet
 	return frame;
     }
     
+    public boolean isResolved(RelationFrame frame) {
+	synchronized(pending_relations) {
+	    return pending_relations.contains(frame);
+	}
+    }
+    
     public RelationFrame makeRelationship(String kind, Properties values, DataFrame parent, DataFrame child) {
 	UID uid = uids.nextUID();
 	RelationFrame rel = (RelationFrame) DataFrame.newFrame(this, kind, uid, values);
@@ -559,6 +565,9 @@ public class SingleInheritanceFrameSet
 	    // Queue for later
 	    synchronized (pending_relations) {
 		pending_relations.add(relationship);
+		log.warn("Relation of type " +relationship.getPrototype().getName() +
+			" between " +relationship.getParentValue() +
+			" and "+relationship.getChildValue()+ " is unresolved");
 	    }
 	    return false;
 	} else {

@@ -105,6 +105,12 @@ public interface FrameSet {
      * slot/value pairs.
      */
     public Set<DataFrame> findFrames(String kind, Properties slot_value_pairs);
+    
+    /**
+     * 
+     * @return true iff both parent and child are available
+     */
+    public boolean isResolved(RelationFrame frame);
 
     /**
      * Returns a collection of {@link DataFrame}s representing frames

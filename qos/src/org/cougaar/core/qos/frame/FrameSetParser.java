@@ -112,18 +112,32 @@ public class FrameSetParser
 	return parseFrameSetData(name, url, frameSet);
     }
     
-    public FrameSet parseFrameSetData(String name, URL url, FrameSet frameSet) {
+    public FrameSet parseFrameSetData(String name, final URL url, FrameSet frameSet) {
 	if (log.isInfoEnabled())
 	    log.info("Loading FrameSet" +name+ " from " +url);
 		
 	this.frame_set = frameSet;
 	this.frame_set_name = name;
 	try {
-	    XMLReader producer = XMLReaderFactory.createXMLReader();
+	    final XMLReader producer = XMLReaderFactory.createXMLReader();
 	    DefaultHandler consumer = this; 
 	    producer.setContentHandler(consumer);
 	    producer.setErrorHandler(consumer);
-	    producer.parse(url.toString());
+	    if (frame_set == null) {
+		producer.parse(url.toString());
+	    } else {
+		// run in a transaction
+		Runnable r = new Runnable() {
+		    public void run() {
+			try {
+			    producer.parse(url.toString());
+			} catch (Throwable ex) {
+			    log.error("Error parsing FrameSet file " + url, ex);
+			}
+		    }
+		};
+		frame_set.runInTransaction(r);
+	    }
 	} catch (Throwable ex) {
 	    log.error("Error parsing FrameSet file " + url, ex);
 	}

@@ -64,6 +64,12 @@ extends DataFrame {
     abstract public String getChildPrototype();
     abstract public String getChildSlot();
     abstract public String getChildValue();
+    
+    // Don't call this isResolved to avoid BeanInfo issues.
+    // TODO: make a RelationFrameBeanInfo class to handle this properly.
+    public boolean resolved() {
+	return getFrameSet().isResolved(this);
+    }
 
     // Path dependencies.
 
