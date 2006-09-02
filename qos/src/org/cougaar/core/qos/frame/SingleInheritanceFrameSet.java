@@ -197,12 +197,52 @@ public class SingleInheritanceFrameSet
 	return makeFrame(proto, values, uid);
     }
 
+    
+    
     public DataFrame makeFrame(String proto, Properties values, UID uid) {
-	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
-	PrototypeFrame pframe = frame.getPrototype();
+	Object key = null;
 	if (primaryIndexSlot != null) {
-	    Object key = values.get(primaryIndexSlot);
+	    // Look for an existing frame with the same key
+	    key = values.get(primaryIndexSlot);
 	    if (key != null) {
+		DataFrame oldFrame = getIndexedFrame(proto, key);
+		if (oldFrame != null) {
+		    log.error("A " +proto+ " frame with " +primaryIndexSlot+ 
+			    " " +key+ " already exists");
+		    return oldFrame;
+		}
+	    }
+	}
+	DataFrame frame = DataFrame.newFrame(this, proto, uid, values);
+	if (key != null) {
+	    PrototypeFrame pframe = frame.getPrototype();
+	    Map<Object,DataFrame> cache = primaryIndexCache.get(pframe);
+	    if (cache == null) {
+		cache = new HashMap<Object,DataFrame>();
+		primaryIndexCache.put(pframe, cache);
+	    }
+	    cache.put(key, frame);
+	}
+	addObject(frame);
+	publishAdd(frame);
+	return frame;
+
+    }
+
+    public DataFrame makeFrame(DataFrame frame) {
+	if (primaryIndexSlot != null) {
+	    Object key = frame.getValue(primaryIndexSlot);
+	    if (key != null) {
+		PrototypeFrame pframe = frame.getPrototype();
+		
+		String proto = pframe.getName();
+		DataFrame oldFrame = getIndexedFrame(proto, key);
+		if (oldFrame != null) {
+		    log.error("A " +proto+ " frame with " +primaryIndexSlot+ 
+			    " " +key+ " already exists");
+		    return oldFrame;
+		}
+		
 		Map<Object,DataFrame> cache = primaryIndexCache.get(pframe);
 		if (cache == null) {
 		    cache = new HashMap<Object,DataFrame>();
@@ -211,12 +251,6 @@ public class SingleInheritanceFrameSet
 		cache.put(key, frame);
 	    }
 	}
-	addObject(frame);
-	publishAdd(frame);
-	return frame;
-    }
-
-    public DataFrame makeFrame(DataFrame frame) {
 	addObject(frame);
 	publishAdd(frame);
 	return frame;
