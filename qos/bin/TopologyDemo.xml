@@ -168,12 +168,7 @@
         priority='COMPONENT'
         insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
       </component>
-      <component
-        name='org.cougaar.lib.mquo.SyscondFactory_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.lib.mquo.SyscondFactory'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
+      
       <component
         name='org.cougaar.core.qos.gossip.GossipFeedComponent_Node.AgentManager.Agent.MetricsServices.Component()'
         class='org.cougaar.core.qos.gossip.GossipFeedComponent'
@@ -567,12 +562,7 @@
         priority='COMPONENT'
         insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
       </component>
-      <component
-        name='org.cougaar.lib.mquo.SyscondFactory_Node.AgentManager.Agent.MetricsServices.Component()'
-        class='org.cougaar.lib.mquo.SyscondFactory'
-        priority='COMPONENT'
-        insertionpoint='Node.AgentManager.Agent.MetricsServices.Component'>
-      </component>
+      
       <component
         name='org.cougaar.core.qos.gossip.GossipFeedComponent_Node.AgentManager.Agent.MetricsServices.Component()'
         class='org.cougaar.core.qos.gossip.GossipFeedComponent'

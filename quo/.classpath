@@ -5,6 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/qos"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/util"/>
-	<classpathentry kind="lib" path="/jars/lib/quoSumo.jar"/>
+	<classpathentry kind="lib" path="/jars/lib/quo-core.jar"/>
 	<classpathentry kind="output" path="tmp/classes"/>
 </classpath>

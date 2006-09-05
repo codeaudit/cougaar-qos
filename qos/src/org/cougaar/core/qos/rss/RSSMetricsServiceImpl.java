@@ -51,7 +51,9 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.RunnableQueue;
 import org.cougaar.util.ConfigFinder;
 
+import com.bbn.ResourceStatus.ResourceNode;
 import com.bbn.rss.BoundDataFormula;
+import com.bbn.rss.CorbaUtils;
 import com.bbn.rss.DataFeed;
 import com.bbn.rss.DataFormula;
 import com.bbn.rss.DataValue;
@@ -60,7 +62,6 @@ import com.bbn.rss.PathParser;
 import com.bbn.rss.RSS;
 import com.bbn.rss.RSSUtils;
 import com.bbn.rss.SitesDB;
-import com.bbn.ResourceStatus.ResourceNode;
 
 /**
  * This Component is an implementation of MetricsService that uses the
@@ -164,7 +165,12 @@ public class RSSMetricsServiceImpl
 	// Make a ServiceBroker available to AgentDS and HostDS.
 	properties.put("ServiceBroker", sb);
 
-	// register local contexts
+	// Register standard RSS contexts.
+	// The class reference will also run a static
+	// code block to get the local IP address.
+	CorbaUtils.registerContexts();
+	
+	// Register local contexts
 	AgentDS.register();
 	AgentFlowDS.register();
 	DestinationDS.register();

@@ -7,6 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/mtsstd"/>
 	<classpathentry kind="lib" path="/jars/lib/log4j.jar"/>
 	<classpathentry kind="lib" path="/jars/lib/servlet.jar"/>
-	<classpathentry kind="lib" path="/jars/lib/quoSumo.jar"/>
+	<classpathentry exported="true" kind="lib" path="/jars/lib/resource-status-service.jar"/>
 	<classpathentry kind="output" path="tmp/classes"/>
 </classpath>
