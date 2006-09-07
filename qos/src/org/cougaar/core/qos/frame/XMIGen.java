@@ -370,7 +370,6 @@ public class XMIGen extends DefaultHandler {
 		"' name='" +type.name+ "'/>");
     }
     
-    // TODO: real work here
     private void writeContentBody() {
 	processedProtos = new HashSet<String>();
 	data_types = new HashMap<String,Type>();
