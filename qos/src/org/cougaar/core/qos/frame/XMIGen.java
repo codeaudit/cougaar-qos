@@ -95,6 +95,7 @@ public class XMIGen extends DefaultHandler {
 	    writer = new PrintWriter(fw);
 	    write();
 	    writer.close();
+	    System.out.println("Wrote " + output);
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
