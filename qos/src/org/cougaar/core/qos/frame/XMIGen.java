@@ -219,7 +219,7 @@ public class XMIGen extends DefaultHandler {
     
     private void writeContentStart() {
 	writer.println("  <XMI.content>");
-	writer.println("    <UML:Model xmi.id='" +nextUID()+ " name='" +domain+ "'>");
+	writer.println("    <UML:Model xmi.id='" +nextUID()+ "' name='" +domain+ "'>");
 	writer.println("      <UML:Namespace.ownedElement>");
     }
     
@@ -232,19 +232,19 @@ public class XMIGen extends DefaultHandler {
     private void writeGeneralization(String id, String parent, String child) {
 	String parent_id = class_uids.get(parent);
 	String child_id = class_uids.get(child);
-	writer.println("        <UML:Generalization xmi.id = '" +id+ "'>");
+	writer.println("        <UML:Generalization xmi.id='" +id+ "'>");
 	writer.println("          <UML:Generalization.child>");
-	writer.println("             <" +classElement(child)+ " xmi.idref = '" +child_id+ "'/>");
+	writer.println("             <" +classElement(child)+ " xmi.idref='" +child_id+ "'/>");
 	writer.println("          </UML:Generalization.child>");
 	writer.println("          <UML:Generalization.parent>");
-	writer.println("             <" +classElement(parent)+ " xmi.idref = '" +parent_id+ "'/>");
+	writer.println("             <" +classElement(parent)+ " xmi.idref='" +parent_id+ "'/>");
 	writer.println("          </UML:Generalization.parent>");
 	writer.println("        </UML:Generalization>");
     }
     
-    private void writeMultiplicity(int min, int max, int indent) {
+    private void writeMultiplicity(String tag, int min, int max, int indent) {
 	for (int i=0; i<indent; i++) writer.print(' ');
-	writer.println("<UML:StructuralFeature.multiplicity>");
+	writer.println("<" +tag+ ".multiplicity>");
 	
 	indent += 2;
 	String mid = nextUID();
@@ -256,7 +256,7 @@ public class XMIGen extends DefaultHandler {
 	writer.println("<UML:Multiplicity.range>");
 	indent += 2;
 	for (int i=0; i<indent; i++) writer.print(' ');
-	writer.println("<UML:MultiplicityRange xmi.id = '" +sid+ "' lower='" +min+ "' upper='"
+	writer.println("<UML:MultiplicityRange xmi.id='" +sid+ "' lower='" +min+ "' upper='"
 		+max+ "'/>");
 	indent -= 2;
 	for (int i=0; i<indent; i++) writer.print(' ');
@@ -267,7 +267,7 @@ public class XMIGen extends DefaultHandler {
 	indent -= 2;
 	
 	for (int i=0; i<indent; i++) writer.print(' ');
-	writer.println("</UML:StructuralFeature.multiplicity>");
+	writer.println("</" +tag+ ".multiplicity>");
     }
     
     private void writeType(Type type, int indent) {
@@ -275,7 +275,7 @@ public class XMIGen extends DefaultHandler {
 	writer.println("<UML:StructuralFeature.type>");
 	indent += 2;
 	for (int i=0; i<indent; i++) writer.print(' ');
-	writer.println("<UML:DataType xmi.idref = '" +type.uid+ "'/>");
+	writer.println("<UML:DataType xmi.idref='" +type.uid+ "'/>");
 	indent -= 2;
 	for (int i=0; i<indent; i++) writer.print(' ');
 	writer.println("</UML:StructuralFeature.type>");
@@ -288,8 +288,8 @@ public class XMIGen extends DefaultHandler {
 	    String id = nextUID();
 	    String name = entry.getKey();
 	    Attributes attrs = entry.getValue();
-	    writer.println("            <UML::Attribute xmi.id='" +id+ "' name='" +name+ "'>");
-	    writeMultiplicity(1, 1, 14);
+	    writer.println("            <UML:Attribute xmi.id='" +id+ "' name='" +name+ "'>");
+	    writeMultiplicity("UML:StructuralFeature", 1, 1, 14);
 	    String typeName = attrs.getValue("type");
 	    if (typeName != null) {
 		Type type = data_types.get(typeName);
@@ -299,7 +299,7 @@ public class XMIGen extends DefaultHandler {
 		writeType(type, 14);
 	    }
 	    // etc
-	    writer.println("            </UML::Attribute>");
+	    writer.println("            </UML:Attribute>");
 	}
 	writer.println("          </UML:Classifier.feature>");
     }
@@ -327,13 +327,13 @@ public class XMIGen extends DefaultHandler {
 	    writer.println("            <UML:Generalization xmi.idref ='" +generalizationId+ "'/>");
 	    writer.println("          </UML:GeneralizableElement.generalization>");
 	}
-	writer.println("        </" +elt+ ">");
 	writeAttributes(proto);
+	writer.println("        </" +elt+ ">");
 	processedProtos.add(proto);
     }
     
     private void writeType(Type type) {
-	writer.println("        <UML:DataType xmi.id = '" +type.uid+
+	writer.println("        <UML:DataType xmi.id='" +type.uid+
 		"' name='" +type.name+ "'/>");
     }
     
