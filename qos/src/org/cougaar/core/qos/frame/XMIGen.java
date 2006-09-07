@@ -304,6 +304,34 @@ public class XMIGen extends DefaultHandler {
 	writer.println("          </UML:Classifier.feature>");
     }
     
+    private void writeAssociationConnection(String proto) {
+	Attributes attrs = proto_attrs.get(proto);
+	String parent = attrs.getValue("parent-prototype");
+	String parentUID = class_uids.get(parent);
+	String child = attrs.getValue("child-prototype");
+	String childUID = class_uids.get(child);
+	String pid = nextUID();
+	String cid = nextUID();
+	
+	writer.println("      <UML:Association.connection>");
+	
+	writer.println("         <UML:AssociationEnd xmi.id='" +pid+ "' name='parent-prototype'>");
+	writeMultiplicity("UML:AssociationEnd", 1, 1, 10);
+	writer.println("         <UML:AssociationEnd.participant>");
+	writer.println("              <UML:Class xmi.idref='" +parentUID+ "'/>");
+	writer.println("         </UML:AssociationEnd.participant>");
+	writer.println("         </UML:AssociationEnd>");
+	
+	writer.println("         <UML:AssociationEnd xmi.id='" +cid+ "' name='child-prototype'>");
+	writeMultiplicity("UML:AssociationEnd", 1, 1, 10);
+	writer.println("         <UML:AssociationEnd.participant>");
+	writer.println("              <UML:Class xmi.idref='" +childUID+ "'/>");
+	writer.println("         </UML:AssociationEnd.participant>");
+	writer.println("         </UML:AssociationEnd>");
+	
+	writer.println("      </UML:Association.connection>");
+    }
+    
     private void writeClass(String proto) {
 	if (processedProtos.contains(proto)) {
 	    // already been here
@@ -328,6 +356,11 @@ public class XMIGen extends DefaultHandler {
 	    writer.println("          </UML:GeneralizableElement.generalization>");
 	}
 	writeAttributes(proto);
+	
+	if (relation_prototypes.contains(proto)) {
+	    writeAssociationConnection(proto);
+	}
+	
 	writer.println("        </" +elt+ ">");
 	processedProtos.add(proto);
     }
