@@ -363,6 +363,9 @@ public class SingleInheritanceFrameSet
 	    }
 	    kb.remove(frame.getUID());
 	}
+	synchronized (frames) {
+	    frames.remove(frame);
+	}
 
 	// Handle the removal of containment relationship frames
 	if (frame instanceof RelationFrame) {
