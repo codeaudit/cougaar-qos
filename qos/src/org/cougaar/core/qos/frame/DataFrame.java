@@ -643,8 +643,7 @@ implements PropertyChangeListener {
 
 
 
-    void writeLocalSlots(PrintWriter writer, int indentation, int offset) {
-	Map slots = getLocalSlots();
+    void writeSlots(PrintWriter writer, Map slots, int indentation, int offset) {
 	Iterator itr = slots.entrySet().iterator();
 	while (itr.hasNext()) {
 	    Map.Entry entry = (Map.Entry) itr.next();
@@ -655,10 +654,11 @@ implements PropertyChangeListener {
 	}
     }
 
-    void write(PrintWriter writer, int indentation, int offset) {
+    void write(PrintWriter writer, int indentation, int offset, boolean allSlots) {
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("<" + getKind());
-	writeLocalSlots(writer, indentation+offset, offset);
+	Map slots = allSlots ? getAllSlots() : getLocalSlots();
+	writeSlots(writer, slots, indentation+offset, offset);
 	for (int i=0; i<indentation; i++) writer.print(' ');
 	writer.println("/>");
     }

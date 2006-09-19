@@ -1070,7 +1070,8 @@ public class SingleInheritanceFrameSet
 
     // XML dumping
 
-    void writeDataFrames(PrintWriter writer, int indentation, int offset, UnaryPredicate filter) {
+    void writeDataFrames(PrintWriter writer, int indentation, int offset, UnaryPredicate filter,
+	    boolean allSlots) {
 	synchronized (kb) {
 	    for (Object raw : kb.values()) {
 		if (raw instanceof DataFrame && !(raw instanceof RelationFrame)) {
@@ -1079,7 +1080,7 @@ public class SingleInheritanceFrameSet
 			continue;
 		    }
 		    DataFrame frame = (DataFrame) raw;
-		    frame.write(writer, indentation, offset);
+		    frame.write(writer, indentation, offset, allSlots);
 		}
 	    }
 	    for (Object raw : kb.values()) {
@@ -1089,13 +1090,14 @@ public class SingleInheritanceFrameSet
 			continue;
 		    }
 		    DataFrame frame = (DataFrame) raw;
-		    frame.write(writer, indentation, offset);
+		    frame.write(writer, indentation, offset, allSlots);
 		}
 	    }
 	}
     }
 
-    void writeData(File file, int indentation, int offset, UnaryPredicate filter)
+    void writeData(File file, int indentation, int offset, UnaryPredicate filter,
+	    boolean allSlots)
     throws java.io.IOException {
 	FileWriter fwriter = new FileWriter(file);
 	PrintWriter writer = new PrintWriter(fwriter);
@@ -1106,7 +1108,7 @@ public class SingleInheritanceFrameSet
 	writer.println("<" + domain+ ">");
 	indentation += offset;
 
-	writeDataFrames(writer, indentation, offset, filter);
+	writeDataFrames(writer, indentation, offset, filter, allSlots);
 
 	indentation -= offset;
 	writer.println("</" + domain+ ">");
@@ -1114,20 +1116,9 @@ public class SingleInheritanceFrameSet
 
 	writer.close();
     }
-
-    public void importFrames(URL location) 
-    throws IOException{
-	FrameSetParser parser = new FrameSetParser();
-	parser.parseFrameSetData(name, location, this);
-    }
-
-    public void exportFrames(File file)
-	throws IOException {
-	writeData(file, 0, 2, null);
-    }
     
-    public void exportFrames(File file, Set<String> prototypes)
-	throws IOException {
+    private void exportFramesOfType(File file, Set<String> prototypes, boolean allSlots) 
+    throws IOException {
 	Set<Class> classes = new HashSet<Class>();
 	for (String prototype : prototypes) {
 	    classes.add(classForPrototype(prototype));
@@ -1145,8 +1136,35 @@ public class SingleInheritanceFrameSet
 		return false;
 	    }
 	};
-	writeData(file, 0, 2, filter);
-}
+	writeData(file, 0, 2, filter, allSlots);
+    }
 
+    public void importFrames(URL location) 
+    throws IOException{
+	FrameSetParser parser = new FrameSetParser();
+	parser.parseFrameSetData(name, location, this);
+    }
 
+    public void exportFrames(File file)
+	throws IOException {
+	writeData(file, 0, 2, null, false);
+    }
+    
+    public void exportFrames(File file, Set<String> prototypes)
+	throws IOException {
+	if (prototypes != null) {
+	    exportFramesOfType(file, prototypes, false);
+	} else {
+	    writeData(file, 0, 2, null, false);
+	}
+    }
+    
+    public void exportFrames(File file, Set<String> prototypes, boolean allSlots)
+    throws IOException {
+	if (prototypes != null) {
+	    exportFramesOfType(file, prototypes, allSlots);
+	} else {
+	    writeData(file, 0, 2, null, allSlots);
+	}
+    }
 }

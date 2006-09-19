@@ -275,14 +275,55 @@ public interface FrameSet {
     public Class classForPrototype(PrototypeFrame prototype);
 
     /**
-     * Dump all DataFrames as XML.
+     * Write the frameset data as xml.
+     * 
+     * For each DataFrame in the frameset, write the current value of
+     * any slot in that frame that is either defined locally or inherited via
+     * the prototype hierarchy.
+     * 
+     * @param file The name of xml file to which the data will be written.
      */
     public void exportFrames(File file) throws IOException;
     
+    
     /**
-     * Dump all DataFrames of the given prototypes as XML
+     * Write a subset of the frameset data as xml.
+     * 
+     * For each DataFrame of the given prototypes, write the current value of
+     * any slot in that frame that is either defined locally or inherited via
+     * the prototype hierarchy.
+     * 
+     * @param file The name of xml file to which the data will be written.
+     * 
+     * @param prototypes Names of the prototypes whose frames should be written. 
+     * If null, this method is equivalent to {@link #exportFrames}.
      */
     public void exportFrames(File file, Set<String> prototypes) throws IOException;
+    
+   
+    /**
+         * Write a subset of the frameset data as xml, optionally including
+         * slot values inherited via containment.
+         * 
+         * @param file
+         *                The name of the xml file to which the data will be
+         *                written.
+         * 
+         * @param prototypes
+         *                Names of the prototypes whose frames should be
+         *                written. If null, this method is like
+         *                {@link #exportFrames} except that all slots can be
+         *                written.
+         * 
+         * @param allSlots
+         *                If false, only writes current value of all slots that
+         *                are either defined locally or inherited via the
+         *                prototype hierarchy. If true, also includes current
+         *                value of slots inherited via containment.
+         */
+    public void exportFrames(File file, Set<String> prototypes, boolean allSlots)
+    throws IOException;
+
 
     /**
      * Load DataFrames at the given location
