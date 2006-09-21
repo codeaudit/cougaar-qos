@@ -91,11 +91,24 @@ public class SingleInheritanceFrameSet
     
     private Map<PrototypeFrame,Map<Object,DataFrame>> primaryIndexCache;
     
-    private final Object transactionLock = new Object();
+    private final Object transactionLock = new TransactionLock();
     
     
     
     private Set<SlotAggregation> aggregations;
+    
+    //eclispe friendly lock names
+    public class TransactionLock extends Object {};
+    public class ChangeQueueLock extends Object {};
+    public class RelationLock extends Object {};  
+    public class PendingRelationships extends HashSet<RelationFrame> {};
+    public class Containers extends  HashMap<DataFrame,DataFrame> {};
+    public class KB extends  HashMap<UID,Object>{};
+    public class Frames extends  HashSet<DataFrame> {};
+    public class CachedClasses extends  HashMap<String,Class> {};
+    public class Paths extends  HashMap<String,Path> {};
+    public class Prototypes extends  HashMap<String,PrototypeFrame> {};
+
 
     public SingleInheritanceFrameSet(String pkg,
 				     ServiceBroker sb,
@@ -108,19 +121,19 @@ public class SingleInheritanceFrameSet
 	this.name = name;
 	this.primaryIndexSlot = primaryIndexSlot;
 	this.container_relation = container_relation;
-	this.cached_classes = new HashMap<String,Class>();
+	this.cached_classes = new CachedClasses();
 	this.parent_cache = new HashMap<RelationFrame,DataFrame>();
 	this.child_cache = new HashMap<RelationFrame,DataFrame>();
 	this.inverse_child_cache = new HashMap<DataFrame,Set<RelationFrame>>();
 	this.inverse_parent_cache = new HashMap<DataFrame,Set<RelationFrame>>();
-	this.paths = new HashMap<String,Path>();
-	this.frames = new HashSet<DataFrame>();
+	this.paths = new Paths();
+	this.frames = new Frames();
 	this.primaryIndexCache = new HashMap<PrototypeFrame,Map<Object, DataFrame>>();
 	this.pkg = pkg;
 	this.bbs = bbs;
 	this.change_queue = new ArrayList();
-	this.change_queue_lock = new Object();
-	this.relation_lock = new Object();
+	this.change_queue_lock = new ChangeQueueLock();
+	this.relation_lock = new RelationLock();
 	log = (LoggingService)
 	    sb.getService(this, LoggingService.class, null);
 	uids = (UIDService)
@@ -128,11 +141,11 @@ public class SingleInheritanceFrameSet
 	metrics = (MetricsService)
 	    sb.getService(this, MetricsService.class, null);
 
- 	this.kb = new HashMap<UID,Object>();
-	this.prototypes = new HashMap<String,PrototypeFrame>();
+ 	this.kb = new KB();
+	this.prototypes = new Prototypes();
 
-	this.pending_relations = new HashSet<RelationFrame>();
-	this.containers = new HashMap<DataFrame,DataFrame>();
+	this.pending_relations = new PendingRelationships();
+	this.containers = new Containers();
 	this.aggregations = new HashSet<SlotAggregation>();
     }
 
@@ -175,9 +188,7 @@ public class SingleInheritanceFrameSet
 		frames.add((DataFrame) object);
 	    }
 	    if (object instanceof RelationFrame) {
-		synchronized (relation_lock) {
 		    cacheRelation((RelationFrame) object);
-		}		
 	    } else {
 		// Any new DataFrame could potentially resolve as yet
 		// unfilled values in relations.
@@ -339,8 +350,8 @@ public class SingleInheritanceFrameSet
 		    Set<RelationFrame> rframes = inverse_parent_cache.get(parent);
 		    rframes.remove(rframe);
 		}
-		cacheRelation(rframe);
 	    }
+	    cacheRelation(rframe);
 	}
 	    
 
@@ -599,21 +610,26 @@ public class SingleInheritanceFrameSet
     
     private boolean cacheRelation(RelationFrame relationship, DataFrame parent, DataFrame child) {
 	if (parent == null || child == null) {
-	    // Queue for later
-	    synchronized (pending_relations) {
-		pending_relations.add(relationship);
-		log.warn("Relation of type " +relationship.getPrototype().getName() +
-			" between " +relationship.getParentValue() +
-			" and "+relationship.getChildValue()+ " is unresolved");
+	    synchronized (relation_lock) {    
+		// Queue for later
+		synchronized (pending_relations) {
+		    pending_relations.add(relationship);
+		    log.warn("Relation of type " +relationship.getPrototype().getName() +
+			    " between " +relationship.getParentValue() +
+			    " and "+relationship.getChildValue()+ " is unresolved");
+		}
+		return false;
 	    }
-	    return false;
 	} else {
 	    if (isContainmentRelation(relationship)) {
                 DataFrame old;
-		synchronized (containers) {
-		    old = containers.get(child);
-		    containers.put(child, parent);
-		}
+                synchronized (relation_lock) {
+                    synchronized (containers) {
+                	old = containers.get(child);
+                	containers.put(child, parent);
+                    }
+                }
+                // JAZ container Change potentially walks all child paths so can't hold relation_lock
                 child.containerChange(old, parent);
 		if (log.isInfoEnabled())
 		    log.info("Parent of " +child+ " is " +parent);

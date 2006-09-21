@@ -79,7 +79,7 @@ implements PropertyChangeListener {
     private transient Map<String,String> slot_map;
     
     //  lock for synchronized manipulation of path dependencies
-    private transient Object rlock; 
+    private transient ReadLock rlock; 
     
 
     protected DataFrame(FrameSet frameSet, UID uid) {
@@ -93,7 +93,7 @@ implements PropertyChangeListener {
 //  abstract protected void removeLocalValue(String slot);
     abstract protected void initializeLocalValue(String slot, Object value);
 
-
+    public class ReadLock extends Object {};
 
     // Serialization
     private void readObject(java.io.ObjectInputStream in)
@@ -108,7 +108,7 @@ implements PropertyChangeListener {
 	rdeps = new HashMap<String,List<RelationFrame>>();
 	slot_map = new HashMap<String,String>();
 	path_dependents = new HashMap<String,Set<DataFrame>>();
-	rlock = new Object();
+	rlock = new ReadLock();
     }
 
     // PropertyChangeListener
