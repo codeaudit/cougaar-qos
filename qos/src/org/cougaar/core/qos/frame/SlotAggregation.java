@@ -51,7 +51,7 @@ public class SlotAggregation {
     private final FrameSet frameset;
     private final String role;
     private final String otherRole;
-    private IncrementalSubscription sub;
+    private IncrementalSubscription frameSub, relationshipSub;
     
     public SlotAggregation(FrameSet frameset, String slot, String relatedSlot, String relation,
 	    String role, String className) 
@@ -116,25 +116,25 @@ public class SlotAggregation {
      * the updater on each.
      */ 
     public void execute(BlackboardService bbs) {
-	if (sub == null) {
+	if (frameSub == null) {
 	    setupSubscriptions(bbs);
 	}
 	Set<DataFrame> framesToUpdate = new HashSet<DataFrame>();
-	if (sub.hasChanged()) {
-	    Collection addedFrames = sub.getAddedCollection();
+	if (frameSub.hasChanged()) {
+	    Collection addedFrames = frameSub.getAddedCollection();
 	    for (Object x : addedFrames) {
 		addToUpdateSet(x, framesToUpdate);
 	    }
 	    
-	    Collection removedFrames = sub.getRemovedCollection();
+	    Collection removedFrames = frameSub.getRemovedCollection();
 	    for (Object x : removedFrames) {
 		addToUpdateSet(x, framesToUpdate);
 	    }
 	    
 	    if (relatedSlot != null) {
-		Collection changedFrames = sub.getChangedCollection();
+		Collection changedFrames = frameSub.getChangedCollection();
 		for (Object x : changedFrames) {
-		    Set changeReports = sub.getChangeReports(x);
+		    Set changeReports = frameSub.getChangeReports(x);
 		    boolean relevant = false;
 		    for (Frame.Change change : (Set<Frame.Change>) changeReports) {
 			if (change.getSlotName().equals(relatedSlot)) {
@@ -145,37 +145,78 @@ public class SlotAggregation {
 		    if (relevant) addToUpdateSet(x, framesToUpdate);
 		}
 	    }
-	    
-	    
-	    for (DataFrame frame : framesToUpdate) {
-		Set<DataFrame> children = frame.findRelations(otherRole, relation);
-		aggregator.updateSlotValue(frame, children, this);
+	}
+	
+	if (relationshipSub.hasChanged()) {
+	    Collection addedFrames = relationshipSub.getAddedCollection();
+	    for (Object x : addedFrames) {
+		RelationFrame rframe = (RelationFrame) x;
+		if (role.equals("parent")) {
+		    framesToUpdate.add(frameset.getRelationshipParent(rframe));
+		} else {
+		    framesToUpdate.add(frameset.getRelationshipChild(rframe)); 
+		}
 	    }
 	    
+	    Collection removedFrames = relationshipSub.getRemovedCollection();
+	    for (Object x : removedFrames) {
+		RelationFrame rframe = (RelationFrame) x;
+		if (role.equals(FrameSet.PARENT)) {
+		    framesToUpdate.add(frameset.getRelationshipParent(rframe));
+		} else {
+		    framesToUpdate.add(frameset.getRelationshipChild(rframe)); 
+		}
+	    } 
+	}
+	
+	for (DataFrame frame : framesToUpdate) {
+	    Set<DataFrame> children = frame.findRelations(otherRole, relation);
+	    aggregator.updateSlotValue(frame, children, this);
 	}
     }
     
     public void setupSubscriptions(BlackboardService bbs) {
-	if (sub == null) {
-	    sub = (IncrementalSubscription) bbs.subscribe(new FramePredicate());
+	if (frameSub == null) {
+	    frameSub = (IncrementalSubscription) bbs.subscribe(new FramePredicate());
+	}
+	if (relationshipSub == null) {
+	    relationshipSub = (IncrementalSubscription) bbs.subscribe(new RelationPredicate());
 	}
     }
     
     private class FramePredicate implements UnaryPredicate {
 	private final String attribute = otherRole + "-prototype";
-	private Class klass;
+	private Class relatedFrameClass;
 	
 	public boolean execute(Object o) {
 	    if (!(o instanceof DataFrame)) return false;
 	    DataFrame frame = (DataFrame) o;
 	    if (frameset != frame.getFrameSet()) return false;
 	    
-	    if (klass == null) {
+	    if (relatedFrameClass == null) {
 		PrototypeFrame relationProto = frameset.findPrototypeFrame(relation);
 		String type = relationProto.getAttribute(attribute);
-		klass = frameset.classForPrototype(type);
+		relatedFrameClass = frameset.classForPrototype(type);
 	    }
-	    return klass.isAssignableFrom(frame.getClass());
+	    Class frameClass = frame.getClass();
+	    return relatedFrameClass.isAssignableFrom(frameClass);
+	}
+    }
+    
+    private class RelationPredicate implements UnaryPredicate {
+	private Class relationshipClass;
+	
+	public boolean execute(Object o) {
+	    if (!(o instanceof DataFrame)) return false;
+	    DataFrame frame = (DataFrame) o;
+	    if (frameset != frame.getFrameSet()) return false;
+	    
+	    if (relationshipClass == null) {
+		PrototypeFrame relationProto = frameset.findPrototypeFrame(relation);
+		relationshipClass = frameset.classForPrototype(relationProto);
+	    }
+	    Class frameClass = frame.getClass();
+	    return relationshipClass.isAssignableFrom(frameClass);
 	}
     }
 }

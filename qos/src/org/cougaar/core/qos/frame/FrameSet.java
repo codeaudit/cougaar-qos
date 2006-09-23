@@ -47,6 +47,10 @@ import org.xml.sax.Attributes;
  */
 
 public interface FrameSet {
+    // Should be enum
+    public static final String CHILD = "child";
+    public static final String PARENT = "parent";
+
     /**
      * Returns the name of the FrameSet.
      */

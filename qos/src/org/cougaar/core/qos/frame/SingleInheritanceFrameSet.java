@@ -62,6 +62,7 @@ import org.xml.sax.Attributes;
  */
 public class SingleInheritanceFrameSet
     implements FrameSet {
+    
     private static final long LOOKUP_WARN_TIME = 10000;
 
     private final String domain;
@@ -339,12 +340,12 @@ public class SingleInheritanceFrameSet
 	if (frame instanceof RelationFrame) {
 	    RelationFrame rframe = (RelationFrame) frame;
 	    synchronized (relation_lock) {
-		if (slot.startsWith("child")) {
+		if (slot.startsWith(CHILD)) {
 		    DataFrame child = child_cache.get(rframe);
 		    child_cache.remove(rframe);
 		    Set<RelationFrame> rframes = inverse_child_cache.get(child);
 		    rframes.remove(rframe);
-		} else if (slot.startsWith("parent")) {
+		} else if (slot.startsWith(PARENT)) {
 		    DataFrame parent = parent_cache.get(rframe);
 		    parent_cache.remove(frame);
 		    Set<RelationFrame> rframes = inverse_parent_cache.get(parent);
@@ -890,13 +891,13 @@ public class SingleInheritanceFrameSet
     public Set<DataFrame> findRelations(Frame frame, // should be DataFrame
 	    String role,
 	    String relation_proto) {
-	if (role.equals("parent")) {
+	if (role.equals(PARENT)) {
 	    return findParents((DataFrame) frame, relation_proto, null);
-	} else if (role.equals("child")) {
+	} else if (role.equals(CHILD)) {
 	    return findChildren((DataFrame) frame, relation_proto, null);
 	} else {
 	    if (log.isWarnEnabled())
-		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+		log.warn("Role " +role+ " should be " +PARENT+ " or " + CHILD);
 	    return null;
 	}
     }
@@ -904,13 +905,13 @@ public class SingleInheritanceFrameSet
     public DataFrame findFirstRelation(Frame frame, // should be DataFrame
 	    String role,
 	    String relation_proto) {
-	if (role.equals("parent")) {
+	if (role.equals(PARENT)) {
 	    return findFirstParent((DataFrame) frame, relation_proto);
-	} else if (role.equals("child")) {
+	} else if (role.equals(CHILD)) {
 	    return findFirstChild((DataFrame) frame, relation_proto);
 	} else {
 	    if (log.isWarnEnabled())
-		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+		log.warn("Role " +role+ " should be " +PARENT+ " or " + CHILD);
 	    return null;
 	}
     }
@@ -918,13 +919,13 @@ public class SingleInheritanceFrameSet
     public int countRelations(Frame frame, // should be DataFrame
 	    String role,
 	    String relation_proto) {
-	if (role.equals("parent")) {
+	if (role.equals(PARENT)) {
 	    return countParents((DataFrame) frame, relation_proto);
-	} else if (role.equals("child")) {
+	} else if (role.equals(CHILD)) {
 	    return countChildren((DataFrame) frame, relation_proto);
 	} else {
 	    if (log.isWarnEnabled())
-		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+		log.warn("Role " +role+ " should be " +PARENT+ " or " + CHILD);
 	    return 0;
 	}
     }
@@ -933,13 +934,13 @@ public class SingleInheritanceFrameSet
 	    String role, 
 	    String relation_proto) {
 	Map<RelationFrame,DataFrame> map = new HashMap<RelationFrame,DataFrame>();
-	if (role.equals("parent")) {
+	if (role.equals(PARENT)) {
 	    findParents(frame, relation_proto, map);
-	} else if (role.equals("child")) {
+	} else if (role.equals(CHILD)) {
 	    findChildren(frame, relation_proto, map);
 	} else {
 	    if (log.isWarnEnabled())
-		log.warn("Role " +role+ " should be \"parent\" or \"child\"");
+		log.warn("Role " +role+ " should be " +PARENT+ " or " + CHILD);
 	}
 	return map;
 				
