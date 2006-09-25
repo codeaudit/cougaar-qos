@@ -170,6 +170,7 @@ public class SlotAggregation {
 	}
 	
 	for (DataFrame frame : framesToUpdate) {
+            if (frame == null) continue;
 	    Set<DataFrame> children = frame.findRelations(otherRole, relation);
 	    aggregator.updateSlotValue(frame, children, this);
 	}
