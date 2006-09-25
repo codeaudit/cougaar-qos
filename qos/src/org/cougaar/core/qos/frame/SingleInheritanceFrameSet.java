@@ -362,8 +362,8 @@ public class SingleInheritanceFrameSet
 	publishChange(frame, change);
     }
 
-
-    public void removeFrame(DataFrame frame) {
+    // Caller should synchronize on kb
+    private void removeFromKB(DataFrame frame) {
 	synchronized (kb) { 
 	    if (primaryIndexSlot != null) {
 		PrototypeFrame pframe = frame.getPrototype();
@@ -374,6 +374,12 @@ public class SingleInheritanceFrameSet
 		}
 	    }
 	    kb.remove(frame.getUID());
+	}
+    }
+
+    public void removeFrame(DataFrame frame) {
+	synchronized (kb) { 
+	    removeFromKB(frame);
 	}
 	synchronized (frames) {
 	    frames.remove(frame);
@@ -408,6 +414,41 @@ public class SingleInheritanceFrameSet
 	publishRemove(frame);
     }
 
+    public void removeFrameAndRelations(DataFrame frame) {
+	Set<DataFrame> removedFrames = new HashSet<DataFrame>();
+	synchronized (kb) { 
+	    removeFromKB(frame);
+	    synchronized(relation_lock) {   
+		containers.remove(frame);
+		Set<RelationFrame> rframes = inverse_child_cache.get(frame);
+		inverse_child_cache.remove(frame);
+		if (rframes != null) {
+		    for (RelationFrame rframe : rframes) {
+			child_cache.remove(rframe);
+			parent_cache.remove(rframe);
+			pending_relations.remove(rframe);
+			removeFromKB(rframe);
+		    }
+		    removedFrames.addAll(rframes);
+		}
+		rframes = inverse_parent_cache.get(frame);
+		inverse_parent_cache.remove(frame);
+		if (rframes != null) {
+		    for (RelationFrame rframe : rframes) {
+			child_cache.remove(rframe);
+			parent_cache.remove(rframe);
+			pending_relations.remove(rframe);
+			removeFromKB(rframe);
+		    }
+		    removedFrames.addAll(rframes);
+		}
+	    }
+	}
+	synchronized (frames) {
+	    frames.removeAll(removedFrames);
+	}
+	publishRemove(removedFrames);
+    }
 
 
     public String getName() {
@@ -615,9 +656,10 @@ public class SingleInheritanceFrameSet
 		// Queue for later
 		synchronized (pending_relations) {
 		    pending_relations.add(relationship);
-		    log.warn("Relation of type " +relationship.getPrototype().getName() +
-			    " between " +relationship.getParentValue() +
-			    " and "+relationship.getChildValue()+ " is unresolved");
+		    if (log.isDetailEnabled())
+			log.detail("Relation of type " +relationship.getPrototype().getName() +
+				" between " +relationship.getParentValue() +
+				" and "+relationship.getChildValue()+ " is unresolved");
 		}
 		return false;
 	    }
@@ -1078,6 +1120,13 @@ public class SingleInheritanceFrameSet
 	    change_queue.add(new Remove(object));
 	    bbs.signalClientActivity();
 	}
+    }
+    
+    void publishRemove(Collection<DataFrame> objects) {
+	synchronized (change_queue_lock) {
+	    for (UniqueObject object : objects) change_queue.add(new Remove(object));
+	}
+	bbs.signalClientActivity();
     }
 
 

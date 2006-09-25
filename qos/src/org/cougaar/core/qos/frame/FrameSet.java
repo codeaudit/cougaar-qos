@@ -219,6 +219,14 @@ public interface FrameSet {
      * operation the Frame will also be removed from the Blackboard.
      */
     public void removeFrame(DataFrame frame);
+    
+    /**
+     * Removes the given Frame  and all its relationships from the FrameSet.  
+     * As a result of this
+     * operation the Frame will also be removed from the Blackboard.
+     */
+    public void removeFrameAndRelations(DataFrame frame);
+
 
     /**
      * Returns the containing Frame of the given Frame, if any.  The
