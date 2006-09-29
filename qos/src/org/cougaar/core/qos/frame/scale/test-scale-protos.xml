@@ -1,4 +1,5 @@
-<!DOCTYPE frameset SYSTEM "../frameset.dtd">
+<!DOCTYPE frameset PUBLIC "-//W3C//DTD frameset" "http://www.cougaar.org/2006/frameset.dtd">
+	
 <frameset domain="testScale" frame-inheritance="single"
 	package="org.cougaar.core.qos.frame.scale" container-relation="contains"
 	index-slot="name">

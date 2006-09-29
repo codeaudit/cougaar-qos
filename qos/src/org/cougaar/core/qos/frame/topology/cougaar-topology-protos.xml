@@ -1,3 +1,5 @@
+<!DOCTYPE frameset PUBLIC "-//W3C//DTD frameset" "http://www.cougaar.org/2006/frameset.dtd">
+
 <frameset
    domain="cougaar-topology"
    frame-inheritance="single"
