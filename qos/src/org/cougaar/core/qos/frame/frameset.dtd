@@ -48,6 +48,6 @@
 
 <!ELEMENT aggregate-by EMPTY>
 <!ATTLIST aggregate-by relation CDATA #REQUIRED
-		  role CDATA #IMPLIED
+		  role CDATA "PARENT"
           aggregator CDATA #REQUIRED
           related-slot CDATA #IMPLIED>
