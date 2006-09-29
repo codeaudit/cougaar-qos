@@ -79,6 +79,8 @@ public class XMIGen extends DefaultHandler {
 	class_uids = new HashMap<String,String>();
 	try {
 	    XMLReader producer = XMLReaderFactory.createXMLReader();
+	    producer.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", 
+		    false);
 	    DefaultHandler consumer = this; 
 	    producer.setContentHandler(consumer);
 	    producer.setErrorHandler(consumer);
