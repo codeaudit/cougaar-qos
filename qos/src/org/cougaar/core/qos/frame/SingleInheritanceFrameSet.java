@@ -416,6 +416,7 @@ public class SingleInheritanceFrameSet
 
     public void removeFrameAndRelations(DataFrame frame) {
 	Set<DataFrame> removedFrames = new HashSet<DataFrame>();
+	removedFrames.add(frame);
 	synchronized (kb) { 
 	    removeFromKB(frame);
 	    synchronized(relation_lock) {   
