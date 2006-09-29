@@ -47,17 +47,27 @@ import org.xml.sax.Attributes;
  */
 
 public interface FrameSet {
-    // Should be enum
-    public static final String CHILD = "child";
+    /**
+     * One of two constants for the roles of frame relationship.
+     * This one if something like the mathematical "domain".
+     * @see #CHILD
+     */
     public static final String PARENT = "parent";
-
+    
+    /**
+     * One of two constants for the roles of frame relationship.
+     * This one if something like the mathematical "range".
+     * @see #PARENT
+     */
+    public static final String CHILD = "child";
+    
     /**
      * Returns the name of the FrameSet.
      */
     public String getName();
 
     /**
-     * Returns the package used by the {@link FrameGen} code generator
+     * Returns the package used by the code generator
      * when it writes Java classes for prototypes.
      */
     public String getPackageName();
@@ -69,8 +79,8 @@ public interface FrameSet {
     public boolean descendsFrom(DataFrame frame, String prototype);
 
     /**
-     * Returns true iff the given frame is an extension the given
-     * prototype, directly or indirectly.
+     * Returns true iff the first prototype frame is an extension 
+     * of the second one, directly or indirectly.
      */
     public boolean descendsFrom(PrototypeFrame frame, String prototype);
 
@@ -105,14 +115,15 @@ public interface FrameSet {
     public Path findPath(UID uid);
 
     /**
-     * Returns a collection of DataFrames that match all the
-     * slot/value pairs.
+     * Returns a collection of DataFrames that match the given prototype and
+     * whose slots match all the given pairs.
      */
     public Set<DataFrame> findFrames(String kind, Properties slot_value_pairs);
     
     /**
      * 
-     * @return true iff both parent and child are available
+     * @return true iff the relationship's {@link #PARENT}
+     *  and {@link #CHILD} frame references are resolvable.
      */
     public boolean isResolved(RelationFrame frame);
 
@@ -120,7 +131,8 @@ public interface FrameSet {
      * Returns a collection of {@link DataFrame}s representing frames
      * related to the given one via a relationship matching the given
      * prototype, and in which the given frame plays the given role
-     * ("parent" or "child").
+     * @see #PARENT
+     * @see #CHILD
      */
     public Set<DataFrame> findRelations(Frame frame, // should be DataFrame
 	    String role,
@@ -128,11 +140,14 @@ public interface FrameSet {
     /**
      * Returns a {@link DataFrame} that's related to the given one
      * via a relationship matching the given prototype, and in which 
-     * the given frame plays the given role ("parent" or "child").
+     * the given frame plays the given role.
      * 
      * If there's more than one such frame, a random one will be
      * returne.  If there are no such frames, the return value
      * is null.
+     * 
+     * @see #PARENT
+     * @see #CHILD
      */
     public DataFrame findFirstRelation(Frame frame, // should be DataFrame
 	    String role,
@@ -141,7 +156,9 @@ public interface FrameSet {
     /**
      * Returns a count of frames that are related to the given one
      * via a relationship matching the given prototype, and in which 
-     * the given frame plays the given role ("parent" or "child").
+     * the given frame plays the given role. 
+     * @see #PARENT
+     * @see #CHILD
      * 
      */
     public int countRelations(Frame frame, // should be DataFrame
@@ -153,7 +170,10 @@ public interface FrameSet {
     /**
      * Returns a collection of {@link RelationFrame}s representing
      * relationships of the given prototype in which the given frame
-     * plays the given role ("parent" or "child").
+     * plays the given role.
+     * @see #PARENT
+     * @see #CHILD 
+     * 
      */
     public Map<RelationFrame,DataFrame> findRelationshipFrames(DataFrame frame,
 	    String role, 
@@ -190,21 +210,20 @@ public interface FrameSet {
 	    DataFrame parent, DataFrame child);
 
     /**
-     * Creates a PrototypeFrame with the given name, parent prototype
-     * and intial values, and adds it to this FrameSet.  A UID for the
-     * frame will be generated automatically.  As a result of this
-     * operation the Frame will be published to the Blackboard.
-     */
-    public PrototypeFrame makePrototype(String kind, String parent,  
+         * Creates a PrototypeFrame with the given name and default slot values,
+         * and that extends the given base prototype. A UID for the frame will
+         * be generated automatically. As a result of this operation the Frame
+         * will be published to the Blackboard.
+         */
+    public PrototypeFrame makePrototype(String kind, String base,  
 	                                Attributes attrs, Map<String,Attributes> slots);
 
     /**
-     * Creates a PrototypeFrame with the given name, parent prototype,
-     * UID, and intial values, and adds it to this FrameSet.  As a
-     * result of this operation the Frame will be published to the
-     * Blackboard.
-     */
-    public PrototypeFrame makePrototype(String kind, String parent,
+         * Creates a PrototypeFrame with the given name UID, and intial values,
+         * and that extends the given pase prototype. As a result of this
+         * operation the Frame will be published to the Blackboard.
+         */
+    public PrototypeFrame makePrototype(String kind, String base,
 	                                Attributes attrs,  Map<String,Attributes> slots, 
 	                                UID uid);
 
@@ -229,7 +248,7 @@ public interface FrameSet {
 
 
     /**
-     * Returns the containing Frame of the given Frame, if any.  The
+     * Returns the container of the given frame, if any.  The
      * exact meaning of 'containment' is specific to the FrameSet
      * instance. 
      */
@@ -241,24 +260,24 @@ public interface FrameSet {
     public PrototypeFrame getPrototype(Frame frame);
 
     /**
-     * Returns the matching 'parent' Frame in the given relationship.
+     * Returns the matching {@link #PARENT} Frame in the given relationship.
      */
     public DataFrame getRelationshipParent(RelationFrame relationship);
 
     /**
-     * Returns the matching 'child' Frame in the given relationship.
+     * Returns the matching {@link #CHILD} Frame in the given relationship.
      */
     public DataFrame getRelationshipChild(RelationFrame relationship);
     
     /**
-     * Inform the FrameSet that the given frame was changed in the
+     * Informs the FrameSet that the given frame was changed in the
      * given way.  As a result of this operation, a change will be
      * published to the Blackboard.
      */
     public void valueUpdated(DataFrame frame, String slot, Object value);
 
     /**
-     * Force the FrameSet to process any queued Blackboard operations.
+     * Forces the FrameSet to process any queued Blackboard operations.
      * This call will block if a transaction is in progress.
      * 
      * @see #runInTransaction(Runnable)
@@ -266,8 +285,9 @@ public interface FrameSet {
     public void processQueue();
     
     /**
-     * Run a body of code using a lock that prevents a
+     * Runs a body of code using a lock that prevents a
      * simultaneous invocation of {@link #processQueue}.
+     * The runnable is executed in the caller's thread.
      */
     public void runInTransaction(Runnable r);
 
@@ -277,19 +297,19 @@ public interface FrameSet {
     public Collection<PrototypeFrame> getPrototypes();
 
     /**
-     * Return the generated class for the given prototype
+     * Returns the generated class for the given prototype
      */
     public Class classForPrototype(String prototypeName);
     
     /**
-     * Return the generated class for the given prototype
+     * Return the generated Java class for the given prototype
      */
     public Class classForPrototype(PrototypeFrame prototype);
 
     /**
-     * Write the frameset data as xml.
+     * Writes the frameset data as xml.
      * 
-     * For each DataFrame in the frameset, write the current value of
+     * For each DataFrame in the frameset, writes the current value of
      * any slot in that frame that is either defined locally or inherited via
      * the prototype hierarchy.
      * 
@@ -299,9 +319,9 @@ public interface FrameSet {
     
     
     /**
-     * Write a subset of the frameset data as xml.
+     * Writes a subset of the frameset data as xml.
      * 
-     * For each DataFrame of the given prototypes, write the current value of
+     * For each DataFrame of the given prototypes, writes the current value of
      * any slot in that frame that is either defined locally or inherited via
      * the prototype hierarchy.
      * 
@@ -338,7 +358,7 @@ public interface FrameSet {
 
 
     /**
-     * Load DataFrames at the given location
+     * Loads DataFrames at the given location.
      * 
      * @param location A file or resource path
      */
@@ -361,7 +381,7 @@ public interface FrameSet {
     // Slot dependencies
     
     /**
-     * Create an aggregator to compute and update the given slot.  Ordinarily this happens
+     * Creates an aggregator to compute and update the given slot.  Ordinarily this happens
      * automatically as part of loading the prototypes and wouldn't need to be called
      * explicitly in user code.
      * 
@@ -378,7 +398,7 @@ public interface FrameSet {
 	    String className);
     
     /**
-     * Set up subscriptions for all aggregators that haven't done so already.
+     * Sets up subscriptions for all aggregators that haven't done so already.
      * Ordinarily this only needs to be called once after the prototypes are
      * loaded.  This is usually handled by {@link FrameSetLoaderPlugin}.
      *
