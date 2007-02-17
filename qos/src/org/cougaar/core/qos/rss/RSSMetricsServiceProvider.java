@@ -40,6 +40,8 @@ import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.thread.ThreadServiceProvider;
 
+import com.bbn.rss.RSSUtils;
+
 /**
  * This Component/Container provides the RSS-based implementation of
  * the MetricsService and MetricsUpdateService, and instantiates the
@@ -84,6 +86,12 @@ public final class RSSMetricsServiceProvider
 	ThreadServiceProvider tsp = new ThreadServiceProvider();
 	tsp.setParameter("name=Metrics");
 	add(tsp);
+
+        // Make a Timer available to RSS and TEC
+        //
+        // We must do this before we load our subcomponents, otherwise RSSUtils
+        // will spawn a default (non-ThreadService-backed) timer thread
+        RSSUtils.setScheduler(new CougaarTimer(getChildServiceBroker()));
 
 	// Childern Components need Registration Service
 	// but the Registration need the MetricServiceImplementation

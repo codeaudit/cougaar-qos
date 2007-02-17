@@ -178,10 +178,6 @@ public class RSSMetricsServiceImpl
 	ServiceDS.register();
 	org.cougaar.core.qos.gossip.GossipIntegraterDS.registerContext();
 
-	// Make a Timer available to RSS and TEC
-	CougaarTimer timer = new CougaarTimer(sb);
-	RSSUtils.setScheduler(timer);
-
 	DataFeed feed = null;
 	String feedName = null;
 	feed = metricsUpdateService.getMetricsFeed();
