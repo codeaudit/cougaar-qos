@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.cougaar.bootstrap.XMLReaderUtils;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.util.log.Logger;
@@ -42,8 +43,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
-
 
 /**
  * This class parses frame and protocol xml files and creates the
@@ -52,15 +51,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class FrameSetParser
     extends DefaultHandler {
-    private static final String DRIVER_PROPERTY = "org.xml.sax.driver";
-    private static final String DRIVER_DEFAULT =
-	"org.apache.crimson.parser.XMLReaderImpl";
-
-    static {
-	String driver = System.getProperty(DRIVER_PROPERTY);
-	if (driver == null) 
-	    System.setProperty(DRIVER_PROPERTY, DRIVER_DEFAULT);
-    }
 
     private String frame_set_name;
     private FrameSet frame_set;
@@ -119,7 +109,7 @@ public class FrameSetParser
 	this.frame_set = frameSet;
 	this.frame_set_name = name;
 	try {
-	    final XMLReader producer = XMLReaderFactory.createXMLReader();
+	    final XMLReader producer = XMLReaderUtils.createXMLReader();
 	    producer.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", 
 		    false);
 	    DefaultHandler consumer = this; 
