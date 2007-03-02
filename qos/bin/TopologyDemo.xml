@@ -1,13 +1,15 @@
 <?xml version='1.0'?>
 
 <!--
-A minimal, two node ping example.
+FrameSet Society Monitoring Example
+A montitor agent is added to the basic two node ping society
+The monitor agent will create a Swing GUI for Node1 process.
 -->
 <society  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
   xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
 	<!-- Select a template -->
 	<vm_parameter> -Dorg.cougaar.society.xsl.param.template=lan	</vm_parameter>
-	
+
 	<!-- Always turn on servlets, even if we're 'embedded' -->
 	<vm_parameter> -Dorg.cougaar.society.xsl.param.servlets=true </vm_parameter>
 	<!--Use Nameserver-->
@@ -15,11 +17,6 @@ A minimal, two node ping example.
 	
 	<!--
 	Run as fast as possible and don't output ping logs
-	
-	Note that we can override these settings in each PingSender plugin
-	by specifying corresponding plugin parameters, e.g.
-	..PingSender ..
-	<argument>delayMillis=1234</argument>
 	-->
 	<vm_parameter>-Dorg.cougaar.core.relay.ping.delayMillis=0</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.relay.ping.verbose=false</vm_parameter>
@@ -27,8 +24,11 @@ A minimal, two node ping example.
 	<!-- Turn off +/- logging on every message send/receive -->
 	<vm_parameter>-Dorg.cougaar.core.agent.quiet=true</vm_parameter>
 	<vm_parameter>-Dorg.cougaar.core.agent.heartbeat=false</vm_parameter>	
-	
+
 	<node name="Node1">
+	   <component class='org.cougaar.core.mobility.service.RootMobilityPlugin' />
+       <component  class='org.cougaar.core.mobility.servlet.MoveAgentServlet' />
+  
 		
 		<agent name='NameServer' class='org.cougaar.core.agent.SimpleAgent'>
 			<facet role='NameServer'/>
@@ -76,7 +76,10 @@ A minimal, two node ping example.
 	</node>
 	
 	<node name="Node2">
-		
+	   <component class='org.cougaar.core.mobility.service.RootMobilityPlugin' />
+       <component  class='org.cougaar.core.mobility.servlet.MoveAgentServlet' />
+	
+	
 		<agent name="sink">
 			<!-- Respond to pings -->
 			<component class="org.cougaar.core.relay.PingReceiver"/>
@@ -85,5 +88,4 @@ A minimal, two node ping example.
 			<component class="org.cougaar.core.relay.PingServlet"/>
 		</agent>
 	</node>
-	
 </society>

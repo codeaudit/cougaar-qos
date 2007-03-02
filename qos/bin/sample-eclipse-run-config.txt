@@ -13,18 +13,17 @@ Program arguments:
 org.cougaar.core.node.Node
 
 VM arguments:
-
 -Dorg.cougaar.society.file=TopologyDemo.xml [or whatever]
 -Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo" [or whatever]
--Dorg.cougaar.node.name=NODE1
--Dorg.cougaar.core.logging.log4j.appender.A2.File=NODE1-events.log
+-Dorg.cougaar.node.name=Node1
+-Dorg.cougaar.society.xsl.param.template=lan
 -Dorg.cougaar.core.logging.config.filename=logging.properties
 -Dorg.cougaar.name.server=NameServer@localhost:8888
--Dorg.xml.sax.driver=com.sun.org.apache.xerces.internal.parsers.SAXParser
 -Dorg.cougaar.core.node.InitializationComponent=XML
 -Dorg.cougaar.core.domain.config.filename= 
 -Dorg.cougaar.install.path=[your $CIP here]
 -Dorg.cougaar.core.agent.quiet=true
+-Xbootclasspath/p:[your $CIP here]/lib/javaiopatch.jar
 -Xms1m
 -Xmx256m
 -XX:ThreadStackSize=256
