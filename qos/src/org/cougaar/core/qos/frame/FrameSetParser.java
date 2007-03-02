@@ -110,8 +110,15 @@ public class FrameSetParser
 	this.frame_set_name = name;
 	try {
 	    final XMLReader producer = XMLReaderUtils.createXMLReader();
-	    producer.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", 
-		    false);
+	    String producerClassName = producer.getClass().getName();
+	    if (log.isInfoEnabled()) log.info("Made SAX reader class=" + producerClassName);
+	    if ( producerClassName.equals("com.sun.org.apache.xerces.internal.parsers.SAXParser")) {
+		producer.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+	    }
+	    if ( producerClassName.equals("org.apache.crimson.parser.XMLReaderImpl")) {
+		// TODO Add Feature to disable validation, so that node does not make Web call to get .dtd
+	    }
+
 	    DefaultHandler consumer = this; 
 	    producer.setContentHandler(consumer);
 	    producer.setErrorHandler(consumer);
