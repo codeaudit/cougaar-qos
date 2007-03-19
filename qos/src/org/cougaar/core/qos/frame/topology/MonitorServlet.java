@@ -116,6 +116,7 @@ public class MonitorServlet extends MetricsServlet
 	out.println("<th>Host</th>");
 	out.println("<th>Node</th>");
 	out.println("<th>Agent</th>");
+	out.println("<th>Heard From</th>");
 	out.println("<th>Load Avg.</th>");
 	out.println("<th>Msg In</th>");
 	out.println("<th>Msg Out</th>");	
@@ -126,6 +127,7 @@ public class MonitorServlet extends MetricsServlet
     private  void printHostRow(PrintWriter out, Host myHost)
     {
 	out.println("<tr><td colspan=3>"+ myHost.getName()+"</td>");
+	out.println("<td>&nbsp;</td>"); // Heard From
 	ServletUtilities.valueTable(myHost.getLoadAverage(),0.0, 1.0, true, f4_2,out);
 	out.println("<td>&nbsp;</td>"); // Msg In
 	out.println("<td>&nbsp;</td>"); // Msg Out
@@ -138,6 +140,7 @@ public class MonitorServlet extends MetricsServlet
     {
 	out.println("<tr><td>&nbsp;</td>"); // Host
 	out.println("<td colspan=2>" + myNode.getName() + "</td>"); // Node column
+		out.println("<td>&nbsp;</td>"); // Heard From
 	ServletUtilities.valueTable(myNode.getCpuLoadAverage(), 0.0, 1.0, true, f4_2,out);
 	ServletUtilities.valueTable(myNode.getMsgIn(),0.0, 2.0, true, f4_2,out);
 	ServletUtilities.valueTable(myNode.getMsgOut(),0.0, 2.0, true, f4_2,out);
@@ -149,6 +152,7 @@ public class MonitorServlet extends MetricsServlet
     {
 	out.println("<tr><td colspan=2>&nbsp;</td>"); // Host Node
 	out.println("<td>" + myAgent.getName()+ "</td>"); // Agent column
+	ServletUtilities.valueTable(myAgent.getHeardFrom(),0.0, 60, true, f4_0, out);
 	ServletUtilities.valueTable(myAgent.getCpuLoadAverage(),0.0, 1.0, true, f4_2,out);
 	ServletUtilities.valueTable(myAgent.getMsgIn(),0.0, 2.0, true, f4_2,out);
 	ServletUtilities.valueTable(myAgent.getMsgOut(),0.0, 2.0, true, f4_2,out);

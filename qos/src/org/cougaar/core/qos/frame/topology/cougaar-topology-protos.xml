@@ -80,6 +80,9 @@
     <prototype name="agent"
 	       container="node"
 	       prototype="thing">
+
+      <slot name="heardFrom" 
+	    metric-path="Agent($(name)):LastHeard()"/>
       <slot name="cpuLoadAverage" 
 	    metric-path="Agent($(name)):CPULoadAvg(10)"/>
       <slot name="cpuLoadMJips" 
