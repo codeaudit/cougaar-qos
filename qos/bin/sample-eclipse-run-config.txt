@@ -12,6 +12,8 @@ Arguments tab
 Program arguments:
 org.cougaar.core.node.Node
 
+define your local CIP variable
+
 VM arguments:
 -Dorg.cougaar.society.file=TopologyDemo.xml [or whatever]
 -Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo" [or whatever]
