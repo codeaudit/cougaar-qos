@@ -1,52 +1,65 @@
 Main tab
 
-Project:
-qos
+	Project: qos
 
-Main class:
-org.couaar.boostrap.Boostrapper
-
+	Main class: org.couaar.boostrap.Boostrapper
 
 Arguments tab
 
-Program arguments:
-org.cougaar.core.node.Node
+	Program arguments: org.cougaar.core.node.Node
 
-define your local CIP variable
+	define your local CIP variable 
+	    (for windows make sure cip does not point to a symbolic link)
+		push variables, edit variable, new
+			name=cip, value= location of "latest"
+			
+	VM arguments:
+	-Dorg.cougaar.society.file=TopologyDemo.xml [or whatever]
+	-Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo" [or whatever]
+	-Dorg.cougaar.node.name=Node1
+	-Dorg.cougaar.society.xsl.param.template=lan
+	-Dorg.cougaar.core.logging.config.filename=logging.properties
+	-Dorg.cougaar.name.server=NameServer@localhost:8888
+	-Dorg.cougaar.core.node.InitializationComponent=XML
+	-Dorg.cougaar.core.domain.config.filename= 
+	-Dorg.cougaar.install.path=[your $CIP here]
+	-Dorg.cougaar.core.agent.quiet=true
+	-Xbootclasspath/p:[your $CIP here]/lib/javaiopatch.jar
+	-Xms1m
+	-Xmx256m
+	-XX:ThreadStackSize=256
 
-VM arguments:
--Dorg.cougaar.society.file=TopologyDemo.xml [or whatever]
--Dcom.apple.mrj.application.apple.menu.about.name="Topology Demo" [or whatever]
--Dorg.cougaar.node.name=Node1
--Dorg.cougaar.society.xsl.param.template=lan
--Dorg.cougaar.core.logging.config.filename=logging.properties
--Dorg.cougaar.name.server=NameServer@localhost:8888
--Dorg.cougaar.core.node.InitializationComponent=XML
--Dorg.cougaar.core.domain.config.filename= 
--Dorg.cougaar.install.path=[your $CIP here]
--Dorg.cougaar.core.agent.quiet=true
--Xbootclasspath/p:[your $CIP here]/lib/javaiopatch.jar
--Xms1m
--Xmx256m
--XX:ThreadStackSize=256
-
-Working directory:
-${workspace_loc:qos/bin}
+	Working directory:  ${workspace_loc:qos/bin}
 
 
 Classpath tab
 
-Bootstrap Entries
- add $CIP/lib/javaiopatch.jar as an "external jar" BEFORE the jre
-
-User Entries:
- add the following "external jars":
-  $CIP/lib/community.jar
-  $CIP/lib/ping.jar
-  $CIP/lib/planning.jar
-  $CIP/lib/quo.jar
-  $CIP/lib/webserver.jar
-  $CIP/lib/webtomcat.jar
- as well as the internal workspace jar tomcat_40.jar from jars/lib
+	select user entries
+	go to "advanced", "add library", "user library", "user libraries"
+	create new library with name=cougaar-lib
+	add ${CIP}/latest/lib/javaiopatch.jar
+		${CIP}/latest/lib/webtomcat.jar
+		${CIP}/latest/lib/webserver.jar
   
+	create new libary with name=cougaar-sys
+		add entire contents of ${CIP}/latest/sys
 
+--------------------------------------------
+
+Go to external tools
+  select ant build
+  create new ant build with name=framegen
+  	main tab
+  		push "browse workspace", select qos, then select build.xml from right part of window
+  	targets tab
+  		uncheck compile
+  		check framesets (should be last one)
+  		
+---------------------------------------------
+Window->Preferences
+
+Potential Programming Problems
+	change "serializable class without serialVersionUID" from warning to ignore
+	
+Generic Types
+	change "unchecked generic type operation" from warning to ignore
