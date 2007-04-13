@@ -58,7 +58,7 @@ For more detailed profiling, add the following components to all nodes:
           class='org.cougaar.mts.std.StatisticsAspect'
           insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'/&gt;
       &lt;component
-          class='org.cougaar.mts.tmatrix.AgentFlowAspect'
+          class='org.cougaar.core.qos.tmatrix.AgentFlowAspect'
           insertionpoint='Node.AgentManager.Agent.MessageTransport.Aspect'/&gt;
 </font>
   &lt;!-- optional mts-internal profilers (select none, any, or all) --&gt;
@@ -96,7 +96,7 @@ For more detailed profiling, add the following components to all nodes:
       &lt;/component&gt;
 
       &lt;component
-          class='org.cougaar.mts.tmatrix.AgentFlowRatePlugin'/&gt;
+          class='org.cougaar.core.qos.tmatrix.AgentFlowRatePlugin'/&gt;
       &lt;component
           class='org.cougaar.core.qos.metrics.AgentStatusRatePlugin'/&gt;
       &lt;component

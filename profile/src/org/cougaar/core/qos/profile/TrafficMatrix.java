@@ -33,7 +33,7 @@ import org.cougaar.util.*;
  */
 public class TrafficMatrix extends ProfilerBase {
   private static final String TMS_CLASS_NAME =
-    "org.cougaar.mts.tmatrix.TrafficMatrixStatisticsService";
+    "org.cougaar.core.qos.tmatrix.TrafficMatrixStatisticsService";
   private static final String[] FIELDS = new String[] {
     "count",
     "bytes",
@@ -62,17 +62,17 @@ public class TrafficMatrix extends ProfilerBase {
       Object tm = snapM.invoke(tms, null);
 
       Class tmCl = Class.forName(
-          "org.cougaar.mts.tmatrix.TrafficMatrix");
+          "org.cougaar.core.qos.tmatrix.TrafficMatrix");
       Method iterM = tmCl.getMethod("getIterator", null);
       Iterator itr = (Iterator) iterM.invoke(tm, null);
 
       Class tiCl = Class.forName(
-          "org.cougaar.mts.tmatrix.TrafficMatrix$TrafficIterator");
+          "org.cougaar.core.qos.tmatrix.TrafficMatrix$TrafficIterator");
       Method origM = tiCl.getMethod("getOrig", null);
       Method targetM = tiCl.getMethod("getTarget", null);
 
       Class trCl = Class.forName(
-          "org.cougaar.mts.tmatrix.TrafficMatrix$TrafficRecord");
+          "org.cougaar.core.qos.tmatrix.TrafficMatrix$TrafficRecord");
       Method msgCountM = trCl.getMethod("getMsgCount", null);
       Method byteCountM = trCl.getMethod("getByteCount", null);
 
