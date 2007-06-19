@@ -5,8 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mtsstd"/>
-	<classpathentry kind="lib" path="/jars/lib/log4j.jar"/>
-	<classpathentry kind="lib" path="/jars/lib/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="/jars/lib/resource-status-service.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/bootstrap"/>
 	<classpathentry kind="output" path="tmp/classes"/>
