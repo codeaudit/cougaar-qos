@@ -1,0 +1,332 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
+"http://www.w3.org/TR/REC-html40/frameset.dtd">
+<!-- $Id: api.html,v 1.1 2007-08-06 16:47:42 rshapiro Exp $ -->
+
+<html> <head>
+<title>RSS API</title>
+</head>
+
+<body>
+
+<h1>Resource Status Service</h1>
+
+<p>Dynamic adaptation to changes in resource availability in a
+distributed system requires timely, accurate relatively high-level
+integrated data.  This data generally has to be synthesized from a set
+of simpler data of variable reliability and timeliness and must be
+distributed in an efficient way.  The data synthesis can viewed as
+form of data fusion, or in some cases, as a kind of impedance matcher.
+
+<p>One way to envision such a service in the broad sense is as a
+hierachical confederation of local services communicating among
+themselves, each of which implements a particular Resource Model
+describing the data being represented at that level.  Each such
+service is locally responsible for handling raw sensor data as well as
+requests for integrated data from consumers, where these consumers
+might be well other service instances.
+
+<p>Various aspects of the RSS are described in more detail below.  The
+<i>DataValue</i> section describes the structure of data entering and
+leaving the RSS.  The <i>DataFeed</i> section describes in an abstract
+way the entities which provide raw low-level "sensor" data to the RSS.
+The <i>ResourceStatusService</i> section describes the interface
+exposed to the client.  The <i>RSS Data Models</i> section describes
+the generic organization of the internal data structures and how they
+model resource data. 
+
+
+<ol>
+  
+<li>
+    <b>DataValue</b>
+
+    <p>The data entering and leaving an RSS needs a set of attributes
+    associated with each value.  A minimal set of attributes would
+    include the following dimensions (which, not coincidentally, are
+    closely related to the familiar notions of timeliness, accuracy
+    and precision).
+
+    <ul>
+
+      <li><b>Time</b>.  Since the utility of data tends to degrade over
+      time, we need to know when it was collected and some measure of
+      how its utility decays.  These are represented by the
+      <code>timestamp</code> and <code>halflife</code> fields, below.
+      In addition to being accessible to the ultimate consumer of the
+      data, these fields are used internally by the RSS in its own
+      management of timeliness and reliability.  </li>
+
+      <li><b>Credibility</b>.  Data has varying levels of credibility
+	  depending on how it was arrived at.  This can be captured
+	  most easily as a real number between 0.0 (no credibility at
+	  all) and 1.0 (no possibility of doubt).  This is represented
+	  in the <code>credibility</code> field, below.  As with the
+	  time related dimensions, credibility is accessible to the end
+	  user of the data and is also used internally by the RSS in
+	  its own management of reliability. </li>
+
+      <li><b>Origin</b>.  Consumers of data might wish to know the
+      source.  This is represented in the <code>provenance</code>
+      field, as an uninterpreted string. </li>
+
+      <li><b>Units</b>.  In order to interpret data sensibly,
+      consumers need to know what unit any given value
+      represents. This is represented in the <code>units</code>
+      field, for now an uninterpreted string.
+
+    </ul>
+
+    <p> Given this, and assuming three kinds of raw data values
+    (numeric, boolean, character), data in an RSS is represented as
+    follows:
+
+    <p>
+    
+    <pre><code>
+    // Assume three sorts of values: strings, booleans and numbers.
+    enum data_types { number_data, string_data, boolean_data};
+    typedef union data_value_union switch(data_types) {
+    case number_data:
+	double  d_value;
+
+    case string_data:
+	string  s_value;
+
+    case boolean_data:
+	boolean    b_value;
+    } data_value;
+
+
+
+    struct DataValue {
+	long long timestamp; // when was it gathered
+	long long halflife;  // how long is it good for
+	double credibility;  // how reliable is it
+	string units;        // what is it measuring
+	string provenance;   // where did it come from
+	data_value value;    // the value itself
+    }; 
+
+    </code></pre>
+    
+</li>
+
+
+<li>
+    <b>DataFeed</b>
+
+    <p>The RSS is a layered service, implemented by a hierarchy of RSS
+    instances in which the higher level data representations are
+    computed in part on the basis of data supplied by lower levels.
+    This layering is parallel to the layering structure of the
+    resource management as a whole.
+    
+    <p>For the most part this hierarchy can be implemented simply by
+    making any given RSS instance a client of the other RSS instances
+    on which it depends.  But eventually this chain of RSS instances
+    linked to one another has to bottom out into a simpler kind of
+    data provider, a <i>sensor</i>, which communicates with the RSS
+    through a different conceptual interface.  This interface is what
+    we call a DataFeed.  To some extent the DataFeed notion is an
+    implementation detail, of no concern to RSS clients.  For
+    completeness, it's described here briefly.
+
+    <p>DataFeeds come in various flavors, each associated with a
+    particular kind of sensor.  Some examples might include static
+    configuration data (e.g., from XML files); network measurements
+    (e.g., from Cisco routers); and host measurements (e.g,, from
+    Eternal Systems monitors).
+
+    <p>Sensors are assumed to be able to provide data to the RSS with
+    a descriptive <i>key</i> indicating what the data represents and
+    which particular sensor it came from.  The interpretation of the
+    key is handled by the implementation of the specific DataFeed
+    associated with that kind of sensor, and should provide enough
+    information to allow the RSS instance to find the right higher
+    level data abstractions that use the raw sensor data.  In other
+    words, the interpretation of the keys is what makes possible the
+    data dependency relationships within the RSS itself.
+
+    <p>As an example, a host data key might look like this:
+    <code>HOST_192.168.0.1_LOADAVERAGE_ETERNALSYS</code>, indicating
+    that the corresponding data is a load average for the given host
+    as supplied by one of Eternal's host monitors.
+
+    <p>For reasons of efficiency, most DataFeeds are local to the RSS
+    process.  But one special feed is accessible via CORBA.  This feed
+    is used in the <code>pushString</code> and <code>pushInt</code>
+    calls on the <code>ResourceStatusService</code> interface (see
+    below).
+
+
+
+</li>
+
+<li>
+    <b>ResourceStatusService</b>, <b>RSSSubscriber</b> and
+    <b>Qualifiers</b>
+
+    <p> The ResourceStatusService interface supports two styles of
+    access, query and subscription.  The RSSSubscriber interface
+    needs to be implemented by clients using the subscription style.
+    The Qualifier interfaces allow subscription clients to restrict
+    the callbacks they get.
+
+    <pre><code>
+   // Client Interfaces
+   interface RSSSubscriber {
+       void dataUpdate(in string callback_id, in DataValue data);
+   };
+
+   
+    enum QualifierKind { min_delta, min_credibility }; // etc
+
+    interface Qualifier {
+	// no remote calls on this
+    };
+
+
+    // Common root for all factories
+    interface QualifierFactory {
+    };
+
+    interface MinDeltaQualifierFactory : QualifierFactory {
+	Qualifier getQualifier(in double threshold);
+    };
+	
+
+    interface MinCredibilityQualifierFactory : QualifierFactory {
+	Qualifier getQualifier(in double threshold);
+    };
+	
+
+    interface ResourceStatusService {
+	boolean query(in ResourceDescription resource, out DataValue result);
+
+	boolean unqualifiedSubscribe(in RSSSubscriber listener,
+				     in ResourceDescription resource,
+				     in long callback_id);
+
+	QualifierFactory getQualifierFactory(in QualifierKind kind);
+
+	boolean qualifiedSubscribe(in RSSSubscriber listener, 
+				   in ResourceDescription resource,
+				   in long callback_id,
+				   in Qualifier qualifier);
+
+	void unsubscribe(in RSSSubscriber listener, 
+			 in ResourceDescription path);
+
+	boolean invoke(in ResourceDescription resource,
+		       in string method_name,
+		       in ParameterList args)
+	    raises (NoSuchMethodException);
+
+        void pushString(in string key, in string raw_value);
+
+	void pushLong(in string key, in long raw_value);
+    };
+
+
+    </code></pre>
+
+    <p>The primary invocation points for RSS clients are the
+    <code>query</code> and <code>subscribe</code> methods of the
+    <code>DataAccess</code> interface.  Both take a <i>path</i>
+    argument, a string which describes the location of the desired
+    value in the data-dependency space of an RSS.  For more details on
+    paths, see the <a href="#DataModel">Data Model</a> section, below.
+    As a simple example of a path, the point-to-point network capacity
+    between two hosts might look like this: <code>
+    "IpFlow(192.168.0.10, 192.168.1.100):Capacity"</code>.
+
+    <p> The <code>query</code> call is used to fetch the current value
+    described by the path.  The <code>subscribe</code> call is used to
+    setup a notification for changes in the value described by the
+    path: if that value changes and if the change meets the
+    <i>qualifications</i>, the subscriber will be notified via the
+    <code>dataUpdate</code> method.
+
+    <p> Resources in the RSS also support a simple form of
+    type-specific methods, with a sequence of strings as the
+    arguments.  To <code>invoke</code> call is used for this.
+
+    <p>In order to get data in to the RSS, there are two methods that
+    push simple raw data onto a predefined DataFeed:
+    <code>pushString</code> and <code>pushLong</code>, for string and
+    numeric data respectively.  This is a minimal set which will
+    likely be extended later.
+
+    <p>The <code>DataSubscriber</code> interface is implemented by the
+    client, and is used only for subscription callbacks.  The
+    <code>Qualifier</code> interface will most likely be implemented
+    as a CORBA ValueType -- supplied by the client but invoked on a
+    local copy in the server. These would typically be used to
+    restrict callbacks, as determined by the client.  The most common
+    form of <code>Qualifier</code> would specify an epsilon below
+    which changes in value are considered too small to matter.  A
+    <code>Qualifier</code> might also be based on time, credibility or
+    origin, or on any combination of these.
+
+</li>
+
+
+<li>
+    <a name="DataModel"><b>RSS Data Models</b></a>
+
+    <p>The abstract interfaces above completely describe the external
+    view of the RSS, but the heart of the service for any particular
+    domain is inside, in the form of a data model.  
+
+    <p>The data model in an RSS is represented as a graph of nodes,
+    usually but not always a tree.  The types of nodes available in
+    any given RSS instance represent the abstract model of a domain,
+    while the collection of related instances represents a specific
+    domain. Depending on the domain, the tree might be very flat or
+    might have some depth -- higher level RSS instances might contain
+    representations of Components, the processes that contain them and
+    the processing nodes that contain the processes.
+
+    <p>A node in this tree of any given type can best be thought of as
+    a dynamic closure over a set of fixed <i>parameters</i> that are
+    sufficient to distinguish it from others of the same type.  In
+    addition, types also define <i>formulas</i>, i.e., computational
+    expressions evaluated dynamically on the basis of parameters and
+    formulas of the other nodes (or the same node) as well as raw data
+    coming in from a DataFeed.  Formulas can be trivially simple,
+    amounting to little more than attributes read more or less
+    directly from raw data.  The Load Average formula below is an
+    example.  They can also be arbitrarily complex.  We could for
+    example define formulas that compute min and max Load Averages
+    over some unit of time for a single processing node, and a higher
+    level formula that computes a mean over a set of these max Load
+    Averages over all the processing nodes in a pool.
+
+    <p>The formula dependency relation defines the data chaining and
+    propagation within the RSS.  The tree relation, on the other hand,
+    describes a form of containment: child nodes inherit the formulas
+    of their ancestors (i.e., the nodes which contain them, directly
+    or indirectly).  The form of this model should now make more clear
+    the nature of DataAccess paths.  A path describes the location of
+    some node in the tree, in form of a sequence of parameterized node
+    type names, followed by the name of a parameter or formula of that
+    node.
+
+
+</li>
+
+
+
+
+</ol>
+
+
+
+<hr>
+<address>R Shapiro
+<a href="mailto:rshapiro@bbn.com">&lt;rshapiro@bbn.com&gt;</a>
+</address>
+<!-- hhmts start -->
+Last modified: Mon Aug 16 18:12:14 EDT 2004
+<!-- hhmts end -->
+</body> </html>

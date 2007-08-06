@@ -1,0 +1,365 @@
+/*
+ * =====================================================================
+ * (c) Copyright 2004  BBN Technologies
+ * =====================================================================
+ */
+
+
+#ifndef BBN_RSS
+#define BBN_RSS
+
+module com
+{
+    module bbn
+    {
+	module ResourceStatus
+	{
+	    // This exception is raised when an invoke call isn't
+	    // handled by the given context.
+	    exception NoSuchMethodException
+	    {
+		string method_name;
+	    };
+
+	    // This exception is raised when a resource path specified
+	    // as a string has bad syntax.  It does not indicate that
+	    // the semantics are bad (eg that it refers to to a
+	    // non-existent context or formula, or that it supplies the
+	    // wrong number or wrong type of parameters).
+	    exception ResourceDescriptionParseException
+	    {
+		string description;
+		string reason;
+	    };
+
+
+	    // For now params are strings and it's up to the
+	    // Resource Contexts to parse them into other
+	    // sorts of values.
+	    typedef sequence<string> ParameterList;
+
+	    // A ResourceNode defines a single entry in the resource
+	    // tree, and a ResourceDescription defines a path through
+	    // the tree, starting from the root.  Terminal nodes in the
+	    // ResourceDescription should refer to a DataFormula (in the
+	    // implementation) while non-terminals should refer to a
+	    // ResourceContext.
+	    struct ResourceNode {
+		string kind;
+		ParameterList parameters;
+	    };
+
+
+	    typedef sequence<ResourceNode> ResourceDescription;
+
+
+
+	    // Although this appears to be identical to
+	    // ResourceDescription, it serves a completely different
+	    // purpose and is therefore definded independently.  The
+	    // ResourceNodeSeq is specific to the addDependency call.
+	    // Likewise RSSSeq.
+	    typedef sequence<ResourceNode> ResourceNodeSeq;
+
+	    interface ResourceStatusService;
+	    typedef sequence<ResourceStatusService> RSSSeq;
+
+
+
+
+	    // Data representation: three kinds (data_types);
+	    // a union describing a single raw value
+	    // (data_value); and a struct which attaches extra
+	    // attributes like timestamp, credibility, etc, to
+	    // a data_value (DataValue).
+	    enum data_types { number_data, string_data, boolean_data };
+
+	    union data_value switch(data_types) {
+	    case number_data:
+		double  d_value;              // Data value
+
+	    case string_data:
+		string  s_value;
+
+	    case boolean_data:
+		boolean    b_value;
+	    };
+
+
+
+	    struct DataValue {
+		// when it entered the rss
+		long long timestamp;  
+
+		// how quickly its usefulness decreases
+		long long halflife;   
+
+		// how believable it is (0-1)
+		double credibility;   
+
+		// what units it's in (not usually filled in)
+		string units;         
+
+		// where it came from
+		string provenance;    
+
+		// the raw value
+		data_value value; 
+	    }; 
+
+
+
+	    // Only a few kinds of qualifiers so far
+	    enum QualifierKind {
+	      min_delta, 
+	      min_credibility,
+	      exceeds_threshold,
+	      crosses_threshold,
+	      every,
+	      some
+	    }; 
+
+
+	    // Qualifiers are returned to clients by a call on a
+	    // factory, and then passed back in on a
+	    // qualifiedSubscribe.  The qualifier itself only supports
+	    // an an abstracted get/set API
+
+	    exception NoSuchAttributeException
+	    {
+		string attribute_name;
+	    };
+
+	    exception BadAttributeValueException
+	    {
+		string attribute_name;
+	    };
+
+	    interface Qualifier {
+		void getAttribute(in string attribute_name, 
+				  out data_value attribute_value)
+		    raises (NoSuchAttributeException, 
+			    BadAttributeValueException);
+
+		void setAttribute(in string attribute_name, 
+				  in data_value attrobute_value)
+		    raises (NoSuchAttributeException,
+			    BadAttributeValueException);
+	    };
+
+	    typedef sequence<Qualifier> QualifierSet;
+
+	    // Common root for all factories. In theory each particular
+	    // factory type has its own method(s) for returning
+	    // qualifiers, which is why no methods are listed here.  The
+	    // two extant examples happen to use methods with the same
+	    // signature but that's only because thet're particularly
+	    // simple.
+	    interface QualifierFactory {
+	    };
+
+
+	    // Qualifies only callbacks for which the change since the
+	    // last callback is greater than the given threshold.
+	    // Obviously this should only be used for formulas with
+	    // numeric values.
+	    interface MinDeltaQualifierFactory : QualifierFactory {
+		Qualifier getQualifier(in double threshold);
+	    };
+	
+
+	    // Qualifies only callbacks for which the credibility is
+	    // greater than the given threshold.
+	    interface MinCredibilityQualifierFactory 
+		: QualifierFactory {
+		Qualifier getQualifier(in double threshold);
+	    };
+
+	    // Qualifies only callbacks for which the value is
+	    // greater than the given threshold.
+	    interface ExceedsThresholdQualifierFactory
+		: QualifierFactory {
+		Qualifier getQualifier(in double threshold);
+	    };
+
+
+	    // Qualifies only callbacks for which the value crosses
+	    // the given threshold. 
+	    interface CrossesThresholdQualifierFactory
+		: QualifierFactory {
+		Qualifier getQualifier(in double threshold);
+	    };
+	
+
+
+	    // Qualifies callbacks when at all qualifiers in
+	    // the  set are satisfied
+	    interface EveryQualifierFactory
+		: QualifierFactory {
+		Qualifier getQualifier(in QualifierSet qualifiers);
+	    };
+	
+
+
+	    // Qualifies callbacks when at least one qualifier in
+	    // the  set is satisfied
+	    interface SomeQualifierFactory
+		: QualifierFactory {
+		Qualifier getQualifier(in QualifierSet qualifiers);
+	    };
+	
+
+
+
+	    // This is the callback interface.  Clients that subscribe
+	    // to the RSS should implement this.
+	    interface RSSSubscriber {
+		oneway void dataUpdate(in long callback_id, 
+				       in DataValue value);
+	    };
+
+
+	    // The service itself.  The core methods come in two
+	    // variants, one which specifies a resource as a
+	    // ResourceDescription and the other of which specifies it
+	    // as a string.  The string methods have '_s' appended to
+	    // the method name and can throw a parsing exception,
+	    // ResourceDescriptionParseException, which indicates a
+	    // syntactic problem with the argument.
+	    interface ResourceStatusService {
+			
+		// Request a value, returned in an out parameter.  The
+		// return value indicates success or failure in accessing
+		// the formula.  Possibly it would be cleaner to throw an
+		// exception instead.  In any case, a true return does not
+		// indicate that the formula has returned a "meaningful"
+		// value, since the interpretation of meaningfulness is
+		// specific to the context.  In particular, the value
+		// could well be empty if the formula is newly created.
+		// The client is responsible for handling this case.
+		//
+		// This call is non-blocking by design.
+		boolean query(in ResourceDescription formula, 
+			      out DataValue result);
+
+		boolean query_s(in string formula, 
+				out DataValue result)
+		    raises (ResourceDescriptionParseException);
+
+
+
+		// Request a value, returned in an out parameter.   This
+		// call will block until the formula returns a real value
+		// (via an internal subscription).  If the formula can't
+		// be found/made OR if the timeout happens before a
+		// callback from the formula happens, the blockingQuery
+		// returns false.  Possibly it would be cleaner to throw
+		// an exception in the former case.
+		boolean blockingQuery(in ResourceDescription formula,
+				      in long long timeout,
+				      out DataValue result);
+
+		boolean blockingQuery_s(in string formula, 
+					in long long timeout,
+					out DataValue result)
+		    raises (ResourceDescriptionParseException);
+
+
+		// Subscribe to a value.  Callbacks will be made to the
+		// given listener whenever the given value changes.  The
+		// client-supplied callback_id will be passed as part of
+		// the callback so that a single listener can be used for
+		// multiple subscriptions and still be able to tell which
+		// one corresponds to a given callback invocation.
+		boolean unqualifiedSubscribe(in RSSSubscriber listener,
+					     in ResourceDescription formula,
+					     in long callback_id);
+
+		boolean unqualifiedSubscribe_s(in RSSSubscriber listener,
+					       in string formula,
+					       in long callback_id)
+		    raises (ResourceDescriptionParseException);
+
+		// As above, except the listener only gets the callback
+		// when the qualifier is satisfied.  To create qualifiers,
+		// the client should first get the right factory (via
+		// getQualifierFactory); then narrow the factory to that
+		// type; then use the factory-specific method to create a
+		// qualifier.
+		boolean qualifiedSubscribe(in RSSSubscriber listener, 
+					   in ResourceDescription formula,
+					   in long callback_id,
+					   in Qualifier qualifier_);
+
+		boolean qualifiedSubscribe_s(in RSSSubscriber listener, 
+					     in string formula,
+					     in long callback_id,
+					     in Qualifier qualifier_)
+		    raises (ResourceDescriptionParseException);
+
+		// End all previously established subscriptions for the
+		// given listener.
+		void unsubscribe(in RSSSubscriber listener, 
+				 in ResourceDescription formula);
+
+		void unsubscribe_s(in RSSSubscriber listener, 
+				   in string formula)
+		    raises (ResourceDescriptionParseException);
+
+
+		// Request a factory of the given kind.  Nothing can be
+		// done directly with the generic QualifierFactory
+		// returned by this call.  The caller is responsible for
+		// narrowing it to the derived interface corresponding to
+		// the kind.  The narrowed reference can then be used to
+		// request a Qualifier.
+		QualifierFactory getQualifierFactory(in QualifierKind kind);
+
+
+		// Quasi-arbitrary method invocation.  Methods are
+		// specific to a ResourceContext, so the
+		// ResourceDescription argument here should refer to a
+		// context rather than a formula.
+		boolean invoke(in ResourceDescription resource_context,
+			       in string method_name,
+			       in ParameterList args)
+		    raises (NoSuchMethodException);
+
+		boolean invoke_s(in string resource_context,
+				 in string method_name,
+				 in ParameterList args)
+		    raises (NoSuchMethodException, 
+			    ResourceDescriptionParseException);
+
+		// Connect to the public data feed in order to add a new
+		// raw value.
+		void pushString(in string key, in string raw_value);
+		void pushLong(in string key, in long raw_value);
+
+
+		// Informs the local RSS that the given resource depends
+		// on data of a particular sort from other RSS instances.
+		// The description of the data dependencies is in
+		// node_dependencies, while the description of service
+		// dependencies is in rss_dependencies.  These two
+		// sequences, which should be proper sets, without
+		// duplicates, are not parallel; in other words, the
+		// caller does not need to know exactly which other RSS
+		// supplies which piece of data.
+		//
+		// NB: This method is deprecated and will
+		// soon go away.
+		void addDependency(in ResourceNode resource,
+				   in ResourceNodeSeq node_dependencies,
+				   in RSSSeq rss_dependencies);
+
+	    }; // end interface ResourceStatusService
+
+
+
+	}; // end module ResourceStatus
+
+    }; // end module bbn
+}; // end module com
+
+#endif
