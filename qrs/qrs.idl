@@ -8,9 +8,11 @@
 #ifndef BBN_RSS
 #define BBN_RSS
 
-module com
+module org
 {
-    module bbn
+    module cougaar
+    {
+    module qos
     {
 	module ResourceStatus
 	{
@@ -358,8 +360,8 @@ module com
 
 
 	}; // end module ResourceStatus
-
-    }; // end module bbn
-}; // end module com
+	}; // end module qos
+    }; // end module cougaar
+}; // end module org
 
 #endif
