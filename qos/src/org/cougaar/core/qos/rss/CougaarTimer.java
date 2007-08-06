@@ -30,8 +30,7 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
-
-import com.bbn.rss.TaskScheduler;
+import org.cougaar.qos.qrs.TaskScheduler;
 
 /**
  * This entity allows RSS tasks to use the COUGAAR ThreadService.

@@ -23,7 +23,7 @@ public class LinuxCPUInfo
 	if (arch.equals("ppc")) {
 	     CacheLineKey = "L2 cache";
 	     ClockLineKey = "clock";
-	} else if (arch.equals("i386")) {
+	} else if (arch.equals("i386")  || arch.equals("amd64")) {
 	    CacheLineKey = "cache size";
 	    ClockLineKey = "cpu MHz";
 	}

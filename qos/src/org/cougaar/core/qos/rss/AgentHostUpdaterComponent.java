@@ -42,10 +42,10 @@ import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.service.wp.WhitePagesService;
 import org.cougaar.core.thread.Schedulable;
+import org.cougaar.qos.qrs.EventSubscriber;
+import org.cougaar.qos.qrs.RSS;
+import org.cougaar.qos.qrs.ResourceContext;
 
-import com.bbn.rss.EventSubscriber;
-import com.bbn.rss.RSS;
-import com.bbn.rss.ResourceContext;
 
 /**
  * This Component provides the {@link AgentHostUpdater} service.

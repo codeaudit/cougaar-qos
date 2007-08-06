@@ -27,8 +27,7 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.qos.metrics.Metric;
-
-import com.bbn.rss.DataValue;
+import org.cougaar.qos.qrs.DataValue;
 
 /**
  * This class wraps RSS DataValues in the {@link Metric} API.

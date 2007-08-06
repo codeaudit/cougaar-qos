@@ -27,12 +27,12 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.qos.metrics.Constants;
+import org.cougaar.qos.qrs.AbstractContextInstantiater;
+import org.cougaar.qos.qrs.ContextInstantiater;
+import org.cougaar.qos.qrs.DataFormula;
+import org.cougaar.qos.qrs.RSS;
+import org.cougaar.qos.qrs.ResourceContext;
 
-import com.bbn.rss.AbstractContextInstantiater;
-import com.bbn.rss.ContextInstantiater;
-import com.bbn.rss.DataFormula;
-import com.bbn.rss.RSS;
-import com.bbn.rss.ResourceContext;
 
 
 /**

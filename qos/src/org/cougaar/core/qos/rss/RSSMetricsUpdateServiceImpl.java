@@ -33,8 +33,8 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
-
-import com.bbn.rss.sysstat.DirectSysStatSupplier;
+import org.cougaar.qos.qrs.DataInterpreter;
+import org.cougaar.qos.qrs.sysstat.DirectSysStatSupplier;
 
 /**
  * This Component is an implementation of MetricsUpdateService that
@@ -62,7 +62,7 @@ public class RSSMetricsUpdateServiceImpl
     private static final int SYSTAT_PERIOD = 15000;
     
     private TrivialDataFeed dataFeed;
-    private com.bbn.rss.DataInterpreter interpreter;
+    private DataInterpreter interpreter;
 
     public RSSMetricsUpdateServiceImpl() {
     }

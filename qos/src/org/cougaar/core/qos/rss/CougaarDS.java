@@ -26,10 +26,9 @@
 
 package org.cougaar.core.qos.rss;
 
+import org.cougaar.qos.qrs.ResourceContext;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-
-import com.bbn.rss.ResourceContext;
 
 /**
  * The base class of all COUGAAR-specific RSS ResourceContexts.

@@ -26,11 +26,12 @@
 
 package org.cougaar.core.qos.gossip;
 
-import com.bbn.rss.AbstractContextInstantiater;
-import com.bbn.rss.ContextInstantiater;
-import com.bbn.rss.DataFormula;
-import com.bbn.rss.ResourceContext;
-import com.bbn.rss.IntegraterDS;
+import org.cougaar.qos.qrs.AbstractContextInstantiater;
+import org.cougaar.qos.qrs.ContextInstantiater;
+import org.cougaar.qos.qrs.DataFormula;
+import org.cougaar.qos.qrs.IntegraterDS;
+import org.cougaar.qos.qrs.ResourceContext;
+
 
 /**
  * Special IntegratorDS used to integrate information from RSS

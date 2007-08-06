@@ -29,9 +29,8 @@ package org.cougaar.core.qos.rss;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
-
-import com.bbn.rss.DataValue;
-import com.bbn.rss.SimpleQueueingDataFeed;
+import org.cougaar.qos.qrs.DataValue;
+import org.cougaar.qos.qrs.SimpleQueueingDataFeed;
 
 
 /**

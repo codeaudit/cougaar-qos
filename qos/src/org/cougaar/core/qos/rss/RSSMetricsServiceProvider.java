@@ -39,8 +39,7 @@ import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
 import org.cougaar.core.qos.metrics.MetricsService;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.thread.ThreadServiceProvider;
-
-import com.bbn.rss.RSSUtils;
+import org.cougaar.qos.qrs.RSSUtils;
 
 /**
  * This Component/Container provides the RSS-based implementation of

@@ -27,17 +27,17 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
+import org.cougaar.qos.ResourceStatus.ResourceNode;
+import org.cougaar.qos.qrs.AbstractContextInstantiater;
+import org.cougaar.qos.qrs.ContextInstantiater;
+import org.cougaar.qos.qrs.DataFormula;
+import org.cougaar.qos.qrs.DataValue;
+import org.cougaar.qos.qrs.RSS;
+import org.cougaar.qos.qrs.ResourceContext;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 import org.cougaar.core.qos.metrics.Constants;
 
-import com.bbn.rss.AbstractContextInstantiater;
-import com.bbn.rss.ContextInstantiater;
-import com.bbn.rss.DataFormula;
-import com.bbn.rss.DataValue;
-import com.bbn.rss.RSS;
-import com.bbn.rss.ResourceContext;
-import com.bbn.ResourceStatus.ResourceNode;
 
 /**
  * This RSS ResourceContext represents a remote Agent to which this

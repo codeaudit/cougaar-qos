@@ -49,19 +49,21 @@ import org.cougaar.core.qos.metrics.VariableEvaluator;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.RunnableQueue;
+import org.cougaar.qos.ResourceStatus.ResourceDescriptionParseException;
+import org.cougaar.qos.ResourceStatus.ResourceNode;
+import org.cougaar.qos.qrs.BoundDataFormula;
+import org.cougaar.qos.qrs.CorbaUtils;
+import org.cougaar.qos.qrs.DataFeed;
+import org.cougaar.qos.qrs.DataFormula;
+import org.cougaar.qos.qrs.DataValue;
+import org.cougaar.qos.qrs.NotificationQualifier;
+import org.cougaar.qos.qrs.NullFormulaException;
+import org.cougaar.qos.qrs.PathParser;
+import org.cougaar.qos.qrs.RSS;
+import org.cougaar.qos.qrs.RSSUtils;
+import org.cougaar.qos.qrs.SitesDB;
 import org.cougaar.util.ConfigFinder;
 
-import com.bbn.ResourceStatus.ResourceNode;
-import com.bbn.rss.BoundDataFormula;
-import com.bbn.rss.CorbaUtils;
-import com.bbn.rss.DataFeed;
-import com.bbn.rss.DataFormula;
-import com.bbn.rss.DataValue;
-import com.bbn.rss.NotificationQualifier;
-import com.bbn.rss.PathParser;
-import com.bbn.rss.RSS;
-import com.bbn.rss.RSSUtils;
-import com.bbn.rss.SitesDB;
 
 /**
  * This Component is an implementation of MetricsService that uses the
@@ -289,10 +291,10 @@ public class RSSMetricsServiceImpl
 		    ResourceNode[] path_spec = PathParser.parsePath(path);
 		    bdf = new BoundDataFormula(path_spec);	
 		} 
-		catch (com.bbn.rss.NullFormulaException ex) {
+		catch (NullFormulaException ex) {
 		    return null;
 		}
-		catch (com.bbn.ResourceStatus.ResourceDescriptionParseException ex) {
+		catch (ResourceDescriptionParseException ex) {
 		    return null;
 		}
 		bdfCache.put(path, bdf);
@@ -352,10 +354,10 @@ public class RSSMetricsServiceImpl
 	    Runnable binder = bdf.getDelayedFormulaCreator();
 	    subscriptionQueue.add(binder);
 	    return new DataValueObserver(observer, bdf);
-	} catch (com.bbn.rss.NullFormulaException ex) {
+	} catch (NullFormulaException ex) {
 	    loggingService.error(path+ " is not valid");
 	    return null;
-	} catch (com.bbn.ResourceStatus.ResourceDescriptionParseException ex) {
+	} catch (ResourceDescriptionParseException ex) {
 	    loggingService.error(path+ " is not valid");
 	    return null;
 	}

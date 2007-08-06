@@ -35,9 +35,9 @@ import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.qos.rss.MetricInterpreter;
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
+import org.cougaar.qos.qrs.DataFeedListener;
+import org.cougaar.qos.qrs.SimpleQueueingDataFeed;
 
-import com.bbn.rss.DataFeedListener;
-import com.bbn.rss.SimpleQueueingDataFeed;
 
 /** 
  * QuO RSS DataFeed used to extract a list of Metrics to request and

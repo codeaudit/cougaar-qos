@@ -27,9 +27,9 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.qos.qrs.DataInterpreter;
+import org.cougaar.qos.qrs.DataValue;
 
-import com.bbn.rss.DataInterpreter;
-import com.bbn.rss.DataValue;
 
 
 /**

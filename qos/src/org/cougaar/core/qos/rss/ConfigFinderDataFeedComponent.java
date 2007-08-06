@@ -33,11 +33,10 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
 import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
+import org.cougaar.qos.qrs.PropertiesDataFeed;
 import org.cougaar.util.ConfigFinder;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-
-import com.bbn.rss.PropertiesDataFeed;
 
 /**
  * This Components uses the {@link DataFeedRegistrationService} to
