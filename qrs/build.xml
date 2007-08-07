@@ -748,4 +748,14 @@
 	<fileset dir="${doc}" />
       </copy>
     </target>
+	
+    <target name="idlj" description="Generate Java classes from idl">
+       <exec executable="idlj">
+       	 <arg value="-td"/>
+         <arg value="src"/>
+         <arg value="-falltie"/>
+         <arg value="qrs.idl"/>
+       </exec>
+    </target>
+
 </project>
