@@ -30,27 +30,21 @@ import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.qos.qrs.DataInterpreter;
 import org.cougaar.qos.qrs.DataValue;
 
-
-
 /**
  * This class is a converter from {@link Metric}s to RSS DataValues.
  */
-public class MetricInterpreter implements DataInterpreter 
-{
-    public double getCredibility(Object x) {
-	return ((Metric) x).getCredibility();
+public class MetricInterpreter implements DataInterpreter<Metric> {
+    public double getCredibility(Metric x) {
+        return x.getCredibility();
     }
-	
-    public DataValue getDataValue(Object x) {
-	Metric metric = (Metric) x;
-	double credibility = metric.getCredibility();
-	String prov = metric.getProvenance();
-	String units = metric.getUnits();
-	Object val = metric.getRawValue();
-	long ts = metric.getTimestamp();
-	long hl = metric.getHalflife();
-	return new DataValue(val, credibility, units, prov, ts, hl);
+
+    public DataValue getDataValue(Metric metric) {
+        double credibility = metric.getCredibility();
+        String prov = metric.getProvenance();
+        String units = metric.getUnits();
+        Object val = metric.getRawValue();
+        long ts = metric.getTimestamp();
+        long hl = metric.getHalflife();
+        return new DataValue(val, credibility, units, prov, ts, hl);
     }
 }
-
-

@@ -6,14 +6,11 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
 
 public class RSSUtils implements Constants {
 
     private static TaskScheduler scheduler;
-    private static final Logger logger = Logging.getLogger(RSSUtils.class);
-
     // Pretty-Printers
     public static void nodeToString(StringBuffer buf, ResourceNode node) {
         buf.append("<Resource ");

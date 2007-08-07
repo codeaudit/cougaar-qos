@@ -6,8 +6,8 @@
 
 package org.cougaar.qos.qrs;
 
-public interface DataInterpreter {
-    public double getCredibility(Object x);
+public interface DataInterpreter<T> {
+    public double getCredibility(T x);
 
-    public DataValue getDataValue(Object x);
+    public DataValue getDataValue(T x);
 }

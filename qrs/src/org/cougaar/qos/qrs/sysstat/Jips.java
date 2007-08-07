@@ -108,7 +108,7 @@ public class Jips extends SysStatHandler implements Runnable
         return theValue;
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         map.put(key, theValue);
     }
 

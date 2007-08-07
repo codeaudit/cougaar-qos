@@ -20,7 +20,7 @@ import org.omg.CosNaming.NamingContextHelper;
 
 import java.util.Iterator;
 
-public class NSIterator implements Iterator {
+public class NSIterator implements Iterator<Object> {
     Logger logger;
     NameComponent[] context_name;
     Binding[] list;

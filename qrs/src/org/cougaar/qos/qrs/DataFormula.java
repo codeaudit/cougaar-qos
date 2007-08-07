@@ -8,7 +8,7 @@ package org.cougaar.qos.qrs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -21,97 +21,19 @@ import org.cougaar.qos.ResourceStatus.ResourceNode;
  * only one formula per type).
  */
 abstract public class DataFormula implements DataValueChangedCallbackListener, Constants {
+    private final List<DataValueChangedCallbackListener> listeners = 
+        new ArrayList<DataValueChangedCallbackListener>();
     private String name;
     private String[] args;
-    private final ArrayList listeners = new ArrayList();
     private DataValue cachedValue;
     private ResourceContext context;
-    private ArrayList dependencies; // collection of DataFormula's
-    private HashMap dependencyKeys; // formula->key
+    private List<DataFormula> dependencies; // collection of DataFormula's
+    private Map<DataFormula,String> dependencyKeys; // formula->key
     private Values dependencyValues; // formula_key -> value
     private boolean deleted;
     private String pretty_name;
 
-    public static class Values extends HashMap {
-        public DataValue get(String key) {
-            return (DataValue) super.get(key);
-        }
-
-        public double doubleValue(String key) {
-            DataValue dvalue = get(key);
-            if (dvalue == null) {
-                return 0.0;
-            } else {
-                return dvalue.getDoubleValue();
-            }
-        }
-
-        public String stringValue(String key) {
-            DataValue svalue = get(key);
-            if (svalue == null) {
-                return "";
-            } else {
-                return svalue.getStringValue();
-            }
-        }
-
-        public boolean booleanValue(String key) {
-            DataValue bvalue = get(key);
-            if (bvalue == null) {
-                return false;
-            } else {
-                return bvalue.getBooleanValue();
-            }
-        }
-
-        public double credibility(String key) {
-            DataValue dvalue = get(key);
-            if (dvalue == null) {
-                return Constants.NO_CREDIBILITY;
-            } else {
-                return dvalue.getCredibility();
-            }
-        }
-
-        // ignore 0.0 unless they're all 0.0
-        public double minPositiveCredibility() {
-            double minimum = 2.0;
-            Iterator itr = entrySet().iterator();
-            while (itr.hasNext()) {
-                Map.Entry entry = (Map.Entry) itr.next();
-                DataValue value = (DataValue) entry.getValue();
-                double credibility = value.getCredibility();
-                if (credibility > 0.0) {
-                    minimum = Math.min(credibility, minimum);
-                }
-            }
-            return minimum > 1.0 ? Constants.NO_CREDIBILITY : minimum;
-        }
-
-        public double minCredibility() {
-            double minimum = 2.0;
-            Iterator itr = entrySet().iterator();
-            while (itr.hasNext()) {
-                Map.Entry entry = (Map.Entry) itr.next();
-                DataValue value = (DataValue) entry.getValue();
-                double credibility = value.getCredibility();
-                minimum = Math.min(credibility, minimum);
-            }
-            return minimum > 1.0 ? Constants.NO_CREDIBILITY : minimum;
-        }
-
-        public double maxCredibility() {
-            double maximum = -1.0;
-            Iterator itr = entrySet().iterator();
-            while (itr.hasNext()) {
-                Map.Entry entry = (Map.Entry) itr.next();
-                DataValue value = (DataValue) entry.getValue();
-                maximum = Math.max(value.getCredibility(), maximum);
-            }
-            return maximum < 0.0 ? Constants.NO_CREDIBILITY : maximum;
-        }
-    }
-
+    
     /**
      * Instantiable subclasses provide this to do the formula's work, if there's
      * any to do.
@@ -123,15 +45,14 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
             if (deleted) {
                 return DataValue.NO_VALUE;
             }
-            for (Iterator itr = dependencies.iterator(); itr.hasNext();) {
-                DataFormula formula = (DataFormula) itr.next();
+            for (DataFormula formula : dependencies) {
                 DataValue value = null;
                 if (forwardChain) {
                     value = formula.blockingQuery();
                 } else {
                     value = formula.getCachedValue();
                 }
-                String key = (String) dependencyKeys.get(formula);
+                String key = dependencyKeys.get(formula);
                 dependencyValues.put(key, value);
             }
         }
@@ -177,23 +98,23 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
         return true;
     }
 
-    protected ArrayList getPath() {
-        ArrayList path = context.getPath();
+    protected List<ResourceNode> getPath() {
+        List<ResourceNode> path = context.getPath();
         path.add(new ResourceNode(name, args));
         return path;
     }
 
     protected void initialize(ResourceContext context) {
         this.context = context;
-        dependencies = new ArrayList();
+        dependencies = new ArrayList<DataFormula>();
         dependencyValues = new Values();
-        dependencyKeys = new HashMap();
+        dependencyKeys = new HashMap<DataFormula,String>();
         cachedValue = DataValue.NO_VALUE;
         deleted = false;
     }
 
     public void reinitialize() {
-        dependencies = new ArrayList();
+        dependencies = new ArrayList<DataFormula>();
     }
 
     protected void postInitialize() {
@@ -251,7 +172,7 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
      * Returns a list of other formulas on which this one depends. Only used by
      * the ResourceContext gui (so far).
      */
-    public ArrayList getDependencies() {
+    public List<DataFormula> getDependencies() {
         return dependencies;
     }
 
@@ -259,7 +180,7 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
      * Returns a list of listeners on this formula. Only used by the
      * ResourceContext gui (so far).
      */
-    public ArrayList getSubscribers() {
+    public List<DataValueChangedCallbackListener> getSubscribers() {
         return listeners;
     }
 
@@ -352,9 +273,7 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
             if (deleted) {
                 return;
             }
-            for (Iterator itr = listeners.iterator(); itr.hasNext();) {
-                DataValueChangedCallbackListener listener =
-                        (DataValueChangedCallbackListener) itr.next();
+            for (DataValueChangedCallbackListener listener : listeners) {
                 if (listener.shouldNotify(cachedValue)) {
                     listener.dataValueChanged(this);
                 }
@@ -371,13 +290,11 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
             }
             dependencies.remove(formula);
         }
-        String key = (String) dependencyKeys.get(formula);
+        String key = dependencyKeys.get(formula);
         dependencyKeys.remove(formula);
-        ArrayList path_list = formula.getPath();
+        List<ResourceNode> path_list = formula.getPath();
         ResourceNode[] path = new ResourceNode[path_list.size()];
-        for (int i = 0; i < path_list.size(); i++) {
-            path[i] = (ResourceNode) path_list.get(i);
-        }
+        path_list.toArray(path);
         DataFormula replacement = RSS.instance().getPathFormula(path);
         if (replacement != null) {
             registerDependency(replacement, key);
@@ -395,34 +312,98 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
     }
 
     void contextDeleted() {
-        ArrayList listeners_clone;
-        ArrayList dependencies_clone;
-        Iterator itr;
+        List<DataValueChangedCallbackListener> listeners_clone;
+        List<DataFormula> dependencies_clone;
 
         synchronized (listeners) {
             synchronized (dependencies) {
                 deleted = true;
-                listeners_clone = new ArrayList(listeners);
-                dependencies_clone = new ArrayList(dependencies);
+                listeners_clone = new ArrayList<DataValueChangedCallbackListener>(listeners);
+                dependencies_clone = new ArrayList<DataFormula>(dependencies);
                 listeners.clear();
                 dependencies.clear();
             }
         }
 
         // Unsubscribe from all dependencies
-        itr = dependencies_clone.iterator();
-        while (itr.hasNext()) {
-            DataFormula formula = (DataFormula) itr.next();
+        for (DataFormula formula : dependencies_clone) {
             formula.unsubscribe(this);
         }
 
         // Inform listeners
-        itr = listeners_clone.iterator();
-        while (itr.hasNext()) {
-            DataValueChangedCallbackListener listener =
-                    (DataValueChangedCallbackListener) itr.next();
+        for (DataValueChangedCallbackListener listener : listeners_clone) {
             listener.formulaDeleted(this);
         }
     }
+    
+    public static class Values extends HashMap<String,DataValue> {
+        public DataValue get(String key) {
+            return super.get(key);
+        }
 
+        public double doubleValue(String key) {
+            DataValue dvalue = get(key);
+            if (dvalue == null) {
+                return 0.0;
+            } else {
+                return dvalue.getDoubleValue();
+            }
+        }
+
+        public String stringValue(String key) {
+            DataValue svalue = get(key);
+            if (svalue == null) {
+                return "";
+            } else {
+                return svalue.getStringValue();
+            }
+        }
+
+        public boolean booleanValue(String key) {
+            DataValue bvalue = get(key);
+            if (bvalue == null) {
+                return false;
+            } else {
+                return bvalue.getBooleanValue();
+            }
+        }
+
+        public double credibility(String key) {
+            DataValue dvalue = get(key);
+            if (dvalue == null) {
+                return Constants.NO_CREDIBILITY;
+            } else {
+                return dvalue.getCredibility();
+            }
+        }
+
+        // ignore 0.0 unless they're all 0.0
+        public double minPositiveCredibility() {
+            double minimum = 2.0;
+            for (DataValue value : values()) {
+                double credibility = value.getCredibility();
+                if (credibility > 0.0) {
+                    minimum = Math.min(credibility, minimum);
+                }
+            }
+            return minimum > 1.0 ? Constants.NO_CREDIBILITY : minimum;
+        }
+
+        public double minCredibility() {
+            double minimum = 2.0;
+            for (DataValue value : values()) {
+                double credibility = value.getCredibility();
+                minimum = Math.min(credibility, minimum);
+            }
+            return minimum > 1.0 ? Constants.NO_CREDIBILITY : minimum;
+        }
+
+        public double maxCredibility() {
+            double maximum = -1.0;
+            for (DataValue value : values()) {
+                maximum = Math.max(value.getCredibility(), maximum);
+            }
+            return maximum < 0.0 ? Constants.NO_CREDIBILITY : maximum;
+        }
+    }
 }

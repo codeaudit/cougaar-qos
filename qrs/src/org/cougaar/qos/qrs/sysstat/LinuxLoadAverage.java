@@ -28,7 +28,7 @@ public class LinuxLoadAverage extends SysStatHandler {
         }
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         String line = null;
         fr = null;
         try {

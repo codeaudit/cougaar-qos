@@ -73,9 +73,7 @@ public class IntegraterDS extends ResourceContext {
         protected void initialize(ResourceContext context) {
             super.initialize(context);
             this.key = (String) context.getValue(KEY);
-            java.util.Enumeration e = RSS.instance().feeds();
-            while (e.hasMoreElements()) {
-                DataFeed feed = (DataFeed) e.nextElement();
+            for (DataFeed feed : RSS.instance().feeds()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Subscribing to " + feed);
                 }
@@ -97,9 +95,7 @@ public class IntegraterDS extends ResourceContext {
 
         private void rescanFeeds(DataValue old) {
             DataValue best = old;
-            java.util.Enumeration e = RSS.instance().feeds();
-            while (e.hasMoreElements()) {
-                DataFeed feed = (DataFeed) e.nextElement();
+            for (DataFeed feed: RSS.instance().feeds()) {
                 DataValue current = feed.lookup(key);
                 DataValue new_best = DataValue.mostCredible(current, best);
                 if (new_best != best) {

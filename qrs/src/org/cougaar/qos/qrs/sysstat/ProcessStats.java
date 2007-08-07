@@ -103,7 +103,7 @@ public class ProcessStats extends SysStatHandler {
 
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         Logger logger = Logging.getLogger(ProcessStats.class);
         String line = null;
         try {

@@ -137,12 +137,12 @@ public final class AgentHostUpdaterComponent
 	    wpService = (WhitePagesService)
 		sb.getService(this, WhitePagesService.class, null);
 
-	    RSS.instance().subscribeToEvent(this, RSS.CREATION_EVENT);
+	    RSS.instance().subscribeToEvent(this, RSS.Event.CREATION_EVENT);
 	}
 
 
 	// RSS EventSubscriber interface
-	public void rssEvent(ResourceContext context, int event_type) 
+	public void rssEvent(ResourceContext context, RSS.Event event_type) 
 	{
 	    if (context instanceof AgentDS) {
 		String name = ((AgentDS) context).getAgentName();

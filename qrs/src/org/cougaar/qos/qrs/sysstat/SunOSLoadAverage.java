@@ -31,7 +31,7 @@ public class SunOSLoadAverage extends SysStatHandler {
         // KEY_SEPR + "CPU" + KEY_SEPR + "clockspeed";
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         Logger logger = org.cougaar.qos.qrs.Logging.getLogger(SunOSLoadAverage.class);
         String line = null;
         try {

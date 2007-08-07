@@ -7,5 +7,5 @@
 package org.cougaar.qos.qrs;
 
 public interface EventSubscriber {
-    public void rssEvent(ResourceContext context, int event_type);
+    public void rssEvent(ResourceContext context, RSS.Event event_type);
 }

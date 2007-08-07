@@ -48,7 +48,7 @@ public class LinuxSockStat extends SysStatHandler {
         return new DataValue(Double.parseDouble(doub), SECOND_MEAS_CREDIBILITY, "", PROVENANCE);
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         String line = null;
         fr = null;
         try {

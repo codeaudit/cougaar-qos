@@ -17,7 +17,7 @@ public class CPUCount extends SysStatHandler {
         key = "Host" + KEY_SEPR + host + KEY_SEPR + "CPU" + KEY_SEPR + "count";
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         int cpuCount = Runtime.getRuntime().availableProcessors();
         map.put(key, new DataValue(cpuCount, SECOND_MEAS_CREDIBILITY, "", PROVENANCE));
     }

@@ -6,8 +6,8 @@
 
 package org.cougaar.qos.qrs.gui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
@@ -28,15 +28,11 @@ public class ResourceContextClassNode extends VectorTreeNode {
     }
 
     public void updateChildren(DefaultTreeModel model) {
-        ArrayList contexts = context.getContextsForClass(context_class);
-        Iterator itr = contexts.iterator();
-        ResourceContext subcontext;
-        DataTreeNode node;
+        List<ResourceContext> contexts = context.getContextsForClass(context_class);
         // *** Need to handle deleted children
         synchronized (contexts) {
-            while (itr.hasNext()) {
-                subcontext = (ResourceContext) itr.next();
-                node = getChild(subcontext);
+            for (ResourceContext subcontext : contexts) {
+                DataTreeNode node = getChild(subcontext);
                 if (node == null) {
                     node = new ResourceContextInstanceNode(this, subcontext);
                     addChild(node, model);

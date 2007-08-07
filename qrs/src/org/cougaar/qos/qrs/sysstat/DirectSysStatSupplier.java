@@ -6,6 +6,11 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.cougaar.qos.qrs.CorbaUtils;
 import org.cougaar.qos.qrs.DataInterpreter;
@@ -13,11 +18,6 @@ import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.Logging;
 import org.cougaar.qos.qrs.RSSUtils;
 import org.cougaar.qos.qrs.SimpleQueueingDataFeed;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Supply syststat data directly to an existing DataFeed. This has nothing to do
@@ -27,19 +27,19 @@ public class DirectSysStatSupplier {
     // "Jips" is no longer a default
     static final String[] DefaultKinds = {"Memory", "CPU", "LoadAverage", "Sockets", "CPUCount"};
 
-    private final ArrayList handlers;
+    private final List<SysStatHandler> handlers;
     private Task task;
     private final SimpleQueueingDataFeed feed;
     private final Interpreter interpreter = new Interpreter();
-    private final HashMap map = new HashMap();
+    private final Map<String, DataValue> map = new HashMap<String, DataValue>();
 
-    private static class Interpreter implements DataInterpreter {
-        public double getCredibility(Object x) {
-            return ((DataValue) x).getCredibility();
+    private static class Interpreter implements DataInterpreter<DataValue> {
+        public double getCredibility(DataValue x) {
+            return x.getCredibility();
         }
 
-        public DataValue getDataValue(Object x) {
-            return (DataValue) x;
+        public DataValue getDataValue(DataValue x) {
+            return x;
         }
     }
 
@@ -50,7 +50,7 @@ public class DirectSysStatSupplier {
         if (kinds == null) {
             kinds = DefaultKinds;
         }
-        handlers = new ArrayList();
+        handlers = new ArrayList<SysStatHandler>();
         for (String element : kinds) {
             try {
                 handlers.add(SysStatHandler.getHandler(element, host, 0));
@@ -79,8 +79,7 @@ public class DirectSysStatSupplier {
             map.clear();
             Logger logger = Logging.getLogger(DirectSysStatSupplier.class);
             synchronized (handlers) {
-                for (int i = 0; i < handlers.size(); i++) {
-                    SysStatHandler handler = (SysStatHandler) handlers.get(i);
+                for (SysStatHandler handler : handlers) {
                     if (handler == null) {
                         continue;
                     }
@@ -88,11 +87,9 @@ public class DirectSysStatSupplier {
                 }
             }
 
-            Iterator itr = map.entrySet().iterator();
-            while (itr.hasNext()) {
-                Map.Entry entry = (Map.Entry) itr.next();
-                String key = (String) entry.getKey();
-                DataValue value = (DataValue) entry.getValue();
+            for (Map.Entry<String,DataValue> entry : map.entrySet()) {
+                String key = entry.getKey();
+                DataValue value = entry.getValue();
                 if (logger.isInfoEnabled()) {
                     logger.info(key + "=" + value);
                 }

@@ -340,8 +340,6 @@ public class HostDS extends ResourceContext implements Constants {
                 credibility = DEFAULT_CREDIBILITY;
             }
 
-            String ipAddr = (String) getContext().getValue(IPADDRESS);
-
             double effectiveMJips =
             // JAZ LoadAverage for Linux is a hard metric to model
                     // If the Object is not greedy, it sneeks in and get
@@ -420,7 +418,6 @@ public class HostDS extends ResourceContext implements Constants {
         protected DataValue doCalculation(DataFormula.Values values) {
             DataValue rawGPS = values.get("RawGPS");
             DataValue isReachable = values.get("IsReachable");
-            double credibility = values.minCredibility();
 
             if (rawGPS.getCredibility() > NO_CREDIBILITY) {
                 // GPS should have a real position

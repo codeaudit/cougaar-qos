@@ -9,11 +9,12 @@ package org.cougaar.qos.qrs.sysstat;
 import java.util.Map;
 
 import org.cougaar.qos.qrs.Constants;
+import org.cougaar.qos.qrs.DataValue;
 
 abstract public class SysStatHandler implements Constants {
     abstract protected void initialize(String host, int pid);
 
-    abstract protected void getData(Map map);
+    abstract protected void getData(Map<String, DataValue> map);
 
     static final String PROVENANCE = "ProcessStats";
 

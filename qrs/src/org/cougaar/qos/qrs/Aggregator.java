@@ -11,7 +11,7 @@ import java.util.List;
 abstract public class Aggregator extends DataFormula {
     abstract protected String getKey(String element);
 
-    abstract protected List getElements();
+    abstract protected List<String> getElements();
 
     protected void initialize(ResourceContext context) {
         super.initialize(context);
@@ -24,15 +24,13 @@ abstract public class Aggregator extends DataFormula {
     }
 
     private void init() {
-        List elements = getElements();
+        List<String> elements = getElements();
         synchronized (elements) {
-            for (int i = 0; i < elements.size(); i++) {
-                String element = (String) elements.get(i);
+            for (String element : elements) {
                 String[] parameters = {getKey(element)};
                 ResourceContext dependency = RSS.instance().resolveSpec("Integrater", parameters);
                 registerDependency(dependency, "Formula", element);
             }
         }
     }
-
 }

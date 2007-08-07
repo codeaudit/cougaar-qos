@@ -9,6 +9,8 @@ package org.cougaar.qos.qrs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.BadAttributeValueException;
@@ -40,7 +42,7 @@ import org.omg.PortableServer.Servant;
 
 public class ResourceStatusServiceImpl implements ResourceStatusServiceOperations {
 
-    private final HashMap subscribers;
+    private final Map<RSSSubscriber, List<RSSSubscriberProxy>> subscribers;
     private QualifierFactory[] factories;
     private final Logger debugLogger;
     private final Logger eventLogger;
@@ -48,7 +50,7 @@ public class ResourceStatusServiceImpl implements ResourceStatusServiceOperation
     private final Servant servant;
 
     protected ResourceStatusServiceImpl() {
-        subscribers = new HashMap(); // subscriber -> proxy
+        subscribers = new HashMap<RSSSubscriber, List<RSSSubscriberProxy>>(); // subscriber -> proxy
         debugLogger = Logging.getLogger(ResourceStatusServiceImpl.class);
         eventLogger = Logging.getEventLogger(ResourceStatusServiceImpl.class);
 
@@ -420,9 +422,9 @@ public class ResourceStatusServiceImpl implements ResourceStatusServiceOperation
             BoundDataFormula bdf = new BoundDataFormula(path, true, nqualifier);
             RSSSubscriberProxy proxy = new RSSSubscriberProxy(bdf, subscriber, callback_id, this);
             synchronized (subscribers) {
-                ArrayList proxies = (ArrayList) subscribers.get(subscriber);
+                List<RSSSubscriberProxy> proxies = subscribers.get(subscriber);
                 if (proxies == null) {
-                    proxies = new ArrayList();
+                    proxies = new ArrayList<RSSSubscriberProxy>();
                     subscribers.put(subscriber, proxies);
                 }
                 proxies.add(proxy);
@@ -472,11 +474,11 @@ public class ResourceStatusServiceImpl implements ResourceStatusServiceOperation
             eventLogger.info("Method entry: " + logmsg);
         }
         synchronized (subscribers) {
-            ArrayList proxies = (ArrayList) subscribers.get(subscriber);
+            List<RSSSubscriberProxy> proxies = subscribers.get(subscriber);
             if (proxies != null) {
-                Iterator itr = proxies.iterator();
+                Iterator<RSSSubscriberProxy> itr = proxies.iterator();
                 while (itr.hasNext()) {
-                    RSSSubscriberProxy proxy = (RSSSubscriberProxy) itr.next();
+                    RSSSubscriberProxy proxy = itr.next();
                     if (proxy.hasPath(path)) {
                         proxy.unbind();
                         itr.remove();

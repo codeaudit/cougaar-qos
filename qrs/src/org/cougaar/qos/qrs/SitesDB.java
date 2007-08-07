@@ -6,13 +6,12 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
-
-import java.net.URL;
-import java.util.Enumeration;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
+import java.net.URL;
+
+import org.apache.log4j.Logger;
 
 /**
  * This is really just an interface to the db stored in
@@ -29,9 +28,7 @@ public class SitesDB implements Constants {
     }
 
     public SiteAddress lookup(String address) {
-        Enumeration e = SiteAddress.elements();
-        while (e.hasMoreElements()) {
-            SiteAddress site = (SiteAddress) e.nextElement();
+        for (SiteAddress site : SiteAddress.elements()) {
             if (site.contains(address)) {
                 return site;
             }

@@ -6,19 +6,13 @@
 
 package org.cougaar.qos.qrs;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 abstract public class Every extends Aggregator {
     protected DataValue doCalculation(Values values) {
         double cred = values.minPositiveCredibility();
         boolean result = true;
-        Iterator itr = values.entrySet().iterator();
-        while (itr.hasNext()) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            DataValue value = (DataValue) entry.getValue();
+        for (DataValue value : values.values()) {
             Object raw = value.getRawValue();
             if (raw instanceof Boolean) {
                 if (!value.getBooleanValue()) {

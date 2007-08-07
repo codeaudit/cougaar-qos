@@ -20,38 +20,37 @@ abstract public class StandardDataFeed extends AbstractDataFeed {
     /**
      * Indexed by key, each entry is a Vector of listeners for that key.
      */
-    private final Hashtable listenerMap = new Hashtable();
+    private final Hashtable<String, Vector<DataFeedListener>> listenerMap = 
+        new Hashtable<String, Vector<DataFeedListener>>();
 
     /**
      * Indexed by key, each entry is a the cached value from last poll
      */
-    private final Hashtable valueMap = new Hashtable();
+    private final Hashtable<String, DataValue> valueMap = new Hashtable<String, DataValue>();
 
     /**
      * Return the cached value if it exists, otherwise NO_VALUE.
      */
     private DataValue getValueForKey(String key) {
-        Object value = valueMap.get(key);
+        DataValue value = valueMap.get(key);
         if (value == null) {
             return DataValue.NO_VALUE;
         } else {
-            return (DataValue) value;
+            return value;
         }
     }
 
     private void notifyListeners(DataValue value, String key) {
-        Vector listeners = listenersForKey(key);
+        Vector<DataFeedListener> listeners = listenersForKey(key);
         if (listeners != null) {
-            int count = listeners.size();
-            for (int i = 0; i < count; i++) {
-                DataFeedListener listener = (DataFeedListener) listeners.elementAt(i);
+            for (DataFeedListener listener : listeners) {
                 listener.newData(this, key, value);
             }
         }
     }
 
-    private Vector listenersForKey(String key) {
-        return (Vector) listenerMap.get(key);
+    private Vector<DataFeedListener> listenersForKey(String key) {
+        return listenerMap.get(key);
     }
 
     /**
@@ -84,9 +83,7 @@ abstract public class StandardDataFeed extends AbstractDataFeed {
      * Forces and caches an update of all listener keys.
      */
     protected void updateAll() {
-        java.util.Enumeration e = listenerMap.keys();
-        while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
+        for (String key : listenerMap.keySet()) {
             updateValueForKey(key, true);
         }
     }
@@ -114,9 +111,9 @@ abstract public class StandardDataFeed extends AbstractDataFeed {
             return;
         }
 
-        Vector listeners = listenersForKey(key);
+        Vector<DataFeedListener> listeners = listenersForKey(key);
         if (listeners == null) {
-            listeners = new Vector(10);
+            listeners = new Vector<DataFeedListener>(10);
             listenerMap.put(key, listeners);
         }
         listeners.addElement(listener);
@@ -127,7 +124,7 @@ abstract public class StandardDataFeed extends AbstractDataFeed {
      * interface.
      */
     public void removeListenerForKey(DataFeedListener listener, String key) {
-        Vector listeners = listenersForKey(key);
+        Vector<DataFeedListener> listeners = listenersForKey(key);
         if (listeners != null) {
             listeners.removeElement(listener);
         }

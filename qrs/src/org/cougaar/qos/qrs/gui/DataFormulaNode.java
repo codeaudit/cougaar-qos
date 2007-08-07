@@ -6,13 +6,14 @@
 
 package org.cougaar.qos.qrs.gui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.cougaar.qos.qrs.DataFormula;
 import org.cougaar.qos.qrs.DataValue;
+import org.cougaar.qos.qrs.DataValueChangedCallbackListener;
 
 public class DataFormulaNode extends VectorTreeNode {
     private final DataFormula formula;
@@ -70,15 +71,10 @@ public class DataFormulaNode extends VectorTreeNode {
         }
 
         public void updateChildren(DefaultTreeModel model) {
-            ArrayList subscribers = formula.getSubscribers();
-            Object subscriber;
-            DataTreeNode node;
+            List<DataValueChangedCallbackListener> subscribers = formula.getSubscribers();
             synchronized (subscribers) {
-                Iterator itr = subscribers.iterator();
-                // *** We need to deal with dropped children
-                while (itr.hasNext()) {
-                    subscriber = itr.next();
-                    node = getChild(subscriber);
+                for (DataValueChangedCallbackListener subscriber : subscribers) {
+                    DataTreeNode node = getChild(subscriber);
                     if (node == null) {
                         node = new LeafNode(this, subscriber);
                         addChild(node, model);
@@ -99,19 +95,15 @@ public class DataFormulaNode extends VectorTreeNode {
         }
 
         public void updateChildren(DefaultTreeModel model) {
-            ArrayList subscribers = formula.getDependencies();
-            Object dependency;
-            DataTreeNode node;
+            List<DataFormula> subscribers = formula.getDependencies();
             synchronized (subscribers) {
-                Iterator itr = subscribers.iterator();
-                // *** We need to deal with dropped children
-                while (itr.hasNext()) {
-                    dependency = itr.next();
-                    node = getChild(dependency);
+                for (DataFormula dependency : subscribers) {
+                    DataTreeNode node = getChild(dependency);
                     if (node == null) {
                         node = new LeafNode(this, dependency);
                         addChild(node, model);
                     }
+                    
                 }
             }
         }

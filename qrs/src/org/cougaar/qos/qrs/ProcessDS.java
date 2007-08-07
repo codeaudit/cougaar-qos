@@ -6,7 +6,6 @@
 
 package org.cougaar.qos.qrs;
 
-import java.util.Hashtable;
 
 /**
  * A ResourceContext for a Process which is on a Host. For now the Process named
@@ -28,8 +27,6 @@ public class ProcessDS extends ResourceContext {
     private static final String PID = "pid";
     private static final String PORT = "port";
 
-    private Hashtable ports;
-
     protected DataFormula instantiateFormula(String kind) {
         return null;
     }
@@ -42,17 +39,13 @@ public class ProcessDS extends ResourceContext {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("ProcessDS: wrong number of parameters");
         } else {
-            ports = new Hashtable();
             String port_string = parameters[0];
             try {
                 int port = Integer.parseInt(port_string);
-                Integer Port = new Integer(port);
-                ports.put(Port, Port);
-                bindSymbolValue(PORT, Port);
+                bindSymbolValue(PORT, port);
 
                 // To be done
-                Integer Pid = new Integer(0);
-                bindSymbolValue(PID, Pid);
+                bindSymbolValue(PID, 0);
             } catch (NumberFormatException not_a_num) {
                 throw new ParameterError("ProcessDS: port is not an int");
             }

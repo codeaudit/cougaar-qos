@@ -46,7 +46,7 @@ public class LinuxCPUInfo extends SysStatHandler {
         }
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         fr = null;
         try {
             fr = new FileReader("/proc/cpuinfo");

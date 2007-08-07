@@ -9,7 +9,9 @@ package org.cougaar.qos.qrs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.RSSSubscriberPOA;
@@ -24,6 +26,118 @@ import org.cougaar.qos.ResourceStatus.ResourceStatusService;
  */
 
 public class PromiscuousRelayDataFeed extends AbstractDataFeed implements Constants {
+    private final Map<String, Set<DataFeedListener>> listeners;
+    private final Map<String, DataValue> data;
+    private final Set<String> keys;
+    private final List<ResourceStatusService> services;
+
+    public PromiscuousRelayDataFeed() {
+        super();
+        listeners = new HashMap<String, Set<DataFeedListener>>();
+        data = new HashMap<String, DataValue>();
+        keys = new HashSet<String>();
+        services = new ArrayList<ResourceStatusService>();
+    }
+
+    public void addService(ResourceStatusService rss) {
+        synchronized (services) {
+            services.add(rss);
+        }
+        synchronized (keys) {
+            for (String key : keys) {
+                Subscriber subscriber = new Subscriber(key, rss);
+                try {
+                    CorbaUtils.poa.activate_object(subscriber);
+                    subscriber.connect();
+                } catch (Exception ex) {
+                    Logger logger = Logging.getLogger(PromiscuousRelayDataFeed.class);
+                    logger.error(null, ex);
+                }
+            }
+        }
+    }
+
+    public void removeService(ResourceStatusService rss) {
+        synchronized (services) {
+            services.remove(rss);
+            // much more to do here.
+        }
+    }
+
+    // Caller should synchronize on keys
+    private void makeNewSubscribersForKey(String key) {
+        Subscriber subscriber;
+        synchronized (services) {
+            for (ResourceStatusService rss : services) {
+                subscriber = new Subscriber(key, rss);
+                try {
+                    CorbaUtils.poa.activate_object(subscriber);
+                    subscriber.connect();
+                } catch (Exception ex) {
+                    Logger logger = Logging.getLogger(PromiscuousRelayDataFeed.class);
+                    logger.error(null, ex);
+                }
+            }
+        }
+    }
+
+    public void removeListenerForKey(DataFeedListener listener, String key) {
+        Set<DataFeedListener> key_listeners = listeners.get(key);
+        if (key_listeners != null) {
+            synchronized (key_listeners) {
+                key_listeners.remove(listener);
+            }
+        }
+    }
+
+    public void addListenerForKey(DataFeedListener listener, String key) {
+        Set<DataFeedListener> key_listeners = null;
+        synchronized (listeners) {
+            key_listeners = listeners.get(key);
+            if (key_listeners == null) {
+                key_listeners = new HashSet<DataFeedListener>();
+                listeners.put(key, key_listeners);
+            }
+        }
+        synchronized (key_listeners) {
+            key_listeners.add(listener);
+        }
+    }
+
+    private void notifyListeners(String key, DataValue value) {
+        Set<DataFeedListener> key_listeners = listeners.get(key);
+        if (key_listeners != null) {
+            synchronized (key_listeners) {
+                for (DataFeedListener listener : key_listeners) {
+                    listener.newData(this, key, value);
+                }
+            }
+        }
+    }
+
+    public DataValue lookup(String key) {
+        synchronized (keys) {
+            if (!keys.contains(key)) {
+                makeNewSubscribersForKey(key);
+                keys.add(key);
+            }
+        }
+        return data.get(key);
+    }
+
+    private void newData(final String key, org.cougaar.qos.ResourceStatus.DataValue corba_value) {
+        synchronized (data) {
+            DataValue old_value = lookup(key);
+            double credibility = corba_value.credibility;
+            if (old_value == null || old_value.getCredibility() <= credibility) {
+                DataValue new_value = new DataValue(corba_value);
+                data.put(key, new_value);
+                notifyListeners(key, new_value);
+            }
+        }
+
+    }
+    
     private class Subscriber extends RSSSubscriberPOA {
         String key;
         ResourceStatusService rss;
@@ -54,125 +168,5 @@ public class PromiscuousRelayDataFeed extends AbstractDataFeed implements Consta
             };
             RSSUtils.schedule(task, 0);
         }
-
     }
-
-    private final HashMap listeners;
-    private final HashMap data;
-    private final HashSet keys;
-    private final ArrayList services;
-
-    public PromiscuousRelayDataFeed() {
-        super();
-        listeners = new HashMap();
-        data = new HashMap();
-        keys = new HashSet();
-        services = new ArrayList();
-    }
-
-    public void addService(ResourceStatusService rss) {
-        synchronized (services) {
-            services.add(rss);
-        }
-        synchronized (keys) {
-            Iterator itr = keys.iterator();
-            while (itr.hasNext()) {
-                String key = (String) itr.next();
-                Subscriber subscriber = new Subscriber(key, rss);
-                try {
-                    CorbaUtils.poa.activate_object(subscriber);
-                    subscriber.connect();
-                } catch (Exception ex) {
-                    Logger logger = Logging.getLogger(PromiscuousRelayDataFeed.class);
-                    logger.error(null, ex);
-                }
-            }
-        }
-    }
-
-    public void removeService(ResourceStatusService rss) {
-        synchronized (services) {
-            services.remove(rss);
-            // much more to do here.
-        }
-    }
-
-    // Caller should synchronize on keys
-    private void makeNewSubscribersForKey(String key) {
-        Subscriber subscriber;
-        synchronized (services) {
-            Iterator itr = services.iterator();
-            while (itr.hasNext()) {
-                ResourceStatusService rss = (ResourceStatusService) itr.next();
-                subscriber = new Subscriber(key, rss);
-                try {
-                    CorbaUtils.poa.activate_object(subscriber);
-                    subscriber.connect();
-                } catch (Exception ex) {
-                    Logger logger = Logging.getLogger(PromiscuousRelayDataFeed.class);
-                    logger.error(null, ex);
-                }
-            }
-        }
-    }
-
-    public void removeListenerForKey(DataFeedListener listener, String key) {
-        HashSet key_listeners = (HashSet) listeners.get(key);
-        if (key_listeners != null) {
-            synchronized (key_listeners) {
-                key_listeners.remove(listener);
-            }
-        }
-    }
-
-    public void addListenerForKey(DataFeedListener listener, String key) {
-        HashSet key_listeners = null;
-        synchronized (listeners) {
-            key_listeners = (HashSet) listeners.get(key);
-            if (key_listeners == null) {
-                key_listeners = new HashSet();
-                listeners.put(key, key_listeners);
-            }
-        }
-        synchronized (key_listeners) {
-            key_listeners.add(listener);
-        }
-    }
-
-    private void notifyListeners(String key, DataValue value) {
-        HashSet key_listeners = (HashSet) listeners.get(key);
-        if (key_listeners != null) {
-            synchronized (key_listeners) {
-                Iterator i = key_listeners.iterator();
-                while (i.hasNext()) {
-                    DataFeedListener listener = (DataFeedListener) i.next();
-                    listener.newData(this, key, value);
-                }
-            }
-        }
-    }
-
-    public DataValue lookup(String key) {
-        synchronized (keys) {
-            if (!keys.contains(key)) {
-                makeNewSubscribersForKey(key);
-                keys.add(key);
-            }
-        }
-        return (DataValue) data.get(key);
-    }
-
-    private void newData(final String key, org.cougaar.qos.ResourceStatus.DataValue corba_value) {
-        synchronized (data) {
-            DataValue old_value = lookup(key);
-            double credibility = corba_value.credibility;
-            if (old_value == null || old_value.getCredibility() <= credibility) {
-                final DataValue new_value = new DataValue(corba_value);
-                data.put(key, new_value);
-                notifyListeners(key, new_value);
-            }
-        }
-
-    }
-
 }

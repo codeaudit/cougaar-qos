@@ -6,14 +6,14 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
-import org.cougaar.qos.ResourceStatus.ResourceNode;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.cougaar.qos.ResourceStatus.ResourceNode;
 
 /**
  * Abstract definition of a contect for resource data, ie a collection of
@@ -21,47 +21,13 @@ import java.util.Map;
  * implemented as DataFormula instances.
  */
 abstract public class ResourceContext implements Constants {
-    /**
-     * Exception class used to indicate the one of the supplied parameters is
-     * missing, has the wrong type or has an unacceptable value.
-     */
-    public static class ParameterError extends Exception {
-        public ParameterError(String message) {
-            super(message);
-        }
-    }
-
-    public static class NoSuchMethodException extends Exception {
-        private final String method;
-        private final String[] args;
-
-        public NoSuchMethodException(String method, String[] args) {
-            super("No such Context method as " + method);
-            this.method = method;
-            this.args = args;
-        }
-
-        public String getMethod() {
-            return method;
-        }
-
-        public String[] getArgs() {
-            return args;
-        }
-    }
-
-    private static HashMap ContextInstantiaters = new HashMap();
-
-    public static void registerContextInstantiater(String kind, ContextInstantiater instantiater) {
-        synchronized (ContextInstantiaters) {
-            ContextInstantiaters.put(kind, instantiater);
-        }
-    }
+    private static Map<String, ContextInstantiater> ContextInstantiaters = 
+        new HashMap<String, ContextInstantiater>();
 
     private ResourceContext parent;
-    private final HashMap children;
-    private final HashMap formulas;
-    private final HashMap symbol_table;
+    private final Map<String, Map<Object, ResourceContext>> children;
+    private final Map<String, List<DataFormula>> formulas;
+    private final Map<String, Object> symbol_table;
     private final String[] parameters;
     private Object id;
     private String kind;
@@ -74,11 +40,20 @@ abstract public class ResourceContext implements Constants {
     protected ResourceContext(String[] parameters, ResourceContext parent) throws ParameterError {
         this.parameters = parameters;
         this.parent = parent;
-        children = new HashMap();
-        formulas = new HashMap();
-        symbol_table = new HashMap();
+        children = new HashMap<String, Map<Object, ResourceContext>>();
+        formulas = new HashMap<String, List<DataFormula>>();
+        symbol_table = new HashMap<String, Object>();
         verifyParameters(parameters);
     }
+    
+    /**
+     * Subclasses should provide this method. It should verify that the given
+     * parameters are correct in number, position, type and value, throwing
+     * ParameterError if not.
+     */
+    abstract protected void verifyParameters(String[] parameters) throws ParameterError;
+
+    abstract protected DataFormula instantiateFormula(String formula_kind);
 
     protected void postInitialize() {
         pretty_name = kind;
@@ -95,10 +70,10 @@ abstract public class ResourceContext implements Constants {
         return pretty_name;
     }
 
-    protected ArrayList getPath() {
-        ArrayList path = null;
+    protected List<ResourceNode> getPath() {
+        List<ResourceNode> path = null;
         if (parent == null || parent == RSS.instance() || !useParentPath()) {
-            path = new ArrayList();
+            path = new ArrayList<ResourceNode>();
         } else {
             path = parent.getPath();
         }
@@ -151,14 +126,7 @@ abstract public class ResourceContext implements Constants {
     protected void setDependencies(ResourceNode[] dependencies) {
     }
 
-    /**
-     * Subclasses should provide this method. It should verify that the given
-     * parameters are correct in number, position, type and value, throwing
-     * ParameterError if not.
-     */
-    abstract protected void verifyParameters(String[] parameters) throws ParameterError;
-
-    abstract protected DataFormula instantiateFormula(String formula_kind);
+    
 
     // private DataFormula instantiateFormula(String formula_kind)
     // {
@@ -176,7 +144,7 @@ abstract public class ResourceContext implements Constants {
     private ResourceContext instantiateContext(String kind, String[] parameters) {
         ContextInstantiater instantiater = null;
         synchronized (ContextInstantiaters) {
-            instantiater = (ContextInstantiater) ContextInstantiaters.get(kind);
+            instantiater = ContextInstantiaters.get(kind);
         }
         if (instantiater != null) {
             try {
@@ -197,7 +165,7 @@ abstract public class ResourceContext implements Constants {
     Object getIdentifier(String kind, String[] parameters) {
         ContextInstantiater instantiater = null;
         synchronized (ContextInstantiaters) {
-            instantiater = (ContextInstantiater) ContextInstantiaters.get(kind);
+            instantiater = ContextInstantiaters.get(kind);
         }
         if (instantiater != null) {
             return instantiater.identifyParameters(parameters);
@@ -210,14 +178,10 @@ abstract public class ResourceContext implements Constants {
      * Returns a list of the classes of any ResourceContexts that have been
      * instantiated so far. This is only used by the ResourceContext gui.
      */
-    public ArrayList getContextClasses() {
+    public List<String> getContextClasses() {
         synchronized (children) {
-            Iterator i = children.entrySet().iterator();
-            ArrayList classes = new ArrayList();
-            while (i.hasNext()) {
-                Map.Entry entry = (Map.Entry) i.next();
-                classes.add(entry.getKey());
-            }
+            List<String> classes = new ArrayList<String>();
+            classes.addAll(children.keySet());
             return classes;
         }
     }
@@ -226,14 +190,11 @@ abstract public class ResourceContext implements Constants {
      * Returns a list of the ResourceContexts for a given class that have been
      * instantiated so far. This is only used by the ResourceContext gui.
      */
-    public ArrayList getContextsForClass(String c) {
-        ArrayList result = new ArrayList();
+    public List<ResourceContext> getContextsForClass(String c) {
+        List<ResourceContext> result = new ArrayList<ResourceContext>();
         synchronized (children) {
-            HashMap context_map = (HashMap) children.get(c);
-            Iterator i = context_map.values().iterator();
-            while (i.hasNext()) {
-                result.add(i.next());
-            }
+            Map<Object, ResourceContext> context_map = children.get(c);
+            result.addAll(context_map.values());
         }
         return result;
     }
@@ -258,7 +219,7 @@ abstract public class ResourceContext implements Constants {
     protected void removeChild(ResourceContext child) {
         String kind = child.getContextKind();
         synchronized (children) {
-            HashMap kids = (HashMap) children.get(kind);
+            Map<Object, ResourceContext> kids = children.get(kind);
             if (kids != null) {
                 kids.remove(child.id);
             }
@@ -268,9 +229,9 @@ abstract public class ResourceContext implements Constants {
     protected void addChild(Object id, ResourceContext child) {
         String kind = child.getContextKind();
         synchronized (children) {
-            HashMap kids = (HashMap) children.get(kind);
+            Map<Object, ResourceContext> kids = children.get(kind);
             if (kids == null) {
-                kids = new HashMap();
+                kids = new HashMap<Object, ResourceContext>();
                 children.put(kind, kids);
             }
             kids.put(id, child);
@@ -284,9 +245,9 @@ abstract public class ResourceContext implements Constants {
 
     ResourceContext resolveSpec(Object id, String kind, String[] parameters) {
         synchronized (children) {
-            HashMap kids = (HashMap) children.get(kind);
+            Map<Object, ResourceContext> kids = children.get(kind);
             if (kids != null) {
-                ResourceContext context = (ResourceContext) kids.get(id);
+                ResourceContext context = kids.get(id);
                 if (context != null) {
                     return context;
                 }
@@ -302,7 +263,7 @@ abstract public class ResourceContext implements Constants {
                 context.kind = kind;
                 context.postInitialize();
                 addChild(id, context);
-                RSS.instance().eventNotification(context, RSS.CREATION_EVENT);
+                RSS.instance().eventNotification(context, RSS.Event.CREATION_EVENT);
                 // callback hook
                 return context;
             }
@@ -424,14 +385,10 @@ abstract public class ResourceContext implements Constants {
      * Returns an list of Formula classes instantiated so far by this context.
      * Only used by the ResourceContext gui.
      */
-    public ArrayList getFormulaKinds() {
+    public List<String> getFormulaKinds() {
         synchronized (formulas) {
-            Iterator i = formulas.entrySet().iterator();
-            ArrayList kinds = new ArrayList();
-            while (i.hasNext()) {
-                Map.Entry entry = (Map.Entry) i.next();
-                kinds.add(entry.getKey());
-            }
+            List<String> kinds = new ArrayList<String>();
+            kinds.addAll(formulas.keySet());
             return kinds;
         }
     }
@@ -440,9 +397,9 @@ abstract public class ResourceContext implements Constants {
      * Returns a list of the Formulas for a given class that have been
      * instantiated so far. This is only used by the ResourceContext gui.
      */
-    public ArrayList getFormulasForKind(String kind) {
+    public List<DataFormula> getFormulasForKind(String kind) {
         synchronized (formulas) {
-            return (ArrayList) formulas.get(kind);
+            return formulas.get(kind);
         }
     }
 
@@ -487,15 +444,13 @@ abstract public class ResourceContext implements Constants {
     private DataFormula findOrMakeLocalFormula(String name, String[] args) {
         synchronized (formulas) {
             DataFormula formula = null;
-            List forms = (List) formulas.get(name);
+            List<DataFormula> forms = formulas.get(name);
             if (forms == null) {
-                forms = new ArrayList();
+                forms = new ArrayList<DataFormula>();
                 formulas.put(name, forms);
             } else {
-                int length = forms.size();
-                DataFormula candidate;
-                for (int i = 0; i < length; i++) {
-                    candidate = (DataFormula) forms.get(i);
+                
+                for (DataFormula candidate : forms) {
                     if (candidate.hasArgs(args)) {
                         return candidate;
                     }
@@ -524,7 +479,7 @@ abstract public class ResourceContext implements Constants {
                 }
                 ProxyFormula proxy = new ProxyFormula(formula);
                 initializeFormula(proxy, name, args);
-                List forms = (List) formulas.get(name);
+                List<DataFormula> forms = formulas.get(name);
                 forms.add(proxy);
                 return proxy;
             }
@@ -533,12 +488,8 @@ abstract public class ResourceContext implements Constants {
 
     protected void reinitializeFormulas() {
         synchronized (formulas) {
-            Iterator itr = formulas.entrySet().iterator();
-            while (itr.hasNext()) {
-                Map.Entry entry = (Map.Entry) itr.next();
-                List forms = (List) entry.getValue();
-                for (int i = 0; i < forms.size(); i++) {
-                    DataFormula formula = (DataFormula) forms.get(i);
+            for (List<DataFormula> forms : formulas.values()) {
+                for (DataFormula formula : forms) {
                     formula.reinitialize();
                 }
             }
@@ -552,15 +503,12 @@ abstract public class ResourceContext implements Constants {
         // Delete child children
         RSS rss = RSS.instance();
         synchronized (children) {
-            Iterator class_itr = children.entrySet().iterator();
-            while (class_itr.hasNext()) {
-                Map.Entry entry = (Map.Entry) class_itr.next();
-                HashMap kids = (HashMap) entry.getValue();
+            for (Map<Object, ResourceContext> kids : children.values()) {
                 if (kids != null) {
-                    Iterator ctxt_itr = kids.entrySet().iterator();
+                    Iterator<Map.Entry<Object,ResourceContext>> ctxt_itr = kids.entrySet().iterator();
                     while (ctxt_itr.hasNext()) {
-                        Map.Entry child = (Map.Entry) ctxt_itr.next();
-                        ResourceContext child_ctxt = (ResourceContext) child.getValue();
+                        Map.Entry<Object, ResourceContext> child = ctxt_itr.next();
+                        ResourceContext child_ctxt = child.getValue();
                         ctxt_itr.remove();
                         rss.deleteContext(child_ctxt);
                     }
@@ -570,22 +518,14 @@ abstract public class ResourceContext implements Constants {
 
         // Delete formulas
         synchronized (formulas) {
-            DataFormula formula;
-            Map.Entry entry;
-            List forms;
-            int length;
-            Iterator class_itr = formulas.entrySet().iterator();
-            while (class_itr.hasNext()) {
-                entry = (Map.Entry) class_itr.next();
+            for (Map.Entry<String, List<DataFormula>> entry : formulas.entrySet()) {
                 if (logger.isDebugEnabled()) {
                     Object key = entry.getKey();
                     logger.debug("Walking through " + key + " formulas for deletion");
                 }
-                forms = (List) entry.getValue();
+                List<DataFormula> forms = entry.getValue();
                 if (forms != null) {
-                    length = forms.size();
-                    for (int i = 0; i < length; i++) {
-                        formula = (DataFormula) forms.get(i);
+                    for (DataFormula formula : forms) {
                         if (logger.isDebugEnabled()) {
                             logger.debug(this + " has informed formula " + formula
                                     + " that the context is deleted");
@@ -596,5 +536,39 @@ abstract public class ResourceContext implements Constants {
             }
         }
     }
+    
+    public static void registerContextInstantiater(String kind, ContextInstantiater instantiater) {
+        synchronized (ContextInstantiaters) {
+            ContextInstantiaters.put(kind, instantiater);
+        }
+    }
 
+    /**
+     * Exception class used to indicate the one of the supplied parameters is
+     * missing, has the wrong type or has an unacceptable value.
+     */
+    public static class ParameterError extends Exception {
+        public ParameterError(String message) {
+            super(message);
+        }
+    }
+
+    public static class NoSuchMethodException extends Exception {
+        private final String method;
+        private final String[] args;
+
+        public NoSuchMethodException(String method, String[] args) {
+            super("No such Context method as " + method);
+            this.method = method;
+            this.args = args;
+        }
+
+        public String getMethod() {
+            return method;
+        }
+
+        public String[] getArgs() {
+            return args;
+        }
+    }
 }

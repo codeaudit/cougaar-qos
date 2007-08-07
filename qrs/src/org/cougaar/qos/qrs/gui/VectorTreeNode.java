@@ -8,34 +8,25 @@ package org.cougaar.qos.qrs.gui;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 abstract class VectorTreeNode implements DataTreeNode {
-    static class NullEnum implements Enumeration {
-        public boolean hasMoreElements() {
-            return false;
-        }
+    static final Enumeration<Object> NULL_ENUM = new NullEnum();
 
-        public Object nextElement() {
-            return null;
-        }
-    }
-
-    static final Enumeration NULL_ENUM = new NullEnum();
-
-    private final Vector children;
-    private final HashMap children_2;
+    private final Vector<DataTreeNode> children;
+    private final Map<Object, DataTreeNode> children_2;
     private final TreeNode parent;
     private final Object datum;
 
     public VectorTreeNode(TreeNode parent, Object object) {
         this.parent = parent;
         this.datum = object;
-        this.children = new Vector();
-        this.children_2 = new HashMap();
+        this.children = new Vector<DataTreeNode>();
+        this.children_2 = new HashMap<Object, DataTreeNode>();
     }
 
     protected void addChild(DataTreeNode child, DefaultTreeModel model) {
@@ -52,7 +43,7 @@ abstract class VectorTreeNode implements DataTreeNode {
     }
 
     public DataTreeNode getChild(Object datum) {
-        return (DataTreeNode) children_2.get(datum);
+        return children_2.get(datum);
     }
 
     // TreeNode
@@ -73,16 +64,25 @@ abstract class VectorTreeNode implements DataTreeNode {
         return parent;
     }
 
-    public Enumeration children() {
+    public Enumeration<?> children() {
         return children == null ? NULL_ENUM : children.elements();
     }
 
     public TreeNode getChildAt(int index) {
-        return (TreeNode) children.elementAt(index);
+        return children.elementAt(index);
     }
 
     public int getIndex(TreeNode child) {
         return children.indexOf(child);
     }
+    
+    static class NullEnum implements Enumeration<Object> {
+        public boolean hasMoreElements() {
+            return false;
+        }
 
+        public Object nextElement() {
+            return null;
+        }
+    }
 }

@@ -6,16 +6,17 @@
 
 package org.cougaar.qos.qrs;
 
-import java.util.HashSet;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.cougaar.util.CircularQueue;
 
 abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
-    private final HashMap listeners;
-    private final HashMap data;
-    private final CircularQueue queue;
+    private final Map<String, Set<DataFeedListener>> listeners;
+    private final Map<String, DataValue> data;
+    private final CircularQueue<String> queue;
     private final Runnable notifier;
 
     private class Notifier implements Runnable {
@@ -42,9 +43,9 @@ abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
     }
 
     protected SimpleQueueingDataFeed() {
-        listeners = new HashMap();
-        data = new HashMap();
-        queue = new CircularQueue();
+        listeners = new HashMap<String, Set<DataFeedListener>>();
+        data = new HashMap<String, DataValue>();
+        queue = new CircularQueue<String>();
         notifier = makeNotifier();
     }
 
@@ -52,7 +53,7 @@ abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
         String next = null;
         synchronized (queue) {
             if (!queue.isEmpty()) {
-                next = (String) queue.next();
+                next = queue.next();
             }
         }
         return next;
@@ -73,7 +74,7 @@ abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
     }
 
     public void removeListenerForKey(DataFeedListener listener, String key) {
-        HashSet key_listeners = (HashSet) listeners.get(key);
+        Set<DataFeedListener> key_listeners = listeners.get(key);
         if (key_listeners != null) {
             synchronized (key_listeners) {
                 key_listeners.remove(listener);
@@ -82,11 +83,11 @@ abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
     }
 
     public void addListenerForKey(DataFeedListener listener, String key) {
-        HashSet key_listeners = null;
+        Set<DataFeedListener> key_listeners = null;
         synchronized (listeners) {
-            key_listeners = (HashSet) listeners.get(key);
+            key_listeners = listeners.get(key);
             if (key_listeners == null) {
-                key_listeners = new HashSet();
+                key_listeners = new HashSet<DataFeedListener>();
                 listeners.put(key, key_listeners);
             }
         }
@@ -96,12 +97,10 @@ abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
     }
 
     protected void notifyListeners(String key, DataValue value) {
-        HashSet key_listeners = (HashSet) listeners.get(key);
+        Set<DataFeedListener> key_listeners = listeners.get(key);
         if (key_listeners != null) {
             synchronized (key_listeners) {
-                Iterator i = key_listeners.iterator();
-                while (i.hasNext()) {
-                    DataFeedListener listener = (DataFeedListener) i.next();
+                for (DataFeedListener listener : key_listeners) {
                     listener.newData(this, key, value);
                 }
             }
@@ -109,10 +108,10 @@ abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
     }
 
     public DataValue lookup(String key) {
-        return (DataValue) data.get(key);
+        return data.get(key);
     }
 
-    public void newData(String key, Object raw, DataInterpreter interpreter) {
+    public <T> void newData(String key, T raw, DataInterpreter<T> interpreter) {
         synchronized (data) {
             DataValue old_value = lookup(key);
             DataValue new_value;

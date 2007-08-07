@@ -54,7 +54,7 @@ public class LinuxMemory extends SysStatHandler {
         return Double.parseDouble(doub);
     }
 
-    public void getData(Map map) {
+    public void getData(Map<String, DataValue> map) {
         String line = null;
         double free = 0.0;
         double total = 0.0;

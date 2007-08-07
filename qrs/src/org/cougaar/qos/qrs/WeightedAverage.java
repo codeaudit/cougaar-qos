@@ -6,7 +6,6 @@
 
 package org.cougaar.qos.qrs;
 
-import java.util.Iterator;
 import java.util.Map;
 
 abstract public class WeightedAverage extends Aggregator {
@@ -16,11 +15,9 @@ abstract public class WeightedAverage extends Aggregator {
         double cred = values.minPositiveCredibility();
         double sum = 0.0;
         int count = 0;
-        Iterator itr = values.entrySet().iterator();
-        while (itr.hasNext()) {
-            Map.Entry entry = (Map.Entry) itr.next();
-            DataValue value = (DataValue) entry.getValue();
-            String key = (String) entry.getKey();
+        for (Map.Entry<String, DataValue> entry : values.entrySet()) {
+            String key = entry.getKey();
+            DataValue value = entry.getValue();
             double weight = getWeight(key);
             sum += value.getDoubleValue() * weight;
             count += weight;

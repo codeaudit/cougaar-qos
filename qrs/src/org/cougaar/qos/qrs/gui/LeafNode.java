@@ -51,7 +51,7 @@ class LeafNode implements DataTreeNode {
         return parent;
     }
 
-    public java.util.Enumeration children() {
+    public java.util.Enumeration<?> children() {
         return VectorTreeNode.NULL_ENUM;
     }
 
