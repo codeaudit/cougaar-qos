@@ -6,19 +6,15 @@
 
 package org.cougaar.qos.qrs.gui;
 
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultTreeModel;
 
-public class ResourceContextTreeModel extends DefaultTreeModel
-{
-    public ResourceContextTreeModel() 
-    {
-	super(new ResourceContextRoot());
+public class ResourceContextTreeModel extends DefaultTreeModel {
+    public ResourceContextTreeModel() {
+        super(new ResourceContextRoot());
     }
-    
-    public void update() 
-    {
-	((ResourceContextRoot) getRoot()).updateChildren(this);
+
+    public void update() {
+        ((ResourceContextRoot) getRoot()).updateChildren(this);
     }
 
 }
-

@@ -9,23 +9,18 @@ package org.cougaar.qos.qrs;
 import java.util.Iterator;
 import java.util.Map;
 
-abstract public class Sum
-    extends Aggregator
-{
-    protected DataValue doCalculation(Values values) 
-    {
-	double cred = values.minPositiveCredibility();
-	double sum = 0.0;
-	Iterator itr = values.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    DataValue value = (DataValue) entry.getValue();
-	    sum += value.getDoubleValue();
-	}
-	DataValue result = new DataValue(sum, cred);
-	return result;
+abstract public class Sum extends Aggregator {
+    protected DataValue doCalculation(Values values) {
+        double cred = values.minPositiveCredibility();
+        double sum = 0.0;
+        Iterator itr = values.entrySet().iterator();
+        while (itr.hasNext()) {
+            Map.Entry entry = (Map.Entry) itr.next();
+            DataValue value = (DataValue) entry.getValue();
+            sum += value.getDoubleValue();
+        }
+        DataValue result = new DataValue(sum, cred);
+        return result;
     }
 
 }
-
-

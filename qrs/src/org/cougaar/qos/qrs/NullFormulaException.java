@@ -6,8 +6,7 @@
 
 package org.cougaar.qos.qrs;
 
-public class NullFormulaException extends Exception
-{
+public class NullFormulaException extends Exception {
     public NullFormulaException() {
     }
 }

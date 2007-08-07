@@ -11,92 +11,90 @@ import org.cougaar.qos.ResourceStatus.DataValueHolder;
 import org.cougaar.qos.ResourceStatus.ResourceDescriptionParseException;
 import org.cougaar.qos.qrs.DataValue;
 
-
 // import java.util.Properties;
 
 class ResourceStatusServiceClientImpl {
-	private org.cougaar.qos.ResourceStatus.ResourceStatusService target = null;
-	private org.omg.CORBA.ORB orb = null;
+    private org.cougaar.qos.ResourceStatus.ResourceStatusService target = null;
+    private org.omg.CORBA.ORB orb = null;
 
-	/**
-	 * Constructor for ResourceStatusServiceClientImpl
-	 * 
-	 * @throws IOException
-	 */
-	public ResourceStatusServiceClientImpl() throws IOException {
-		initORB(null);
-	}
+    /**
+     * Constructor for ResourceStatusServiceClientImpl
+     * 
+     * @throws IOException
+     */
+    public ResourceStatusServiceClientImpl() throws IOException {
+        initORB(null);
+    }
 
-	/**
-	 * Constructor for ResourceStatusServiceClientImpl
-	 * 
-	 * @throws IOException
-	 * @see java.lang.Object#Object()
-	 */
-	public ResourceStatusServiceClientImpl(String[] args) throws IOException {
-		initORB(args);
-	}
+    /**
+     * Constructor for ResourceStatusServiceClientImpl
+     * 
+     * @throws IOException
+     * @see java.lang.Object#Object()
+     */
+    public ResourceStatusServiceClientImpl(String[] args) throws IOException {
+        initORB(args);
+    }
 
-	/**
-	 * Initialize ORB.
-	 *  
-	 * @param args
-	 * @throws IOException
-	 */
-	public void initORB(String[] args) throws IOException {
+    /**
+     * Initialize ORB.
+     * 
+     * @param args
+     * @throws IOException
+     */
+    public void initORB(String[] args) throws IOException {
 
-		
-		// Initialize the ORB
-		orb = org.omg.CORBA.ORB.init((String[])args, null);
+        // Initialize the ORB
+        orb = org.omg.CORBA.ORB.init(args, null);
 
-		// ---- Uncomment below to enable Naming Service access. ----
-		// org.omg.CORBA.Object ncobj = orb.resolve_initial_references("NameService");
-		// NamingContextExt nc = NamingContextExtHelper.narrow(ncobj);
-		// org.omg.CORBA.Object obj = nc.resolve_str("MyServerObject");
+        // ---- Uncomment below to enable Naming Service access. ----
+        // org.omg.CORBA.Object ncobj =
+        // orb.resolve_initial_references("NameService");
+        // NamingContextExt nc = NamingContextExtHelper.narrow(ncobj);
+        // org.omg.CORBA.Object obj = nc.resolve_str("MyServerObject");
 
-		LineNumberReader input = new LineNumberReader(new FileReader("server.ior"));
-		String ior = input.readLine();
-		org.omg.CORBA.Object obj = orb.string_to_object(ior);
+        LineNumberReader input = new LineNumberReader(new FileReader("server.ior"));
+        String ior = input.readLine();
+        org.omg.CORBA.Object obj = orb.string_to_object(ior);
 
-		target = org.cougaar.qos.ResourceStatus.ResourceStatusServiceHelper.narrow(obj);		
-	}
+        target = org.cougaar.qos.ResourceStatus.ResourceStatusServiceHelper.narrow(obj);
+    }
 
-	/**
-	 * Obtain ORB Interface.
-	 * 
-	 * @return
-	 */
-	public org.cougaar.qos.ResourceStatus.ResourceStatusService getORBInterface() {
-		return target;
-	}
+    /**
+     * Obtain ORB Interface.
+     * 
+     * @return
+     */
+    public org.cougaar.qos.ResourceStatus.ResourceStatusService getORBInterface() {
+        return target;
+    }
 
-	/**
-	 * Test driver for ResourceStatusServiceClientImpl.
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			ResourceStatusServiceClientImpl test = new ResourceStatusServiceClientImpl();
-			System.out.println("Running blocking query on RSS");
-			DataValueHolder datavalue = new DataValueHolder();
-			String queryString = new String("Host(localhost):Jips");
-			test.getORBInterface().blockingQuery_s(queryString, 1, datavalue);
-			
-			// Now we create our DataValue from CORBA DataValue
-			DataValue bbnValueObj = new DataValue(datavalue.value);
-			
-			System.out.println(queryString+ "=" + bbnValueObj);
-			System.out.println("Running blocking query on RSS again");
-			test.getORBInterface().blockingQuery_s(queryString, 3, datavalue);
-			bbnValueObj = new DataValue(datavalue.value);
-			System.out.println(queryString+ "=" + bbnValueObj);
-		}
-		catch(IOException ex) {
-			ex.printStackTrace();
-		} catch (ResourceDescriptionParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    /**
+     * Test driver for ResourceStatusServiceClientImpl.
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
+        try {
+            ResourceStatusServiceClientImpl test = new ResourceStatusServiceClientImpl();
+            System.out.println("Running blocking query on RSS");
+            DataValueHolder datavalue = new DataValueHolder();
+            String queryString = new String("Host(localhost):Jips");
+            test.getORBInterface().blockingQuery_s(queryString, 1, datavalue);
+
+            // Now we create our DataValue from CORBA DataValue
+            DataValue bbnValueObj = new DataValue(datavalue.value);
+
+            System.out.println(queryString + "=" + bbnValueObj);
+            System.out.println("Running blocking query on RSS again");
+            test.getORBInterface().blockingQuery_s(queryString, 3, datavalue);
+            bbnValueObj = new DataValue(datavalue.value);
+            System.out.println(queryString + "=" + bbnValueObj);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ResourceDescriptionParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

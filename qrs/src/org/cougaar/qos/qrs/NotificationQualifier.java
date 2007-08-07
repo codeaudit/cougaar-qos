@@ -6,7 +6,6 @@
 
 package org.cougaar.qos.qrs;
 
-public interface NotificationQualifier
-{
+public interface NotificationQualifier {
     boolean shouldNotify(DataValue value);
 }

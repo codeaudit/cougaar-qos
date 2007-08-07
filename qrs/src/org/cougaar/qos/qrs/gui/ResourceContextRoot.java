@@ -8,15 +8,11 @@ package org.cougaar.qos.qrs.gui;
 
 import org.cougaar.qos.qrs.RSS;
 
-public class ResourceContextRoot extends ResourceContextInstanceNode
-{
+public class ResourceContextRoot extends ResourceContextInstanceNode {
 
-    public ResourceContextRoot() 
-    {
-	super(null, RSS.instance());
-	// updateChildren();
+    public ResourceContextRoot() {
+        super(null, RSS.instance());
+        // updateChildren();
     }
 
 }
-    
-    

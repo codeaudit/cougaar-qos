@@ -6,11 +6,13 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
-public class Hardware
-{
-    
+public class Hardware {
+
     public static native long getClockSpeed();
+
     public static native String getHostName();
 
-    static { System.loadLibrary("RSSUnixUtils"); }
+    static {
+        System.loadLibrary("RSSUnixUtils");
+    }
 }
