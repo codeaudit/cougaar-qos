@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.cougaar.util.CircularQueue;
+
 abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
     private final HashMap listeners;
     private final HashMap data;
