@@ -116,7 +116,7 @@ public class ProcessStats extends SysStatHandler {
             bufferedStdOut.close();
             process.destroy();
         } catch (java.io.IOException ioex) {
-            logger.error(null, ioex);
+            logger.warn("Error running ps: " + ioex.getMessage());
             return;
         }
 

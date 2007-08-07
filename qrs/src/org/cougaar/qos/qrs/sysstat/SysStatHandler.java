@@ -36,6 +36,10 @@ abstract public class SysStatHandler implements Constants {
         } else if (name.equals("Windows NT")) {
             // NT handlers
             // None so far
+        } else if (name.equals("Windows XP")) {
+            if (kind.equals("LoadAverage")) {
+        	handler = new XPLoadAverage();
+            }
         } else if (name.equals("Mac OS X")) {
             // MacOSX handlers
             if (kind.equals("LoadAverage")) {

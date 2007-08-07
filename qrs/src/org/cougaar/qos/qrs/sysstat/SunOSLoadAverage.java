@@ -43,13 +43,13 @@ public class SunOSLoadAverage extends SysStatHandler {
             bufferedStdOut.close();
             process.destroy();
         } catch (java.io.IOException ioex) {
-            logger.error(null, ioex);
+            logger.warn("Error running uptime: " + ioex.getMessage());
             return;
         }
 
         Matcher matcher = pattern.matcher(line);
         if (!matcher.find()) {
-            logger.error("Matcher failed on " + line);
+            logger.warn("Matcher failed on " + line);
             return;
         }
 

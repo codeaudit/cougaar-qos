@@ -83,7 +83,12 @@ public class DirectSysStatSupplier {
                     if (handler == null) {
                         continue;
                     }
-                    handler.getData(map);
+                    try {
+			handler.getData(map);
+		    } catch (RuntimeException e) {
+			logger.warn("Handler " + handler+ " failed " +
+				e.getMessage());
+		    }
                 }
             }
 
