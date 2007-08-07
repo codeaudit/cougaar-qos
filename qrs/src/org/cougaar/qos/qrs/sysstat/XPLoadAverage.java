@@ -18,15 +18,10 @@ public class XPLoadAverage extends SysStatHandler {
     private static final String command = 
 	"typeperf \"\\Processor(_total)\\% Processor Time\" -sc 1";
 
-    // private static final DataValue ClockSpeed =
-    // new DataValue(Hardware.getClockSpeed(), SECOND_MEAS_CREDIBILITY);
-
     private String key;
 
     public void initialize(String host, int pid) {
         key = "Host" + KEY_SEPR + host + KEY_SEPR + "CPU" + KEY_SEPR + "loadavg";
-        // clock_key = "Host" + KEY_SEPR + host +
-        // KEY_SEPR + "CPU" + KEY_SEPR + "clockspeed";
     }
 
     public void getData(Map<String, DataValue> map) {
@@ -52,9 +47,8 @@ public class XPLoadAverage extends SysStatHandler {
             String percentUtil = csv[1];
             // remove the extra pair of surrounding quotes
             percentUtil = percentUtil.substring(1, percentUtil.length()-2);
-            double loadavg = Double.parseDouble(percentUtil) / 100.0; // XXX: Phony load avg
+            double loadavg = Double.parseDouble(percentUtil) / 50.0; // XXX: Phony load avg
             map.put(key, new DataValue(loadavg, SECOND_MEAS_CREDIBILITY, "", PROVENANCE));
         }
     }
-
 }
