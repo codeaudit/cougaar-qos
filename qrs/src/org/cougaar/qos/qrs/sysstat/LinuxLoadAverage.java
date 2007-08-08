@@ -29,6 +29,15 @@ public class LinuxLoadAverage extends SysStatHandler {
     }
 
     public void getData(Map<String, DataValue> map) {
+        // Use the OperatingSystemMXBean if possible.
+        Double load = getLoadAvgFromOS();
+        if (load != null) {
+            map.put(key, new DataValue(load, SECOND_MEAS_CREDIBILITY, "", PROVENANCE));
+            return;
+        }
+        
+        // If we get here, either getSystemLoadAverage is unavailable, or the call failed.
+        // Use /proc file system instead
         String line = null;
         fr = null;
         try {
@@ -53,15 +62,10 @@ public class LinuxLoadAverage extends SysStatHandler {
         } else {
             doub = line.substring(0, index);
         }
-        try {
-            map.put(key, new DataValue(Double.parseDouble(doub),
-                                       SECOND_MEAS_CREDIBILITY,
-                                       "",
-                                       PROVENANCE));
-        } catch (NumberFormatException nf_ex) {
-            ;
-        }
-
+        map.put(key, new DataValue(Double.parseDouble(doub),
+                                   SECOND_MEAS_CREDIBILITY,
+                                   "",
+                                   PROVENANCE));
     }
 
 }
