@@ -8,6 +8,7 @@ package org.cougaar.qos.qrs.sysstat;
 
 import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Map;
 
 import org.cougaar.qos.qrs.DataValue;
@@ -15,9 +16,6 @@ import org.cougaar.qos.qrs.DataValue;
 public class LinuxMemory extends SysStatHandler {
     private static final String FreeLineKey = "MemFree";
     private static final String TotalLineKey = "MemTotal";
-
-    private FileReader fr;
-    private BufferedReader br;
 
     private String free_key, total_key, util_key;
 
@@ -34,13 +32,6 @@ public class LinuxMemory extends SysStatHandler {
 
     }
 
-    private void close() {
-        try {
-            br.close();
-        } catch (java.io.IOException ioe_ex) {
-        }
-    }
-
     private double parse_one(String line) {
         int start = 8;
         while (!Character.isDigit(line.charAt(start))) {
@@ -55,52 +46,44 @@ public class LinuxMemory extends SysStatHandler {
     }
 
     public void getData(Map<String, DataValue> map) {
-        String line = null;
-        double free = 0.0;
-        double total = 0.0;
-        DataValue free_dv = null;
-        DataValue total_dv = null;
-        fr = null;
+        double free = -1;
+        double total = -1;
+        FileReader fr;
         try {
             fr = new FileReader("/proc/meminfo");
         } catch (java.io.FileNotFoundException fnf_ex) {
             return;
         }
 
-        br = new BufferedReader(fr);
+        BufferedReader br = new BufferedReader(fr);
         while (true) {
             try {
-                line = br.readLine();
+                String line = br.readLine();
                 if (line == null) {
                     break;
                 }
                 if (line.startsWith(FreeLineKey)) {
                     free = parse_one(line);
-                    free_dv = new DataValue(free, SECOND_MEAS_CREDIBILITY, "KB", PROVENANCE);
+                    DataValue free_dv = new DataValue(free, SECOND_MEAS_CREDIBILITY, "KB", PROVENANCE);
+                    map.put(free_key, free_dv);
                 } else if (line.startsWith(TotalLineKey)) {
                     total = parse_one(line);
-                    total_dv = new DataValue(total, SECOND_MEAS_CREDIBILITY, "KB", PROVENANCE);
-
+                    DataValue total_dv = new DataValue(total, SECOND_MEAS_CREDIBILITY, "KB", PROVENANCE);
+                    map.put(total_key, total_dv);
                 }
             } catch (java.io.IOException io_ex) {
-                close();
                 break;
             }
         }
-
-        close();
-
-        if (free_dv != null) {
-            map.put(free_key, free_dv);
+        try {
+            fr.close();
+        } catch (IOException e) {
+            //  don't care
         }
-        if (total_dv != null) {
-            map.put(total_key, total_dv);
-        }
-        if (free_dv != null && total_dv != null) {
+        if (free >= 0 && total > 0) {
             double util = (total - free) / total;
             DataValue util_dv = new DataValue(util, SECOND_MEAS_CREDIBILITY, "", PROVENANCE);
             map.put(util_key, util_dv);
         }
     }
-
 }
