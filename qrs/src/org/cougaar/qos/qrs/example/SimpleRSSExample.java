@@ -76,7 +76,7 @@ public class SimpleRSSExample {
 
         // make RSS, using conf
         Properties props = new Properties();
-        if (gui && impl != null) {
+        if (gui) {
             String gui_title = "RSS on " + CorbaUtils.hostname();
             props.setProperty(RSS.getGUI_PROPERTY(), gui_title);
         }
