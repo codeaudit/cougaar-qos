@@ -29,7 +29,7 @@ package org.cougaar.core.qos.frame;
 import java.util.StringTokenizer;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 

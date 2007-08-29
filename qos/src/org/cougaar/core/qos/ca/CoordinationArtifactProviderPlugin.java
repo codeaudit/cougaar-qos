@@ -27,7 +27,7 @@
 package org.cougaar.core.qos.ca;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 
 /**
  * This is a simple Plugin wrapper for a {@link CoordinationArtifactProvider}.

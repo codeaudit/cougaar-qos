@@ -36,7 +36,7 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.frame.Frame;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;

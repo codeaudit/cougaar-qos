@@ -41,7 +41,7 @@ import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
 import org.cougaar.core.qos.metrics.Metric;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.qos.rss.AgentTopologyService;
 import org.cougaar.core.service.AlarmService;
 import org.cougaar.core.service.BlackboardService;

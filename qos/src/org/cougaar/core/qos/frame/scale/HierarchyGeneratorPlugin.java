@@ -35,7 +35,7 @@ import java.util.Set;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
-import org.cougaar.core.qos.metrics.ParameterizedPlugin;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.service.LoggingService;
 
 public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements FrameSetService.Callback {
