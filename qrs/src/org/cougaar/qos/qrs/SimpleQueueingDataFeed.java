@@ -136,6 +136,7 @@ abstract public class SimpleQueueingDataFeed extends AbstractDataFeed {
         synchronized (queue) {
             if (!queue.contains(key)) {
                 queue.add(key);
+                // XXX: Should the dispatch really keep the queue locked?
                 dispatch();
             }
         }
