@@ -59,7 +59,7 @@ public class CorbaUtils {
     }
 
     private static void bind(NamingContext root, NameComponent[] name, org.omg.CORBA.Object ref)
-            throws NotFound, CannotProceed, InvalidName, AlreadyBound {
+            throws NotFound, CannotProceed, InvalidName {
         int context_length = name.length - 1;
         NamingContext context = root;
         for (int i = 0; i < context_length; i++) {
