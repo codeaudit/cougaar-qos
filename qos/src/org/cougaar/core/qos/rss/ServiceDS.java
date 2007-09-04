@@ -37,103 +37,85 @@ import org.cougaar.qos.qrs.DataFormula;
 import org.cougaar.qos.qrs.RSS;
 import org.cougaar.qos.qrs.ResourceContext;
 
-
 /**
- * This RSS ResourcContext represents subsystems in a Node, other than
- * agents.  Its parent in the RSS hierarchy tree is a Node.  It's
- * identified by the name of the service and defines two local
- * formulas for CPU load.  <p> The currently supported "services" are
- * defined by the metrics and mts containers.  Other subsystems like
- * servlet management and persistence might be supported later.
- *
+ * This RSS ResourcContext represents subsystems in a Node, other than agents.
+ * Its parent in the RSS hierarchy tree is a Node. It's identified by the name
+ * of the service and defines two local formulas for CPU load.
+ * <p>
+ * The currently supported "services" are defined by the metrics and mts
+ * containers. Other subsystems like servlet management and persistence might be
+ * supported later.
+ * 
  * @see NodeDS
  */
-public class ServiceDS 
-    extends CougaarDS
-{
-    static void register()
-    {
-	ContextInstantiater cinst = new AbstractContextInstantiater() {
-		public ResourceContext instantiateContext(String[] parameters, 
-							  ResourceContext parent)
-		    throws ParameterError
-		{
-		    return new ServiceDS(parameters, parent);
-		}
+public class ServiceDS extends CougaarDS {
+    static void register() {
+        ContextInstantiater cinst = new AbstractContextInstantiater() {
+            public ResourceContext instantiateContext(String[] parameters, ResourceContext parent)
+                    throws ParameterError {
+                return new ServiceDS(parameters, parent);
+            }
 
-		public Object identifyParameters(String[] parameters) 
-		{
-		    if (parameters == null || parameters.length != 1) 
-			return null;
-		    return  parameters[0];
-		}		
+            public Object identifyParameters(String[] parameters) {
+                if (parameters == null || parameters.length != 1) {
+                    return null;
+                }
+                return parameters[0];
+            }
 
-		
-	    };
-	registerContextInstantiater("Service", cinst);
+        };
+        registerContextInstantiater("Service", cinst);
     }
 
     private static final String SERVICENAME = "servicename".intern();
 
-    public ServiceDS(String[] parameters, ResourceContext parent) 
-	throws ParameterError
-    {
-	super(parameters, parent);
+    public ServiceDS(String[] parameters, ResourceContext parent) throws ParameterError {
+        super(parameters, parent);
     }
 
     protected boolean useParentPath() {
-	return false;
+        return false;
     }
 
-    // Service DataScopes can be the first element in a path.  They must
+    // Service DataScopes can be the first element in a path. They must
     // find or make the corresponding NodeDS and return that as the
     // preferred parent.
     protected ResourceContext preferredParent(RSS root) {
-	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	NodeIdentificationService node_id_svc = (NodeIdentificationService)
-	    sb.getService(this, NodeIdentificationService.class, null);
-	String nodeID = node_id_svc.getMessageAddress().toString();
+        ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
+        NodeIdentificationService node_id_svc =
+                sb.getService(this, NodeIdentificationService.class, null);
+        String nodeID = node_id_svc.getMessageAddress().toString();
 
-	String[] params = { nodeID };
-	ResourceNode node = new ResourceNode();
-	node.kind = "Node";
-	node.parameters = params;
-	ResourceNode[] path = { node };
-	ResourceContext parent = root.getPathContext(path);
-	setParent(parent);
-	return parent;
+        String[] params = {nodeID};
+        ResourceNode node = new ResourceNode();
+        node.kind = "Node";
+        node.parameters = params;
+        ResourceNode[] path = {node};
+        ResourceContext parent = root.getPathContext(path);
+        setParent(parent);
+        return parent;
     }
 
-    
-
-    protected void verifyParameters(String[] parameters) 
-	throws ParameterError
-    {
-	if (parameters == null || parameters.length != 1) {
-	    throw new ParameterError("ServiceDS: wrong number of parameters");
-	}
-	if (!(parameters[0] != null)) {
-	    throw new ParameterError("ServiceDS: wrong parameter type");
-	} else {
-	    // could canonicalize here
-	    String servicename = parameters[0];
-	    bindSymbolValue(SERVICENAME, servicename);
-	    historyPrefix = "Service" +KEY_SEPR+ servicename;
-	}
+    protected void verifyParameters(String[] parameters) throws ParameterError {
+        if (parameters == null || parameters.length != 1) {
+            throw new ParameterError("ServiceDS: wrong number of parameters");
+        }
+        if (!(parameters[0] != null)) {
+            throw new ParameterError("ServiceDS: wrong parameter type");
+        } else {
+            // could canonicalize here
+            String servicename = parameters[0];
+            bindSymbolValue(SERVICENAME, servicename);
+            historyPrefix = "Service" + KEY_SEPR + servicename;
+        }
     }
 
-
-    protected DataFormula instantiateFormula(String kind)
-    {
-	if (kind.equals(Constants.CPU_LOAD_AVG)
-	    ||
-	    kind.equals(Constants.CPU_LOAD_MJIPS)) {
-	    return new DecayingHistoryFormula(historyPrefix, kind);
-	} else {
-	    return null;
-	}
+    protected DataFormula instantiateFormula(String kind) {
+        if (kind.equals(Constants.CPU_LOAD_AVG) || kind.equals(Constants.CPU_LOAD_MJIPS)) {
+            return new DecayingHistoryFormula(historyPrefix, kind);
+        } else {
+            return null;
+        }
     }
-
 
 }
-

@@ -29,8 +29,6 @@ package org.cougaar.core.qos.rss;
 /**
  * Callback interface for the {@link AgentHostUpdater} service.
  */
-public interface AgentHostUpdaterListener 
-{
+public interface AgentHostUpdaterListener {
     public void newHost(String host);
 }
-

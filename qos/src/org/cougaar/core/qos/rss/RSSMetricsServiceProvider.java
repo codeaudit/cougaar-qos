@@ -42,49 +42,44 @@ import org.cougaar.core.thread.ThreadServiceProvider;
 import org.cougaar.qos.qrs.RSSUtils;
 
 /**
- * This Component/Container provides the RSS-based implementation of
- * the MetricsService and MetricsUpdateService, and instantiates the
- * implementations, RSSMetricsServiceImpl and
- * RSSMetricsUpdateServiceImpl respectively, as child Components.
+ * This Component/Container provides the RSS-based implementation of the
+ * MetricsService and MetricsUpdateService, and instantiates the
+ * implementations, RSSMetricsServiceImpl and RSSMetricsUpdateServiceImpl
+ * respectively, as child Components.
  * 
  * @see MetricsService
  * @see MetricsUpdateService
  * @see RSSMetricsServiceImpl
  * @see RSSMetricsUpdateServiceImpl
  */
-public final class RSSMetricsServiceProvider
-    extends ContainerSupport
-    implements ServiceProvider
-{
+public final class RSSMetricsServiceProvider extends ContainerSupport implements ServiceProvider {
     private MetricsService retriever;
     private MetricsUpdateService updater;
     private DataFeedRegistrationService registrar;
 
     private void makeUpdaterService() {
-	updater = new RSSMetricsUpdateServiceImpl();
-	add(updater);
+        updater = new RSSMetricsUpdateServiceImpl();
+        add(updater);
     }
 
     private void makeRetrieverService() {
-	retriever = new RSSMetricsServiceImpl();
-	add(retriever);
-	registrar = (DataFeedRegistrationService) retriever;
+        retriever = new RSSMetricsServiceImpl();
+        add(retriever);
+        registrar = (DataFeedRegistrationService) retriever;
     }
-
 
     // This is done before child-components are created
     public void loadHighPriorityComponents() {
         super.loadHighPriorityComponents();
-	ServiceBroker sb = getServiceBroker();
-	NodeControlService ncs = (NodeControlService)
-	    sb.getService(this, NodeControlService.class, null);
-	ServiceBroker rootsb = ncs.getRootServiceBroker();
-	
-	// DataFeeds could need a thread service
-	// JAZ needs a ComponentDescription?
-	ThreadServiceProvider tsp = new ThreadServiceProvider();
-	tsp.setParameter("name=Metrics");
-	add(tsp);
+        ServiceBroker sb = getServiceBroker();
+        NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
+        ServiceBroker rootsb = ncs.getRootServiceBroker();
+
+        // DataFeeds could need a thread service
+        // JAZ needs a ComponentDescription?
+        ThreadServiceProvider tsp = new ThreadServiceProvider();
+        tsp.setParameter("name=Metrics");
+        add(tsp);
 
         // Make a Timer available to RSS and TEC
         //
@@ -92,66 +87,61 @@ public final class RSSMetricsServiceProvider
         // will spawn a default (non-ThreadService-backed) timer thread
         RSSUtils.setScheduler(new CougaarTimer(getChildServiceBroker()));
 
-	// Childern Components need Registration Service
-	// but the Registration need the MetricServiceImplementation
-	// make Metric Updater Service
-	makeUpdaterService();
-	rootsb.addService(MetricsUpdateService.class, this);
-	// make Metric Service and Feed registration service
-	makeRetrieverService();
-	rootsb.addService(MetricsService.class, this);
-	// register registration service
-	sb.addService(DataFeedRegistrationService.class, this);
+        // Childern Components need Registration Service
+        // but the Registration need the MetricServiceImplementation
+        // make Metric Updater Service
+        makeUpdaterService();
+        rootsb.addService(MetricsUpdateService.class, this);
+        // make Metric Service and Feed registration service
+        makeRetrieverService();
+        rootsb.addService(MetricsService.class, this);
+        // register registration service
+        sb.addService(DataFeedRegistrationService.class, this);
     }
 
     // Service Provider API
 
-    public Object getService(ServiceBroker sb, 
-			     Object requestor, 
-			     Class serviceClass) 
-    {
-	if (serviceClass == MetricsService.class) {
-	    return retriever;
-	} else if (serviceClass == MetricsUpdateService.class) {
-	    return updater;
-	} else if (serviceClass == DataFeedRegistrationService.class) {
-	    return registrar;
-	} else {
-	    return null;
-	}
+    public Object getService(ServiceBroker sb, Object requestor, Class<?> serviceClass) {
+        if (serviceClass == MetricsService.class) {
+            return retriever;
+        } else if (serviceClass == MetricsUpdateService.class) {
+            return updater;
+        } else if (serviceClass == DataFeedRegistrationService.class) {
+            return registrar;
+        } else {
+            return null;
+        }
     }
 
-    public void releaseService(ServiceBroker sb, 
-			       Object requestor, 
-			       Class serviceClass, 
-			       Object service)
-    {
+    public void releaseService(ServiceBroker sb,
+                               Object requestor,
+                               Class<?> serviceClass,
+                               Object service) {
     }
 
     // Container API
 
     protected ComponentDescriptions findInitialComponentDescriptions() {
-	ServiceBroker sb = getServiceBroker();
-	ComponentInitializerService cis = (ComponentInitializerService) 
-	    sb.getService(this, ComponentInitializerService.class, null);
-	NodeIdentificationService nis = (NodeIdentificationService)
-	    sb.getService(this, NodeIdentificationService.class, null);
-	try {
-	    String cp = specifyContainmentPoint();
-	    String id = nis.getMessageAddress().toString();
-	    ComponentDescription[] descs = cis.getComponentDescriptions(id,cp);
- 	    // Want only items _below_. Could filter (not doing so now)
-	    return new ComponentDescriptions(descs);
-	} catch (ComponentInitializerService.InitializerException cise) {
-	    cise.printStackTrace();
-	    return null;
-	} finally {
-	    sb.releaseService(this, ComponentInitializerService.class, cis);
-	    sb.releaseService(this, NodeIdentificationService.class, nis);
-	}
+        ServiceBroker sb = getServiceBroker();
+        ComponentInitializerService cis =
+                sb.getService(this, ComponentInitializerService.class, null);
+        NodeIdentificationService nis = sb.getService(this, NodeIdentificationService.class, null);
+        try {
+            String cp = specifyContainmentPoint();
+            String id = nis.getMessageAddress().toString();
+            ComponentDescription[] descs = cis.getComponentDescriptions(id, cp);
+            // Want only items _below_. Could filter (not doing so now)
+            return new ComponentDescriptions(descs);
+        } catch (ComponentInitializerService.InitializerException cise) {
+            cise.printStackTrace();
+            return null;
+        } finally {
+            sb.releaseService(this, ComponentInitializerService.class, cis);
+            sb.releaseService(this, NodeIdentificationService.class, nis);
+        }
     }
 
     protected String specifyContainmentPoint() {
-	return Agent.INSERTION_POINT + ".MetricsServices";
+        return Agent.INSERTION_POINT + ".MetricsServices";
     }
 }

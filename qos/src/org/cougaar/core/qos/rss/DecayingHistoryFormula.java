@@ -26,7 +26,6 @@
 
 package org.cougaar.core.qos.rss;
 
-
 import org.cougaar.core.qos.metrics.Constants;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
 import org.cougaar.qos.qrs.DataFormula;
@@ -34,61 +33,50 @@ import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.RSS;
 import org.cougaar.qos.qrs.ResourceContext;
 
-
 /**
- * This RSS formula class encapsules the use of data published into
- * the RSS by {@link org.cougaar.core.qos.metrics.DecayingHistory}.
+ * This RSS formula class encapsules the use of data published into the RSS by
+ * {@link org.cougaar.core.qos.metrics.DecayingHistory}.
  */
-public class DecayingHistoryFormula 
-    extends DataFormula 
-{
+public class DecayingHistoryFormula extends DataFormula {
     private String period;
-    private String prefix;
-    private String kind;
+    private final String prefix;
+    private final String kind;
 
-    public DecayingHistoryFormula(String prefix, String kind)
-    {
-	super();
-	this.prefix = prefix;
-	this.kind = kind;
+    public DecayingHistoryFormula(String prefix, String kind) {
+        super();
+        this.prefix = prefix;
+        this.kind = kind;
     }
 
-    protected DataValue defaultValue() 
-    {
-	return new DataValue(0);
-    }
-	
-
-    protected void initialize(ResourceContext context)
-    {
-	super.initialize(context);
-
-	String key = prefix +KEY_SEPR+ kind +period+ Constants.SecAvgKeySuffix;
-	String[] parameters = { key };
-	ResourceNode node = new ResourceNode();
-	node.kind = "Integrater";
-	node.parameters = parameters;
-	ResourceNode formula = new ResourceNode();
-	formula.kind = "Formula";
-	formula.parameters = new String[0];
-	ResourceNode[] path = { node, formula };
-	DataFormula dependency = RSS.instance().getPathFormula(path);
-	registerDependency(dependency, "Formula");
+    protected DataValue defaultValue() {
+        return new DataValue(0);
     }
 
-    protected DataValue doCalculation(DataFormula.Values values) 
-    {
-	DataValue computedValue = values.get("Formula");
-	DataValue defaultValue = defaultValue();
-	return DataValue.mostCredible(computedValue, defaultValue);
+    protected void initialize(ResourceContext context) {
+        super.initialize(context);
+
+        String key = prefix + KEY_SEPR + kind + period + Constants.SecAvgKeySuffix;
+        String[] parameters = {key};
+        ResourceNode node = new ResourceNode();
+        node.kind = "Integrater";
+        node.parameters = parameters;
+        ResourceNode formula = new ResourceNode();
+        formula.kind = "Formula";
+        formula.parameters = new String[0];
+        ResourceNode[] path = {node, formula};
+        DataFormula dependency = RSS.instance().getPathFormula(path);
+        registerDependency(dependency, "Formula");
     }
 
-
-    protected void setArgs(String[] args) 
-    {
-	super.setArgs(args);
-	this.period = args[0];
+    protected DataValue doCalculation(DataFormula.Values values) {
+        DataValue computedValue = values.get("Formula");
+        DataValue defaultValue = defaultValue();
+        return DataValue.mostCredible(computedValue, defaultValue);
     }
-	
+
+    protected void setArgs(String[] args) {
+        super.setArgs(args);
+        this.period = args[0];
+    }
 
 }

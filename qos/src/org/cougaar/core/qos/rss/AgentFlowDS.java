@@ -33,103 +33,83 @@ import org.cougaar.qos.qrs.DataFormula;
 import org.cougaar.qos.qrs.RSS;
 import org.cougaar.qos.qrs.ResourceContext;
 
-
-
 /**
- * This RSS ResourceContext represents message flow between two
- * Agents.  This is a top-level context in the RSS inheritance tree,
- * and is identified by a pair of Agent names (source and destination,
- * in that order).  It supports two messaging rate formulas, for byte
- * counst and message counts respectively
+ * This RSS ResourceContext represents message flow between two Agents. This is
+ * a top-level context in the RSS inheritance tree, and is identified by a pair
+ * of Agent names (source and destination, in that order). It supports two
+ * messaging rate formulas, for byte counst and message counts respectively
  */
-public class AgentFlowDS 
-    extends CougaarDS 
-{
+public class AgentFlowDS extends CougaarDS {
 
-    static void register()
-    {
-	ContextInstantiater cinst = new AbstractContextInstantiater() {
-		public ResourceContext instantiateContext(String[] parameters, 
-							  ResourceContext parent)
-		    throws ParameterError
-		{
-		    return new AgentFlowDS(parameters, parent);
-		}
+    static void register() {
+        ContextInstantiater cinst = new AbstractContextInstantiater() {
+            public ResourceContext instantiateContext(String[] parameters, ResourceContext parent)
+                    throws ParameterError {
+                return new AgentFlowDS(parameters, parent);
+            }
 
-		public Object identifyParameters(String[] parameters) 
-		{
-		    if (parameters == null || parameters.length != 1) 
-			return null;
-		    String src = parameters[0];
-		    String dst = parameters[1];
-		    return src +"->"+ dst;
-		}		
+            public Object identifyParameters(String[] parameters) {
+                if (parameters == null || parameters.length != 1) {
+                    return null;
+                }
+                String src = parameters[0];
+                String dst = parameters[1];
+                return src + "->" + dst;
+            }
 
-		
-	    };
-	registerContextInstantiater("AgentFlow", cinst);
+        };
+        registerContextInstantiater("AgentFlow", cinst);
     }
 
     private static final String SOURCE_AGENT = "sourceAgent".intern();
     private static final String DESTINATION_AGENT = "destinationAgent".intern();
 
-
-    public AgentFlowDS(String[] parameters, ResourceContext parent) 
-	throws ParameterError
-    {
-	super(parameters, parent);
+    public AgentFlowDS(String[] parameters, ResourceContext parent) throws ParameterError {
+        super(parameters, parent);
     }
 
     protected boolean useParentPath() {
-	return false;
+        return false;
     }
 
-    //AgentFlow should really to have an IpFlow as a Parent so that
-    //they can get the path capacity.  Also they need to have the
-    //Source and Destination hosts as perents in order to predict serialization cost
+    // AgentFlow should really to have an IpFlow as a Parent so that
+    // they can get the path capacity. Also they need to have the
+    // Source and Destination hosts as perents in order to predict serialization
+    // cost
     // The Flow Layering needs new Modeling primitives TBD later.
-    //JAZ Standalone for now
+    // JAZ Standalone for now
     protected ResourceContext preferredParent(RSS root) {
-	return root;
+        return root;
     }
 
     // Two Parameter which are Agent Names
-    protected void verifyParameters(String[] parameters) 
-	throws ParameterError
-    {
-	String source = null;
-	String destination = null;
-	if (parameters == null || parameters.length != 2) {
-	    throw new ParameterError("AgentFlowDS: wrong number of parameters");
-	}
-	if (!(parameters[0] != null)) {
-	    throw new ParameterError("AgentFlowDS: wrong parameter 1 type");
-	} else {
-	    source = parameters[0];
-	    bindSymbolValue(SOURCE_AGENT, source);
-	}
-	if (!(parameters[1] != null)) {
-	    throw new ParameterError("AgentFlowDS: wrong parameter 2 type");
-	} else {
-	    destination = parameters[1];
-	    bindSymbolValue(DESTINATION_AGENT, destination);
-	    historyPrefix = "AgentFlow" +KEY_SEPR+ 
-		source  +KEY_SEPR+ 
-		destination;
-	}
+    protected void verifyParameters(String[] parameters) throws ParameterError {
+        String source = null;
+        String destination = null;
+        if (parameters == null || parameters.length != 2) {
+            throw new ParameterError("AgentFlowDS: wrong number of parameters");
+        }
+        if (!(parameters[0] != null)) {
+            throw new ParameterError("AgentFlowDS: wrong parameter 1 type");
+        } else {
+            source = parameters[0];
+            bindSymbolValue(SOURCE_AGENT, source);
+        }
+        if (!(parameters[1] != null)) {
+            throw new ParameterError("AgentFlowDS: wrong parameter 2 type");
+        } else {
+            destination = parameters[1];
+            bindSymbolValue(DESTINATION_AGENT, destination);
+            historyPrefix = "AgentFlow" + KEY_SEPR + source + KEY_SEPR + destination;
+        }
     }
 
-
-    protected DataFormula instantiateFormula(String kind)
-    {
-	if (kind.equals(Constants.MSG_RATE) ||
-	    kind.equals(Constants.BYTE_RATE)) {
-	    return new DecayingHistoryFormula(historyPrefix, kind);
-	} else {
-	    return null;
-	}
+    protected DataFormula instantiateFormula(String kind) {
+        if (kind.equals(Constants.MSG_RATE) || kind.equals(Constants.BYTE_RATE)) {
+            return new DecayingHistoryFormula(historyPrefix, kind);
+        } else {
+            return null;
+        }
     }
-
 
 }
-

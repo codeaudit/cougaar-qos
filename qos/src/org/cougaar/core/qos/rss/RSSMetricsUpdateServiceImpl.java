@@ -33,88 +33,78 @@ import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsUpdateService;
 import org.cougaar.core.qos.metrics.QosComponent;
-import org.cougaar.qos.qrs.DataInterpreter;
 import org.cougaar.qos.qrs.sysstat.DirectSysStatSupplier;
 
 /**
- * This Component is an implementation of MetricsUpdateService that
- * uses the RSS.  Instantiated by and as child component of the {@link
+ * This Component is an implementation of MetricsUpdateService that uses the
+ * RSS. Instantiated by and as child component of the {@link
  * RSSMetricsServiceProvider}.
- *
+ * 
  * @property org.cougaar.metrics.probes If provided, this should be a
- * comma-separated list of host probes, as understood by the QuO
- * StatusTEC; or 'all'; or 'none'.  The list of possible probes is as
- * follows: Bogomips, Cache, Clock, FreeMemory, TotalMemory,
- * LoadAverage, TCPInUse, UDPInUse, Jips, and CPUCount.  If the
- * property is not provided, or is provided with the value 'all', all
- * probes are run.  If the property is provided with the value 'none',
- * the probe task will not be started.  Note that some probes are only
- * available in Linux.
- *
- *
+ *           comma-separated list of host probes, as understood by the QuO
+ *           StatusTEC; or 'all'; or 'none'. The list of possible probes is as
+ *           follows: Bogomips, Cache, Clock, FreeMemory, TotalMemory,
+ *           LoadAverage, TCPInUse, UDPInUse, Jips, and CPUCount. If the
+ *           property is not provided, or is provided with the value 'all', all
+ *           probes are run. If the property is provided with the value 'none',
+ *           the probe task will not be started. Note that some probes are only
+ *           available in Linux.
+ * 
+ * 
  */
-public class RSSMetricsUpdateServiceImpl
-    extends QosComponent
-    implements MetricsUpdateService
-{
-    private static final String SYSSTAT_KINDS_PROPERTY = 
-	"org.cougaar.metrics.probes";
+public class RSSMetricsUpdateServiceImpl extends QosComponent implements MetricsUpdateService {
+    private static final String SYSSTAT_KINDS_PROPERTY = "org.cougaar.metrics.probes";
     private static final int SYSTAT_PERIOD = 15000;
-    
+
     private TrivialDataFeed dataFeed;
-    private DataInterpreter interpreter;
+    private MetricInterpreter interpreter;
 
     public RSSMetricsUpdateServiceImpl() {
     }
 
     public void load() {
-	super.load();
+        super.load();
 
-	ServiceBroker sb = getServiceBroker();
+        ServiceBroker sb = getServiceBroker();
 
-	String kinds_string = System.getProperty(SYSSTAT_KINDS_PROPERTY);
-	// kinds_string absent or 'all' for all probes
-	// kinds_string empty or 'none' for no probes
-	// Otherwise it should be a comma-separated list
+        String kinds_string = System.getProperty(SYSSTAT_KINDS_PROPERTY);
+        // kinds_string absent or 'all' for all probes
+        // kinds_string empty or 'none' for no probes
+        // Otherwise it should be a comma-separated list
 
-	String[] kinds = 
-	    { "Jips", "Memory", "CPU", "LoadAverage", "Sockets",  "CPUCount"};;
-	// kinds == null for all probes
-	// kinds == zero-length array for no probes
-	// kinds == true array of strings for specified probes
+        String[] kinds = {"Jips", "Memory", "CPU", "LoadAverage", "Sockets", "CPUCount"};;
+        // kinds == null for all probes
+        // kinds == zero-length array for no probes
+        // kinds == true array of strings for specified probes
 
-	if (kinds_string != null) {
-	    if (kinds_string.equalsIgnoreCase("none")) {
-		kinds = new String[0];
-	    } else if (!kinds_string.equalsIgnoreCase("all")) {
-		StringTokenizer tokenizer = 
-		    new StringTokenizer(kinds_string, ",");
-		kinds = new String[tokenizer.countTokens()];
-		int i = 0;
-		while (tokenizer.hasMoreElements()) {
-		    kinds[i] = tokenizer.nextToken();
-		}
-	    }
-	}
+        if (kinds_string != null) {
+            if (kinds_string.equalsIgnoreCase("none")) {
+                kinds = new String[0];
+            } else if (!kinds_string.equalsIgnoreCase("all")) {
+                StringTokenizer tokenizer = new StringTokenizer(kinds_string, ",");
+                kinds = new String[tokenizer.countTokens()];
+                int i = 0;
+                while (tokenizer.hasMoreElements()) {
+                    kinds[i] = tokenizer.nextToken();
+                }
+            }
+        }
 
-	dataFeed = new TrivialDataFeed(sb);
-	interpreter = new MetricInterpreter();
-	if (kinds == null || kinds.length > 0) {
-	    DirectSysStatSupplier supplier = 
-		new DirectSysStatSupplier(kinds, dataFeed);
-	    supplier.schedule(SYSTAT_PERIOD);
-	}
+        dataFeed = new TrivialDataFeed(sb);
+        interpreter = new MetricInterpreter();
+        if (kinds.length > 0) {
+            DirectSysStatSupplier supplier = new DirectSysStatSupplier(kinds, dataFeed);
+            supplier.schedule(SYSTAT_PERIOD);
+        }
 
     }
 
     TrivialDataFeed getMetricsFeed() {
-	return dataFeed;
+        return dataFeed;
     }
-
 
     public void updateValue(String key, Metric value) {
-	dataFeed.newData(key, value, interpreter);
+        dataFeed.newData(key, value, interpreter);
     }
-
 
 }

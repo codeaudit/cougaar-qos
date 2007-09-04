@@ -39,96 +39,88 @@ import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
 /**
- * This Components uses the {@link DataFeedRegistrationService} to
- * register an RSS properties feed that uses the {@link ConfigFinder}
- * to resolve the URL.
+ * This Components uses the {@link DataFeedRegistrationService} to register an
+ * RSS properties feed that uses the {@link ConfigFinder} to resolve the URL.
  */
-public class ConfigFinderDataFeedComponent
-    extends QosComponent
-{
+public class ConfigFinderDataFeedComponent extends QosComponent {
     public static final String CONFIG_PROTOCOL = "cougaarconfig";
 
-
-    public ConfigFinderDataFeedComponent() 
-    {
+    public ConfigFinderDataFeedComponent() {
     }
 
-    public void load() 
-    {
-	super.load();
+    public void load() {
+        super.load();
 
-	String urlString = getParameter("url");
-	String name = getParameter("name");
+        String urlString = getParameter("url");
+        String name = getParameter("name");
 
-	ServiceBroker sb = getServiceBroker();
-	LoggingService logging = (LoggingService)
-	    sb.getService(this, LoggingService.class, null);
+        ServiceBroker sb = getServiceBroker();
+        LoggingService logging = sb.getService(this, LoggingService.class, null);
 
-	DataFeedRegistrationService svc = (DataFeedRegistrationService)
-	    sb.getService(this, DataFeedRegistrationService.class, null);
+        DataFeedRegistrationService svc =
+                sb.getService(this, DataFeedRegistrationService.class, null);
 
-	Feed feed = new Feed(urlString);
-	svc.registerFeed(feed, name);
-	
-	// special Feed that has the URL for the sites file
-	if (name.equalsIgnoreCase("sites")) {
-	    if (logging.isDebugEnabled())
-		logging.debug("Populating Sites with  url=" +urlString );
-	    svc.populateSites(urlString);
-	}
-	sb.releaseService(this, DataFeedRegistrationService.class, svc);
+        Feed feed = new Feed(urlString);
+        svc.registerFeed(feed, name);
+
+        // special Feed that has the URL for the sites file
+        if (name.equalsIgnoreCase("sites")) {
+            if (logging.isDebugEnabled()) {
+                logging.debug("Populating Sites with  url=" + urlString);
+            }
+            svc.populateSites(urlString);
+        }
+        sb.releaseService(this, DataFeedRegistrationService.class, svc);
 
     }
 
     private static class Feed extends PropertiesDataFeed {
 
-	public Feed(String properties_url)
-	{
-	    super(properties_url);
-	}
+        public Feed(String properties_url) {
+            super(properties_url);
+        }
 
-	protected InputStream openURL(String  urlString) 
-	{
-	    Logger logging = 
-		Logging.getLogger(ConfigFinderDataFeedComponent.class);
-	    URI uri = null;
-	    try {
-		uri = new URI(urlString);
-	    } catch (java.net.URISyntaxException ex) {
-		// log it
-		if (logging.isErrorEnabled())
-		    logging.error(null, ex);
-		return null;
-	    }
-	    
-	    String scheme = uri.getScheme();
-	    String path = uri.getSchemeSpecificPart();
+        protected InputStream openURL(String urlString) {
+            Logger logging = Logging.getLogger(ConfigFinderDataFeedComponent.class);
+            URI uri = null;
+            try {
+                uri = new URI(urlString);
+            } catch (java.net.URISyntaxException ex) {
+                // log it
+                if (logging.isErrorEnabled()) {
+                    logging.error(null, ex);
+                }
+                return null;
+            }
 
-	    if (logging.isDebugEnabled()){
-		logging.debug("scheme=" + scheme +
-			      " Path=" + path);
-	    }
+            String scheme = uri.getScheme();
+            String path = uri.getSchemeSpecificPart();
 
+            if (logging.isDebugEnabled()) {
+                logging.debug("scheme=" + scheme + " Path=" + path);
+            }
 
-	    if (scheme.equals(CONFIG_PROTOCOL)) {
-		try {
-		    if (logging.isDebugEnabled())
-			logging.debug("Opening configuration URL=" + urlString);
-		    ConfigFinder finder = ConfigFinder.getInstance();
-		    return finder.open(path);
-		} catch (java.io.IOException io_ex) {
-		    if (logging.isErrorEnabled())
-			logging.error("Could not open Config URL=" +urlString);
-		    return null;
-		}
-	    } else {
-		if (logging.isDebugEnabled())
-		    logging.debug("Opening external URL=" + urlString);
-		return super.openURL(urlString);
-	    }
-	}
+            if (scheme.equals(CONFIG_PROTOCOL)) {
+                try {
+                    if (logging.isDebugEnabled()) {
+                        logging.debug("Opening configuration URL=" + urlString);
+                    }
+                    ConfigFinder finder = ConfigFinder.getInstance();
+                    return finder.open(path);
+                } catch (java.io.IOException io_ex) {
+                    if (logging.isErrorEnabled()) {
+                        logging.error("Could not open Config URL=" + urlString);
+                    }
+                    return null;
+                }
+            } else {
+                if (logging.isDebugEnabled()) {
+                    logging.debug("Opening external URL=" + urlString);
+                }
+                return super.openURL(urlString);
+            }
+        }
 
     }
 
 }
-

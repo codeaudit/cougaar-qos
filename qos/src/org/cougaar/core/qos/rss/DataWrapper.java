@@ -32,36 +32,78 @@ import org.cougaar.qos.qrs.DataValue;
 /**
  * This class wraps RSS DataValues in the {@link Metric} API.
  */
-public class DataWrapper implements Metric, java.io.Serializable
-{
-    private DataValue data;
+public class DataWrapper implements Metric, java.io.Serializable {
+    private final DataValue data;
 
     public DataWrapper(DataValue data) {
-	this.data = data;
+        this.data = data;
     }
 
     public String toString() {
-	return data.toString();
+        return data.toString();
     }
 
     public DataValue getDataValue() {
-	return data;
+        return data;
     }
 
-    public String stringValue() { return data.getStringValue(); }
-    public byte byteValue() { return data.getByteValue(); }
-    public short shortValue() { return data.getShortValue(); }
-    public int intValue() { return data.getIntValue(); }
-    public long longValue() { return data.getLongValue(); }
-    public float floatValue() { return data.getFloatValue(); }
-    public double doubleValue() { return data.getDoubleValue(); }
-    public char charValue() { return data.getCharValue(); }
-    public boolean booleanValue() { return data.getBooleanValue(); }
+    public String stringValue() {
+        return data.getStringValue();
+    }
 
-    public Object getRawValue() { return data.getRawValue(); }
-    public double getCredibility() { return data.getCredibility(); }
-    public String getUnits() { return data.getUnits(); }
-    public String getProvenance() { return data.getProvenance(); }
-    public long getTimestamp() { return data.getTimestamp(); }
-    public long getHalflife() { return data.getHalflife(); }
+    public byte byteValue() {
+        return data.getByteValue();
+    }
+
+    public short shortValue() {
+        return data.getShortValue();
+    }
+
+    public int intValue() {
+        return data.getIntValue();
+    }
+
+    public long longValue() {
+        return data.getLongValue();
+    }
+
+    public float floatValue() {
+        return data.getFloatValue();
+    }
+
+    public double doubleValue() {
+        return data.getDoubleValue();
+    }
+
+    public char charValue() {
+        return data.getCharValue();
+    }
+
+    public boolean booleanValue() {
+        return data.getBooleanValue();
+    }
+
+    public Object getRawValue() {
+        return data.getRawValue();
+    }
+
+    public double getCredibility() {
+        return data.getCredibility();
+    }
+
+    public String getUnits() {
+        return data.getUnits();
+    }
+
+    public String getProvenance() {
+        return data.getProvenance();
+    }
+
+    public long getTimestamp() {
+        return data.getTimestamp();
+    }
+
+    public long getHalflife() {
+        return data.getHalflife();
+    }
 }

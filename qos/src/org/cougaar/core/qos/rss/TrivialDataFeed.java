@@ -32,54 +32,58 @@ import org.cougaar.core.thread.Schedulable;
 import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.SimpleQueueingDataFeed;
 
-
 /**
  * This entity implements a simple RSS DataFeed and is used by the
  * {@link RSSMetricsUpdateServiceImpl} to push data into the RSS.
  */
-public class TrivialDataFeed 
-    extends SimpleQueueingDataFeed
-{
+public class TrivialDataFeed extends SimpleQueueingDataFeed {
     private static final long HOLD_TIME = 500;
-    private Schedulable thread;
+    private final Schedulable thread;
 
     private class Notifier implements Runnable {
-	public void run() { 
-	    long endTime= System.currentTimeMillis() + HOLD_TIME;
-	    // String key = nextKey();
-	    // DataValue value = null;
-	    do {
-		String key = nextKey();
-		if (key == null) break;
-		DataValue value = lookup(key);
-		if (value == null) continue;
-		notifyListeners(key, value); 
-	    } while (System.currentTimeMillis() <= endTime) ;
-// 	    if (key != null) {
-// 		value = lookup(key);
-// 		if (value != null) notifyListeners(key, value); 
-// 	    }
-	    if (!isEmpty()) thread.start();
-	}
+        public void run() {
+            long endTime = System.currentTimeMillis() + HOLD_TIME;
+            // String key = nextKey();
+            // DataValue value = null;
+            do {
+                String key = nextKey();
+                if (key == null) {
+                    break;
+                }
+                DataValue value = lookup(key);
+                if (value == null) {
+                    continue;
+                }
+                notifyListeners(key, value);
+            } while (System.currentTimeMillis() <= endTime);
+            // if (key != null) {
+            // value = lookup(key);
+            // if (value != null) notifyListeners(key, value);
+            // }
+            if (!isEmpty()) {
+                thread.start();
+            }
+        }
     }
 
-
     protected Runnable makeNotifier() {
-	return new Notifier();
+        return new Notifier();
     }
 
     TrivialDataFeed(ServiceBroker sb) {
-	super();
-	ThreadService threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
-	Runnable notifier = getNotifier();
-	thread = threadService.getThread(this, notifier, "TrivialDataFeed",
-					 ThreadService.WELL_BEHAVED_LANE);
-	sb.releaseService(this, ThreadService.class, threadService);
+        super();
+        ThreadService threadService = sb.getService(this, ThreadService.class, null);
+        Runnable notifier = getNotifier();
+        thread =
+                threadService.getThread(this,
+                                        notifier,
+                                        "TrivialDataFeed",
+                                        ThreadService.WELL_BEHAVED_LANE);
+        sb.releaseService(this, ThreadService.class, threadService);
     }
 
     protected void dispatch() {
-	thread.start();
+        thread.start();
     }
 
 }

@@ -41,185 +41,161 @@ import org.cougaar.qos.qrs.RSS;
 import org.cougaar.qos.qrs.ResourceContext;
 
 /**
- * This RSS ResourceContext represents a COUGGAR Node.  Its parent in
- * the RSS hierarchy tree is the context for the Node's host.  It's
- * identified by the Node's name and has no locally defined formulas.
+ * This RSS ResourceContext represents a COUGGAR Node. Its parent in the RSS
+ * hierarchy tree is the context for the Node's host. It's identified by the
+ * Node's name and has no locally defined formulas.
  */
-public class NodeDS 
-    extends CougaarDS
-{
-    static void register()
-    {
-	ContextInstantiater cinst = new AbstractContextInstantiater() {
-		public ResourceContext instantiateContext(String[] parameters, 
-							  ResourceContext parent)
-		    throws ParameterError
-		{
-		    return new NodeDS(parameters, parent);
-		}
+public class NodeDS extends CougaarDS {
+    static void register() {
+        ContextInstantiater cinst = new AbstractContextInstantiater() {
+            public ResourceContext instantiateContext(String[] parameters, ResourceContext parent)
+                    throws ParameterError {
+                return new NodeDS(parameters, parent);
+            }
 
-		public Object identifyParameters(String[] parameters) 
-		{
-		    if (parameters == null || parameters.length != 1) 
-			return null;
-		    return  parameters[0];
-		}		
+            public Object identifyParameters(String[] parameters) {
+                if (parameters == null || parameters.length != 1) {
+                    return null;
+                }
+                return parameters[0];
+            }
 
-		
-	    };
-	registerContextInstantiater("Node", cinst);
+        };
+        registerContextInstantiater("Node", cinst);
     }
 
     static final String NODENAME = "nodename".intern();
     static final String TOPOLOGY = "topology";
-    static final String UNKNOWN_HOST_IP = "169.0.0.1";//DHCP No Address from server
+    static final String UNKNOWN_HOST_IP = "169.0.0.1";// DHCP No Address from
+                                                        // server
 
     private DataFormula vm_size;
 
-    static boolean isUnknownHost(String addr)
-    {
-	return addr.equals(UNKNOWN_HOST_IP);
+    static boolean isUnknownHost(String addr) {
+        return addr.equals(UNKNOWN_HOST_IP);
     }
 
-
-    public NodeDS(String[] parameters, ResourceContext parent) 
-	throws ParameterError
-    {
-	super(parameters, parent);
+    public NodeDS(String[] parameters, ResourceContext parent) throws ParameterError {
+        super(parameters, parent);
     }
-
 
     protected boolean useParentPath() {
-	return false;
+        return false;
     }
 
     String getNodeName() {
-	return (String) getSymbolValue(NODENAME);
+        return (String) getSymbolValue(NODENAME);
     }
 
-    // Node DataScopes can be the first element in a path.  They must
+    // Node DataScopes can be the first element in a path. They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
-    protected ResourceContext preferredParent(RSS root) 
-    {
+    protected ResourceContext preferredParent(RSS root) {
 
-	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	AgentTopologyService ats = (AgentTopologyService)
-	    sb.getService(this, AgentTopologyService.class, null);
-	String nodename = (String) getSymbolValue(NODENAME);
-	String hostname = null;
-	if (ats != null) {
-	    hostname=ats.getNodeHost(MessageAddress.getMessageAddress(nodename));
-	} else {
-	    // AgentTopologyService not loaded.  Try a direct WP
-	    // call, even though it can give an inconsistent picture.
-	    WhitePagesService svc = (WhitePagesService)
-		sb.getService(this, WhitePagesService.class, null);
-	    try {
-		AddressEntry entry = svc.get(nodename, TOPOLOGY, -1);
-		if (entry == null) {
-		    if (logger.isWarnEnabled())
-			logger.warn("Can't find host for node " +nodename);
-		} else {
-		    hostname = entry.getURI().getHost();
-		}
-	    } catch (Exception ex) {
-		// log this?
-	    }
-	}
+        ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
+        AgentTopologyService ats = sb.getService(this, AgentTopologyService.class, null);
+        String nodename = (String) getSymbolValue(NODENAME);
+        String hostname = null;
+        if (ats != null) {
+            hostname = ats.getNodeHost(MessageAddress.getMessageAddress(nodename));
+        } else {
+            // AgentTopologyService not loaded. Try a direct WP
+            // call, even though it can give an inconsistent picture.
+            WhitePagesService svc = sb.getService(this, WhitePagesService.class, null);
+            try {
+                AddressEntry entry = svc.get(nodename, TOPOLOGY, -1);
+                if (entry == null) {
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("Can't find host for node " + nodename);
+                    }
+                } else {
+                    hostname = entry.getURI().getHost();
+                }
+            } catch (Exception ex) {
+                // log this?
+            }
+        }
 
-	String[] params = { hostname == null ? UNKNOWN_HOST_IP : hostname };
-	ResourceNode node = new ResourceNode();
-	node.kind = "Host";
-	node.parameters = params;
-	ResourceNode[] path = { node } ;
-	ResourceContext parent = root.getPathContext(path);
-	setParent(parent);
-	return parent;
+        String[] params = {hostname == null ? UNKNOWN_HOST_IP : hostname};
+        ResourceNode node = new ResourceNode();
+        node.kind = "Host";
+        node.parameters = params;
+        ResourceNode[] path = {node};
+        ResourceContext parent = root.getPathContext(path);
+        setParent(parent);
+        return parent;
     }
 
-
-    protected void verifyParameters(String[] parameters) 
-	throws ParameterError
-    {
-	if (parameters == null || parameters.length != 1) {
-	    throw new ParameterError("NodeDS: wrong number of parameters");
-	}
-	if (!(parameters[0] != null)) {
-	    throw new ParameterError("NodeDS: wrong parameter type");
-	} else {
-	    // could canonicalize here
-	    String nodename = parameters[0];
-	    bindSymbolValue(NODENAME, nodename);
-	    historyPrefix = "Node" +KEY_SEPR+ nodename;
-	}
+    protected void verifyParameters(String[] parameters) throws ParameterError {
+        if (parameters == null || parameters.length != 1) {
+            throw new ParameterError("NodeDS: wrong number of parameters");
+        }
+        if (!(parameters[0] != null)) {
+            throw new ParameterError("NodeDS: wrong parameter type");
+        } else {
+            // could canonicalize here
+            String nodename = parameters[0];
+            bindSymbolValue(NODENAME, nodename);
+            historyPrefix = "Node" + KEY_SEPR + nodename;
+        }
     }
 
-
-    protected DataFormula instantiateFormula(String kind)
-    {
-	if (kind.equals(Constants.CPU_LOAD_AVG) ||
-	    kind.equals(Constants.CPU_LOAD_MJIPS) ||
-	    kind.equals(Constants.MSG_IN) ||
-	    kind.equals(Constants.BYTES_IN) ||
-	    kind.equals(Constants.MSG_OUT) ||
-	    kind.equals(Constants.BYTES_OUT)) {
-	    return new DecayingHistoryFormula(historyPrefix, kind);
-	} else if (kind.equals("VMSize")) {
-	    // singleton
-	    return findOrMakeVMSizeFormula();
-	} else {
-	    // No local formulas
-	    return null;
-	}
+    protected DataFormula instantiateFormula(String kind) {
+        if (kind.equals(Constants.CPU_LOAD_AVG) || kind.equals(Constants.CPU_LOAD_MJIPS)
+                || kind.equals(Constants.MSG_IN) || kind.equals(Constants.BYTES_IN)
+                || kind.equals(Constants.MSG_OUT) || kind.equals(Constants.BYTES_OUT)) {
+            return new DecayingHistoryFormula(historyPrefix, kind);
+        } else if (kind.equals("VMSize")) {
+            // singleton
+            return findOrMakeVMSizeFormula();
+        } else {
+            // No local formulas
+            return null;
+        }
     }
 
-
-    private synchronized DataFormula  findOrMakeVMSizeFormula()
-    {
-	if (vm_size == null) vm_size = new VMSize();
-	return vm_size;
+    private synchronized DataFormula findOrMakeVMSizeFormula() {
+        if (vm_size == null) {
+            vm_size = new VMSize();
+        }
+        return vm_size;
     }
 
     private class VMSize extends DataFormula {
-	Runtime rt;
+        Runtime rt;
 
-	protected DataValue defaultValue() {
-	    return DataValue.NO_VALUE;
-	}
-	
+        protected DataValue defaultValue() {
+            return DataValue.NO_VALUE;
+        }
 
-	protected void initialize(ResourceContext context) {
-	    super.initialize(context);
+        protected void initialize(ResourceContext context) {
+            super.initialize(context);
 
-	    rt = Runtime.getRuntime();
-	    ResourceNode node = new ResourceNode();
-	    node.kind = "Alarm";
-	    node.parameters = new String[0];
-	    ResourceNode formula = new ResourceNode();
-	    formula.kind = "FifteenSeconds";
-	    formula.parameters = new String[0];
-	    ResourceNode[] path = { node, formula };
-	    DataFormula alarm = RSS.instance().getPathFormula(path);
-	    registerDependency(alarm, "Alarm");
-	}
+            rt = Runtime.getRuntime();
+            ResourceNode node = new ResourceNode();
+            node.kind = "Alarm";
+            node.parameters = new String[0];
+            ResourceNode formula = new ResourceNode();
+            formula.kind = "FifteenSeconds";
+            formula.parameters = new String[0];
+            ResourceNode[] path = {node, formula};
+            DataFormula alarm = RSS.instance().getPathFormula(path);
+            registerDependency(alarm, "Alarm");
+        }
 
-	protected DataValue doCalculation(DataFormula.Values vals)
-	{
-	    long total = rt.totalMemory(); // code size? never
-					   // changes in Linux
-	    if (logger.isDebugEnabled()) {
-		long free = rt.freeMemory();
-		long max = rt.maxMemory();
-		logger.debug(" totalMemory=" +total+
-			     " maxMemory=" +max+
-			     " freeMemory=" +free);
-	    }
-	    return new DataValue(total, Constants.SECOND_MEAS_CREDIBILITY,
-				 "bytes", 
-				 "Runtime.getRuntime().totalMemory()");
-	}
+        protected DataValue doCalculation(DataFormula.Values vals) {
+            long total = rt.totalMemory(); // code size? never
+            // changes in Linux
+            if (logger.isDebugEnabled()) {
+                long free = rt.freeMemory();
+                long max = rt.maxMemory();
+                logger.debug(" totalMemory=" + total + " maxMemory=" + max + " freeMemory=" + free);
+            }
+            return new DataValue(total,
+                                 Constants.SECOND_MEAS_CREDIBILITY,
+                                 "bytes",
+                                 "Runtime.getRuntime().totalMemory()");
+        }
 
-	
     }
 }

@@ -33,35 +33,29 @@ import org.cougaar.util.log.Logging;
 /**
  * The base class of all COUGAAR-specific RSS ResourceContexts.
  */
-abstract class CougaarDS 
-    extends ResourceContext
-{
+abstract class CougaarDS extends ResourceContext {
 
     protected Logger logger;
     protected String historyPrefix;
 
-    CougaarDS(String[] parameters, ResourceContext parent) 
-	throws ParameterError
-    {
-	super(parameters, parent);
+    CougaarDS(String[] parameters, ResourceContext parent) throws ParameterError {
+        super(parameters, parent);
     }
 
-    protected void postInitialize()
-    {
-	super.postInitialize();
-	logger = Logging.getLogger(getClass().getName());
-	if (logger.isDebugEnabled()) {
-	    ResourceContext parent = getParent();
-	    logger.debug(parent + " created " +this);
-	}
+    protected void postInitialize() {
+        super.postInitialize();
+        logger = Logging.getLogger(getClass().getName());
+        if (logger.isDebugEnabled()) {
+            ResourceContext parent = getParent();
+            logger.debug(parent + " created " + this);
+        }
     }
 
-    protected void delete() 
-    {
-	if (logger.isDebugEnabled())
-	    logger.debug("Deleting " + this);
-	super.delete();
+    protected void delete() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Deleting " + this);
+        }
+        super.delete();
     }
 
 }
-

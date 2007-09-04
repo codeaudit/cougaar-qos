@@ -35,34 +35,29 @@ import org.cougaar.qos.qrs.TaskScheduler;
 /**
  * This entity allows RSS tasks to use the COUGAAR ThreadService.
  */
-public class CougaarTimer implements TaskScheduler
-{
-    private ThreadService threadService;
+public class CougaarTimer implements TaskScheduler {
+    private final ThreadService threadService;
 
-    CougaarTimer(ServiceBroker sb) 
-    {
-	threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
+    CougaarTimer(ServiceBroker sb) {
+        threadService = sb.getService(this, ThreadService.class, null);
     }
 
-    public Object schedule(Runnable body, long delay) 
-    {
-	Schedulable sched = threadService.getThread(this, body);
-	sched.schedule(delay);
-	return sched;
+    public Object schedule(Runnable body, long delay) {
+        Schedulable sched = threadService.getThread(this, body);
+        sched.schedule(delay);
+        return sched;
     }
 
-    public Object schedule(Runnable body, long delay, long period) 
-    {
-	Schedulable sched = threadService.getThread(this, body);
-	sched.schedule(delay, period);
-	return sched;
+    public Object schedule(Runnable body, long delay, long period) {
+        Schedulable sched = threadService.getThread(this, body);
+        sched.schedule(delay, period);
+        return sched;
     }
 
-    public void unschedule(Object task)
-    {
-	if (task != null) ((Schedulable) task).cancelTimer();
+    public void unschedule(Object task) {
+        if (task != null) {
+            ((Schedulable) task).cancelTimer();
+        }
     }
-
 
 }

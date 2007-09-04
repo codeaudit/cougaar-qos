@@ -40,303 +40,265 @@ import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.RSS;
 import org.cougaar.qos.qrs.ResourceContext;
 
-
 /**
- * This RSS ResourceContext represents an Agent.  In the RSS
- * inheritance tree, the parent of an Agent context is a Node context
- * (see {@link NodeDS}).  Agent contexts are identified by name and support a
- * variety of messaging and cpu related formulas, described in detail
- * elsewhere.
+ * This RSS ResourceContext represents an Agent. In the RSS inheritance tree,
+ * the parent of an Agent context is a Node context (see {@link NodeDS}). Agent
+ * contexts are identified by name and support a variety of messaging and cpu
+ * related formulas, described in detail elsewhere.
  */
-public class AgentDS 
-    extends CougaarDS
-{
+public class AgentDS extends CougaarDS {
 
-    static void register()
-    {
-	ContextInstantiater cinst = new AbstractContextInstantiater() {
-		public ResourceContext instantiateContext(String[] parameters, 
-							  ResourceContext parent)
-		    throws ParameterError
-		{
-		    return new AgentDS(parameters, parent);
-		}
+    static void register() {
+        ContextInstantiater cinst = new AbstractContextInstantiater() {
+            public ResourceContext instantiateContext(String[] parameters, ResourceContext parent)
+                    throws ParameterError {
+                return new AgentDS(parameters, parent);
+            }
 
-		public Object identifyParameters(String[] parameters) 
-		{
-		    if (parameters == null || parameters.length != 1) 
-			return null;
-		    return  parameters[0];
-		}		
+            public Object identifyParameters(String[] parameters) {
+                if (parameters == null || parameters.length != 1) {
+                    return null;
+                }
+                return parameters[0];
+            }
 
-		
-	    };
-	registerContextInstantiater("Agent", cinst);
+        };
+        registerContextInstantiater("Agent", cinst);
     }
 
     private static final String AGENTNAME = "agentname".intern();
     static final String TOPOLOGY = "topology";
     static final String UNKNOWN_NODE = "FosterNode";
 
-    public AgentDS(String[] parameters, ResourceContext parent) 
-	throws ParameterError
-    {
-	super(parameters, parent);
+    public AgentDS(String[] parameters, ResourceContext parent) throws ParameterError {
+        super(parameters, parent);
     }
 
     protected boolean useParentPath() {
-	return false;
+        return false;
     }
 
     String getAgentName() {
-	return (String) getSymbolValue(AGENTNAME);
+        return (String) getSymbolValue(AGENTNAME);
     }
 
-    // Node DataScopes can be the first element in a path.  They must
+    // Node DataScopes can be the first element in a path. They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
     protected ResourceContext preferredParent(RSS root) {
-	String agentname = (String) getSymbolValue(AGENTNAME);
-	String nodename = null;
-	ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
-	AgentTopologyService ats = (AgentTopologyService)
-	    sb.getService(this, AgentTopologyService.class, null);
-	if (ats != null) {
-	    nodename=ats.getAgentNode(MessageAddress.getMessageAddress(agentname));
-	} else {
-	    // AgentTopologyService not loaded.  Try a direct WP
-	    // call, even though it can give an inconsistent picture.
-	    WhitePagesService svc = (WhitePagesService)
-		sb.getService(this, WhitePagesService.class, null);
-	    try {
-		AddressEntry entry = svc.get(agentname, TOPOLOGY, -1);
-		if (entry == null) {
-		    if (logger.isWarnEnabled())
-			logger.warn("Can't find node for agent " +agentname);
-		} else {
-		    nodename = entry.getURI().getPath().substring(1);
-		}
-	    } catch (Exception ex) {
-		// log?
-	    }
+        String agentname = (String) getSymbolValue(AGENTNAME);
+        String nodename = null;
+        ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
+        AgentTopologyService ats = sb.getService(this, AgentTopologyService.class, null);
+        if (ats != null) {
+            nodename = ats.getAgentNode(MessageAddress.getMessageAddress(agentname));
+        } else {
+            // AgentTopologyService not loaded. Try a direct WP
+            // call, even though it can give an inconsistent picture.
+            WhitePagesService svc = sb.getService(this, WhitePagesService.class, null);
+            try {
+                AddressEntry entry = svc.get(agentname, TOPOLOGY, -1);
+                if (entry == null) {
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("Can't find node for agent " + agentname);
+                    }
+                } else {
+                    nodename = entry.getURI().getPath().substring(1);
+                }
+            } catch (Exception ex) {
+                // log?
+            }
 
-	}
+        }
 
-	String[] params = { nodename == null ? UNKNOWN_NODE : nodename };
-	ResourceNode node = new ResourceNode();
-	node.kind = "Node";
-	node.parameters = params;
-	ResourceNode[] path = { node };
-	ResourceContext parent = root.getPathContext(path);
-	setParent(parent);
-	return parent;
+        String[] params = {nodename == null ? UNKNOWN_NODE : nodename};
+        ResourceNode node = new ResourceNode();
+        node.kind = "Node";
+        node.parameters = params;
+        ResourceNode[] path = {node};
+        ResourceContext parent = root.getPathContext(path);
+        setParent(parent);
+        return parent;
     }
 
-
-    protected void verifyParameters(String[] parameters) 
-	throws ParameterError
-    {
-	if (parameters == null || parameters.length != 1) {
-	    throw new ParameterError("AgentDS: wrong number of parameters");
-	}
-	if (!(parameters[0] != null)) {
-	    throw new ParameterError("AgentDS: wrong parameter type");
-	} else {
-	    // could canonicalize here
-	    String agentname = parameters[0];
-	    bindSymbolValue(AGENTNAME, agentname);
-	    historyPrefix = "Agent" +KEY_SEPR+ agentname;
-	}
+    protected void verifyParameters(String[] parameters) throws ParameterError {
+        if (parameters == null || parameters.length != 1) {
+            throw new ParameterError("AgentDS: wrong number of parameters");
+        }
+        if (!(parameters[0] != null)) {
+            throw new ParameterError("AgentDS: wrong parameter type");
+        } else {
+            // could canonicalize here
+            String agentname = parameters[0];
+            bindSymbolValue(AGENTNAME, agentname);
+            historyPrefix = "Agent" + KEY_SEPR + agentname;
+        }
     }
 
-
-    protected DataFormula instantiateFormula(String kind)
-    {
-	if (kind.equals("LastHeard")) {
-	    return new LastHeard();
-	} else if (kind.equals("LastSpoke")) {
-	    return new LastSpoke();
-	} else if (kind.equals("LastSpokeError")) {
-	    return new LastSpokeError();
-	} else if (kind.equals("HeardTime")) {
-	    return new HeardTime();
-	} else if (kind.equals("SpokeTime")) {
-	    return new SpokeTime();
-	} else if (kind.equals("SpokeErrorTime")) {
-	    return new SpokeErrorTime();
-	} else if (kind.equals(Constants.PERSIST_SIZE_LAST)) {
-	    return new PersistSizeLast();
-	} else if (kind.equals(Constants.CPU_LOAD_AVG) ||
-		   kind.equals(Constants.CPU_LOAD_MJIPS) ||
-		   kind.equals(Constants.MSG_IN) ||
-		   kind.equals(Constants.BYTES_IN) ||
-		   kind.equals(Constants.MSG_OUT) ||
-		   kind.equals(Constants.BYTES_OUT)) {
-	    return new DecayingHistoryFormula(historyPrefix, kind);
-	} else {
-	    return null;
-	}
+    protected DataFormula instantiateFormula(String kind) {
+        if (kind.equals("LastHeard")) {
+            return new LastHeard();
+        } else if (kind.equals("LastSpoke")) {
+            return new LastSpoke();
+        } else if (kind.equals("LastSpokeError")) {
+            return new LastSpokeError();
+        } else if (kind.equals("HeardTime")) {
+            return new HeardTime();
+        } else if (kind.equals("SpokeTime")) {
+            return new SpokeTime();
+        } else if (kind.equals("SpokeErrorTime")) {
+            return new SpokeErrorTime();
+        } else if (kind.equals(Constants.PERSIST_SIZE_LAST)) {
+            return new PersistSizeLast();
+        } else if (kind.equals(Constants.CPU_LOAD_AVG) || kind.equals(Constants.CPU_LOAD_MJIPS)
+                || kind.equals(Constants.MSG_IN) || kind.equals(Constants.BYTES_IN)
+                || kind.equals(Constants.MSG_OUT) || kind.equals(Constants.BYTES_OUT)) {
+            return new DecayingHistoryFormula(historyPrefix, kind);
+        } else {
+            return null;
+        }
     }
 
+    abstract static class Formula extends DataFormula {
 
+        abstract String getKey();
 
+        protected DataValue defaultValue() {
+            return new DataValue(0);
+        }
 
+        protected void initialize(ResourceContext context) {
+            super.initialize(context);
+            String agentName = (String) context.getValue(AGENTNAME);
+            String key = "Agent" + KEY_SEPR + agentName + KEY_SEPR + getKey();
 
+            String[] parameters = {key};
+            ResourceNode node = new ResourceNode();
+            node.kind = "Integrater";
+            node.parameters = parameters;
+            ResourceNode formula = new ResourceNode();
+            formula.kind = "Formula";
+            formula.parameters = new String[0];
+            ResourceNode[] path = {node, formula};
+            DataFormula dependency = RSS.instance().getPathFormula(path);
+            registerDependency(dependency, "Formula");
+        }
 
-    abstract static class Formula 
-	extends DataFormula
-    {
-
-	abstract String getKey();
-	
-	protected DataValue defaultValue() {
-	    return new DataValue(0);
-	}
-	
-
-	protected void initialize(ResourceContext context) {
-	    super.initialize(context);
-	    String agentName = (String) context.getValue(AGENTNAME);
-	    String key = "Agent" +KEY_SEPR+ agentName +KEY_SEPR+ getKey();
-
-	    String[] parameters = { key };
-	    ResourceNode node = new ResourceNode();
-	    node.kind = "Integrater";
-	    node.parameters = parameters;
-	    ResourceNode formula = new ResourceNode();
-	    formula.kind = "Formula";
-	    formula.parameters = new String[0];
-	    ResourceNode[] path = { node, formula };
-	    DataFormula dependency = RSS.instance().getPathFormula(path);
-	    registerDependency(dependency, "Formula");
-	}
-
-	protected DataValue doCalculation(DataFormula.Values values) {
-	    DataValue computedValue = values.get("Formula");
-	    DataValue defaultValue = defaultValue();
-	    return DataValue.mostCredible(computedValue, defaultValue);
-	}
+        protected DataValue doCalculation(DataFormula.Values values) {
+            DataValue computedValue = values.get("Formula");
+            DataValue defaultValue = defaultValue();
+            return DataValue.mostCredible(computedValue, defaultValue);
+        }
 
     }
 
     abstract static class MonotonicLongFormula extends Formula {
-	int granularity = 1000;
-	protected DataValue doCalculation(DataFormula.Values vals){
-	    DataValue newValue = vals.get("Formula");
-	    DataValue cachedValue= getCachedValue();
-	    long  longNew = newValue.getLongValue();
-	    long  longCached = cachedValue.getLongValue();
-	    if (longNew - longCached > granularity) {
-		return newValue; 
-	    } else {
-		return cachedValue;
-	    }	    
-	}
+        int granularity = 1000;
+
+        protected DataValue doCalculation(DataFormula.Values vals) {
+            DataValue newValue = vals.get("Formula");
+            DataValue cachedValue = getCachedValue();
+            long longNew = newValue.getLongValue();
+            long longCached = cachedValue.getLongValue();
+            if (longNew - longCached > granularity) {
+                return newValue;
+            } else {
+                return cachedValue;
+            }
+        }
     }
 
     abstract static class AlarmFormula extends DataFormula {
 
-	abstract String getKey();
-	
-	protected DataValue defaultValue() {
-	    return new DataValue(0);
-	}
-	
+        abstract String getKey();
 
-	protected void initialize(ResourceContext context) {
-	    super.initialize(context);
+        protected DataValue defaultValue() {
+            return new DataValue(0);
+        }
 
-	    DataFormula baseFormula = context.getFormula(getKey(), null);
-	    registerDependency(baseFormula, "Formula");
+        protected void initialize(ResourceContext context) {
+            super.initialize(context);
 
-	    ResourceNode node = new ResourceNode();
-	    node.kind = "Alarm";
-	    node.parameters = new String[0];
-	    ResourceNode formula = new ResourceNode();
-	    formula.kind = "OneSecond";
-	    formula.parameters = new String[0];
-	    ResourceNode[] path = { node, formula };
-	    DataFormula alarm = RSS.instance().getPathFormula(path);
-	    registerDependency(alarm, "Alarm");
-	}
+            DataFormula baseFormula = context.getFormula(getKey(), null);
+            registerDependency(baseFormula, "Formula");
 
-	protected DataValue doCalculation(DataFormula.Values vals)
-	{
-	    DataValue formulaDV = vals.get("Formula");
-	    DataValue alarmDV = vals.get("Alarm");
-	    if (formulaDV == null || alarmDV == null) {
-		// Callback before both dependencies were registered.
-		// Punt.
-		return DataValue.NO_VALUE;
-	    }
-	    long sendTime = formulaDV.getLongValue();
-	    long alarmTime = alarmDV.getLongValue();
-	    long elapsed = 0;
+            ResourceNode node = new ResourceNode();
+            node.kind = "Alarm";
+            node.parameters = new String[0];
+            ResourceNode formula = new ResourceNode();
+            formula.kind = "OneSecond";
+            formula.parameters = new String[0];
+            ResourceNode[] path = {node, formula};
+            DataFormula alarm = RSS.instance().getPathFormula(path);
+            registerDependency(alarm, "Alarm");
+        }
 
+        protected DataValue doCalculation(DataFormula.Values vals) {
+            DataValue formulaDV = vals.get("Formula");
+            DataValue alarmDV = vals.get("Alarm");
+            if (formulaDV == null || alarmDV == null) {
+                // Callback before both dependencies were registered.
+                // Punt.
+                return DataValue.NO_VALUE;
+            }
+            long sendTime = formulaDV.getLongValue();
+            long alarmTime = alarmDV.getLongValue();
+            long elapsed = 0;
 
-	    if (alarmTime > sendTime) {
-		elapsed = (long) Math.floor((alarmTime-sendTime)/1000.0);
-	    }
-	    return new DataValue(elapsed, vals.minCredibility(),
-				 "seconds", "unknown");
-	}
+            if (alarmTime > sendTime) {
+                elapsed = (long) Math.floor((alarmTime - sendTime) / 1000.0);
+            }
+            return new DataValue(elapsed, vals.minCredibility(), "seconds", "unknown");
+        }
 
-	
     }
 
-
     static class LastHeard extends AlarmFormula {
-	String getKey() {
-	    return "HeardTime";
-	}
+        String getKey() {
+            return "HeardTime";
+        }
     }
 
     static class LastSpoke extends AlarmFormula {
-	String getKey() {
-	    return "SpokeTime";
-	}
+        String getKey() {
+            return "SpokeTime";
+        }
     }
 
     static class LastSpokeError extends AlarmFormula {
-	String getKey() {
-	    return "SpokeErrorTime";
-	}
+        String getKey() {
+            return "SpokeErrorTime";
+        }
     }
 
     // HeardTime, SpokeTime and SpokeErrorTime need to be Monotonic, and they
     // need to be hooked into LastHeard and LastSpoke
 
-    //The raw integrater values can not be used because there is no
-    //ordering between threads, so an old thread could publish a
-    //HeardTime that is actually before the current HeardTime
+    // The raw integrater values can not be used because there is no
+    // ordering between threads, so an old thread could publish a
+    // HeardTime that is actually before the current HeardTime
     static class HeardTime extends MonotonicLongFormula {
-	String getKey() {
-	    return "HeardTime";
-	}
-    }	
+        String getKey() {
+            return "HeardTime";
+        }
+    }
 
     static class SpokeTime extends MonotonicLongFormula {
-	String getKey() {
-	    return "SpokeTime";
-	}
-    }	
+        String getKey() {
+            return "SpokeTime";
+        }
+    }
 
     static class SpokeErrorTime extends MonotonicLongFormula {
-	String getKey() {
-	    return "SpokeErrorTime";
-	}
-    }	
-
-
+        String getKey() {
+            return "SpokeErrorTime";
+        }
+    }
 
     static class PersistSizeLast extends Formula {
-	String getKey() {
-	    return Constants.PERSIST_SIZE_LAST;
-	}
-    }	
-
-
-
+        String getKey() {
+            return Constants.PERSIST_SIZE_LAST;
+        }
+    }
 
 }
-
