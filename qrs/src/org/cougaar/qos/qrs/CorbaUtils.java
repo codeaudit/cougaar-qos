@@ -28,6 +28,7 @@
 
 package org.cougaar.qos.qrs;
 
+import org.cougaar.util.log.Logger;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.CORBA.ORB;
@@ -41,9 +42,6 @@ import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.InvalidName;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.omg.PortableServer.Servant;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -252,7 +250,6 @@ public class CorbaUtils {
 
     public static void main(String[] args, ResourceStatusServiceImpl impl) {
         String iorfile = null;
-        String logging_props_file = null;
         String config = null;
         boolean gui = false;
 
@@ -261,8 +258,6 @@ public class CorbaUtils {
             String arg = args[i++];
             if (arg.equals("-ior")) {
                 iorfile = args[i++];
-            } else if (arg.equals("-logging.props")) {
-                logging_props_file = args[i++];
             } else if (arg.equals("-gui")) {
                 gui = true;
             } else if (arg.equals("-rss.config")) {
@@ -271,14 +266,10 @@ public class CorbaUtils {
                 System.out.println("Do not understand switch " + arg);
             }
         }
-
-        if (logging_props_file != null) {
-            PropertyConfigurator.configure(logging_props_file);
-        }
-
+        
         Logger logger = Logging.getLogger(CorbaUtils.class);
         if (logger.isDebugEnabled()) {
-            logger.debug("Arg Switches " + " -logging.props=" + logging_props_file + " -gui=" + gui
+            logger.debug("Arg Switches " + " -gui=" + gui
                     + " -rss.config=" + config + " -ior=" + iorfile);
         }
 
@@ -329,7 +320,7 @@ public class CorbaUtils {
                 poa.activate_object(servant);
                 reference = poa.servant_to_reference(servant);
             } catch (Exception ex) {
-                logger.error(ex);
+                logger.error(ex.getMessage(), ex);
             }
 
             if (iorfile != null) {

@@ -28,8 +28,9 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
 import java.net.InetAddress;
+
+import org.cougaar.util.log.Logger;
 
 /**
  * A sample ResourceContext which looks for Host capacity data on any feed, by

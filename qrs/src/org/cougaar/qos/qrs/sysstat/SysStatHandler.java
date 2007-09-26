@@ -31,10 +31,10 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.qrs.Constants;
 import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.Logging;
+import org.cougaar.util.log.Logger;
 
 abstract public class SysStatHandler implements Constants {
     static final String PROVENANCE = "ProcessStats";

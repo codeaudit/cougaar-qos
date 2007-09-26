@@ -33,7 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.cougaar.util.log.Logger;
 
 /**
  * This is really just an interface to the db stored in

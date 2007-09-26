@@ -34,8 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
+import org.cougaar.util.log.Logger;
 
 /**
  * Abstract definition of a contect for resource data, ie a collection of

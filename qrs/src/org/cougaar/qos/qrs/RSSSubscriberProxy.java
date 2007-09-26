@@ -30,9 +30,9 @@ package org.cougaar.qos.qrs;
 
 import java.util.Observable;
 import java.util.Observer;
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.RSSSubscriber;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
+import org.cougaar.util.log.Logger;
 
 class RSSSubscriberProxy implements Observer {
     private BoundDataFormula bdf;

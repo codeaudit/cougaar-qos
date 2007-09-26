@@ -33,8 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
+import org.cougaar.util.log.Logger;
 
 /**
  * A DataFormula describes a (possibly computed) attribute of a ResourceContext.

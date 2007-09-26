@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.Logging;
+import org.cougaar.util.log.Logger;
 
 public class SunOSLoadAverage extends SysStatHandler {
     private static final String command = "/usr/bin/uptime";

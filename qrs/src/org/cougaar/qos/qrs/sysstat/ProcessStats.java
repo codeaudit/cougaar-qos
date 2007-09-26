@@ -26,9 +26,9 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.Logging;
+import org.cougaar.util.log.Logger;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

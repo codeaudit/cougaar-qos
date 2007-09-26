@@ -28,7 +28,7 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
+import org.cougaar.util.log.Logger;
 
 abstract public class Every extends Aggregator {
     protected DataValue doCalculation(Values values) {

@@ -28,7 +28,7 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
+import org.cougaar.util.log.Logger;
 
 /**
  * A standard ResourceContext type, which listens on all known DataFeeds and

@@ -31,8 +31,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.qrs.DataValue;
+import org.cougaar.util.log.Logger;
 
 public class XPMemory extends SysStatHandler {
     private static final String command = 

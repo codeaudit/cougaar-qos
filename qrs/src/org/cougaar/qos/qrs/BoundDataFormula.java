@@ -28,8 +28,8 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
+import org.cougaar.util.log.Logger;
 
 import java.util.Observable;
 import java.util.Observer;

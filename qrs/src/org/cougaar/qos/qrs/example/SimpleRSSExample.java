@@ -30,8 +30,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.cougaar.qos.ResourceStatus.ResourceDescriptionParseException;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
 import org.cougaar.qos.qrs.BoundDataFormula;
@@ -41,6 +39,7 @@ import org.cougaar.qos.qrs.Logging;
 import org.cougaar.qos.qrs.NullFormulaException;
 import org.cougaar.qos.qrs.PathParser;
 import org.cougaar.qos.qrs.RSS;
+import org.cougaar.util.log.Logger;
 
 public class SimpleRSSExample {
 
@@ -71,16 +70,13 @@ public class SimpleRSSExample {
     public static void main(String[] args) {
 
         SimpleRSSExample impl = new SimpleRSSExample();
-        String logging_props_file = null;
         String config = null;
         boolean gui = false;
 
         int i = 0;
         while (i < args.length) {
             String arg = args[i++];
-            if (arg.equals("-logging.props")) {
-                logging_props_file = args[i++];
-            } else if (arg.equals("-gui")) {
+            if (arg.equals("-gui")) {
                 gui = true;
             } else if (arg.equals("-rss.config")) {
                 config = args[i++];
@@ -89,13 +85,9 @@ public class SimpleRSSExample {
             }
         }
 
-        if (logging_props_file != null) {
-            PropertyConfigurator.configure(logging_props_file);
-        }
-
         Logger logger = Logging.getLogger(CorbaUtils.class);
         if (logger.isDebugEnabled()) {
-            logger.debug("Arg Switches " + " -logging.props=" + logging_props_file + " -gui=" + gui
+            logger.debug("Arg Switches " + " -gui=" + gui
                     + " -rss.config=" + config);
         }
 

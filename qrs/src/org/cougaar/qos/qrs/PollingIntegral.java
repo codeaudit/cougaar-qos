@@ -28,7 +28,7 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
+import org.cougaar.util.log.Logger;
 
 /**
  * This a 'rate-ifier' abstraction. It's designed to accumulate calculated

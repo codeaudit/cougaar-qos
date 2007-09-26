@@ -35,10 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.RSSSubscriberPOA;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
 import org.cougaar.qos.ResourceStatus.ResourceStatusService;
+import org.cougaar.util.log.Logger;
 
 /**
  * RelayDataFeeds are designed to move data from one RSS to another. This first

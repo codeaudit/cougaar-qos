@@ -40,8 +40,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.qrs.sysstat.DirectSysStatSupplier;
+import org.cougaar.util.log.Logger;
 
 /** The root of the ResourceContext tree */
 public final class RSS extends ResourceContext {

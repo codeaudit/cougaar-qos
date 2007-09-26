@@ -28,13 +28,13 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
-
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Properties;
+
+import org.cougaar.util.log.Logger;
 
 /**
  * A DataFeed which returns fixed values that it reads from a java properties

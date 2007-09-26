@@ -28,9 +28,9 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.data_types;
 import org.cougaar.qos.ResourceStatus.data_value;
+import org.cougaar.util.log.Logger;
 
 /**
  * A simple struct-like class used to represent the values manipulated by the

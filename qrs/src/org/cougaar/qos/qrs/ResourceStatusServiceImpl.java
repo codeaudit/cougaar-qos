@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.ResourceStatus.BadAttributeValueException;
 import org.cougaar.qos.ResourceStatus.CrossesThresholdQualifierFactoryPOA;
 import org.cougaar.qos.ResourceStatus.DataValueHolder;
@@ -58,6 +57,7 @@ import org.cougaar.qos.ResourceStatus.SomeQualifierFactoryPOA;
 import org.cougaar.qos.ResourceStatus.data_types;
 import org.cougaar.qos.ResourceStatus.data_value;
 import org.cougaar.qos.ResourceStatus.data_valueHolder;
+import org.cougaar.util.log.Logger;
 
 import org.omg.CosNaming.NameComponent;
 import org.omg.PortableServer.Servant;

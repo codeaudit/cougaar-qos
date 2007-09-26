@@ -31,7 +31,7 @@ package org.cougaar.qos.qrs;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.cougaar.util.log.Logger;
 
 // Nice clean code
 public class SiteAddress {

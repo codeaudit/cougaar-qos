@@ -1,4 +1,4 @@
-// $Id: Logging.java,v 1.4 2007-09-24 21:34:56 jzinky Exp $
+// $Id: Logging.java,v 1.5 2007-09-26 10:59:08 rshapiro Exp $
 /*
 
  * <copyright>
@@ -29,9 +29,10 @@
 
 package org.cougaar.qos.qrs;
 
-import org.apache.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.cougaar.util.log.Logger;
 
 public class Logging {
     private static String dprefix = null;
@@ -65,7 +66,7 @@ public class Logging {
             result = loggers.get(klass);
             if (result == null) {
                 String tag = hack_classname(dprefix, klass);
-                result = Logger.getLogger(tag);
+                result = org.cougaar.util.log.Logging.getLogger(tag);
                 loggers.put(klass, result);
             }
         }
@@ -78,7 +79,7 @@ public class Logging {
             result = eventLoggers.get(klass);
             if (result == null) {
                 String tag = hack_classname(eprefix, klass);
-                result = Logger.getLogger(tag);
+                result = org.cougaar.util.log.Logging.getLogger(tag);
                 eventLoggers.put(klass, result);
             }
         }

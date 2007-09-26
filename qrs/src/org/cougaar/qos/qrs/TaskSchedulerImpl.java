@@ -30,7 +30,8 @@ package org.cougaar.qos.qrs;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import org.apache.log4j.Logger;
+
+import org.cougaar.util.log.Logger;
 
 class TaskSchedulerImpl extends Timer implements TaskScheduler {
     private static class Task extends TimerTask {

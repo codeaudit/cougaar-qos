@@ -31,13 +31,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.cougaar.qos.qrs.CorbaUtils;
 import org.cougaar.qos.qrs.DataInterpreter;
 import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.Logging;
 import org.cougaar.qos.qrs.RSSUtils;
 import org.cougaar.qos.qrs.SimpleQueueingDataFeed;
+import org.cougaar.util.log.Logger;
 
 /**
  * Supply syststat data directly to an existing DataFeed. This has nothing to do
