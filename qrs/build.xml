@@ -173,7 +173,7 @@
     
     <!-- jarfiles required by this module, relative to various other paths -->
     <!-- WARNING: Only relative paths work here. -->
-    <property name="compile.jarlist" value="${target.lib}/util.jar,${target.sys}/log4j.jar"/>
+    <property name="compile.jarlist" value="${target.lib}/util.jar"/>
     <!-- Put absolute paths on this list, in the form of a path. -->
     <property name="compile.abs.jarlist" value=""/>
 
