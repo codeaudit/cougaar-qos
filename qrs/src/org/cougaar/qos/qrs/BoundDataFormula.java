@@ -152,7 +152,9 @@ public class BoundDataFormula extends Observable implements DataValueChangedCall
         // it's deleted before we subscribe, we lose.
 
         Logger logger = Logging.getLogger(BoundDataFormula.class);
-        logger.warn("Replaced deleted formula " + formula + " with " + replacement);
+        if (logger.isInfoEnabled()) {
+            logger.info("Replaced deleted formula " + formula + " with " + replacement);
+        }
         this.formula = replacement;
         isReady = true;
         replacement.subscribe(this);
