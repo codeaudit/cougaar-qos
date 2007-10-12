@@ -166,6 +166,7 @@ public final class RSS extends ResourceContext {
                     java.net.URL sitesURL = null;
                     try {
                         sitesURL = new java.net.URL(sitesurl_string);
+                        // TODO: Check for the configfinder protocol in the URL
                     } catch (java.net.MalformedURLException ex) {
                         Logger logger = Logging.getLogger(RSS.class);
                         logger.error(null, ex);
