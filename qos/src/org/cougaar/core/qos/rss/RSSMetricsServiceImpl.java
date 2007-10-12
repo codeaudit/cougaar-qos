@@ -150,6 +150,7 @@ public class RSSMetricsServiceImpl extends QosComponent
                 properties.load(is);
                 is.close();
             } catch (Exception ex) {
+                loggingService.error("Couldn't load properties from " + propertiesURL, ex);
             }
         }
 
