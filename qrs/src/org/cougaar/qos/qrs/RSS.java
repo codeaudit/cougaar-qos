@@ -69,14 +69,14 @@ public final class RSS extends ResourceContext {
         super(new String[0], null);
         Logger static_logger = Logging.getLogger(RSS.class);
         if (static_logger.isDebugEnabled()) {
-            static_logger.debug("RSS Property=" + props);
+            static_logger.debug("QRS Property=" + props);
         }
         this.props = props;
         instance = this;
-        this.sitesurl_string = props.getProperty("rss.SitesURL");
+        this.sitesurl_string = props.getProperty("qrs.SitesURL");
         data_feeds = new Hashtable<String, DataFeed>();
 
-        String raw_feed_data = props.getProperty("rss.DataFeeds");
+        String raw_feed_data = props.getProperty("qrs.DataFeeds");
         if (raw_feed_data != null) {
             StringTokenizer tokenizer = new StringTokenizer(raw_feed_data, " ");
             while (tokenizer.hasMoreTokens()) {
@@ -85,7 +85,7 @@ public final class RSS extends ResourceContext {
             }
         }
 
-        String sysstat_interval_str = props.getProperty("rss.sysstat");
+        String sysstat_interval_str = props.getProperty("qrs.sysstat");
         if (sysstat_interval_str != null) {
             int sysstat_interval = Integer.parseInt(sysstat_interval_str);
             TimerQueueingDataFeed feed = new TimerQueueingDataFeed();
@@ -106,7 +106,7 @@ public final class RSS extends ResourceContext {
     }
 
     public String toString() {
-        return "RSS root";
+        return "QRS root";
     }
 
     void eventNotification(ResourceContext context, Event event_type) {
@@ -383,7 +383,7 @@ public final class RSS extends ResourceContext {
                 properties.load(is);
                 is.close();
             } catch (java.io.IOException ex) {
-                static_logger.error("Error loading RSS properties from " + name + ": " + ex);
+                static_logger.error("Error loading QRS properties from " + name + ": " + ex);
             }
         }
 
