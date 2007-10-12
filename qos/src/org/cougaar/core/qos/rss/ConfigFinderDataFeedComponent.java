@@ -26,15 +26,17 @@
 
 package org.cougaar.core.qos.rss;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.DataFeedRegistrationService;
 import org.cougaar.core.qos.metrics.QosComponent;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.qos.qrs.PropertiesDataFeed;
 import org.cougaar.util.ConfigFinder;
+import org.cougaar.util.annotations.Cougaar.Arg;
+import org.cougaar.util.annotations.Cougaar.ObtainService;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
 
@@ -45,20 +47,23 @@ import org.cougaar.util.log.Logging;
 public class ConfigFinderDataFeedComponent extends QosComponent {
     public static final String CONFIG_PROTOCOL = "cougaarconfig";
 
+    @Arg(name="url")
+    public String urlString;
+    
+    @Arg(name="name")
+    public String name;
+    
+    @ObtainService
+    public DataFeedRegistrationService svc;
+    
+    @ObtainService
+    public LoggingService logging;
+    
     public ConfigFinderDataFeedComponent() {
     }
 
     public void load() {
         super.load();
-
-        String urlString = getParameter("url");
-        String name = getParameter("name");
-
-        ServiceBroker sb = getServiceBroker();
-        LoggingService logging = sb.getService(this, LoggingService.class, null);
-
-        DataFeedRegistrationService svc =
-                sb.getService(this, DataFeedRegistrationService.class, null);
 
         Feed feed = new Feed(urlString);
         svc.registerFeed(feed, name);
@@ -70,7 +75,7 @@ public class ConfigFinderDataFeedComponent extends QosComponent {
             }
             svc.populateSites(urlString);
         }
-        sb.releaseService(this, DataFeedRegistrationService.class, svc);
+        getServiceBroker().releaseService(this, DataFeedRegistrationService.class, svc);
 
     }
 
@@ -107,7 +112,7 @@ public class ConfigFinderDataFeedComponent extends QosComponent {
                     }
                     ConfigFinder finder = ConfigFinder.getInstance();
                     return finder.open(path);
-                } catch (java.io.IOException io_ex) {
+                } catch (IOException io_ex) {
                     if (logging.isErrorEnabled()) {
                         logging.error("Could not open Config URL=" + urlString);
                     }
