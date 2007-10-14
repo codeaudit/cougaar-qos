@@ -28,19 +28,22 @@ package org.cougaar.qos.qrs.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Enumeration;
+
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
 
 public class ResourceContextTree extends JTree implements TreeSelectionListener {
-    private Object selectedObject;
-
+    private final Renderer renderer;
+    
     public ResourceContextTree(ResourceContextTreeModel model) {
         super(model);
-        setCellRenderer(new Renderer());
+        renderer = new Renderer();
+        setCellRenderer(renderer);
         TreeSelectionModel m = getSelectionModel();
         m.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         m.addTreeSelectionListener(this);
@@ -50,16 +53,23 @@ public class ResourceContextTree extends JTree implements TreeSelectionListener 
     public void valueChanged(TreeSelectionEvent event) {
         boolean on_off = event.isAddedPath();
         if (!on_off) {
-            selectedObject = null;
+            renderer.setSelectedNode(null);
         } else {
             TreePath path = event.getPath();
-            DataTreeNode node = (DataTreeNode) path.getLastPathComponent();
-            selectedObject = node.getDatum();
+            renderer.setSelectedNode((DataTreeNode) path.getLastPathComponent());
         }
         repaint();
     }
 
-    private class Renderer extends DefaultTreeCellRenderer {
+    private static class Renderer extends DefaultTreeCellRenderer {
+        private static final Color SELECTED_COLOR = Color.red;
+        private static final Color ANCESTOR_COLOR = new Color(205, 160, 121);
+        private DataTreeNode selectedNode;
+        
+        private void setSelectedNode(DataTreeNode node) {
+            this.selectedNode = node;
+        }
+        
         public Component getTreeCellRendererComponent(JTree tree,
                                                       Object object,
                                                       boolean set,
@@ -75,11 +85,36 @@ public class ResourceContextTree extends JTree implements TreeSelectionListener 
                                                        leaf,
                                                        row,
                                                        hasFocus);
-            DataTreeNode node = (DataTreeNode) object;
-            if (selectedObject != null && node.getDatum() == selectedObject) {
-                comp.setForeground(Color.red);
+            if (selectedNode != null) {
+                Object selectedDatum = selectedNode.getDatum();
+                if (selectedDatum != null) {
+                    // Colorize cells that either have the given datum or
+                    // are ancestors of such cells, using different colors
+                    // for the two cases.
+                    DataTreeNode node = (DataTreeNode) object;
+                    if (selectedDatum == node.getDatum()) {
+                        comp.setForeground(SELECTED_COLOR);
+                    } else if (isDescendantSelected(node, selectedDatum)) {
+                        comp.setForeground(ANCESTOR_COLOR);
+                    }
+                }
             }
             return comp;
+        }
+
+        private boolean isDescendantSelected(DataTreeNode node, Object selectedDatum) {
+            if (selectedDatum == node.getDatum()) {
+                return true;
+            } else {
+                @SuppressWarnings("unchecked")
+                Enumeration<DataTreeNode> e = node.children();
+                while (e.hasMoreElements()) {
+                    if (isDescendantSelected(e.nextElement(), selectedDatum)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
 
     }
