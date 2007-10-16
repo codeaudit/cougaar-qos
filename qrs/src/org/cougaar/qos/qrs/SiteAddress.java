@@ -49,9 +49,9 @@ public class SiteAddress {
     private final long net_masked;
     public long mask;
     
-    public SiteAddress(byte[] address, int count) {
+    public SiteAddress(byte[] address, int maskPrefixLength) {
         this.net = bytesToLongAddress(address);
-        this.mask = countToMask(count);
+        this.mask = prefixLengthToMask(maskPrefixLength);
         net_masked = mask & net;
     }
     
@@ -61,7 +61,7 @@ public class SiteAddress {
         int maskedbits = Integer.parseInt(maskbits_string);
         String address = maskedAddress.substring(0, slash);
         net = stringToLongAddress(address);
-        mask = countToMask(maskedbits);
+        mask = prefixLengthToMask(maskedbits);
         net_masked = mask & net;
     }
     
@@ -98,7 +98,7 @@ public class SiteAddress {
 
     public String toString() {
         return ((net & 0xff000000) >> 24) + "." + ((net & 0x00ff0000) >> 16) + "."
-                + ((net & 0x0000ff00) >> 8) + "." + (net & 0x000000ff) + "/" + maskToCount(mask);
+                + ((net & 0x0000ff00) >> 8) + "." + (net & 0x000000ff) + "/" + maskToPrefixLength(mask);
     }
     
     public static Iterable<SiteAddress> elements() {
@@ -114,11 +114,12 @@ public class SiteAddress {
         return site;
     }
     
-    public static long countToMask(int count) {
-        return Masks[count];
+    public static long prefixLengthToMask(int prefixLength) {
+        return Masks[prefixLength];
     }
+    
 
-    public static int maskToCount(long mask) {
+    public static int maskToPrefixLength(long mask) {
         for (int i = 0; i < Masks.length; i++) {
             if (mask == Masks[i]) {
                 return i;
