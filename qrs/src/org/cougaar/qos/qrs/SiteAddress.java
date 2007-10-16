@@ -49,7 +49,13 @@ public class SiteAddress {
     private final long net_masked;
     public long mask;
     
-    private SiteAddress(String maskedAddress) {
+    public SiteAddress(byte[] address, int count) {
+        this.net = bytesToLongAddress(address);
+        this.mask = countToMask(count);
+        net_masked = mask & net;
+    }
+    
+    public SiteAddress(String maskedAddress) {
         int slash = maskedAddress.indexOf('/');
         String maskbits_string = maskedAddress.substring(1 + slash);
         int maskedbits = Integer.parseInt(maskbits_string);
@@ -69,9 +75,7 @@ public class SiteAddress {
 
     private long stringToLongAddress(String address) {
         try {
-            byte[] net_bytes = stringToAddress(address);
-            return unsignedByteToLong(net_bytes[0]) << 24 | unsignedByteToLong(net_bytes[1]) << 16
-                    | unsignedByteToLong(net_bytes[2]) << 8 | unsignedByteToLong(net_bytes[3]);
+            return bytesToLongAddress(stringToAddress(address));
         } catch (java.net.UnknownHostException ex) {
             Logger logger = Logging.getLogger(SiteAddress.class);
             logger.error("Bogus net " + address);
@@ -79,6 +83,11 @@ public class SiteAddress {
         }
     }
 
+    private long bytesToLongAddress(byte[] net_bytes) {
+        return unsignedByteToLong(net_bytes[0]) << 24 | unsignedByteToLong(net_bytes[1]) << 16
+        | unsignedByteToLong(net_bytes[2]) << 8 | unsignedByteToLong(net_bytes[3]);
+    }
+    
     public boolean contains(long addr) {
         return (addr & mask) == net_masked;
     }
