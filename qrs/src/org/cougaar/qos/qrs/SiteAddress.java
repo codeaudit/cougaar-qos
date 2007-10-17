@@ -65,29 +65,6 @@ public class SiteAddress {
         net_masked = mask & net;
     }
     
-    private long unsignedByteToLong(byte b) {
-        if (b < 0) {
-            return 256 + b;
-        } else {
-            return b;
-        }
-    }
-
-    private long stringToLongAddress(String address) {
-        try {
-            return bytesToLongAddress(stringToAddress(address));
-        } catch (java.net.UnknownHostException ex) {
-            Logger logger = Logging.getLogger(SiteAddress.class);
-            logger.error("Bogus net " + address);
-            return 0;
-        }
-    }
-
-    private long bytesToLongAddress(byte[] net_bytes) {
-        return unsignedByteToLong(net_bytes[0]) << 24 | unsignedByteToLong(net_bytes[1]) << 16
-        | unsignedByteToLong(net_bytes[2]) << 8 | unsignedByteToLong(net_bytes[3]);
-    }
-    
     public boolean contains(long addr) {
         return (addr & mask) == net_masked;
     }
@@ -99,6 +76,30 @@ public class SiteAddress {
     public String toString() {
         return ((net & 0xff000000) >> 24) + "." + ((net & 0x00ff0000) >> 16) + "."
                 + ((net & 0x0000ff00) >> 8) + "." + (net & 0x000000ff) + "/" + maskToPrefixLength(mask);
+    }
+    
+    
+    public static long unsignedByteToLong(byte b) {
+        if (b < 0) {
+            return 256 + b;
+        } else {
+            return b;
+        }
+    }
+
+    public static long stringToLongAddress(String address) {
+        try {
+            return bytesToLongAddress(stringToAddress(address));
+        } catch (java.net.UnknownHostException ex) {
+            Logger logger = Logging.getLogger(SiteAddress.class);
+            logger.error("Bogus net " + address);
+            return 0;
+        }
+    }
+
+    public static long bytesToLongAddress(byte[] net_bytes) {
+        return unsignedByteToLong(net_bytes[0]) << 24 | unsignedByteToLong(net_bytes[1]) << 16
+        | unsignedByteToLong(net_bytes[2]) << 8 | unsignedByteToLong(net_bytes[3]);
     }
     
     public static Iterable<SiteAddress> elements() {
