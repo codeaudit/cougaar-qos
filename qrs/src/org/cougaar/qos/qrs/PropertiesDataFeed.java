@@ -28,10 +28,15 @@
 
 package org.cougaar.qos.qrs;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.cougaar.util.log.Logger;
@@ -41,13 +46,14 @@ import org.cougaar.util.log.Logger;
  * data in a url. Handy for supplying defaults.
  */
 public class PropertiesDataFeed extends AbstractDataFeed implements Constants {
-    private static final long PROPERTIES_TIME = System.currentTimeMillis();
+    private static final String KEY_SUFFIX = KEY_SEPR + "value";
     private static final double DEFAULT_VALUE = 0.0;
     private static final double FEED_DEFAULT_CREDIBILITY = SYS_DEFAULT_CREDIBILITY;
 
-    private final Properties props = new Properties();
-    private String urlString;
-    private final Logger logger;
+    protected final Logger log;
+    private final Properties props;
+    private URI uri;  // conceptually final but Java makes it too hard to declare it
+    private long captureTime;
 
     /**
      * The args should be command-line style, and should include the '-url'
@@ -55,91 +61,119 @@ public class PropertiesDataFeed extends AbstractDataFeed implements Constants {
      * appear in a kernel config file.
      */
     public PropertiesDataFeed(String[] args) {
-        super();
+        log = Logging.getLogger(getClass());
+        props = new Properties();
+        if (args != null) {
+            parseArgs(args);
+            initialize();
+        } else {
+            log.error("No args");
+        }
+    }
 
-        logger = Logging.getLogger(PropertiesDataFeed.class);
-
-        if (args == null) {
-            logger.error(this.getName() + ":PropertiesDataFeed: no args");
+    public PropertiesDataFeed(String propertiesUrl) {
+        log = Logging.getLogger(PropertiesDataFeed.class);
+        props = new Properties();
+        if (propertiesUrl == null) {
+            log.error(this.getName() + ":PropertiesDataFeed: no url");
             return;
         }
-
-        String url = null;
+        try {
+            uri = new URI(propertiesUrl);
+            initialize();
+        } catch (URISyntaxException e) {
+            log.error("Malformed URL " + propertiesUrl);
+        }
+    }
+    
+    protected void parseArgs(String[] args) {
+        String urlString = null;
         int i = 0;
         for (i = 0; i < args.length; i++) {
             String arg = args[i];
             if (arg.equals("-url")) {
-                url = args[++i];
-            } else {
-                logger.error(this.getName() + ":PropertiesDataFeed: unknown argument " + arg);
+                urlString = args[++i];
             }
         }
-
-        initialize(url);
+        if (urlString != null) {
+            try {
+                uri = new URI(urlString);
+            } catch (URISyntaxException e) {
+                log.error("Malformed URL " + urlString);
+            }
+        } else {
+            log.error("No -url argument");
+        }
     }
 
-    public PropertiesDataFeed(String properties_url) {
-        logger = Logging.getLogger(PropertiesDataFeed.class);
-        initialize(properties_url);
+    protected void initialize() {
+       // Done in the initializer thread to guarantee that values will be available
+       // for lookup.
+       capture();
     }
-
-    protected InputStream openURL(String urlString) {
-        URL url;
+    
+    // This is called out as a method so that it can be
+    // overridden, for example to handle ConfigFinder URIs.
+    protected InputStream openURI(URI uri) throws IOException {
         try {
-            url = new URL(urlString);
-        } catch (java.net.MalformedURLException bad_url) {
-            logger.error(urlString + ":PropertiesDataFeed:", bad_url);
+            return uri.toURL().openStream();
+        } catch (MalformedURLException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+    
+    protected Properties capture() {
+        if (uri == null) {
+            log.error(":PropertiesDataFeed: no URL");
             return null;
         }
 
-        try {
-            return url.openStream();
-        } catch (java.io.IOException open_error) {
-            logger.error(url + ":PropertiesDataFeed:", open_error);
-            return null;
-        }
+        InputStream stream = null;
 
+        try {
+            stream = openURI(uri);
+            props.clear();
+            captureTime = System.currentTimeMillis();
+            synchronized (props) {
+                props.load(stream);
+            }
+            if (log.isDebugEnabled()) {
+                StringWriter raw = new StringWriter();
+                PrintWriter writer = new PrintWriter(raw);
+                writer.print(uri);
+                writer.print(" Contents:");
+                props.list(writer);
+                log.debug(raw.toString());
+                writer.close();
+            }
+        } catch (IOException load_error) {
+            log.error(uri + ":PropertiesDataFeed:", load_error);
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // don't care
+                }
+            }
+        }
+        return props;
     }
 
-    private void initialize(String properties_url) {
-
-        if (properties_url == null) {
-            logger.error(":PropertiesDataFeed: no URL");
-            return;
+    protected Map<String, DataValue> collectValues() {
+        Map<String, DataValue> keys = new HashMap<String, DataValue>();
+        synchronized (props) {
+            for (Object key : props.keySet()) {
+                String keyString = (String) key;
+                if (keyString.endsWith(KEY_SUFFIX)) {
+                    int end = keyString.length() - KEY_SUFFIX.length();
+                    String baseKey = keyString.substring(0, end);
+                    keys.put(baseKey, lookup(baseKey));
+                }
+            }
         }
-
-        InputStream stream = openURL(properties_url);
-        if (stream == null) {
-            return;
-        }
-
-        // good url
-        urlString = properties_url;
-
-        try {
-            props.load(stream);
-        } catch (java.io.IOException load_error) {
-            logger.error(properties_url + ":PropertiesDataFeed:", load_error);
-        }
-
-        try {
-            stream.close();
-        } catch (java.io.IOException close_error) {
-            logger.error(properties_url + "PropertiesDataFeed:", close_error);
-        }
-
-        if (logger.isDebugEnabled()) {
-            StringWriter raw = new StringWriter();
-            PrintWriter writer = new PrintWriter(raw);
-            writer.print(properties_url);
-            writer.print(" Contents:");
-            props.list(writer);
-            logger.debug(raw.toString());
-            writer.close();
-        }
-
+        return keys;
     }
-
     // no-op
     public void removeListenerForKey(DataFeedListener listener, String key) {
     }
@@ -149,45 +183,49 @@ public class PropertiesDataFeed extends AbstractDataFeed implements Constants {
     }
 
     public DataValue lookup(String key) {
-        double value = DEFAULT_VALUE;
-        double credibility = FEED_DEFAULT_CREDIBILITY;
-        String provenance = null;
-        String units = null;
-        String value_string = props.getProperty(key + KEY_SEPR + "value");
-        if (value_string != null) {
-            try {
-                value = Double.parseDouble(value_string);
-            } catch (NumberFormatException bad_value) {
-                logger.error(this.getName() + ":PropertiesDataFeed:", bad_value);
-            }
-
-            String credibility_string = props.getProperty(key + KEY_SEPR + "credibility");
-            // no credibility -> use the default credibility
-            if (credibility_string != null) {
+        double value;
+        double credibility;
+        String provenance;
+        String units;
+        synchronized (props) {
+            value = DEFAULT_VALUE;
+            credibility = FEED_DEFAULT_CREDIBILITY;
+            provenance = null;
+            units = null;
+            String value_string = props.getProperty(key + KEY_SUFFIX);
+            if (value_string != null) {
                 try {
-                    credibility = Double.parseDouble(credibility_string);
-                } catch (NumberFormatException bad_credibility) {
-                    logger.error(this.getName() + ":PropertiesDataFeed:", bad_credibility);
+                    value = Double.parseDouble(value_string);
+                } catch (NumberFormatException bad_value) {
+                    log.error(this.getName() + ":PropertiesDataFeed:", bad_value);
                 }
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(this.getName() + ":PropertiesDataFeed for " + urlString
-                            + ": no credibility for " + key);
-                }
-            }
-            provenance = props.getProperty(key + KEY_SEPR + "provenance", urlString);
-            units = props.getProperty(key + KEY_SEPR + "units");
-        } else {
-            // no value in Properties -> key is invalid
-            if (logger.isDebugEnabled()) {
-                logger.debug(this.getName() + ":PropertiesDataFeed for " + urlString
-                        + ": no value for " + key);
-            }
-            credibility = 0.0;
-        }
 
-        return new DataValue(new Double(value), credibility, units, provenance, PROPERTIES_TIME, 0l);
+                String credibility_string = props.getProperty(key + KEY_SEPR + "credibility");
+                // no credibility -> use the default credibility
+                if (credibility_string != null) {
+                    try {
+                        credibility = Double.parseDouble(credibility_string);
+                    } catch (NumberFormatException bad_credibility) {
+                        log.error(this.getName() + ":PropertiesDataFeed:", bad_credibility);
+                    }
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug(this.getName() + ":PropertiesDataFeed for " + uri
+                                + ": no credibility for " + key);
+                    }
+                }
+                provenance = props.getProperty(key + KEY_SEPR + "provenance", uri.toString());
+                units = props.getProperty(key + KEY_SEPR + "units");
+            } else {
+                // no value in Properties -> key is invalid
+                if (log.isDebugEnabled()) {
+                    log.debug(this.getName() + ":PropertiesDataFeed for " + uri
+                            + ": no value for " + key);
+                }
+                credibility = 0.0;
+            }
+        }
+        return new DataValue(new Double(value), credibility, units, provenance, captureTime, 0l);
 
     }
-
 }
