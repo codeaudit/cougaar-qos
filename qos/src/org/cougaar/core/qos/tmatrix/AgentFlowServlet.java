@@ -47,20 +47,18 @@ public class AgentFlowServlet
     private final java.text.DecimalFormat f4_2 = 
 	new java.text.DecimalFormat("#0.00");
  
-    private CommunityTrafficMatrixService agentFlowService;
+    private TrafficMatrixStatisticsService agentFlowService;
     
     public AgentFlowServlet(ServiceBroker sb) {
 	super(sb);
     
-	logging = (LoggingService)
-            sb.getService(this, LoggingService.class, null);
+	logging = sb.getService(this, LoggingService.class, null);
 	
 	// TrafficMatrix accessor service
-	agentFlowService = (CommunityTrafficMatrixService)
-	    sb.getService(this, CommunityTrafficMatrixService.class, null);
+	agentFlowService = sb.getService(this, TrafficMatrixStatisticsService.class, null);
 	if (agentFlowService == null) {
 	    if (logging.isErrorEnabled()) {
-		logging.error("Can't find CommunityTrafficMatrixService. This plugin must be loaded at Low priority");
+		logging.error("Can't find TrafficStatisticsMatrixService. This plugin must be loaded at Low priority");
 	    }
 	}
     }
@@ -70,7 +68,7 @@ public class AgentFlowServlet
     }
     
     public String getTitle () {
-	return "Detailed Community Traffic";
+	return "Outgoing Agent to Agent Traffic on Node " + getNodeID();
     }
   
 
@@ -93,7 +91,7 @@ public class AgentFlowServlet
     public void printMatrix(PrintWriter out) {
 
 
-	out.println("TrafficMatrix:<p>");
+	out.println("<p> Node " +getNodeID()+ " Local TrafficMatrix:<p>");
 	out.println("<table border=1>");
 
 	TrafficMatrix.TrafficIterator itr = agentFlowSnapshot.getIterator();
@@ -104,8 +102,8 @@ public class AgentFlowServlet
 	out.println("<tr>");
 	out.println("<th>Source</th>");
 	out.println("<th>Destination</th>");
-	out.println("<th>Msg/sec</th>");
-	out.println("<th>Bytes/sec</th>");
+	out.println("<th>Msg</th>");
+	out.println("<th>Bytes</th>");
 	out.println("</tr>");
 	while (itr.hasNext()) {
 	    out.println("<tr>");
