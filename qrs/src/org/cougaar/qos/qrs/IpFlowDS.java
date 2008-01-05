@@ -164,12 +164,14 @@ public class IpFlowDS extends ResourceContext {
             SiteAddress to_site = sites.lookup(destination);
 
             if (from_site == null) {
-                logger.error("IP FLOW No from site matching " + source);
+                if (logger.isWarnEnabled()) 
+                	logger.warn("IP FLOW No from site matching " + source);
                 return;
             }
 
             if (to_site == null) {
-                logger.error("IPFLOW No to site matching " + destination);
+            	if (logger.isWarnEnabled())
+            		logger.warn("IPFLOW No to site matching " + destination);
                 return;
             }
 
