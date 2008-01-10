@@ -86,7 +86,8 @@ public class SitesDB implements Constants {
             }
             rdr.close();
         } catch (java.io.IOException ex) {
-            logger.error(null, ex);
+            logger.error(ex.getMessage());
+            logger.debug(null, ex);
             return;
         }
     }
@@ -96,7 +97,8 @@ public class SitesDB implements Constants {
             InputStream stream = url.openStream();
             populate(stream);
         } catch (java.io.IOException ex) {
-            logger.error(null, ex);
+            logger.error(ex.getMessage());
+            logger.debug(null, ex);
             return;
         }
     }

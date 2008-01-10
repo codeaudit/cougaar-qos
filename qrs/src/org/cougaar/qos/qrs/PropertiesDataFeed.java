@@ -147,7 +147,8 @@ public class PropertiesDataFeed extends AbstractDataFeed implements Constants {
                 writer.close();
             }
         } catch (IOException load_error) {
-            log.error(uri + ":PropertiesDataFeed:", load_error);
+            log.error("URI="+ uri + " :PropertiesDataFeed: " +load_error.getMessage());
+            log.debug(null, load_error);
         } finally {
             if (stream != null) {
                 try {
