@@ -139,6 +139,7 @@ public class DestinationDS extends CougaarDS {
     }
 
     static class CapacityMax extends DataFormula {
+        private static final String IP_FLOW_KEY = "IpFlow";
         private static final DataValue UnknownCapacityMax = new DataValue(0, 0.0);
         private String agentAddr;
         private String myAddr;
@@ -161,21 +162,13 @@ public class DestinationDS extends CougaarDS {
                     return UnknownCapacityMax;
                 }
                 
-                unregisterDependencies();
-                
-                // unregisterDependencies throws away all dependencies so
-                // we need to resubscribe to the two addresses.
-                // TODO: tell unregisterDependencies only to delete the IpFlow sub
-                ResourceContext context = getContext();
-                registerDependency(context, "AgentIpAddress");
-                registerDependency(context, "PrimaryIpAddress");
-                
+                unregisterDependency(IP_FLOW_KEY);
                 String[] flow_params = {myAddr, agentAddr};
-                ResourceNode flow = new ResourceNode("IpFlow", flow_params);
+                ResourceNode flow = new ResourceNode(IP_FLOW_KEY, flow_params);
                 ResourceNode capm = new ResourceNode("CapacityMax", null);
                 ResourceNode[] path = {flow, capm};
                 DataFormula cap_max = RSS.instance().getPathFormula(path);
-                registerDependency(cap_max, "IpFlow");
+                registerDependency(cap_max, IP_FLOW_KEY);
                 return cap_max.blockingQuery();
             } else {
                 return null;
@@ -199,7 +192,7 @@ public class DestinationDS extends CougaarDS {
                 return UnknownCapacityMax;
             }
             
-            DataValue result = values.get("IpFlow");
+            DataValue result = values.get(IP_FLOW_KEY);
             if (logger.isDebugEnabled()) {
                 logger.debug("Recalculating CapacityMax with" + " my address = " + myAddr
                              + " dest address = " + agentAddr + " = " + result);

@@ -156,8 +156,30 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
         synchronized (dependencies) {
             dependencies_clone = new ArrayList<DataFormula>(dependencies);
             dependencies.clear();
+            for (DataFormula formula : dependencies_clone) {
+                dependencyKeys.remove(formula);
+            }
         }
         for (DataFormula formula : dependencies_clone) {
+            formula.unsubscribe(this);
+        }
+    }
+    
+    protected void unregisterDependency(String key) {
+        DataFormula formula = null;
+        synchronized (dependencies) {
+            for (Map.Entry<DataFormula, String> entry : dependencyKeys.entrySet()) {
+                if (entry.getValue().equals(key)) {
+                    formula = entry.getKey();
+                    break;
+                }
+            }
+            if (formula != null) {
+                dependencyKeys.remove(formula);
+                dependencies.remove(formula);
+            }
+        }
+        if (formula != null) {
             formula.unsubscribe(this);
         }
     }
@@ -168,8 +190,8 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
                 return;
             }
             dependencies.add(formula);
+            dependencyKeys.put(formula, key);
         }
-        dependencyKeys.put(formula, key);
         formula.subscribe(this);
     }
 
