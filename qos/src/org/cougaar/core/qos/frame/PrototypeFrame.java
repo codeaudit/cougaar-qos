@@ -28,7 +28,6 @@ package org.cougaar.core.qos.frame;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -40,153 +39,153 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * This extension to {@link Frame} is the runtime representation of a
- * prototype.  It's main job at runtime is to hold non-static default
- * values (static defaults are code-generated into constants) and to
- * process {@link Path} slot values.
+ * This extension to {@link Frame} is the runtime representation of a prototype.
+ * It's main job at runtime is to hold non-static default values (static
+ * defaults are code-generated into constants) and to process {@link Path} slot
+ * values.
  */
-public class PrototypeFrame
-    extends Frame
-{
+public class PrototypeFrame extends Frame {
     private final String prototype_name;
     private final String parent_prototype;
     private final transient List<String> inheritableSlots;
-    private transient Logger log = Logging.getLogger(getClass().getName());
-    private final transient Map<String,Object> dynamic_values;
+    private transient final Logger log = Logging.getLogger(getClass().getName());
+    private final transient Map<String, Object> dynamic_values;
     private final Attributes attrs;
-    private final Map<String,Path> path_cache;
-    private final Map<String,Attributes> slots;
-    
+    private final Map<String, Path> path_cache;
+    private final Map<String, Attributes> slots;
 
-    PrototypeFrame(FrameSet frameSet, 
-		   String prototype_name,
-		   String parent, 
-		   UID uid, 
-		   Attributes attrs,
-		   Map<String,Attributes> slots) {
-	super(frameSet, uid);
-	this.inheritableSlots = new ArrayList<String>();
-	for (Map.Entry<String,Attributes> entry : slots.entrySet()) {
-	    String inheritance = entry.getValue().getValue("inheritable-through");
-	    if (inheritance == null || inheritance.equals("all")) {
-		inheritableSlots.add(entry.getKey());
-	    }
-	}
-	this.parent_prototype = parent;
-	this.prototype_name = prototype_name;
-	this.slots = slots;
-	this.dynamic_values = new HashMap<String,Object>();
-	this.attrs = attrs;
-	this.path_cache = new HashMap<String,Path>();
+    PrototypeFrame(FrameSet frameSet,
+                   String prototype_name,
+                   String parent,
+                   UID uid,
+                   Attributes attrs,
+                   Map<String, Attributes> slots) {
+        super(frameSet, uid);
+        this.inheritableSlots = new ArrayList<String>();
+        for (Map.Entry<String, Attributes> entry : slots.entrySet()) {
+            String inheritance = entry.getValue().getValue("inheritable-through");
+            if (inheritance == null || inheritance.equals("all")) {
+                inheritableSlots.add(entry.getKey());
+            }
+        }
+        this.parent_prototype = parent;
+        this.prototype_name = prototype_name;
+        this.slots = slots;
+        this.dynamic_values = new HashMap<String, Object>();
+        this.attrs = attrs;
+        this.path_cache = new HashMap<String, Path>();
     }
 
     public String getKind() {
-	return parent_prototype;
+        return parent_prototype;
     }
 
     public Properties getSlotDefinitions() {
-	// return a copy
-	Properties defs = new Properties();
-	Iterator itr = slots.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    Object key = entry.getKey();
-	    Attributes attrs = (Attributes) entry.getValue();
-	    defs.put(key, new AttributesImpl(attrs));
-	}
-	return defs;
+        // return a copy
+        Properties defs = new Properties();
+        for (Map.Entry<String, Attributes> entry : slots.entrySet()) {
+            Object key = entry.getKey();
+            Attributes attrs = entry.getValue();
+            defs.put(key, new AttributesImpl(attrs));
+        }
+        return defs;
     }
-    
+
     public List<String> getInheritedSlots() {
-	return inheritableSlots;
+        return inheritableSlots;
     }
-	
 
     public Properties getLocalSlots() {
-	Properties result = new VisibleProperties();
-	Iterator itr = slots.entrySet().iterator();
-	while (itr.hasNext()) {
-	    Map.Entry entry = (Map.Entry) itr.next();
-	    String slot_name = (String) entry.getKey();
-	    Attributes attrs = (Attributes) entry.getValue();
-	    Object slot_value = dynamic_values.get(slot_name);
-	    if (slot_value != null) {
-		result.put(slot_name, slot_value);
-	    } else {
-		slot_value = attrs.getValue("default-value");
-		if (slot_value != null) result.put(slot_name, slot_value);
-	    }
-	}
-	return result;
+        Properties result = new VisibleProperties();
+        for (Map.Entry<String, Attributes> entry : slots.entrySet()) {
+            String slot_name = entry.getKey();
+            Attributes attrs = entry.getValue();
+            Object slot_value = dynamic_values.get(slot_name);
+            if (slot_value != null) {
+                result.put(slot_name, slot_value);
+            } else {
+                slot_value = attrs.getValue("default-value");
+                if (slot_value != null) {
+                    result.put(slot_name, slot_value);
+                }
+            }
+        }
+        return result;
     }
 
     public void setValue(String slot, Object value) {
-	dynamic_values.put(slot, value);
+        dynamic_values.put(slot, value);
     }
 
     Object getValue(Frame origin, String slot_name) {
-	// Look for a dynamically set default first.
-	Object slot_value = dynamic_values.get(slot_name);
-	if (slot_value != null) return slot_value;
+        // Look for a dynamically set default first.
+        Object slot_value = dynamic_values.get(slot_name);
+        if (slot_value != null) {
+            return slot_value;
+        }
 
-	Attributes attrs = slots.get(slot_name);
-	if (attrs != null) {
-	    // Declared at this level -- either get a real value or
-	    // complain and return null.
-	    Object result = null;
-	    String value = attrs.getValue("default-value");
-	    String warnp = attrs.getValue("warn");
-	    String path_name = attrs.getValue("path");
-	    if (value != null) {
-		result = value;
-	    } else if (path_name != null) {
-		if (origin instanceof PrototypeFrame) {
-		    // Makes no sense to follow a path in this case.
-		    return null;
-		}
-		Path path;
-		synchronized (path_cache) {
-		    path = path_cache.get(path_name);
-		    if (path == null) {
-			path = getFrameSet().findPath(path_name);
-			path_cache.put(path_name, path);
-		    }
-		}
-		result = path.getValue((DataFrame) origin, slot_name);
-	    } else  if (warnp == null || warnp.equalsIgnoreCase("true")) {
-		if (log.isWarnEnabled())
-		    log.warn("Slot " +slot_name+ " is required by prototype "
-			     +prototype_name+ 
-			     " but was never provided in frame "
-			     +origin);
-	    }
-	    return result;
-	} else {
-	    // Not owned by us, check super
-	    return getInheritedValue(origin, slot_name);
-	}
+        Attributes attrs = slots.get(slot_name);
+        if (attrs != null) {
+            // Declared at this level -- either get a real value or
+            // complain and return null.
+            Object result = null;
+            String value = attrs.getValue("default-value");
+            String warnp = attrs.getValue("warn");
+            if (warnp == null && attrs.getValue("metric-path") != null) {
+                // if no warn attribute is specified and metric_path is specified, don't warn
+                warnp = "false";
+            }
+            String path_name = attrs.getValue("path");
+            if (value != null) {
+                result = value;
+            } else if (path_name != null) {
+                if (origin instanceof PrototypeFrame) {
+                    // Makes no sense to follow a path in this case.
+                    return null;
+                }
+                Path path;
+                synchronized (path_cache) {
+                    path = path_cache.get(path_name);
+                    if (path == null) {
+                        path = getFrameSet().findPath(path_name);
+                        path_cache.put(path_name, path);
+                    }
+                }
+                result = path.getValue((DataFrame) origin, slot_name);
+            } else if (warnp == null || warnp.equalsIgnoreCase("true")) {
+                if (log.isWarnEnabled()) {
+                    log.warn("Slot " + slot_name + " is required by prototype " + prototype_name
+                            + " but was never provided in frame " + origin);
+                }
+            }
+            return result;
+        } else {
+            // Not owned by us, check super
+            return getInheritedValue(origin, slot_name);
+        }
     }
 
     public String getName() {
-	return prototype_name;
+        return prototype_name;
     }
 
     public String getPrototypeName() {
-	return prototype_name;
-    }
-    
-    public String getAttribute(String key) {
-	return attrs.getValue(key);
+        return prototype_name;
     }
 
+    public String getAttribute(String key) {
+        return attrs.getValue(key);
+    }
 
     public String toString() {
-	return "<Prototype " +prototype_name+ " " +getUID()+ ">";
+        return "<Prototype " + prototype_name + " " + getUID() + ">";
     }
 
     public boolean isa(String kind) {
-	if (frameSet == null) return kind.equals(prototype_name);
-	return frameSet.descendsFrom(this, kind);
+        if (frameSet == null) {
+            return kind.equals(prototype_name);
+        }
+        return frameSet.descendsFrom(this, kind);
     }
 
 }
