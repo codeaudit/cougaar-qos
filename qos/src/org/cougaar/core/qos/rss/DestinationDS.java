@@ -140,45 +140,71 @@ public class DestinationDS extends CougaarDS {
 
     static class CapacityMax extends DataFormula {
         private static final DataValue UnknownCapacityMax = new DataValue(0, 0.0);
-
+        private String agentAddr;
+        private String myAddr;
+        
         protected void initialize(ResourceContext context) {
             super.initialize(context);
             // subscribe to our own IpAddress and NodeIpAddress
             registerDependency(context, "AgentIpAddress");
             registerDependency(context, "PrimaryIpAddress");
         }
+        
+        private DataValue maybeReinit(String agentAddr, String myAddr) {
+            if (!agentAddr.equals(this.agentAddr) || !myAddr.equals(this.myAddr)) {
+                this.agentAddr = agentAddr;
+                this.myAddr = myAddr;
+                
+                if (NodeDS.isUnknownHost(agentAddr) || NodeDS.isUnknownHost(myAddr)) {
+                    // No point is changing dependencies until we have a valid pair
+                    // for IpFlow.
+                    return UnknownCapacityMax;
+                }
+                
+                unregisterDependencies();
+                
+                // unregisterDependencies throws away all dependencies so
+                // we need to resubscribe to the two addresses.
+                // TODO: tell unregisterDependencies only to delete the IpFlow sub
+                ResourceContext context = getContext();
+                registerDependency(context, "AgentIpAddress");
+                registerDependency(context, "PrimaryIpAddress");
+                
+                String[] flow_params = {myAddr, agentAddr};
+                ResourceNode flow = new ResourceNode("IpFlow", flow_params);
+                ResourceNode capm = new ResourceNode("CapacityMax", null);
+                ResourceNode[] path = {flow, capm};
+                DataFormula cap_max = RSS.instance().getPathFormula(path);
+                registerDependency(cap_max, "IpFlow");
+                return cap_max.blockingQuery();
+            } else {
+                return null;
+            }
+        }
 
         protected DataValue doCalculation(DataFormula.Values values) {
-            DataValue result = null;
             String agentAddr = null;
             String myAddr = null;
+            Logger logger = Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
             try {
                 agentAddr = values.get("AgentIpAddress").getStringValue();
                 myAddr = values.get("PrimaryIpAddress").getStringValue();
+                DataValue cap_max = maybeReinit(agentAddr, myAddr);
+                if (cap_max != null) {
+                    return cap_max;
+                }
             } catch (Exception ex) {
                 // One of the dependencies is NO_VALUE
-                result = UnknownCapacityMax;
+                logger.info(ex.getMessage());
+                return UnknownCapacityMax;
             }
-            if (result != UnknownCapacityMax) {
-                if (NodeDS.isUnknownHost(agentAddr) || NodeDS.isUnknownHost(myAddr)) {
-                    result = UnknownCapacityMax;
-                } else {
-                    String[] flow_params = {myAddr, agentAddr};
-                    ResourceNode flow = new ResourceNode("IpFlow", flow_params);
-                    ResourceNode capm = new ResourceNode("CapacityMax", null);
-                    ResourceNode[] path = {flow, capm};
-                    DataFormula cap_max = RSS.instance().getPathFormula(path);
-                    result = cap_max.blockingQuery();
-                }
-            }
-
-            Logger logger = Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
+            
+            DataValue result = values.get("IpFlow");
             if (logger.isDebugEnabled()) {
                 logger.debug("Recalculating CapacityMax with" + " my address = " + myAddr
-                        + " dest address = " + agentAddr + " = " + result);
+                             + " dest address = " + agentAddr + " = " + result);
             }
-
-            return result;
+            return result == null ? UnknownCapacityMax : result;
         }
 
     }

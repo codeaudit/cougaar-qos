@@ -150,6 +150,17 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
             pretty_name += "]";
         }
     }
+    
+    protected void unregisterDependencies() {
+        List<DataFormula> dependencies_clone;
+        synchronized (dependencies) {
+            dependencies_clone = new ArrayList<DataFormula>(dependencies);
+            dependencies.clear();
+        }
+        for (DataFormula formula : dependencies_clone) {
+            formula.unsubscribe(this);
+        }
+    }
 
     protected void registerDependency(DataFormula formula, String key) {
         synchronized (dependencies) {
@@ -332,7 +343,7 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
             logger.warn(buf.toString());
         }
     }
-
+    
     void contextDeleted() {
         List<DataValueChangedCallbackListener> listeners_clone;
         List<DataFormula> dependencies_clone;
