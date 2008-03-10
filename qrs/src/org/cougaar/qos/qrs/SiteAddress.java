@@ -28,6 +28,7 @@ package org.cougaar.qos.qrs;
 
  */
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,6 +82,10 @@ public class SiteAddress {
 
     public boolean contains(String addr) {
         return (stringToLongAddress(addr) & mask) == net_masked;
+    }
+    
+    public boolean contains(InetAddress addr) {
+    	return contains(bytesToLongAddress(addr.getAddress()));
     }
 
     public String toString() {
