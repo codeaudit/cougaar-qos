@@ -16,8 +16,8 @@
  *
  * Created : Aug 24, 2007
  * Workfile: CSVLog.java
- * $Revision: 1.1 $
- * $Date: 2008-04-02 13:42:18 $
+ * $Revision: 1.2 $
+ * $Date: 2008-04-02 14:55:49 $
  * $Author: jzinky $
  *
  * =============================================================================
@@ -38,6 +38,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
+
 public class CsvFormat<T> {
     private final Map<Integer, String> fieldLabelMap;
     private final Map<Integer, DecimalFormat> fieldFormatterMap;
@@ -45,9 +48,14 @@ public class CsvFormat<T> {
     private final PropertyDescriptor[] descriptors;
     private int lastIndex = -1;
     
-    public CsvFormat(Class<T> rowClass) 
-    		throws IntrospectionException {
-    	BeanInfo in = Introspector.getBeanInfo(rowClass);
+    public CsvFormat(Class<T> rowClass) {
+    	BeanInfo in;
+        try {
+            in = Introspector.getBeanInfo(rowClass);
+        } catch (IntrospectionException e) {
+            // Provided class that really is not a bean
+            throw new IllegalStateException(e);
+        }
     	this.descriptors = in.getPropertyDescriptors();
     	new TreeMap<String, Integer>();
     	this.fieldLabelMap = new HashMap<Integer, String>();
@@ -56,8 +64,7 @@ public class CsvFormat<T> {
     	
     }
     
-    public void defineField(String field, String label, DecimalFormat format) 
-    		throws IntrospectionException {
+    public void defineField(String field, String label, DecimalFormat format) {
     	int index = ++lastIndex;
     	fieldLabelMap.put(index, label != null ? label : field);
     	if (format != null) {
@@ -70,7 +77,8 @@ public class CsvFormat<T> {
     		}
     	}
     	if (!fieldGetters.containsKey(index)) {
-    		throw new IntrospectionException("No field named \"" + field+ "\"");
+    	    Logger log = Logging.getLogger(getClass().getName());
+    		log.error("No field named \"" + field+ "\"");
     	}
     }
     
@@ -87,25 +95,27 @@ public class CsvFormat<T> {
    }
    
    public void writeRow(T row, PrintStream out) 
-   		throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-	   boolean first = true;
-	   for (int i=0; i<fieldLabelMap.size(); i++) {
-		   if (!first) {
-			   out.print(",");
-		   }
-		   first = false;
-		   Method reader = fieldGetters.get(i);
-		   Object value = reader.invoke(row);
-		   DecimalFormat fmt = fieldFormatterMap.get(i);
-		   if (value != null) {
-			if (fmt != null) {
-				out.print(fmt.format(value));
-			} else {
-				out.print(value);
-			}
-		}
-	   }
-	   out.println();
+   throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+       boolean first = true;
+       for (int i=0; i<fieldLabelMap.size(); i++) {
+           if (!first) {
+               out.print(",");
+           }
+           first = false;
+           Method reader = fieldGetters.get(i);
+           if (reader != null) {
+               Object value = reader.invoke(row);
+               DecimalFormat fmt = fieldFormatterMap.get(i);
+               if (value != null) {
+                   if (fmt != null) {
+                       out.print(fmt.format(value));
+                   } else {
+                       out.print(value);
+                   }
+               }
+           }
+       }
+       out.println();
    }
 
 }
