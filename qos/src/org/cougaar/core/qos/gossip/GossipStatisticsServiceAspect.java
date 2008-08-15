@@ -31,6 +31,7 @@ import org.cougaar.core.component.ServiceProvider;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.mts.MessageAttributes;
 import org.cougaar.core.node.NodeControlService;
+import org.cougaar.mts.base.AttributedMessage;
 import org.cougaar.mts.base.CommFailureException;
 import org.cougaar.mts.base.DestinationLink;
 import org.cougaar.mts.base.DestinationLinkDelegateImplBase;
@@ -41,7 +42,6 @@ import org.cougaar.mts.base.NameLookupException;
 import org.cougaar.mts.base.RPCLinkProtocol;
 import org.cougaar.mts.base.StandardAspect;
 import org.cougaar.mts.base.UnregisteredNameException;
-import org.cougaar.mts.std.AttributedMessage;
 
 /** 
  * Aspect to collect Gossip overhead statistics
