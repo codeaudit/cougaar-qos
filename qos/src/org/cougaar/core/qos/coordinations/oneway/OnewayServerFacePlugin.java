@@ -16,8 +16,8 @@
  *
  * Created : Sept 18, 2008
  * Workfile: OnewayServerFacePlugin
- * $Revision: 1.2 $
- * $Date: 2008-09-19 12:52:27 $
+ * $Revision: 1.3 $
+ * $Date: 2008-09-19 16:14:46 $
  * $Author: jzinky $
  *
  * =============================================================================
@@ -43,7 +43,7 @@ import org.cougaar.util.annotations.Subscribe;
  * No reply is expected from the client. 
  * Each object is guaranteed its own message.
  * The objects can be dropped along the way.
- * Optionally, the object can be removed from the black board
+ * Optionally, the object can be removed from the Server black board
  * 
  * Subclasses should implement {@link #match}.
  */
@@ -74,7 +74,7 @@ abstract public class OnewayServerFacePlugin extends FacePlugin<OneWay.Server>
 	        blackboard.publishAdd(relay);
 	        //Cleanup: 
 	        //delete relay right away
-	        blackboard.publishRemove(relay);
+	        //blackboard.publishRemove(relay);
 	        // Remove blackboard object itself
 	        if (deleteOnSend) {
 	            blackboard.publishRemove(objectToSend);

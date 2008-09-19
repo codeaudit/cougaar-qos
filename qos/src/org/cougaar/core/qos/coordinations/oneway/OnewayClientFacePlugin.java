@@ -16,8 +16,8 @@
  *
  * Created : Sept 18, 2008
  * Workfile: OnewayServerFacePlugin
- * $Revision: 1.2 $
- * $Date: 2008-09-19 12:52:27 $
+ * $Revision: 1.3 $
+ * $Date: 2008-09-19 16:14:46 $
  * $Author: jzinky $
  *
  * =============================================================================
@@ -41,7 +41,7 @@ import org.cougaar.util.annotations.Subscribe;
 //TODO the sender has to mark to object so it is ours to unwrap
 //maybe use match function
 //maybe look for UID in target address
-//maybe generic, cleint for all Oneways.
+//maybe generic, client for all Oneways.
 abstract public class OnewayClientFacePlugin extends FacePlugin<OneWay.Client>
     implements OneWay.Matcher<Face<OneWay.EventType>> {
     
@@ -55,7 +55,13 @@ abstract public class OnewayClientFacePlugin extends FacePlugin<OneWay.Client>
         blackboard.publishAdd(object);
      }
 
-    public boolean isMyRelay(UniqueObject object) {
-        return match(OneWay.EventType.RECEIVE, object);
+    public boolean isMyRelay(SimpleRelay relay) {
+        //unpack content from relay
+        Object relayContents = relay.getQuery();
+        if (relayContents instanceof UniqueObject) {
+            return match(OneWay.EventType.RECEIVE, (UniqueObject) relayContents);
+        } else {
+            return false;
+        }
     }
 }
