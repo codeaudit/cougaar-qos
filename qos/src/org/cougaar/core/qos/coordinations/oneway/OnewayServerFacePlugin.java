@@ -16,8 +16,8 @@
  *
  * Created : Sept 18, 2008
  * Workfile: OnewayServerFacePlugin
- * $Revision: 1.4 $
- * $Date: 2008-09-19 16:39:46 $
+ * $Revision: 1.5 $
+ * $Date: 2008-09-19 17:16:32 $
  * $Author: jzinky $
  *
  * =============================================================================
@@ -72,16 +72,17 @@ abstract public class OnewayServerFacePlugin extends FacePlugin<OneWay.Server>
 	        SimpleRelay relay = new SimpleRelaySource(uid, agentId, targetAddress, null);
 	        relay.setQuery(objectToSend);
 	        blackboard.publishAdd(relay);
+	        blackboard.publishRemove(relay);
 	        // Delete the objectToSend
                 if (deleteOnSend) {
                     blackboard.publishRemove(objectToSend);
                 }
 	    }
 	    
-            @Cougaar.Execute(on=Subscribe.ModType.ADD, when="isMyRelay")
-            public void cleanUpRelays(SimpleRelay relay) {
-                blackboard.publishRemove(relay);
-            }
+//            @Cougaar.Execute(on=Subscribe.ModType.ADD, when="isMyRelay")
+//            public void cleanUpRelays(SimpleRelay relay) {
+//                blackboard.publishRemove(relay);
+//            }
 	    
 	    /*
 	     * Override this method to use properties of the objectToSend to change the attributes of the target address.
@@ -99,15 +100,15 @@ abstract public class OnewayServerFacePlugin extends FacePlugin<OneWay.Server>
 	        return  MessageAddressWithAttributes.getMessageAddressWithAttributes(clientAddress, attrs);
 	    }
 	    
-	    public boolean isMyRelay(SimpleRelay relay) {
-	        //unpack content from relay
-	        Object relayContents = relay.getQuery();
-	        if (relayContents instanceof UniqueObject) {
-	            return match(OneWay.EventType.SEND, (UniqueObject) relayContents);
-	         } else {
-	            return false;
-	         }
-	    }
+//	    public boolean isMyRelay(SimpleRelay relay) {
+//	        //unpack content from relay
+//	        Object relayContents = relay.getQuery();
+//	        if (relayContents instanceof UniqueObject) {
+//	            return match(OneWay.EventType.SEND, (UniqueObject) relayContents);
+//	         } else {
+//	            return false;
+//	         }
+//	    }
 	    
 	    public boolean isSendableObject(UniqueObject object) {
 	        return match(OneWay.EventType.SEND, object);
