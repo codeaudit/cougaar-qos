@@ -16,8 +16,8 @@
  *
  * Created : Sept 18, 2008
  * Workfile: OnewayServerFacePlugin
- * $Revision: 1.3 $
- * $Date: 2008-09-19 16:14:46 $
+ * $Revision: 1.4 $
+ * $Date: 2008-09-19 16:39:46 $
  * $Author: jzinky $
  *
  * =============================================================================
@@ -72,14 +72,16 @@ abstract public class OnewayServerFacePlugin extends FacePlugin<OneWay.Server>
 	        SimpleRelay relay = new SimpleRelaySource(uid, agentId, targetAddress, null);
 	        relay.setQuery(objectToSend);
 	        blackboard.publishAdd(relay);
-	        //Cleanup: 
-	        //delete relay right away
-	        //blackboard.publishRemove(relay);
-	        // Remove blackboard object itself
-	        if (deleteOnSend) {
-	            blackboard.publishRemove(objectToSend);
-	        }
+	        // Delete the objectToSend
+                if (deleteOnSend) {
+                    blackboard.publishRemove(objectToSend);
+                }
 	    }
+	    
+            @Cougaar.Execute(on=Subscribe.ModType.ADD, when="isMyRelay")
+            public void cleanUpRelays(SimpleRelay relay) {
+                blackboard.publishRemove(relay);
+            }
 	    
 	    /*
 	     * Override this method to use properties of the objectToSend to change the attributes of the target address.
@@ -96,7 +98,17 @@ abstract public class OnewayServerFacePlugin extends FacePlugin<OneWay.Server>
 	        attrs.setAttribute(UID_ATTRIBUTE, uid);
 	        return  MessageAddressWithAttributes.getMessageAddressWithAttributes(clientAddress, attrs);
 	    }
-
+	    
+	    public boolean isMyRelay(SimpleRelay relay) {
+	        //unpack content from relay
+	        Object relayContents = relay.getQuery();
+	        if (relayContents instanceof UniqueObject) {
+	            return match(OneWay.EventType.SEND, (UniqueObject) relayContents);
+	         } else {
+	            return false;
+	         }
+	    }
+	    
 	    public boolean isSendableObject(UniqueObject object) {
 	        return match(OneWay.EventType.SEND, object);
 	    }

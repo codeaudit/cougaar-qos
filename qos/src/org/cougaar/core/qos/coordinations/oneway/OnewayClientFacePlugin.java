@@ -16,8 +16,8 @@
  *
  * Created : Sept 18, 2008
  * Workfile: OnewayServerFacePlugin
- * $Revision: 1.3 $
- * $Date: 2008-09-19 16:14:46 $
+ * $Revision: 1.4 $
+ * $Date: 2008-09-19 16:39:46 $
  * $Author: jzinky $
  *
  * =============================================================================
@@ -53,6 +53,7 @@ abstract public class OnewayClientFacePlugin extends FacePlugin<OneWay.Client>
     public void executeNewObjectToSend(SimpleRelay relay) {
        Object object = relay.getQuery();
         blackboard.publishAdd(object);
+        blackboard.publishRemove(relay);
      }
 
     public boolean isMyRelay(SimpleRelay relay) {
