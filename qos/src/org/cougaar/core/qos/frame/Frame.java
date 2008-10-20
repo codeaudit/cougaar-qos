@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.cougaar.core.blackboard.OverrideChangeReport;
+import org.cougaar.core.persist.NotPersistable;
 import org.cougaar.core.qos.metrics.VariableEvaluator;
 import org.cougaar.core.util.UID;
 import org.cougaar.core.util.UniqueObject;
@@ -42,7 +43,7 @@ import org.cougaar.util.log.Logging;
  * all of the generic implementation.
  */
 abstract public class Frame implements UniqueObject, Cloneable,
-	VariableEvaluator {
+	VariableEvaluator, NotPersistable {
     private final UID uid;
 
     protected transient FrameSet frameSet;
