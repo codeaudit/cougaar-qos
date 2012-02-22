@@ -16,8 +16,8 @@
  *
  * Created : Aug 14, 2007
  * Workfile: Anova.java
- * $Revision: 1.1 $
- * $Date: 2008-04-02 13:42:18 $
+ * $Revision: 1.3 $
+ * $Date: 2010/12/20 18:32:31 $
  * $Author: jzinky $
  *
  * =============================================================================
@@ -145,9 +145,14 @@ public class Anova implements Statistic {
         return valueCount;
     }
     
+    public double getSumSq() {
+        return sumSq;
+    }
+    
     public double getSum() {
         return sum;
     }
+
     
     public double itemPerSec() {
     	long deltaT = endTime - startTime;
@@ -159,11 +164,8 @@ public class Anova implements Statistic {
     }
     
     public double average(){
-        if (valueCount != 0) {
-            return sum / valueCount;
-        } else {
-            return -1;
-        }
+        if (valueCount <= 0) return -1;
+        return sum / valueCount;
     }
     
     public double max() {
@@ -175,11 +177,10 @@ public class Anova implements Statistic {
     }
     
     public double stdDev() {
-        if (valueCount !=0) {
-            double avgSquared = Math.pow(average(), 2);
-            return  Math.sqrt(avgSquared - sumSq );
-        }
-        return 0;
+        if (valueCount <= 1) return 0;
+        double sumSquared = Math.pow(sum, 2);
+        double n = valueCount;
+        return  Math.sqrt( (n/(n-1)) * (sumSq - sumSquared) );
     }
 
  }
