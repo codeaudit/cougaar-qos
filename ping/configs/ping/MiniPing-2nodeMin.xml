@@ -66,7 +66,6 @@ for additional usage and testing notes.
       <vm_parameter>-Dorg.cougaar.workspace=$COUGAAR_INSTALL_PATH/workspace</vm_parameter>
       <vm_parameter>-Dorg.cougaar.system.path=$COUGAAR_INSTALL_PATH/sys</vm_parameter>
       <vm_parameter>-Djava.class.path=$COUGAAR_INSTALL_PATH/lib/bootstrap.jar</vm_parameter>
-      <vm_parameter>-Xbootclasspath/p:$COUGAAR_INSTALL_PATH/lib/javaiopatch.jar</vm_parameter>
  
      <!--optional developement jars -->
       <!--
@@ -171,7 +170,6 @@ for additional usage and testing notes.
       <vm_parameter>-Dorg.cougaar.workspace=$COUGAAR_INSTALL_PATH/workspace</vm_parameter>
       <vm_parameter>-Dorg.cougaar.system.path=$COUGAAR_INSTALL_PATH/sys</vm_parameter>
       <vm_parameter>-Djava.class.path=$COUGAAR_INSTALL_PATH/lib/bootstrap.jar</vm_parameter>
-      <vm_parameter>-Xbootclasspath/p:$COUGAAR_INSTALL_PATH/lib/javaiopatch.jar</vm_parameter>
  
      <!--optional developement jars -->
       <!--

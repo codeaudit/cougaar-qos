@@ -24,7 +24,6 @@ Arguments tab
 	-Dorg.cougaar.core.domain.config.filename= 
 	-Dorg.cougaar.install.path=[your $CIP here]
 	-Dorg.cougaar.core.agent.quiet=true
-	-Xbootclasspath/p:[your $CIP here]/lib/javaiopatch.jar
 	-Xms1m
 	-Xmx256m
 	-XX:ThreadStackSize=256
@@ -37,8 +36,7 @@ Classpath tab
 	select user entries
 	go to "advanced", "add library", "user library", "user libraries"
 	create new library with name=cougaar-lib
-	add ${CIP}/latest/lib/javaiopatch.jar
-		${CIP}/latest/lib/webtomcat.jar
+	add     ${CIP}/latest/lib/webtomcat.jar
 		${CIP}/latest/lib/webserver.jar
   
 	create new libary with name=cougaar-sys
