@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <!-- Copyright 2006 BBN Technologies Corp.  All Rights Reserved.  -->
 <society name='MiniPing' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-	xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
+	xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2003/society.xsd'>
 	<vm_parameter>-Xmx1024m</vm_parameter>
 	<vm_parameter>
 		-Dorg.cougaar.core.logging.config.filename=logging.properties</vm_parameter>

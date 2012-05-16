@@ -6,7 +6,7 @@ A montitor agent is added to the basic two node ping society
 The monitor agent will create a Swing GUI for Node1 process.
 -->
 <society  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-  xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
+  xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2003/society.xsd'>
 	<!-- Select a template -->
 	<vm_parameter> -Dorg.cougaar.society.xsl.param.template=lan	</vm_parameter>
 

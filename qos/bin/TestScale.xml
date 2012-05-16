@@ -5,7 +5,7 @@ FrameSet Society Scale Tester
 A Large Tree of frames is created to test how changes are propagated
 -->
 <society  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-  xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2006/society.xsd'>
+  xsi:noNamespaceSchemaLocation='http://www.cougaar.org/2003/society.xsd'>
 	<!-- Select a template -->
 	<vm_parameter> -Dorg.cougaar.society.xsl.param.template=single_debug</vm_parameter>
 
