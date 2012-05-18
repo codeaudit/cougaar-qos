@@ -28,7 +28,7 @@
 
 package org.cougaar.qos.qrs;
 
-public class AlarmDS extends ResourceContext implements Constants {
+public class AlarmDS extends ResourceContext {
     static void register() {
         ContextInstantiater cinst = new AbstractContextInstantiater() {
             public ResourceContext instantiateContext(String[] parameters, ResourceContext parent)
@@ -73,7 +73,7 @@ public class AlarmDS extends ResourceContext implements Constants {
         super(parameters, parent);
     }
 
-    static class AlarmFormula extends DataFormula implements Constants {
+    static class AlarmFormula extends DataFormula {
 
         private Object task;
         private final Object task_lock = new Object();

@@ -37,7 +37,7 @@ import org.cougaar.util.log.Logger;
  * using a Remos-style key with an IntegraterDS. The available formulas are
  * 'CapacityMax' and 'CapacityUnused'.
  */
-public class HostDS extends ResourceContext implements Constants {
+public class HostDS extends ResourceContext {
     static void register() {
         ContextInstantiater cinst = new AbstractContextInstantiater() {
             public ResourceContext instantiateContext(String[] parameters, ResourceContext parent)
@@ -169,7 +169,7 @@ public class HostDS extends ResourceContext implements Constants {
 
     }
 
-    abstract static class Formula extends DataFormula implements Constants {
+    abstract static class Formula extends DataFormula {
 
         abstract String getKey();
 
@@ -415,7 +415,7 @@ public class HostDS extends ResourceContext implements Constants {
 
     }
 
-    public static class IsReachable extends DataFormula implements Constants {
+    public static class IsReachable extends DataFormula {
 
         private static final DataValue defaultValue = new DataValue(false, DEFAULT_CREDIBILITY);
 

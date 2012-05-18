@@ -32,7 +32,7 @@ package org.cougaar.qos.qrs;
  * Mean Value Analysis model for Latency This assumes that component latencies
  * are separable.
  */
-public class MvaDS extends ResourceContext implements Constants {
+public class MvaDS extends ResourceContext {
     static void register() {
         ContextInstantiater cinst = new AbstractContextInstantiater() {
             public ResourceContext instantiateContext(String[] parameters, ResourceContext parent)

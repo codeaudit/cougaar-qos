@@ -10,6 +10,6 @@ package org.cougaar.qos.ResourceStatus;
 
 
 // numeric values.
-public interface MinDeltaQualifierFactory extends MinDeltaQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory, org.omg.CORBA.portable.IDLEntity 
+public interface MinDeltaQualifierFactory extends MinDeltaQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory 
 {
 } // interface MinDeltaQualifierFactory

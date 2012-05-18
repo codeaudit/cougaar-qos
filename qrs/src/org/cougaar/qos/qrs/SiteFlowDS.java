@@ -85,7 +85,7 @@ public class SiteFlowDS extends ResourceContext {
         super(parameters, parent);
     }
 
-    abstract static class Formula extends DataFormula implements Constants {
+    abstract static class Formula extends DataFormula {
         abstract String getKey();
 
         @Override

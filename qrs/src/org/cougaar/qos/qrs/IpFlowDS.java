@@ -129,7 +129,7 @@ public class IpFlowDS extends ResourceContext {
         return "<IpFlowDS " + src + ", " + dst + ">";
     }
 
-    abstract static class Formula extends DataFormula implements Constants {
+    abstract static class Formula extends DataFormula {
         private DataValue[] values;
         private Logger logger;
 

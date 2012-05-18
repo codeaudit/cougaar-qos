@@ -10,6 +10,6 @@ package org.cougaar.qos.ResourceStatus;
 
 
 // greater than the given threshold.
-public interface ExceedsThresholdQualifierFactory extends ExceedsThresholdQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory, org.omg.CORBA.portable.IDLEntity 
+public interface ExceedsThresholdQualifierFactory extends ExceedsThresholdQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory 
 {
 } // interface ExceedsThresholdQualifierFactory

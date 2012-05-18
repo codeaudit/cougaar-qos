@@ -663,7 +663,8 @@ public class ResourceStatusServiceImpl implements ResourceStatusServiceOperation
             super(threshold);
         }
 
-        boolean sufficientChange(DataValue value) {
+        @SuppressWarnings("unused")
+      boolean sufficientChange(DataValue value) {
             double delta = value.getDoubleValue() - last.getDoubleValue();
             return delta < 0 ? -delta > threshold : delta > threshold;
         }

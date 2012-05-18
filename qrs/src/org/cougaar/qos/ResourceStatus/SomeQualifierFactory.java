@@ -10,6 +10,6 @@ package org.cougaar.qos.ResourceStatus;
 
 
 // the  set is satisfied
-public interface SomeQualifierFactory extends SomeQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory, org.omg.CORBA.portable.IDLEntity 
+public interface SomeQualifierFactory extends SomeQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory 
 {
 } // interface SomeQualifierFactory

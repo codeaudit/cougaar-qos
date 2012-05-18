@@ -10,6 +10,6 @@ package org.cougaar.qos.ResourceStatus;
 
 
 // the given threshold.
-public interface CrossesThresholdQualifierFactory extends CrossesThresholdQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory, org.omg.CORBA.portable.IDLEntity 
+public interface CrossesThresholdQualifierFactory extends CrossesThresholdQualifierFactoryOperations, org.cougaar.qos.ResourceStatus.QualifierFactory 
 {
 } // interface CrossesThresholdQualifierFactory
