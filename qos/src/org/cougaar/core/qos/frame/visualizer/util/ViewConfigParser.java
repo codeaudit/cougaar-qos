@@ -207,7 +207,8 @@ public class ViewConfigParser extends XMLParser  {
 
 
 
-    public void startElement(String uri, String local, String name, Attributes attrs) {
+    @Override
+   public void startElement(String uri, String local, String name, Attributes attrs) {
         if (name.equals("shape")) {
            createShape(attrs);
         } else if (name.equals("labelrenderer")) {
@@ -251,7 +252,8 @@ public class ViewConfigParser extends XMLParser  {
     }
 
 
-    public void endElement(String uri, String local, String name) {
+    @Override
+   public void endElement(String uri, String local, String name) {
         ShapeGraphic shg=null;
 
         if (name.equals("slotChangeListener"))

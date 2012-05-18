@@ -57,8 +57,7 @@ abstract public class CoordinationArtifactProviderImpl
 	this.artifacts = new ArrayList();
 	this.sb = sb;
 	this.kind = kind;
-	CoordinationArtifactBroker cab = (CoordinationArtifactBroker) 
-	    sb.getService(this, CoordinationArtifactBroker.class, null);
+	CoordinationArtifactBroker cab = sb.getService(this, CoordinationArtifactBroker.class, null);
 	cab.registerCoordinationArtifactProvider(this);
 	sb.releaseService(this, CoordinationArtifactBroker.class, cab);
     }

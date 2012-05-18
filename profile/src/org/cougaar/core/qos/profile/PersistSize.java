@@ -1,20 +1,20 @@
 package org.cougaar.core.qos.profile;
  
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.cougaar.core.agent.AgentContainer;
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.node.NodeControlService;
+import org.cougaar.core.node.NodeIdentificationService;
+import org.cougaar.core.service.LoggingService;
 
 /**
  * This component profiles persistence activity for each
@@ -49,7 +49,8 @@ public class PersistSize extends ProfilerBase {
   private String baseDir;
   private final Map logs = new HashMap();
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
 
     enabled = 
@@ -60,13 +61,11 @@ public class PersistSize extends ProfilerBase {
       return;
     }
 
-    NodeIdentificationService nis = (NodeIdentificationService)
-      sb.getService(this, NodeIdentificationService.class, null);
+    NodeIdentificationService nis = sb.getService(this, NodeIdentificationService.class, null);
     nodeId = nis.getMessageAddress();
     sb.releaseService(this, NodeIdentificationService.class, nis);
 
-    NodeControlService ncs = (NodeControlService)
-      sb.getService(this, NodeControlService.class, null);
+    NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
     ac = ncs.getRootContainer();
     sb.releaseService(this, NodeControlService.class, ncs);
 
@@ -75,7 +74,8 @@ public class PersistSize extends ProfilerBase {
       System.getProperty("org.cougaar.workspace", installPath + "/workspace");
     baseDir = workspaceDir+"/P";
   }
-  public void run() {
+  @Override
+public void run() {
     if (enabled) {
       logP();
     }
@@ -149,11 +149,10 @@ public class PersistSize extends ProfilerBase {
     synchronized (logs) {
       log = (LoggingService) logs.get(key);
       if (log == null) {
-        log = (LoggingService)
-          sb.getService(
-              "org.cougaar.core.qos.profile.persistence."+key,
-              LoggingService.class,
-              null);
+        log = sb.getService(
+           "org.cougaar.core.qos.profile.persistence."+key,
+           LoggingService.class,
+           null);
         logs.put(key, log);
         log.shout(getHeader(key));
         if (align) {
@@ -214,7 +213,8 @@ public class PersistSize extends ProfilerBase {
     public int first;
     public int last;
     public int numFiles;
-    public String toString() {
+    @Override
+   public String toString() {
       long now = System.currentTimeMillis();
       // 0, 0, 8588, 1103326510000, 14395, 8553, 0, 1, 0,
       return 

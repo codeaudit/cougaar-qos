@@ -106,7 +106,8 @@ public class ShapeGraphic implements Cloneable {
         this.renderer = shapeRenderer;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "["+(isContainer()?"Container":"Component")+" id="+id+" name="+label+" proto="+isPrototype+" "+predicate+"]";
     }
 

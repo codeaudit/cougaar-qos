@@ -74,7 +74,11 @@ import javax.swing.RepaintManager;
 public abstract class Surface extends JPanel implements Printable {
 
 
-    public Object AntiAlias = RenderingHints.VALUE_ANTIALIAS_ON;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   public Object AntiAlias = RenderingHints.VALUE_ANTIALIAS_ON;
     public Object Rendering = RenderingHints.VALUE_RENDER_SPEED;
     public AlphaComposite composite;
     public Paint texture;
@@ -334,7 +338,8 @@ public abstract class Surface extends JPanel implements Printable {
      * turning off double buffering in the RepaintManager before calling 
      * super.paintImmediately(g).
      */
-    public void paintImmediately(int x,int y,int w, int h) {
+    @Override
+   public void paintImmediately(int x,int y,int w, int h) {
         RepaintManager repaintManager = null;
         boolean save = true;
         if (!isDoubleBuffered()) {
@@ -350,7 +355,8 @@ public abstract class Surface extends JPanel implements Printable {
     }
 
 
-    public void paint(Graphics g) {
+    @Override
+   public void paint(Graphics g) {
 
         Dimension d = getSize();
 

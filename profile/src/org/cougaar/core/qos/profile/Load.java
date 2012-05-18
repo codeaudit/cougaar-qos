@@ -1,19 +1,17 @@
 package org.cougaar.core.qos.profile;
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.cougaar.core.mts.AgentStatusService;
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.node.NodeIdentificationService;
+import org.cougaar.core.qos.metrics.Constants;
+import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.qos.metrics.MetricsService;
+import org.cougaar.core.service.LoggingService;
 
 /**
  * This component profiles the {@link MetricsService}'s load
@@ -96,17 +94,18 @@ public class Load extends ProfilerBase {
   private MetricsService ms;
   public AgentStatusService as;
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
     localNode = findLocalNode();
-    ms = (MetricsService)
-      sb.getService(this, MetricsService.class, null);
+    ms = sb.getService(this, MetricsService.class, null);
     findServiceLater(
         "as",
         "org.cougaar.core.mts.AgentStatusService");
   }
 
-  public void run() {
+  @Override
+public void run() {
     logLoads();
   }
   private void logLoads() {
@@ -190,11 +189,10 @@ public class Load extends ProfilerBase {
            isNode(o) ? "node_"+localNode :
            "agent_"+o);
         key = key.replace('.', '_');
-        log = (LoggingService)
-          sb.getService(
-              "org.cougaar.core.qos.profile.agent_load."+key,
-              LoggingService.class,
-              null);
+        log = sb.getService(
+           "org.cougaar.core.qos.profile.agent_load."+key,
+           LoggingService.class,
+           null);
         logs.put(o, log);
         if (header) {
           log.shout(isService(o) ? SERVICE_HEADER : HEADER);
@@ -216,8 +214,7 @@ public class Load extends ProfilerBase {
   }
 
   private MessageAddress findLocalNode() {
-    NodeIdentificationService nis = (NodeIdentificationService)
-      sb.getService(this, NodeIdentificationService.class, null);
+    NodeIdentificationService nis = sb.getService(this, NodeIdentificationService.class, null);
     if (nis == null) {
       return null;
     }

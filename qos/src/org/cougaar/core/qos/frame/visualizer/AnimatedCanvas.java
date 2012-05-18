@@ -21,7 +21,11 @@ import org.cougaar.util.log.Logging;
  * To change this template use File | Settings | File Templates.
  */
 public class AnimatedCanvas extends AnimatingSurface implements MouseListener, MouseMotionListener {
-    protected HashMap shapes;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   protected HashMap shapes;
     protected boolean mouseMoveFlag =false;
     protected Point   mousePoint=null, lastPoint=null;
     protected Point   mouseStartDragPoint=null;
@@ -41,7 +45,8 @@ public class AnimatedCanvas extends AnimatingSurface implements MouseListener, M
         addMouseMotionListener(this);
     }
 
-    public void reset(int w, int h) {
+    @Override
+   public void reset(int w, int h) {
         /*ShapeGraphic shape;
         for (Iterator ii=shapes.values().iterator(); ii.hasNext();) {
         shape = (ShapeGraphic) ii.next();
@@ -51,7 +56,8 @@ public class AnimatedCanvas extends AnimatingSurface implements MouseListener, M
         oldSize = getSize();
     }
 
-    public void step(int w, int h) {
+    @Override
+   public void step(int w, int h) {
         /*ShapeGraphic shape;
         for (Iterator ii=shapes.values().iterator(); ii.hasNext();) {
         shape = (ShapeGraphic) ii.next();
@@ -74,7 +80,8 @@ public class AnimatedCanvas extends AnimatingSurface implements MouseListener, M
             shapes.remove(shape.getId());
     }
 
-    public void render(int w, int h, Graphics2D g2) {
+    @Override
+   public void render(int w, int h, Graphics2D g2) {
         //System.out.println("SassiAnimatedSurface.render w="+w+" h="+h);
         Dimension d = getSize();
         if (oldSize.width != d.width || oldSize.height != d.height)

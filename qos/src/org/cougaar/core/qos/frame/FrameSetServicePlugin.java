@@ -49,7 +49,8 @@ public class FrameSetServicePlugin
     private HashMap sets;
     private HashMap pending;
 
-    public void load()
+    @Override
+   public void load()
     {
 	super.load();
 
@@ -64,12 +65,14 @@ public class FrameSetServicePlugin
     }
 
     // plugin
-    protected void execute()
+    @Override
+   protected void execute()
     {
 	handleCallbacks();
     }
 
-    protected void setupSubscriptions() 
+    @Override
+   protected void setupSubscriptions() 
     {
     }
 

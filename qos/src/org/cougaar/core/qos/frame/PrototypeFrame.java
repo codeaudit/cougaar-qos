@@ -45,7 +45,11 @@ import org.xml.sax.helpers.AttributesImpl;
  * values.
  */
 public class PrototypeFrame extends Frame {
-    private final String prototype_name;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private final String prototype_name;
     private final String parent_prototype;
     private final transient List<String> inheritableSlots;
     private transient final Logger log = Logging.getLogger(getClass().getName());
@@ -76,7 +80,8 @@ public class PrototypeFrame extends Frame {
         this.path_cache = new HashMap<String, Path>();
     }
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return parent_prototype;
     }
 
@@ -95,7 +100,8 @@ public class PrototypeFrame extends Frame {
         return inheritableSlots;
     }
 
-    public Properties getLocalSlots() {
+    @Override
+   public Properties getLocalSlots() {
         Properties result = new VisibleProperties();
         for (Map.Entry<String, Attributes> entry : slots.entrySet()) {
             String slot_name = entry.getKey();
@@ -113,11 +119,13 @@ public class PrototypeFrame extends Frame {
         return result;
     }
 
-    public void setValue(String slot, Object value) {
+    @Override
+   public void setValue(String slot, Object value) {
         dynamic_values.put(slot, value);
     }
 
-    Object getValue(Frame origin, String slot_name) {
+    @Override
+   Object getValue(Frame origin, String slot_name) {
         // Look for a dynamically set default first.
         Object slot_value = dynamic_values.get(slot_name);
         if (slot_value != null) {
@@ -177,11 +185,13 @@ public class PrototypeFrame extends Frame {
         return attrs.getValue(key);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "<Prototype " + prototype_name + " " + getUID() + ">";
     }
 
-    public boolean isa(String kind) {
+    @Override
+   public boolean isa(String kind) {
         if (frameSet == null) {
             return kind.equals(prototype_name);
         }

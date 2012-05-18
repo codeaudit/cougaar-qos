@@ -49,18 +49,21 @@ public class ClassDS extends ResourceContext {
 
     // Host Classes can be the first element in a path. They have
     // no parent or context other than the root.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         return root;
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         return null;
     }
 
     /**
      * The parameters should contain one string, the name of the class
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length < 2) {
             throw new ParameterError("ClassDS: wrong number of parameters");
         } else {

@@ -102,13 +102,48 @@ public class SingleInheritanceFrameSet
     public class TransactionLock extends Object {};
     public class ChangeQueueLock extends Object {};
     public class RelationLock extends Object {};  
-    public class PendingRelationships extends HashSet<RelationFrame> {};
-    public class Containers extends  HashMap<DataFrame,DataFrame> {};
-    public class KB extends  HashMap<UID,Object>{};
-    public class Frames extends  HashSet<DataFrame> {};
-    public class CachedClasses extends  HashMap<String,Class> {};
-    public class Paths extends  HashMap<String,Path> {};
-    public class Prototypes extends  HashMap<String,PrototypeFrame> {};
+    public class PendingRelationships extends HashSet<RelationFrame> {
+
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;};
+    public class Containers extends  HashMap<DataFrame,DataFrame> {
+
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;};
+    public class KB extends  HashMap<UID,Object>{
+
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;};
+    public class Frames extends  HashSet<DataFrame> {
+
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;};
+    public class CachedClasses extends  HashMap<String,Class> {
+
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;};
+    public class Paths extends  HashMap<String,Path> {
+
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;};
+    public class Prototypes extends  HashMap<String,PrototypeFrame> {
+
+      /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;};
 
 
     public SingleInheritanceFrameSet(String pkg,
@@ -135,12 +170,9 @@ public class SingleInheritanceFrameSet
 	this.change_queue = new ArrayList();
 	this.change_queue_lock = new ChangeQueueLock();
 	this.relation_lock = new RelationLock();
-	log = (LoggingService)
-	    sb.getService(this, LoggingService.class, null);
-	uids = (UIDService)
-	    sb.getService(this, UIDService.class, null);
-	metrics = (MetricsService)
-	    sb.getService(this, MetricsService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
+	uids = sb.getService(this, UIDService.class, null);
+	metrics = sb.getService(this, MetricsService.class, null);
 
  	this.kb = new KB();
 	this.prototypes = new Prototypes();
@@ -1193,7 +1225,12 @@ public class SingleInheritanceFrameSet
 	final Class[] pclasses = new Class[classes.size()];
 	classes.toArray(pclasses);
 	UnaryPredicate filter = new UnaryPredicate() {
-	    public boolean execute(Object o) {
+	    /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
 		Class cls = o.getClass();
 		for (Class cl : pclasses) {
 		    if (cl.isAssignableFrom(cls)) {

@@ -55,7 +55,8 @@ public class GossipFeedComponent
     private MetricInterpreter interpreter = new MetricInterpreter();
     private int propagation;
 
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 	sb = getServiceBroker();
 	
@@ -64,13 +65,11 @@ public class GossipFeedComponent
 	feed = new GossipFeed(sb);
 
 
-	DataFeedRegistrationService svc = (DataFeedRegistrationService)
-	    sb.getService(this, DataFeedRegistrationService.class, null);
+	DataFeedRegistrationService svc = sb.getService(this, DataFeedRegistrationService.class, null);
 	svc.registerFeed(feed, "GossipFeed");
 
 	updateService = new GossipUpdateServiceImpl();
-	NodeControlService ncs = (NodeControlService)
-	    sb.getService(this, NodeControlService.class, null);
+	NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
 	ServiceBroker rootsb = ncs.getRootServiceBroker();
 	ServiceProvider sp = new GossipServices();
 	rootsb.addService(GossipUpdateService.class, sp);
@@ -78,8 +77,7 @@ public class GossipFeedComponent
 
     private synchronized void ensureKeyService() {
 	if (keyService == null) {
-	    keyService = (GossipKeyDistributionService)
-		sb.getService(this, GossipKeyDistributionService.class, null);
+	    keyService = sb.getService(this, GossipKeyDistributionService.class, null);
 	}
     }
 
@@ -120,25 +118,27 @@ public class GossipFeedComponent
 
 	GossipFeed(ServiceBroker sb) {
 	    super();
-	    ThreadService threadService = (ThreadService)
-		sb.getService(this, ThreadService.class, null);
+	    ThreadService threadService = sb.getService(this, ThreadService.class, null);
 	    Runnable notifier = getNotifier();
 	    thread = threadService.getThread(this, notifier, "GossipFeed");
 	}
 
-	protected void dispatch() {
+	@Override
+   protected void dispatch() {
 	    thread.start();
 	}
 
 
-	public void removeListenerForKey(DataFeedListener listener, String key)
+	@Override
+   public void removeListenerForKey(DataFeedListener listener, String key)
 	{
 	    super.removeListenerForKey(listener, key);
 	    ensureKeyService();
 	    if (keyService != null) keyService.removeKey(key);
 	}
 
-	public void addListenerForKey(DataFeedListener listener, String key) {
+	@Override
+   public void addListenerForKey(DataFeedListener listener, String key) {
 	    super.addListenerForKey(listener, key);
 	    if (listener instanceof GossipIntegraterDS.GossipFormula) return;
 	    ensureKeyService();

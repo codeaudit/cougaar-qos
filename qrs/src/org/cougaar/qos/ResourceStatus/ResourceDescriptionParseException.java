@@ -10,7 +10,11 @@ package org.cougaar.qos.ResourceStatus;
 
 public final class ResourceDescriptionParseException extends org.omg.CORBA.UserException
 {
-  public String description = null;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+public String description = null;
   public String reason = null;
 
   public ResourceDescriptionParseException ()

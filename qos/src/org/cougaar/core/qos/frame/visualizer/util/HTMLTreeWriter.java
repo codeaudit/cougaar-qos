@@ -1,10 +1,11 @@
 package org.cougaar.core.qos.frame.visualizer.util;
 
-import org.cougaar.core.qos.frame.visualizer.tree.FrameNode;
-
-import javax.swing.tree.TreeNode;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+
+import javax.swing.tree.TreeNode;
+
+import org.cougaar.core.qos.frame.visualizer.tree.FrameNode;
 
 
 /**

@@ -51,7 +51,8 @@ implements ServerSelection.Matcher<Face<ServerSelection.EventType>> {
      */
      abstract public void remapResponse(UniqueObject object);
      
-     protected void setupSubscriptions() {
+     @Override
+   protected void setupSubscriptions() {
          super.setupSubscriptions();
          selectionPolicy = selectionPolicyFactory.makePolicy();
          selectionPolicy.setup(getServiceBroker(), log, serverAddresses);

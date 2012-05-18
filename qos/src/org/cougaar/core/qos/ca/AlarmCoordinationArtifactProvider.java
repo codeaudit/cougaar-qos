@@ -78,7 +78,8 @@ abstract public class AlarmCoordinationArtifactProvider
 	}
 
 
-	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
+	@Override
+   protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
 	{
 	    ServiceBroker sb = getServiceBroker();
 	    if (spec.role.equals(SleeperRole)) {

@@ -26,8 +26,8 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
-import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.Map;
 
 import org.cougaar.qos.qrs.DataValue;
@@ -40,7 +40,8 @@ public class LinuxSockStat extends SysStatHandler {
     private BufferedReader br;
     private String tcp_key, udp_key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         tcp_key =
                 "Host" + KEY_SEPR + host + KEY_SEPR + "Network" + KEY_SEPR + "TCP" + KEY_SEPR
                         + "sockets" + KEY_SEPR + "inuse";
@@ -68,7 +69,8 @@ public class LinuxSockStat extends SysStatHandler {
         return new DataValue(Double.parseDouble(doub), SECOND_MEAS_CREDIBILITY, "", PROVENANCE);
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         String line = null;
         fr = null;
         try {

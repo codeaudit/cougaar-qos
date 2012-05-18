@@ -166,7 +166,8 @@ extends DefaultHandler
 
     
     // SAX
-    public void startElement(String uri, String local, String name, Attributes attrs) {
+    @Override
+   public void startElement(String uri, String local, String name, Attributes attrs) {
 	if (name.equals("frameset")) {
 	    startFrameset(attrs);
 	} else if (name.equals("prototypes")) {
@@ -189,7 +190,8 @@ extends DefaultHandler
 	}
     }
 
-    public void endElement(String uri, String local, String name) {
+    @Override
+   public void endElement(String uri, String local, String name) {
 	if (name.equals("frameset")) {
 	    endFrameset();
 	} else if (name.equals("prototypes")) {
@@ -205,7 +207,8 @@ extends DefaultHandler
 	}
     }
 
-    public void characters(char buf[], int offset, int length) {
+    @Override
+   public void characters(char buf[], int offset, int length) {
 	if (inCopyright) {
 	    String text = new String(buf, offset, length);
 	    if (copyright == null) {

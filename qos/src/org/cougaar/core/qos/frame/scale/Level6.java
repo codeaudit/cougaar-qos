@@ -15,7 +15,13 @@ import org.cougaar.core.util.UID;
 
 public class Level6
     extends Thing {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -41,12 +47,14 @@ public class Level6
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "level6";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getLevel6SlotFloat__AsObject();
@@ -56,7 +64,8 @@ public class Level6
     }
 
 
-    protected void collectContainerSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectContainerSlotValues(java.util.Properties __props) {
         super.collectContainerSlotValues(__props);
         Object __value;
         __value = getLevel4SlotFloat__AsObject();
@@ -432,7 +441,8 @@ public class Level6
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new) {
+    @Override
+   protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new) {
         if (!(__raw_old instanceof Level5)) {
             getLogger().warn("Container of " +this+ " is not a Level5: " + __raw_old);
             return;
@@ -532,7 +542,8 @@ public class Level6
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw) {
+    @Override
+   protected void fireContainerChanges(DataFrame __raw) {
         if (!(__raw instanceof Level5)) {
             getLogger().warn("Container of " +this+ " is not a Level5: " + __raw);
             return;
@@ -590,7 +601,8 @@ public class Level6
     }
 
 
-    protected Object getLocalValue(String __slot) {
+    @Override
+   protected Object getLocalValue(String __slot) {
        String __key = __slot.intern();
        if ("level5SlotFloat" == __key)
             return getLevel5SlotFloat__AsObject();
@@ -627,7 +639,8 @@ public class Level6
     }
 
 
-    protected void setLocalValue(String __slot,
+    @Override
+   protected void setLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("level6SlotFloat" == __key)
@@ -639,7 +652,8 @@ public class Level6
     }
 
 
-    protected void initializeLocalValue(String __slot,
+    @Override
+   protected void initializeLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("level6SlotFloat" == __key)
@@ -651,7 +665,8 @@ public class Level6
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("level6SlotFloat");
         slots.add("level6SlotString");
@@ -838,7 +853,8 @@ public class Level6
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("level6SlotFloat", slotMetaData__Level6SlotFloat());
         map.put("level6SlotString", slotMetaData__Level6SlotString());

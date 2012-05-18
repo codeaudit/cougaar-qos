@@ -1,8 +1,9 @@
 package org.cougaar.core.qos.frame.visualizer.util;
 
-import javax.swing.tree.TreeNode;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+
+import javax.swing.tree.TreeNode;
 
 /**
  * Created by IntelliJ IDEA.

@@ -28,9 +28,9 @@
 package org.cougaar.core.qos.rss;
 
 import org.cougaar.core.component.ServiceBroker;
-import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.metrics.Constants;
+import org.cougaar.core.service.wp.AddressEntry;
 import org.cougaar.core.service.wp.WhitePagesService;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
 import org.cougaar.qos.qrs.AbstractContextInstantiater;
@@ -53,6 +53,7 @@ public class NodeDS extends CougaarDS {
                 return new NodeDS(parameters, parent);
             }
 
+            @Override
             public Object identifyParameters(String[] parameters) {
                 if (parameters == null || parameters.length != 1) {
                     return null;
@@ -79,7 +80,8 @@ public class NodeDS extends CougaarDS {
         super(parameters, parent);
     }
 
-    protected boolean useParentPath() {
+    @Override
+   protected boolean useParentPath() {
         return false;
     }
 
@@ -90,7 +92,8 @@ public class NodeDS extends CougaarDS {
     // Node DataScopes can be the first element in a path. They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
 
         ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
         AgentTopologyService ats = sb.getService(this, AgentTopologyService.class, null);
@@ -126,7 +129,8 @@ public class NodeDS extends CougaarDS {
         return parent;
     }
 
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("NodeDS: wrong number of parameters");
         }
@@ -140,7 +144,8 @@ public class NodeDS extends CougaarDS {
         }
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals(Constants.CPU_LOAD_AVG) || kind.equals(Constants.CPU_LOAD_MJIPS)
                 || kind.equals(Constants.MSG_IN) || kind.equals(Constants.BYTES_IN)
                 || kind.equals(Constants.MSG_OUT) || kind.equals(Constants.BYTES_OUT)) {
@@ -168,7 +173,8 @@ public class NodeDS extends CougaarDS {
             return DataValue.NO_VALUE;
         }
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
 
             rt = Runtime.getRuntime();
@@ -183,7 +189,8 @@ public class NodeDS extends CougaarDS {
             registerDependency(alarm, "Alarm");
         }
 
-        protected DataValue doCalculation(DataFormula.Values vals) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values vals) {
             long total = rt.totalMemory(); // code size? never
             // changes in Linux
             if (logger.isDebugEnabled()) {

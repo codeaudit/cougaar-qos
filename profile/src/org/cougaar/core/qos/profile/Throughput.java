@@ -1,19 +1,11 @@
 package org.cougaar.core.qos.profile;
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.text.DecimalFormat;
+
+import org.cougaar.core.mts.AgentStatusService;
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.mts.MessageStatistics;
+import org.cougaar.core.node.NodeIdentificationService;
+import org.cougaar.core.service.MessageStatisticsService;
 
 /**
  * This component profiles the aggregate "messages per second"
@@ -54,7 +46,8 @@ public class Throughput extends ProfilerBase {
   private long lastAgent;
   private long lastTotal;
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
     localNode = findLocalNode();
     findServiceLater(
@@ -64,7 +57,8 @@ public class Throughput extends ProfilerBase {
         "as",
         "org.cougaar.core.mts.AgentStatusService");
   }
-  public void run() {
+  @Override
+public void run() {
     log("org.cougaar.core.qos.profile.throughput",
         HEADER, getThroughput());
   }
@@ -78,12 +72,12 @@ public class Throughput extends ProfilerBase {
     double agentSendRate = 0.0;
     double totalSendRate = 0.0;
     if (lastTime > 0) {
-      double t = (long) ((now - lastTime) / 1000);
+      double t = ((now - lastTime) / 1000);
       if (t < 1.0) {
         t = 1.0;
       }
-      agentSendRate = ((double) (agentSendCount - lastAgent)/t);
-      totalSendRate = ((double) (totalSendCount - lastTotal)/t);
+      agentSendRate = ((agentSendCount - lastAgent)/t);
+      totalSendRate = ((totalSendCount - lastTotal)/t);
     }
 
     lastTime = now;
@@ -107,8 +101,7 @@ public class Throughput extends ProfilerBase {
     return (state == null ? 0 : state.deliveredCount);
   }
   private MessageAddress findLocalNode() {
-    NodeIdentificationService nis = (NodeIdentificationService)
-      sb.getService(this, NodeIdentificationService.class, null);
+    NodeIdentificationService nis = sb.getService(this, NodeIdentificationService.class, null);
     if (nis == null) {
       return null;
     }

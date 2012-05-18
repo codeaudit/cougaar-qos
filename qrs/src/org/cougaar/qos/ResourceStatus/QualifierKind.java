@@ -12,7 +12,11 @@ package org.cougaar.qos.ResourceStatus;
 // Only a few kinds of qualifiers so far
 public class QualifierKind implements org.omg.CORBA.portable.IDLEntity
 {
-  private        int __value;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+private        int __value;
   private static int __size = 6;
   private static org.cougaar.qos.ResourceStatus.QualifierKind[] __array = new org.cougaar.qos.ResourceStatus.QualifierKind [__size];
 

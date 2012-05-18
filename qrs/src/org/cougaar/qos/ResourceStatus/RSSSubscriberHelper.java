@@ -49,7 +49,7 @@ abstract public class RSSSubscriberHelper
 
   public static void write (org.omg.CORBA.portable.OutputStream ostream, org.cougaar.qos.ResourceStatus.RSSSubscriber value)
   {
-    ostream.write_Object ((org.omg.CORBA.Object) value);
+    ostream.write_Object (value);
   }
 
   public static org.cougaar.qos.ResourceStatus.RSSSubscriber narrow (org.omg.CORBA.Object obj)

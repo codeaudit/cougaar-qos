@@ -12,7 +12,11 @@ import javax.swing.event.ChangeEvent;
  * To change this template use File | Settings | File Templates.
  */
 public class RemovedFramesEvent extends ChangeEvent {
-    HashSet removedDataFrames, removedRelationFrames;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   HashSet removedDataFrames, removedRelationFrames;
 
 
     public RemovedFramesEvent(Object source, HashSet removedDataFrames, HashSet removedRelationFrames) {

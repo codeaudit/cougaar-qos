@@ -63,8 +63,7 @@ abstract public class CommunityFacetImpl
 				 RolePlayer player)
     {
 	super(owner, sb, spec, player);
-	commService = (CommunityService)
-	    sb.getService(this, CommunityService.class, null);
+	commService = sb.getService(this, CommunityService.class, null);
 
     }
 
@@ -116,7 +115,8 @@ abstract public class CommunityFacetImpl
 
 
 
-    protected Receptacle makeReceptacle()
+    @Override
+   protected Receptacle makeReceptacle()
     {
 	return new CommunityReceptacleImpl();
     }

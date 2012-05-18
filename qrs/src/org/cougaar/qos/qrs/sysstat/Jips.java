@@ -112,7 +112,8 @@ public class Jips extends SysStatHandler implements Runnable
         type = TYPE;
     }
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         if (type >= 3) {
             fieldM = new int[MEM_SIZE];
         }
@@ -128,7 +129,8 @@ public class Jips extends SysStatHandler implements Runnable
         return theValue;
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         map.put(key, theValue);
     }
 

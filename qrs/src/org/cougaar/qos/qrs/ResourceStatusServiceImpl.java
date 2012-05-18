@@ -58,7 +58,6 @@ import org.cougaar.qos.ResourceStatus.data_types;
 import org.cougaar.qos.ResourceStatus.data_value;
 import org.cougaar.qos.ResourceStatus.data_valueHolder;
 import org.cougaar.util.log.Logger;
-
 import org.omg.CosNaming.NameComponent;
 import org.omg.PortableServer.Servant;
 

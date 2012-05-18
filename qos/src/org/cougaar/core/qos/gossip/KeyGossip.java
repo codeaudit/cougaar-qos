@@ -33,10 +33,20 @@ import java.util.Map;
  */
 class KeyGossip  extends Gossip
 {
-    private static class Data 
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   private static class Data 
 	implements java.io.Serializable, GossipPropagation
     {
-	int propagation_distance;
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   int propagation_distance;
 
 	Data(int propagation_distance) {
 	    this.propagation_distance = propagation_distance;
@@ -46,7 +56,8 @@ class KeyGossip  extends Gossip
 	    return propagation_distance;
 	}
 
-	public boolean equals(Object candidate) {
+	@Override
+   public boolean equals(Object candidate) {
 	    if (candidate == null || !(candidate instanceof Data)) return false;
 	    return ((Data) candidate).propagation_distance ==
 		propagation_distance;

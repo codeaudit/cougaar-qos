@@ -34,10 +34,10 @@ import java.util.HashMap;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.Frame;
 import org.cougaar.core.qos.frame.FrameSet;
-import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.core.service.ThreadService;
@@ -48,7 +48,12 @@ public class FrameVisualizerPlugin
         extends ParameterizedPlugin
 {
     private UnaryPredicate framePred = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             return ((o instanceof DataFrame) &&
                     ((DataFrame) o).getFrameSet().getName().equals(frameSetName)) ;
         }
@@ -67,14 +72,15 @@ public class FrameVisualizerPlugin
 
 
 
-    public void load() {
+    @Override
+   public void load() {
         super.load();
         ServiceBroker sb = getServiceBroker();
-        log = (LoggingService)
-                sb.getService(this, LoggingService.class, null);
+        log = sb.getService(this, LoggingService.class, null);
     }
 
-    protected void setupSubscriptions()  {
+    @Override
+   protected void setupSubscriptions()  {
         BlackboardService bbs = getBlackboardService();
         if (log.isDebugEnabled())
             log.debug("FrameSet name is " + frameSetName);
@@ -87,7 +93,8 @@ public class FrameVisualizerPlugin
         do_execute(bbs);
     }
 
-    public void start() {
+    @Override
+   public void start() {
         frameSetName = getParameter("frame-set");
         frameCache = new ArrayList();
         newFramesPresent = false;
@@ -102,8 +109,7 @@ public class FrameVisualizerPlugin
         }
         frameModel = new FrameModel();
         ServiceBroker sb = getServiceBroker();
-        ThreadService tsvc = (ThreadService)
-                sb.getService(this, ThreadService.class, null);
+        ThreadService tsvc = sb.getService(this, ThreadService.class, null);
         new DisplayWindow(frameModel, xml_url, tsvc);
 
 
@@ -112,7 +118,8 @@ public class FrameVisualizerPlugin
     }
 
 
-    protected void execute() {
+    @Override
+   protected void execute() {
         BlackboardService bbs = getBlackboardService();
         do_execute(bbs);
     }

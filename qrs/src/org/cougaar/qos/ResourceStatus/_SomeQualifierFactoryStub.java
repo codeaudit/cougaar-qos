@@ -38,9 +38,10 @@ public class _SomeQualifierFactoryStub extends org.omg.CORBA.portable.ObjectImpl
     "IDL:org/cougaar/qos/ResourceStatus/SomeQualifierFactory:1.0", 
     "IDL:org/cougaar/qos/ResourceStatus/QualifierFactory:1.0"};
 
-  public String[] _ids ()
+  @Override
+public String[] _ids ()
   {
-    return (String[])__ids.clone ();
+    return __ids.clone ();
   }
 
   private void readObject (java.io.ObjectInputStream s) throws java.io.IOException

@@ -58,11 +58,13 @@ public class IntegraterDS extends ResourceContext {
 
     // Host Integraters can be the first element in a path. They have
     // no parent or context other than the root.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         return root;
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("Formula")) {
             return new Formula();
         } else {
@@ -74,7 +76,8 @@ public class IntegraterDS extends ResourceContext {
      * The parameters should contain one object, a String, which will be the key
      * used to register this context as a listener on the various DataFeeds.
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length == 0) {
             throw new ParameterError("IntegraterDS: no parameters");
         }
@@ -92,7 +95,8 @@ public class IntegraterDS extends ResourceContext {
         public Formula() {
         }
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             this.key = (String) context.getValue(KEY);
             for (DataFeed feed : RSS.instance().feeds()) {
@@ -107,7 +111,8 @@ public class IntegraterDS extends ResourceContext {
         }
 
         // No explicit calculation is ever needed here
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             return getCachedValue();
         }
 

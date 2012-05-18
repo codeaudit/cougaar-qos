@@ -43,14 +43,16 @@ public class ObjectMethodDS extends DeflectingContext {
     private static final String METHOD_NAME = "MethodName";
     private MethodDS methodDefinition;
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         return null;
     }
 
     /**
      * The parameters should contain one string, the name of the method
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("MethodDS: wrong number of parameters");
         } else {

@@ -26,7 +26,11 @@
 package org.cougaar.core.qos.stats;
 
 public class Anova implements Statistic {
-    private String name;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private String name;
     private int valueCount;
     private double sum;
     private double sumSq;
@@ -105,11 +109,13 @@ public class Anova implements Statistic {
 		return buf.toString();
 	}
          
-    public String toString() {
+    @Override
+   public String toString() {
     	return "<Anova: " + getSummaryString() + ">";
     }
     
-    public Anova clone() throws CloneNotSupportedException {
+    @Override
+   public Anova clone() throws CloneNotSupportedException {
         return (Anova) super.clone();
     }   
     

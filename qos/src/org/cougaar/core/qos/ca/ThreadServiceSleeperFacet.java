@@ -52,8 +52,7 @@ abstract public class ThreadServiceSleeperFacet
 	super(owner, sb, spec, player);
 	runners = new HashMap();
 	facts = new HashMap();
-	threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
+	threadService = sb.getService(this, ThreadService.class, null);
 
 	linkPlayer();
     }
@@ -87,7 +86,8 @@ abstract public class ThreadServiceSleeperFacet
 	return threadService.getThread(this, runner, id);
     }
 
-    public void processFactAssertion(Object fact)
+    @Override
+   public void processFactAssertion(Object fact)
     {
 	String key = getId(fact);
 	long time = getFireTime(fact);

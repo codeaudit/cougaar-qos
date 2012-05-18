@@ -27,6 +27,7 @@
 // Later this will move elsewhere...
 package org.cougaar.core.qos.rss;
 
+import org.cougaar.core.qos.metrics.Constants;
 import org.cougaar.qos.ResourceStatus.ResourceNode;
 import org.cougaar.qos.qrs.AbstractContextInstantiater;
 import org.cougaar.qos.qrs.ContextInstantiater;
@@ -36,7 +37,6 @@ import org.cougaar.qos.qrs.RSS;
 import org.cougaar.qos.qrs.ResourceContext;
 import org.cougaar.util.log.Logger;
 import org.cougaar.util.log.Logging;
-import org.cougaar.core.qos.metrics.Constants;
 
 /**
  * This RSS ResourceContext represents a remote Agent to which this Node is
@@ -53,6 +53,7 @@ public class DestinationDS extends CougaarDS {
                 return new DestinationDS(parameters, parent);
             }
 
+            @Override
             public Object identifyParameters(String[] parameters) {
                 if (parameters == null || parameters.length != 1) {
                     return null;
@@ -70,7 +71,8 @@ public class DestinationDS extends CougaarDS {
         super(parameters, parent);
     }
 
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("DestinationDS: wrong number of parameters");
         }
@@ -87,7 +89,8 @@ public class DestinationDS extends CougaarDS {
         }
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals(Constants.MSG_FROM) || kind.equals(Constants.BYTES_FROM)
                 || kind.equals(Constants.MSG_TO) || kind.equals(Constants.BYTES_TO)) {
             return new DecayingHistoryFormula(historyPrefix, kind);
@@ -105,7 +108,8 @@ public class DestinationDS extends CougaarDS {
     }
 
     static class AgentIpAddress extends DataFormula {
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             String agent = (String) context.getValue(DESTINATION);
             String[] parameters = {agent};
@@ -115,7 +119,8 @@ public class DestinationDS extends CougaarDS {
             registerDependency(dependency, "PrimaryIpAddress");
         }
 
-        public void formulaDeleted(DataFormula formula) {
+        @Override
+      public void formulaDeleted(DataFormula formula) {
             super.formulaDeleted(formula);
 
             Logger logger = Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
@@ -126,7 +131,8 @@ public class DestinationDS extends CougaarDS {
 
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue result = values.get("PrimaryIpAddress");
             Logger logger = Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
             if (logger.isDebugEnabled()) {
@@ -144,7 +150,8 @@ public class DestinationDS extends CougaarDS {
         private String agentAddr;
         private String myAddr;
         
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             // subscribe to our own IpAddress and NodeIpAddress
             registerDependency(context, "AgentIpAddress");
@@ -175,7 +182,8 @@ public class DestinationDS extends CougaarDS {
             }
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             String agentAddr = null;
             String myAddr = null;
             Logger logger = Logging.getLogger("org.cougaar.core.qos.rss.DestinationDS");
@@ -205,12 +213,14 @@ public class DestinationDS extends CougaarDS {
     private static final double LAN_CAPACITY = 10000.0;
 
     static class OnSameSecureLAN extends DataFormula {
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             registerDependency(context, "CapacityMax");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue capacityMax = values.get("CapacityMax");
             double capacityMaxValue = capacityMax.getDoubleValue();
             double capacityMaxCred = capacityMax.getCredibility();
@@ -235,7 +245,8 @@ public class DestinationDS extends CougaarDS {
             return new DataValue(0);
         }
 
-        protected void initialize(ResourceContext ctx) {
+        @Override
+      protected void initialize(ResourceContext ctx) {
             super.initialize(ctx);
             String key = historyPrefix + KEY_SEPR + Constants.PERSIST_SIZE_LAST;
             String[] parameters = {key};
@@ -251,7 +262,8 @@ public class DestinationDS extends CougaarDS {
 
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue computedValue = values.get("Formula");
             DataValue defaultValue = defaultValue();
             return DataValue.mostCredible(computedValue, defaultValue);

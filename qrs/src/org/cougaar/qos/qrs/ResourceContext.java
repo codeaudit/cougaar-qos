@@ -88,7 +88,8 @@ abstract public class ResourceContext implements Constants {
         }
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return pretty_name;
     }
 
@@ -570,13 +571,22 @@ abstract public class ResourceContext implements Constants {
      * missing, has the wrong type or has an unacceptable value.
      */
     public static class ParameterError extends Exception {
-        public ParameterError(String message) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public ParameterError(String message) {
             super(message);
         }
     }
 
     public static class NoSuchMethodException extends Exception {
-        private final String method;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      private final String method;
         private final String[] args;
 
         public NoSuchMethodException(String method, String[] args) {

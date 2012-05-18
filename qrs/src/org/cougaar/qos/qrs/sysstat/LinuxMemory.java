@@ -26,8 +26,8 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
-import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
@@ -39,7 +39,8 @@ public class LinuxMemory extends SysStatHandler {
 
     private String free_key, total_key, util_key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         free_key =
                 "Host" + KEY_SEPR + host + KEY_SEPR + "Memory" + KEY_SEPR + "Physical" + KEY_SEPR
                         + "Free";
@@ -65,7 +66,8 @@ public class LinuxMemory extends SysStatHandler {
         return Double.parseDouble(doub);
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         double free = -1;
         double total = -1;
         FileReader fr;

@@ -46,7 +46,11 @@ abstract public class SimplestRelayImpl
     implements Relay, Relay.Source, Relay.Target, Serializable 
 {
 
-    private final UID uid;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private final UID uid;
     private final MessageAddress source;
     private final MessageAddress target;
 
@@ -128,7 +132,8 @@ abstract public class SimplestRelayImpl
 
     // Object:
 
-    public boolean equals(Object o) {
+    @Override
+   public boolean equals(Object o) {
 	if (o == this) {
 	    return true;
 	} else if (o instanceof SimplestRelayImpl) { 
@@ -138,7 +143,8 @@ abstract public class SimplestRelayImpl
 	    return false;
 	}
     }
-    public int hashCode() {
+    @Override
+   public int hashCode() {
 	return uid.hashCode();
     }
     private void readObject(java.io.ObjectInputStream os) 
@@ -146,7 +152,8 @@ abstract public class SimplestRelayImpl
 	os.defaultReadObject();
 	cacheTargets();
     }
-    public String toString() {
+    @Override
+   public String toString() {
 	return 
 	    "(SimpleRelayImpl"+
 	    " uid="+uid+

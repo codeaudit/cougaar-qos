@@ -135,7 +135,12 @@ abstract public class SysStatHandler implements Constants {
     }
     
     public static class NoSysStatHandler extends Exception {
-        NoSysStatHandler(String message) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      NoSysStatHandler(String message) {
             super(message);
         }
     }

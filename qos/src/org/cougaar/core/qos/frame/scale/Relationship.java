@@ -16,7 +16,13 @@ import org.cougaar.core.util.UID;
 
 public class Relationship
     extends RelationFrame {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -40,12 +46,14 @@ public class Relationship
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "relationship";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getParentValue__AsObject();
@@ -55,27 +63,32 @@ public class Relationship
     }
 
 
-    public String getParentPrototype() {
+    @Override
+   public String getParentPrototype() {
         return "thing";
     }
 
 
-    public String getParentSlot() {
+    @Override
+   public String getParentSlot() {
         return "name";
     }
 
 
-    public String getChildPrototype() {
+    @Override
+   public String getChildPrototype() {
         return "thing";
     }
 
 
-    public String getChildSlot() {
+    @Override
+   public String getChildSlot() {
         return "name";
     }
 
 
-    public String getParentValue() {
+    @Override
+   public String getParentValue() {
         return parent_value;
     }
 
@@ -116,7 +129,8 @@ public class Relationship
     }
 
 
-    public String getChildValue() {
+    @Override
+   public String getChildValue() {
         return child_value;
     }
 
@@ -157,7 +171,8 @@ public class Relationship
     }
 
 
-    protected Object getLocalValue(String __slot) {
+    @Override
+   protected Object getLocalValue(String __slot) {
        String __key = __slot.intern();
        if ("parent-value" == __key)
             return getParentValue__AsObject();
@@ -168,7 +183,8 @@ public class Relationship
     }
 
 
-    protected void setLocalValue(String __slot,
+    @Override
+   protected void setLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("parent-value" == __key)
@@ -178,7 +194,8 @@ public class Relationship
     }
 
 
-    protected void initializeLocalValue(String __slot,
+    @Override
+   protected void initializeLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("parent-value" == __key)
@@ -188,7 +205,8 @@ public class Relationship
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("parent-value");
         slots.add("child-value");
@@ -229,7 +247,8 @@ public class Relationship
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("parent-value", slotMetaData__ParentValue());
         map.put("child-value", slotMetaData__ChildValue());

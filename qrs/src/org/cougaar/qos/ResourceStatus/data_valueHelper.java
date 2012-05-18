@@ -83,7 +83,7 @@ abstract public class data_valueHelper
     switch (_dis0.value ())
     {
       case org.cougaar.qos.ResourceStatus.data_types._number_data:
-        double _d_value = (double)0;
+        double _d_value = 0;
         _d_value = istream.read_double ();
         value.d_value (_d_value);
         break;

@@ -29,7 +29,12 @@ package org.cougaar.qos.qrs.gui;
 import javax.swing.tree.DefaultTreeModel;
 
 public class ResourceContextTreeModel extends DefaultTreeModel {
-    public ResourceContextTreeModel() {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+   public ResourceContextTreeModel() {
         super(new ResourceContextRoot());
     }
 

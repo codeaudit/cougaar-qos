@@ -42,21 +42,23 @@ public class MonitorServletPlugin extends ParameterizedPlugin
 	super();
     }
 
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();
 	String name = getParameter("frame-set","societyTopology");
 	LoggingService loggingService;
-	loggingService = (LoggingService)
-	    sb.getService(this, LoggingService.class, null);
+	loggingService = sb.getService(this, LoggingService.class, null);
 	new MonitorServlet(sb, loggingService, name);
     }
 
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
     }
   
-    protected void execute() {
+    @Override
+   protected void execute() {
 	//System.out.println("Executed MonitorServletPlugin");
     }
 

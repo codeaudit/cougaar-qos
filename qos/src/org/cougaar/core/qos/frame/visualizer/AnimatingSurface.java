@@ -41,16 +41,20 @@
 
 package org.cougaar.core.qos.frame.visualizer;
 
+import java.awt.Dimension;
+
 import org.cougaar.core.service.ThreadService;
 import org.cougaar.core.thread.Schedulable;
-
-import java.awt.*;
 
 
 
 public abstract class AnimatingSurface extends Surface implements Runnable {
 
-    public Schedulable thread;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   public Schedulable thread;
 
     public abstract void step(int w, int h);
 

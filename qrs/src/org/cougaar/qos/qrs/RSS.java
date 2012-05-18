@@ -101,11 +101,13 @@ public final class RSS extends ResourceContext {
 
     }
     
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         return null;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "QRS root";
     }
 
@@ -181,7 +183,8 @@ public final class RSS extends ResourceContext {
         return sites;
     }
 
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
     }
 
    
@@ -214,7 +217,8 @@ public final class RSS extends ResourceContext {
         }
     }
 
-    protected void addChild(Object id, ResourceContext child) {
+    @Override
+   protected void addChild(Object id, ResourceContext child) {
         ResourceContext preferredParent = child.preferredParent(this);
         if (preferredParent == null) {
             Logger logger = Logging.getLogger(RSS.class);
@@ -234,7 +238,8 @@ public final class RSS extends ResourceContext {
         }
     }
 
-    public ResourceContext resolveSpec(String kind, String[] parameters) {
+    @Override
+   public ResourceContext resolveSpec(String kind, String[] parameters) {
         Logger logger = Logging.getLogger(RSS.class);
         if (logger.isDebugEnabled()) {
             String paramString = "";

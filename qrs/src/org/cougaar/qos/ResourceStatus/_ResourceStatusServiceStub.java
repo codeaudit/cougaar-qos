@@ -399,9 +399,10 @@ public class _ResourceStatusServiceStub extends org.omg.CORBA.portable.ObjectImp
   private static String[] __ids = {
     "IDL:org/cougaar/qos/ResourceStatus/ResourceStatusService:1.0"};
 
-  public String[] _ids ()
+  @Override
+public String[] _ids ()
   {
-    return (String[])__ids.clone ();
+    return __ids.clone ();
   }
 
   private void readObject (java.io.ObjectInputStream s) throws java.io.IOException

@@ -37,17 +37,20 @@ public class AgentFlowServletPlugin extends ComponentPlugin
 	super();
     }
 
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();	
 	new AgentFlowServlet(sb);
     }
 
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
     }
   
-    protected void execute() {
+    @Override
+   protected void execute() {
     }
 
 }

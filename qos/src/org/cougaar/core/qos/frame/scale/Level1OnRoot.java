@@ -14,7 +14,13 @@ import org.cougaar.core.util.UID;
 
 public class Level1OnRoot
     extends Contains {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -36,22 +42,26 @@ public class Level1OnRoot
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "level1OnRoot";
     }
 
 
-    public String getParentPrototype() {
+    @Override
+   public String getParentPrototype() {
         return "root";
     }
 
 
-    public String getChildPrototype() {
+    @Override
+   public String getChildPrototype() {
         return "level1";
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
     }
 }

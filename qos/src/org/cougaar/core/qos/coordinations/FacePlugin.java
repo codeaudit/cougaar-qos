@@ -23,7 +23,8 @@ public abstract class FacePlugin<F extends Face<?>> extends TodoPlugin {
         return face;
     }
     
-    public void load() {
+    @Override
+   public void load() {
         super.load();
         if (log.isInfoEnabled()) {
             CoordinationEventType[] subscribesTo = face.consumes();

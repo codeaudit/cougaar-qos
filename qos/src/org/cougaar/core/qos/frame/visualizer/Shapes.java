@@ -1,10 +1,10 @@
 package org.cougaar.core.qos.frame.visualizer;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.awt.Rectangle;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.*;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.

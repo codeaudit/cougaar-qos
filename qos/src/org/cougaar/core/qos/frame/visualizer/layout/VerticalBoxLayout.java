@@ -1,11 +1,11 @@
 package org.cougaar.core.qos.frame.visualizer.layout;
 
-import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
-
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
+
+import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
+import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +21,8 @@ public class VerticalBoxLayout extends ShapeLayout {
         super();
     }
 
-    public void doLayout(ShapeContainer container) {
+    @Override
+   public void doLayout(ShapeContainer container) {
         Rectangle2D.Double bounds = (Rectangle2D.Double) container.getBounds2D();
         Collection children = container.getChildren();
         ShapeGraphic child;

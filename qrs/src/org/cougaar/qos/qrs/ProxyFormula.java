@@ -37,16 +37,19 @@ public class ProxyFormula extends DataFormula {
         this.delegate = delegate;
     }
 
-    protected void initialize(ResourceContext context) {
+    @Override
+   protected void initialize(ResourceContext context) {
         super.initialize(context);
         registerDependency(delegate, "Delegate");
     }
 
-    protected DataValue doCalculation(Values values) {
+    @Override
+   protected DataValue doCalculation(Values values) {
         return delegate.computeValue(true);
     }
 
-    protected boolean hasArgs(String[] args) {
+    @Override
+   protected boolean hasArgs(String[] args) {
         return delegate.hasArgs(args);
     }
 

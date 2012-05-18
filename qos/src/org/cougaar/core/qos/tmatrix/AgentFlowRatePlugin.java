@@ -71,7 +71,8 @@ public class AgentFlowRatePlugin
 	}
     
 	// done on records, not the whole matrix
-	public void newAddition(KeyMap keys,
+	@Override
+   public void newAddition(KeyMap keys,
 				DecayingHistory.SnapShot now_raw,
 				DecayingHistory.SnapShot last_raw) 
 	{
@@ -127,27 +128,24 @@ public class AgentFlowRatePlugin
     }
   
     // Component
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
     
 	ServiceBroker sb = getServiceBroker();
 
-	logging = (LoggingService)
-            sb.getService(this, LoggingService.class, null);
+	logging = sb.getService(this, LoggingService.class, null);
 
-	agentFlowService = (TrafficMatrixStatisticsService)
-	    sb.getService(this, TrafficMatrixStatisticsService.class, null);
+	agentFlowService = sb.getService(this, TrafficMatrixStatisticsService.class, null);
 	if (agentFlowService == null) {
 	    logging.error("Can't find TrafficMatrixStatsisticsService. This plugin must be loaded at Low priority");
 	    return;
 	}
     
-	metricsUpdateService = (MetricsUpdateService)
-	    sb.getService(this, MetricsUpdateService.class, null);
+	metricsUpdateService = sb.getService(this, MetricsUpdateService.class, null);
 
 
-	ThreadService threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
+	ThreadService threadService = sb.getService(this, ThreadService.class, null);
 	schedulable = threadService.getThread(this, this, "AgentFlowRatePlugin");
 	schedulable.schedule(5000, BASE_PERIOD*1000);
 	sb.releaseService(this, ThreadService.class, threadService);
@@ -178,9 +176,11 @@ public class AgentFlowRatePlugin
     }
     
     // Plugin
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
     }
   
-    protected void execute() {
+    @Override
+   protected void execute() {
     }
 }

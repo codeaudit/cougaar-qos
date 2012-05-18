@@ -47,7 +47,7 @@ abstract public class QualifierHelper
 
   public static void write (org.omg.CORBA.portable.OutputStream ostream, org.cougaar.qos.ResourceStatus.Qualifier value)
   {
-    ostream.write_Object ((org.omg.CORBA.Object) value);
+    ostream.write_Object (value);
   }
 
   public static org.cougaar.qos.ResourceStatus.Qualifier narrow (org.omg.CORBA.Object obj)

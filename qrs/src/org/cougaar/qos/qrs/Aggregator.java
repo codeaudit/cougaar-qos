@@ -35,12 +35,14 @@ abstract public class Aggregator extends DataFormula {
 
     abstract protected List<String> getElements();
 
-    protected void initialize(ResourceContext context) {
+    @Override
+   protected void initialize(ResourceContext context) {
         super.initialize(context);
         init();
     }
 
-    public void reinitialize() {
+    @Override
+   public void reinitialize() {
         super.reinitialize();
         init();
     }

@@ -66,8 +66,7 @@ abstract public class FactToFrameFacetImpl
 				   RolePlayer player)
     {
 	super(owner, sb, spec, player);
-	log = (LoggingService)
-           sb.getService(this, LoggingService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
 	this.sb = sb;
 	String files = spec.ca_parameters.getProperty("files");
 	set_name = spec.ca_parameters.getProperty("frame-set");
@@ -97,11 +96,13 @@ abstract public class FactToFrameFacetImpl
     abstract protected DataFrame getFrame(Object fact);
     abstract protected Object getModifications(Object fact);
     
-    public void setupSubscriptions(BlackboardService bbs) 
+    @Override
+   public void setupSubscriptions(BlackboardService bbs) 
     {
     }
 
-    public void execute(BlackboardService bbs)
+    @Override
+   public void execute(BlackboardService bbs)
     {
     }
 
@@ -116,8 +117,7 @@ abstract public class FactToFrameFacetImpl
     {
 	if (frameSet != null) return;
 
-	FrameSetService fss = (FrameSetService)
-	    sb.getService(this, FrameSetService.class, null);
+	FrameSetService fss = sb.getService(this, FrameSetService.class, null);
 	if (use_existing_frameset) {
 	    frameSet = fss.findFrameSet(set_name, null);
 	    if (frameSet != null) {
@@ -178,7 +178,8 @@ abstract public class FactToFrameFacetImpl
 	
     }
 
-    public void processFactBase(BlackboardService bbs)
+    @Override
+   public void processFactBase(BlackboardService bbs)
     {
 	if (!factsHaveChanged()) return;
 	ensureFrameSet(bbs);

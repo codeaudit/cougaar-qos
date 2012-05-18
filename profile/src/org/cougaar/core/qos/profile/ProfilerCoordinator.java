@@ -1,19 +1,18 @@
 package org.cougaar.core.qos.profile;
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.TimeZone;
+
+import org.cougaar.core.component.Component;
+import org.cougaar.core.component.Service;
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.service.ThreadService;
+import org.cougaar.core.thread.Schedulable;
+import org.cougaar.util.Arguments;
+import org.cougaar.util.GenericStateModelAdapter;
+import org.cougaar.util.RarelyModifiedList;
 
 /**
  * This component coordinates the profiler components to
@@ -60,7 +59,8 @@ implements Component, Runnable
     this.sb = sb;
   }
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
 
     // advertise our profiler coordination service
@@ -68,7 +68,8 @@ implements Component, Runnable
     sb.addService(ProfilerService.class, psp);
   }
 
-  public void start() {
+  @Override
+public void start() {
     super.start();
 
     // must wait for "start()" to make sure the ThreadService
@@ -108,8 +109,7 @@ implements Component, Runnable
     }
 
     // get thread
-    ThreadService threadService = (ThreadService)
-      sb.getService(this, ThreadService.class, null);
+    ThreadService threadService = sb.getService(this, ThreadService.class, null);
     thread = threadService.getThread(
         this,
         this,
@@ -157,15 +157,20 @@ implements Component, Runnable
   }
 
   private final class ProfilerSP extends ServiceProviderBase {
-    protected Class getServiceClass() { return ProfilerService.class; }
-    protected Class getClientClass() { return ProfilerService.Client.class; }
-    protected void register(Object client) {
+    @Override
+   protected Class getServiceClass() { return ProfilerService.class; }
+    @Override
+   protected Class getClientClass() { return ProfilerService.Client.class; }
+    @Override
+   protected void register(Object client) {
       profilers.add(client);
     }
-    protected void unregister(Object client) {
+    @Override
+   protected void unregister(Object client) {
       profilers.remove(client);
     }
-    protected Service getService(Object client) { return new SI(client); }
+    @Override
+   protected Service getService(Object client) { return new SI(client); }
     protected class SI extends MyServiceImpl implements ProfilerService {
       public SI(Object client) { super(client); }
       public boolean logHeader() {

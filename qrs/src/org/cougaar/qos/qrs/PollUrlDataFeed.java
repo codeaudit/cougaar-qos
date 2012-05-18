@@ -39,7 +39,8 @@ public class PollUrlDataFeed extends PropertiesDataFeed {
         super(args);
     }
     
-    protected void parseArgs(String[] args) {
+    @Override
+   protected void parseArgs(String[] args) {
         super.parseArgs(args);
         listeners = new HashMap<String, Set<DataFeedListener>>();
         pollPeriodMillis = 10000;
@@ -53,7 +54,8 @@ public class PollUrlDataFeed extends PropertiesDataFeed {
         }
     }
     
-    protected void initialize() {
+    @Override
+   protected void initialize() {
         if (pollPeriodMillis <= 0) {
             log.error("Poll period must be greater than 0 but is " +pollPeriodMillis);
             return;
@@ -61,7 +63,8 @@ public class PollUrlDataFeed extends PropertiesDataFeed {
         RSSUtils.schedule(new Poller(), 0, pollPeriodMillis);
     }
     
-    public void removeListenerForKey(DataFeedListener listener, String key) {
+    @Override
+   public void removeListenerForKey(DataFeedListener listener, String key) {
         Set<DataFeedListener> keyListeners = null;
         synchronized (listeners) {
             keyListeners = listeners.get(key);
@@ -73,7 +76,8 @@ public class PollUrlDataFeed extends PropertiesDataFeed {
         }
     }
 
-    public void addListenerForKey(DataFeedListener listener, String key) {
+    @Override
+   public void addListenerForKey(DataFeedListener listener, String key) {
         Set<DataFeedListener> keyListeners = null;
         synchronized (listeners) {
             keyListeners = listeners.get(key);

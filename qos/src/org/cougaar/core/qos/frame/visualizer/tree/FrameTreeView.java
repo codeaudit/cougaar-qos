@@ -44,7 +44,11 @@ import org.cougaar.util.log.Logging;
  * To change this template use File | Settings | File Templates.
  */
 public class FrameTreeView extends TreeView implements ChangeListener {
-    HashMap frameMap;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   HashMap frameMap;
     HashMap relationshipMap;
     HashSet relationMappedFrameNodes;
     ArrayList treePaths;
@@ -84,7 +88,8 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         return root;
     }
 
-    public Component createOtherComponent() {
+    @Override
+   public Component createOtherComponent() {
         frameInheritenceView =  new FrameInheritenceView();
 
         JPanel rightPanel = new JPanel(new BorderLayout());
@@ -106,7 +111,11 @@ public class FrameTreeView extends TreeView implements ChangeListener {
     }
 
     class RefreshFrameTreeAction extends AbstractAction {
-        public RefreshFrameTreeAction() {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      public RefreshFrameTreeAction() {
             super("Refresh Tree");
         }
         public void actionPerformed(ActionEvent e) {
@@ -136,13 +145,15 @@ public class FrameTreeView extends TreeView implements ChangeListener {
         return lbl;
     }
 
-    protected void treeSelected(Object data) {
+    @Override
+   protected void treeSelected(Object data) {
         if (data instanceof org.cougaar.core.qos.frame.Frame) {
             displayFrameInTable((org.cougaar.core.qos.frame.Frame)data);
         }
     }
 
-    protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
+    @Override
+   protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
         //frameInheritenceView.clear();
         frameInheritenceView.setFrame(frame);
         selectedFrameLabel.setText( (frame instanceof PrototypeFrame ? ((PrototypeFrame)frame).getName() : FrameModel.getName(frame)));
@@ -398,7 +409,11 @@ public class FrameTreeView extends TreeView implements ChangeListener {
      */
 
     private class FrameRenderer extends DefaultTreeCellRenderer {
-        Icon relationIcon;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      Icon relationIcon;
         Icon frameIcon;
 
         public FrameRenderer(Icon frameIcon, Icon relationIcon) {
@@ -407,7 +422,8 @@ public class FrameTreeView extends TreeView implements ChangeListener {
             this.frameIcon = frameIcon;
         }
 
-        public Component getTreeCellRendererComponent(
+        @Override
+      public Component getTreeCellRendererComponent(
                 JTree tree,
                 Object value,
                 boolean sel,

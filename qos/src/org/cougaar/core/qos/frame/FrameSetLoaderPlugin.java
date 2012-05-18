@@ -44,14 +44,15 @@ public class FrameSetLoaderPlugin extends ParameterizedPlugin {
     private LoggingService log;
     private FrameSet frameset;
 
-    public void load()    {
+    @Override
+   public void load()    {
 	super.load();
 	ServiceBroker sb = getServiceBroker();
-	log = (LoggingService)
-           sb.getService(this, LoggingService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
     }
 
-    public void start() {
+    @Override
+   public void start() {
 	String files = getParameter("frame-set-files");
 	String name = getParameter("frame-set");
 	if (files != null) {
@@ -62,8 +63,7 @@ public class FrameSetLoaderPlugin extends ParameterizedPlugin {
 
 	    ServiceBroker sb = getServiceBroker();
 	    BlackboardService bbs = getBlackboardService();
-	    FrameSetService fss = (FrameSetService)
-		sb.getService(this, FrameSetService.class, null);
+	    FrameSetService fss = sb.getService(this, FrameSetService.class, null);
 	    frameset = fss.loadFrameSet(name, xml_filenames, sb, bbs);
 	    sb.releaseService(this, FrameSetService.class, fss);
 	} else {
@@ -73,11 +73,13 @@ public class FrameSetLoaderPlugin extends ParameterizedPlugin {
 	super.start();
     }
 
-    protected void execute() {
+    @Override
+   protected void execute() {
 	frameset.processQueue();
     }
 
-    protected void setupSubscriptions()  {
+    @Override
+   protected void setupSubscriptions()  {
 	if (frameset != null) {
 	    // Set up subscriptions for handling slot dependencies
 	    frameset.initializeAggregators();

@@ -28,11 +28,11 @@
 
 package org.cougaar.qos.qrs;
 
-import org.cougaar.qos.ResourceStatus.ResourceNode;
-import org.cougaar.util.log.Logger;
-
 import java.util.Observable;
 import java.util.Observer;
+
+import org.cougaar.qos.ResourceStatus.ResourceNode;
+import org.cougaar.util.log.Logger;
 
 public class BoundDataFormula extends Observable implements DataValueChangedCallbackListener {
     private Object currentValue;
@@ -219,7 +219,8 @@ public class BoundDataFormula extends Observable implements DataValueChangedCall
         }
     }
 
-    public void addObserver(Observer o) {
+    @Override
+   public void addObserver(Observer o) {
         super.addObserver(o);
         DataValue current = (DataValue) getCurrentValue();
         if (!current.equals(DataValue.NO_VALUE) && shouldNotify(current)) {

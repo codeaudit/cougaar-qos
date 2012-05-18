@@ -60,13 +60,13 @@ public class AgentFlowAspect
 	trafficMatrix = new TrafficMatrix();
     }
   
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();
 
-	NodeControlService ncs = (NodeControlService)
-	    sb.getService(this, NodeControlService.class, null);
+	NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
 
 	if (ncs != null) {
 	    ServiceBroker rootsb = ncs.getRootServiceBroker();
@@ -160,7 +160,8 @@ public class AgentFlowAspect
     // 
     // Aspect Code to implement TrafficRecord Collection
   
-    public Object getDelegate(Object object, Class type) {
+    @Override
+   public Object getDelegate(Object object, Class type) {
 	if (type == DestinationLink.class) {
 	    return new AgentFlowDestinationLink((DestinationLink) object);
 // 	} else 	if (type == MessageDeliverer.class) {
@@ -181,7 +182,8 @@ public class AgentFlowAspect
 	}
     
     
-	public MessageAttributes forwardMessage(AttributedMessage message) 
+	@Override
+   public MessageAttributes forwardMessage(AttributedMessage message) 
 	    throws UnregisteredNameException, 
 		   NameLookupException, 
 		   CommFailureException,
@@ -202,7 +204,8 @@ public class AgentFlowAspect
 	    super(delegatee);
 	}
     
-	public MessageAttributes deliverMessage(AttributedMessage message,
+	@Override
+   public MessageAttributes deliverMessage(AttributedMessage message,
 						MessageAddress dest)
 	    throws MisdeliveredMessageException
 	{  

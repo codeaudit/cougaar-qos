@@ -1,11 +1,15 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import org.cougaar.core.qos.frame.SlotDescription;
+import java.awt.Component;
+import java.awt.Font;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
-import java.awt.*;
+
+import org.cougaar.core.qos.frame.SlotDescription;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +19,11 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class FrameTableCellRenderer extends JLabel implements TableCellRenderer {
-    Border unselectedBorder = null;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   Border unselectedBorder = null;
     Border selectedBorder = null;
     boolean isBordered = true;
     FrameTableModel model;

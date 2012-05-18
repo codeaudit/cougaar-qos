@@ -1,9 +1,9 @@
 package org.cougaar.core.qos.frame.visualizer.event;
 
+import javax.swing.event.ChangeEvent;
+
 import org.cougaar.core.qos.frame.visualizer.ShapeContainer;
 import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-
-import javax.swing.event.ChangeEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +13,11 @@ import javax.swing.event.ChangeEvent;
  * To change this template use File | Settings | File Templates.
  */
 public class ContainerChildRemovedEvent extends ChangeEvent {
-    ShapeContainer container;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   ShapeContainer container;
     ShapeGraphic remChild;
 
 

@@ -13,7 +13,8 @@ import java.beans.SimpleBeanInfo;
  *
  */
 public class DataFrameBeanInfo extends SimpleBeanInfo {
-    public PropertyDescriptor[] getPropertyDescriptors() {
+    @Override
+   public PropertyDescriptor[] getPropertyDescriptors() {
 	return new PropertyDescriptor[] {};
     }
 }

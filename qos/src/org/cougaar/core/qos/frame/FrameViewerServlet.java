@@ -58,10 +58,15 @@ import org.xml.sax.Attributes;
  */
 public class FrameViewerServlet extends ComponentServlet {
 
-  private LoggingService log;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+private LoggingService log;
   private FrameSetService fss;
 
-  protected String getPath() {
+  @Override
+protected String getPath() {
     String s = super.getPath();
     return (s == null ? "/frames" : s);
   }
@@ -70,11 +75,11 @@ public class FrameViewerServlet extends ComponentServlet {
     this.log = log;
   }
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
-    fss = (FrameSetService)
-      getServiceBroker().getService(
-          this, FrameSetService.class, null);
+    fss = getServiceBroker().getService(
+       this, FrameSetService.class, null);
     if (fss == null && log.isWarnEnabled()) {
       log.warn("Unable to obtain FrameSetService");
     }
@@ -90,7 +95,8 @@ public class FrameViewerServlet extends ComponentServlet {
 	    return x_name.compareTo(y_name);
 	}
 
-	public boolean equals(Object thing)
+	@Override
+   public boolean equals(Object thing)
 	{
 	    return thing == this;
 	}
@@ -99,7 +105,8 @@ public class FrameViewerServlet extends ComponentServlet {
     private static final java.util.Comparator cmp = new PrototypeComparator();
 
 
-  public void doGet(
+  @Override
+public void doGet(
       HttpServletRequest request,
       HttpServletResponse response) throws IOException {
     (new Worker(request, response)).execute();

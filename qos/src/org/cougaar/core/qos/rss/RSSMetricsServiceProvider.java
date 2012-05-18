@@ -69,7 +69,8 @@ public final class RSSMetricsServiceProvider extends ContainerSupport implements
     }
 
     // This is done before child-components are created
-    public void loadHighPriorityComponents() {
+    @Override
+   public void loadHighPriorityComponents() {
         super.loadHighPriorityComponents();
         ServiceBroker sb = getServiceBroker();
         NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
@@ -121,7 +122,8 @@ public final class RSSMetricsServiceProvider extends ContainerSupport implements
 
     // Container API
 
-    protected ComponentDescriptions findInitialComponentDescriptions() {
+    @Override
+   protected ComponentDescriptions findInitialComponentDescriptions() {
         ServiceBroker sb = getServiceBroker();
         ComponentInitializerService cis =
                 sb.getService(this, ComponentInitializerService.class, null);
@@ -141,7 +143,8 @@ public final class RSSMetricsServiceProvider extends ContainerSupport implements
         }
     }
 
-    protected String specifyContainmentPoint() {
+    @Override
+   protected String specifyContainmentPoint() {
         return Agent.INSERTION_POINT + ".MetricsServices";
     }
 }

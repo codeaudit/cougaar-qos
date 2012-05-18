@@ -1,13 +1,13 @@
 package org.cougaar.core.qos.frame.visualizer;
 
 
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
-import org.cougaar.core.qos.frame.visualizer.util.Vec2d;
-
+import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.*;
+
+import org.cougaar.core.qos.frame.visualizer.util.Vec2d;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 /**
  * Created by IntelliJ IDEA.
@@ -141,7 +141,8 @@ public class Transition {
         shape.drawLabel(g2);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         String from = (fromContainer != null ? fromContainer.id : "null");
         String to = (toContainer != null ? toContainer.id : "null");
         return "Transition:  move '"+shape.id+"'  from '"+from+"' to '"+to+"'";

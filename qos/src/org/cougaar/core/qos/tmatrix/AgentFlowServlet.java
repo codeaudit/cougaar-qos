@@ -41,7 +41,11 @@ import org.cougaar.core.servlet.ServletFrameset;
 public class AgentFlowServlet
     extends ServletFrameset
 {
-    private LoggingService logging;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private LoggingService logging;
     private TrafficMatrix agentFlowSnapshot;
 
     private final java.text.DecimalFormat f4_2 = 
@@ -63,11 +67,13 @@ public class AgentFlowServlet
 	}
     }
     
-    public String getPath() {
+    @Override
+   public String getPath() {
 	return "/agent/traffic";
     }
     
-    public String getTitle () {
+    @Override
+   public String getTitle () {
 	return "Outgoing Agent to Agent Traffic on Node " + getNodeID();
     }
   
@@ -119,7 +125,8 @@ public class AgentFlowServlet
 	out.println("</table>");
     }
 
-    public void printPage(HttpServletRequest request, PrintWriter out) {
+    @Override
+   public void printPage(HttpServletRequest request, PrintWriter out) {
 	agentFlowSnapshot = agentFlowService.snapshotMatrix();
 	printMatrix(out);
     }

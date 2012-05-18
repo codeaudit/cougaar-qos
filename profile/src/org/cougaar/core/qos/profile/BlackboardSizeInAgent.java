@@ -1,21 +1,10 @@
 package org.cougaar.core.qos.profile;
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.blackboard.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.plugin.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.cougaar.core.blackboard.IncrementalSubscription;
+import org.cougaar.core.plugin.ComponentPlugin;
+import org.cougaar.util.UnaryPredicate;
 
 /**
  * This component supports the node-level {@link BlackboardSize}
@@ -65,7 +54,8 @@ implements BlackboardSizeService.Client
   private final IncrementalSubscription[] subs = 
     new IncrementalSubscription[CLASSES.length];
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
 
     for (int i = 0; i < CLASSNAMES.length; i++) {
@@ -78,29 +68,35 @@ implements BlackboardSizeService.Client
     }
     data.put("transactions", trans);
 
-    bss = (BlackboardSizeService)
-      getServiceBroker().getService(
-          this,
-          BlackboardSizeService.class, 
-          null);
+    bss = getServiceBroker().getService(
+       this,
+       BlackboardSizeService.class, 
+       null);
     if (bss == null) {
       throw new RuntimeException(
           "Unable to obtain bss");
     }
   }
 
-  protected void setupSubscriptions() {
+  @Override
+protected void setupSubscriptions() {
     for (int i = 0; i < CLASSES.length; i++) {
       final Class cl = CLASSES[i];
       UnaryPredicate p = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+          * 
+          */
+         private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
           return cl.isAssignableFrom(o.getClass());
         }
       };
       subs[i] = (IncrementalSubscription) blackboard.subscribe(p);
     }
   }
-  protected void execute() {
+  @Override
+protected void execute() {
     trans[CURRENT]++;
     trans[ADD]++;
     for (int i = 0; i < CLASSES.length; i++) {

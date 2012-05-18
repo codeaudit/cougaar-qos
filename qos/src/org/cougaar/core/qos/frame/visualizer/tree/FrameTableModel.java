@@ -19,7 +19,11 @@ import org.cougaar.core.qos.frame.SlotDescription;
  */
 
 public class FrameTableModel extends TBLModel {
-    org.cougaar.core.qos.frame.Frame frame;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   org.cougaar.core.qos.frame.Frame frame;
     ArrayList frameSlotNames;
     Properties frameSlots;
     HashMap localSlots;
@@ -121,7 +125,8 @@ public class FrameTableModel extends TBLModel {
       return inheritedSlots.get(slotName) != null;
   }
 
-  public void clear() {
+  @Override
+public void clear() {
     frame = null;
     frameSlots.clear();
     frameSlotNames.clear();
@@ -132,16 +137,20 @@ public class FrameTableModel extends TBLModel {
     fireTableDataChanged();
   }
 
-  public String getColumnName(int col) {
+  @Override
+public String getColumnName(int col) {
     if (col > -1 && col < columnNames.length)
       return columnNames[col];
     return "";
   }
 
-  public int getColumnCount() { return columnNames.length;}
-  public int getRowCount() { return frameSlotNames.size();}
+  @Override
+public int getColumnCount() { return columnNames.length;}
+  @Override
+public int getRowCount() { return frameSlotNames.size();}
 
-  public Object getValueAt(int row, int col) {
+  @Override
+public Object getValueAt(int row, int col) {
       if (row >-1 && row < frameSlotNames.size()) {
         Object val= ( col == 0 ? frameSlotNames.get(row) : frameSlots.get(frameSlotNames.get(row)));
 	if (val == null || val.equals(DataFrame.NIL))
@@ -151,15 +160,18 @@ public class FrameTableModel extends TBLModel {
     return null;
   }
 
-  public Class getColumnClass(int col) {
+  @Override
+public Class getColumnClass(int col) {
       return Object.class;
   }
 
-  public boolean isCellEditable(int row, int col) {
+  @Override
+public boolean isCellEditable(int row, int col) {
     return (col == 0 ? false : !isReadOnly(row));
   }
 
-  public void setValueAt(Object value, int row, int col) {
+  @Override
+public void setValueAt(Object value, int row, int col) {
     if (row >-1 && row < frameSlotNames.size() && !isReadOnly(row)) {
         frameSlots.setProperty((String)frameSlotNames.get(row), (String) value);
         //frame.setValue((String)frameSlotNames.get(row), value);

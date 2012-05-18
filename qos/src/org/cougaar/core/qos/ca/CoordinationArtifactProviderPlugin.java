@@ -40,7 +40,8 @@ abstract public class CoordinationArtifactProviderPlugin
     protected abstract CoordinationArtifactProviderImpl 
 	makeProvider(ServiceBroker sb);
 
-    public void start()
+    @Override
+   public void start()
     {
 	super.start();
 
@@ -48,11 +49,13 @@ abstract public class CoordinationArtifactProviderPlugin
 	makeProvider(sb);
     }
 
-    protected void setupSubscriptions() 
+    @Override
+   protected void setupSubscriptions() 
     {
     }
     
-    protected void execute() 
+    @Override
+   protected void execute() 
     {
     }
 

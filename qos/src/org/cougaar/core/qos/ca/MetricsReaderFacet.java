@@ -54,8 +54,7 @@ abstract public class MetricsReaderFacet
     {
 	super(owner, sb, spec, player);
 	subscriptionKeys = new HashMap();
-	metricsService = (MetricsService)
-	    sb.getService(this, MetricsService.class, null);
+	metricsService = sb.getService(this, MetricsService.class, null);
 	linkPlayer();
     }
 
@@ -104,15 +103,18 @@ abstract public class MetricsReaderFacet
 	
     }
 
-    public void setupSubscriptions(BlackboardService blackboard)
+    @Override
+   public void setupSubscriptions(BlackboardService blackboard)
     {
     }
 
-    public void execute(BlackboardService blackboard)
+    @Override
+   public void execute(BlackboardService blackboard)
     {
     }
 
-    public void processFactBase(BlackboardService blackboard)
+    @Override
+   public void processFactBase(BlackboardService blackboard)
     {
 	if (!factsHaveChanged()) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {

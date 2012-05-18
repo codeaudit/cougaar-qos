@@ -29,6 +29,11 @@
 package org.cougaar.qos.qrs;
 
 public class NullFormulaException extends Exception {
-    public NullFormulaException() {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+   public NullFormulaException() {
     }
 }

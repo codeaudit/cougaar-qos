@@ -49,7 +49,7 @@ abstract public class MinDeltaQualifierFactoryHelper
 
   public static void write (org.omg.CORBA.portable.OutputStream ostream, org.cougaar.qos.ResourceStatus.MinDeltaQualifierFactory value)
   {
-    ostream.write_Object ((org.omg.CORBA.Object) value);
+    ostream.write_Object (value);
   }
 
   public static org.cougaar.qos.ResourceStatus.MinDeltaQualifierFactory narrow (org.omg.CORBA.Object obj)

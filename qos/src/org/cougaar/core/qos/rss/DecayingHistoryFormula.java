@@ -52,7 +52,8 @@ public class DecayingHistoryFormula extends DataFormula {
         return new DataValue(0);
     }
 
-    protected void initialize(ResourceContext context) {
+    @Override
+   protected void initialize(ResourceContext context) {
         super.initialize(context);
 
         String key = prefix + KEY_SEPR + kind + period + Constants.SecAvgKeySuffix;
@@ -68,13 +69,15 @@ public class DecayingHistoryFormula extends DataFormula {
         registerDependency(dependency, "Formula");
     }
 
-    protected DataValue doCalculation(DataFormula.Values values) {
+    @Override
+   protected DataValue doCalculation(DataFormula.Values values) {
         DataValue computedValue = values.get("Formula");
         DataValue defaultValue = defaultValue();
         return DataValue.mostCredible(computedValue, defaultValue);
     }
 
-    protected void setArgs(String[] args) {
+    @Override
+   protected void setArgs(String[] args) {
         super.setArgs(args);
         this.period = args[0];
     }

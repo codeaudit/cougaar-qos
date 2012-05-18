@@ -31,7 +31,8 @@ package org.cougaar.qos.qrs;
 import org.cougaar.util.log.Logger;
 
 abstract public class Every extends Aggregator {
-    protected DataValue doCalculation(Values values) {
+    @Override
+   protected DataValue doCalculation(Values values) {
         double cred = values.minPositiveCredibility();
         boolean result = true;
         for (DataValue value : values.values()) {

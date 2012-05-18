@@ -107,7 +107,8 @@ public class GossipAspect
     // for key gossip.
     private HashMap neighborLocks;
 
-    public Object getDelegate(Object delegatee, Class type) 
+    @Override
+   public Object getDelegate(Object delegatee, Class type) 
     {
 	if (type == DestinationLink.class) {
 	    // RPC Links  only!
@@ -126,21 +127,19 @@ public class GossipAspect
     private synchronized void ensureQualifierService() {
 	if (qualifierService == null) {
 	    ServiceBroker sb = getServiceBroker();
-	    qualifierService = (GossipQualifierService)
-		sb.getService(this, GossipQualifierService.class, null);
+	    qualifierService = sb.getService(this, GossipQualifierService.class, null);
 	}
     }
 
 
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();
 
-	metricsService = (MetricsService)
-	    sb.getService(this, MetricsService.class, null);
-	wpService = (WhitePagesService)
-	    sb.getService(this, WhitePagesService.class, null);
+	metricsService = sb.getService(this, MetricsService.class, null);
+	wpService = sb.getService(this, WhitePagesService.class, null);
 	localRequests = new KeyGossip();
 	allRequests = new KeyGossip();
 	pendingRequests = new HashMap();
@@ -150,8 +149,7 @@ public class GossipAspect
 
 	keyService = new GossipKeyDistributionServiceImpl();
 	
-	NodeControlService ncs = (NodeControlService)
-	    sb.getService(this, NodeControlService.class, null);
+	NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
 	ServiceBroker rootsb = ncs.getRootServiceBroker();
 
 	ServiceProvider sp = new GossipServices();
@@ -298,8 +296,7 @@ public class GossipAspect
 	ServiceBroker sb = getServiceBroker();
 	synchronized (this) {
 	    if (updateService == null) 
-		updateService = (GossipUpdateService)
-		    sb.getService(this, GossipUpdateService.class, null);
+		updateService = sb.getService(this, GossipUpdateService.class, null);
 	    if (updateService != null) {
 		gossip.update(updateService);
 	    }
@@ -392,7 +389,8 @@ public class GossipAspect
 	    super(delegatee);
 	}
 
-	public MessageAttributes forwardMessage(AttributedMessage message) 
+	@Override
+   public MessageAttributes forwardMessage(AttributedMessage message) 
 	    throws UnregisteredNameException, 
 		   NameLookupException, 
 		   CommFailureException,
@@ -433,7 +431,8 @@ public class GossipAspect
 	    super(delegatee);
 	}
 
-	public MessageAttributes deliverMessage(AttributedMessage message,
+	@Override
+   public MessageAttributes deliverMessage(AttributedMessage message,
 						MessageAddress dest)
 	    throws MisdeliveredMessageException
 	{

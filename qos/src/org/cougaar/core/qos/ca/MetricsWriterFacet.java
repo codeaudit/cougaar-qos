@@ -46,8 +46,7 @@ abstract public class MetricsWriterFacet
 				 RolePlayer player)
     {
 	super(owner, sb, spec, player);
-	metricsUpdateService = (MetricsUpdateService)
-	    sb.getService(this, MetricsUpdateService.class, null);
+	metricsUpdateService = sb.getService(this, MetricsUpdateService.class, null);
 	linkPlayer();
     }
 
@@ -63,15 +62,18 @@ abstract public class MetricsWriterFacet
 	metricsUpdateService.updateValue(key, value);
     }
 
-    public void setupSubscriptions(BlackboardService blackboard)
+    @Override
+   public void setupSubscriptions(BlackboardService blackboard)
     {
     }
 
-    public void execute(BlackboardService blackboard)
+    @Override
+   public void execute(BlackboardService blackboard)
     {
     }
 
-    public void processFactBase(BlackboardService blackboard)
+    @Override
+   public void processFactBase(BlackboardService blackboard)
     {
 	if (!factsHaveChanged()) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {

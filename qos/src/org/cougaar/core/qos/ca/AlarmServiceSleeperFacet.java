@@ -47,8 +47,7 @@ abstract public class AlarmServiceSleeperFacet
 				       RolePlayer player)
     {
 	super(owner, sb, spec, player);
- 	alarmService = (AlarmService)
-	    sb.getService(this, AlarmService.class, null);
+ 	alarmService = sb.getService(this, AlarmService.class, null);
 	linkPlayer();
     }
 
@@ -56,7 +55,8 @@ abstract public class AlarmServiceSleeperFacet
 
 
 
-    protected void processFactAssertion(Object fact)
+    @Override
+   protected void processFactAssertion(Object fact)
     {
 	Alarm alarm = makeAlarm(fact);
 	alarmService.addRealTimeAlarm(alarm);

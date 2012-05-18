@@ -1,8 +1,9 @@
 package org.cougaar.core.qos.frame.visualizer;
 
+import java.awt.Color;
+import java.awt.Paint;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.

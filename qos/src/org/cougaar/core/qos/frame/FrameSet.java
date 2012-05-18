@@ -35,7 +35,6 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
 
-import org.cougaar.core.qos.frame.aggregator.SlotAggregator;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.util.UID;
 import org.xml.sax.Attributes;

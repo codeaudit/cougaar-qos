@@ -56,6 +56,7 @@ public class ServiceDS extends CougaarDS {
                 return new ServiceDS(parameters, parent);
             }
 
+            @Override
             public Object identifyParameters(String[] parameters) {
                 if (parameters == null || parameters.length != 1) {
                     return null;
@@ -73,14 +74,16 @@ public class ServiceDS extends CougaarDS {
         super(parameters, parent);
     }
 
-    protected boolean useParentPath() {
+    @Override
+   protected boolean useParentPath() {
         return false;
     }
 
     // Service DataScopes can be the first element in a path. They must
     // find or make the corresponding NodeDS and return that as the
     // preferred parent.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
         NodeIdentificationService node_id_svc =
                 sb.getService(this, NodeIdentificationService.class, null);
@@ -96,7 +99,8 @@ public class ServiceDS extends CougaarDS {
         return parent;
     }
 
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("ServiceDS: wrong number of parameters");
         }
@@ -110,7 +114,8 @@ public class ServiceDS extends CougaarDS {
         }
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals(Constants.CPU_LOAD_AVG) || kind.equals(Constants.CPU_LOAD_MJIPS)) {
             return new DecayingHistoryFormula(historyPrefix, kind);
         } else {

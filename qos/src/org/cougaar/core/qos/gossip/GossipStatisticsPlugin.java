@@ -39,7 +39,8 @@ public class GossipStatisticsPlugin extends ComponentPlugin
 	super();
     }
 
-    public void load() 
+    @Override
+   public void load() 
     {
 	super.load();
 
@@ -47,11 +48,13 @@ public class GossipStatisticsPlugin extends ComponentPlugin
 	new GossipServlet(sb);
     }
 
-    protected void setupSubscriptions() 
+    @Override
+   protected void setupSubscriptions() 
     {
     }
   
-    protected void execute() 
+    @Override
+   protected void execute() 
     {
     }
 

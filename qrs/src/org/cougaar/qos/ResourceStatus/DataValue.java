@@ -11,14 +11,19 @@ package org.cougaar.qos.ResourceStatus;
 public final class DataValue implements org.omg.CORBA.portable.IDLEntity
 {
 
-  // when it entered the rss
-  public long timestamp = (long)0;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+// when it entered the rss
+  public long timestamp = 0;
 
   // how quickly its usefulness decreases
-  public long halflife = (long)0;
+  public long halflife = 0;
 
   // how believable it is (0-1)
-  public double credibility = (double)0;
+  public double credibility = 0;
 
   // what units it's in (not usually filled in)
   public String units = null;

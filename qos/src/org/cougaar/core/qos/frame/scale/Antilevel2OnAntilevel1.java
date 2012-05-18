@@ -14,7 +14,13 @@ import org.cougaar.core.util.UID;
 
 public class Antilevel2OnAntilevel1
     extends Relationship {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -36,22 +42,26 @@ public class Antilevel2OnAntilevel1
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "antilevel2OnAntilevel1";
     }
 
 
-    public String getParentPrototype() {
+    @Override
+   public String getParentPrototype() {
         return "antilevel1";
     }
 
 
-    public String getChildPrototype() {
+    @Override
+   public String getChildPrototype() {
         return "antilevel2";
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
     }
 }

@@ -60,7 +60,8 @@ public class ConfigFinderDataFeedComponent extends QosComponent {
     public ConfigFinderDataFeedComponent() {
     }
 
-    public void load() {
+    @Override
+   public void load() {
         super.load();
 
         Feed feed = new Feed(urlString);
@@ -83,7 +84,8 @@ public class ConfigFinderDataFeedComponent extends QosComponent {
             super(properties_url);
         }
 
-        protected InputStream openURI(URI uri) throws IOException {
+        @Override
+      protected InputStream openURI(URI uri) throws IOException {
             String scheme = uri.getScheme();
             String path = uri.getSchemeSpecificPart();
 

@@ -49,7 +49,8 @@ public class ProcessDS extends ResourceContext {
     private static final String PID = "pid";
     private static final String PORT = "port";
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         return null;
     }
 
@@ -57,7 +58,8 @@ public class ProcessDS extends ResourceContext {
      * The parameters should contain one string, the port of the host being
      * monitored.
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("ProcessDS: wrong number of parameters");
         } else {

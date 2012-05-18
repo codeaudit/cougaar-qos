@@ -44,10 +44,18 @@ import org.cougaar.util.log.Logging;
  */
 public class Path
     implements UniqueObject {
-    private transient Logger log = Logging.getLogger(getClass().getName());
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private transient Logger log = Logging.getLogger(getClass().getName());
 
     static class Fork implements java.io.Serializable {
-	private String role;
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   private String role;
 	private String relation;
 
 	Fork(String role, String relation) {

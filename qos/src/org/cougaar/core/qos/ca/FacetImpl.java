@@ -56,7 +56,12 @@ abstract public class FacetImpl
 
 
     private static class SimpleQueue extends LinkedList {
-	Object next() {
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+   Object next() {
 	    return removeFirst();
 	}
     }
@@ -73,18 +78,15 @@ abstract public class FacetImpl
 	this.factQueue = new SimpleQueue();
 
 	this.sb = sb;
-	log = (LoggingService)
-	    sb.getService(this, LoggingService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
 
-	uids = (UIDService)
-	    sb.getService(this, UIDService.class, null);
+	uids = sb.getService(this, UIDService.class, null);
 	
 
 	// get agent id
-	AgentIdentificationService agentIdService = (AgentIdentificationService) 
-	    sb.getService(this, 
-			  AgentIdentificationService.class, 
-			  null);
+	AgentIdentificationService agentIdService = sb.getService(this, 
+   	  AgentIdentificationService.class, 
+   	  null);
 	if (agentIdService == null) {
 	    throw new RuntimeException("Unable to obtain agent-id service");
 	}

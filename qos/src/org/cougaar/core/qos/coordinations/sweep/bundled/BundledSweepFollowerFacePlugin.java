@@ -65,7 +65,8 @@ public abstract class BundledSweepFollowerFacePlugin
      * At the end of an execute, deal with any pending responses
      * if it's our turn to send.
      */
-    public void execute () {
+    @Override
+   public void execute () {
         super.execute();
         if (somethingToSend() && ourTurnToSendRelay) {
             Bundle pending = new Bundle(pendingAddResponses,

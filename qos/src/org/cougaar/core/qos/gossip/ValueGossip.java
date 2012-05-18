@@ -38,8 +38,19 @@ class ValueGossip
     extends Gossip
 {
 
-    private static class Data implements java.io.Serializable {
-	Data(Metric metric) {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   private static class Data implements java.io.Serializable {
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+   Data(Metric metric) {
 	    this.metric = metric;
 	}
 

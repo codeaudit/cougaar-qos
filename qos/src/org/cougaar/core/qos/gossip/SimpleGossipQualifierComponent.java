@@ -42,12 +42,12 @@ import org.cougaar.mts.base.BoundComponent;
 public class SimpleGossipQualifierComponent
     extends BoundComponent 
 {
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 
 	ServiceBroker sb = getServiceBroker();
-	NodeIdentificationService nis = (NodeIdentificationService)
-	    sb.getService(this, NodeIdentificationService.class, null);
+	NodeIdentificationService nis = sb.getService(this, NodeIdentificationService.class, null);
 	String node = nis.getMessageAddress().getAddress();
 
 	ServiceProvider sp = new Provider(node);

@@ -26,8 +26,8 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
-import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.Map;
 
 import org.cougaar.qos.qrs.DataValue;
@@ -52,7 +52,8 @@ public class LinuxCPUInfo extends SysStatHandler {
     private BufferedReader br;
     private String bogomips_key, cache_key, clock_key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         String prefix = "Host" + KEY_SEPR + host + KEY_SEPR + "CPU" + KEY_SEPR;
         bogomips_key = prefix + "bogomips";
         cache_key = prefix + "cache";
@@ -66,7 +67,8 @@ public class LinuxCPUInfo extends SysStatHandler {
         }
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         fr = null;
         try {
             fr = new FileReader("/proc/cpuinfo");

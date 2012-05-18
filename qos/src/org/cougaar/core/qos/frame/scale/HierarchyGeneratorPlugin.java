@@ -33,9 +33,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
-import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.service.LoggingService;
 
 public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements FrameSetService.Callback {
@@ -47,14 +47,15 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
     private int maxDepth;
     private int totalFrames;
     
-    public void start() {
+    @Override
+   public void start() {
 	height = (int) getParameter("height", 1);
 	maxDepth = height + 1;
 	degree = (int) getParameter("degree", 2);
 	String frameSetName = getParameter("frame-set");
 	ServiceBroker sb = getServiceBroker();
-	log = (LoggingService) sb.getService(this, LoggingService.class, null);
-	FrameSetService fss = (FrameSetService) sb.getService(this, FrameSetService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
+	FrameSetService fss = sb.getService(this, FrameSetService.class, null);
 	if (fss == null) {
 	    log.error("Couldn't find FrameSetService");
 	} else {
@@ -126,13 +127,15 @@ public class HierarchyGeneratorPlugin extends ParameterizedPlugin implements Fra
 	populated = true;
     }
     
-    protected void execute() {
+    @Override
+   protected void execute() {
 	if (frameset != null && !populated) {
 	    populateFrameSet();
 	}
     }
 
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
 	if (frameset != null && !populated) {
 	    populateFrameSet();
 	}

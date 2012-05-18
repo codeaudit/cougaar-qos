@@ -55,9 +55,10 @@ public abstract class EveryQualifierFactoryPOA extends org.omg.PortableServer.Se
     "IDL:org/cougaar/qos/ResourceStatus/EveryQualifierFactory:1.0", 
     "IDL:org/cougaar/qos/ResourceStatus/QualifierFactory:1.0"};
 
-  public String[] _all_interfaces (org.omg.PortableServer.POA poa, byte[] objectId)
+  @Override
+public String[] _all_interfaces (org.omg.PortableServer.POA poa, byte[] objectId)
   {
-    return (String[])__ids.clone ();
+    return __ids.clone ();
   }
 
   public EveryQualifierFactory _this() 

@@ -8,7 +8,11 @@ package org.cougaar.core.qos.frame.visualizer.shapes;
  * To change this template use File | Settings | File Templates.
  */
 public class Ellipse extends java.awt.geom.Ellipse2D.Double {
-    public Ellipse() {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   public Ellipse() {
         super();
     }
     public Ellipse(double x, double y, double w, double h) {

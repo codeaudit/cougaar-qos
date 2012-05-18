@@ -37,11 +37,11 @@ import org.cougaar.core.agent.service.alarm.Alarm;
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.qos.frame.DataFrame;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
 import org.cougaar.core.qos.metrics.Metric;
-import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.qos.rss.AgentTopologyService;
 import org.cougaar.core.service.AlarmService;
 import org.cougaar.core.service.BlackboardService;
@@ -382,17 +382,18 @@ extends ParameterizedPlugin {
          }
     }
     
-    public void load() {
+    @Override
+   public void load() {
         super.load();
         ServiceBroker sb = getServiceBroker();
-        log = (LoggingService)
-        sb.getService(this, LoggingService.class, null);
-        alarmService = (AlarmService)  sb.getService(this, AlarmService.class, null);
-        wp = (WhitePagesService)  sb.getService(this, WhitePagesService.class, null);
-        topologyService = (AgentTopologyService) sb.getService(this, AgentTopologyService.class, null);
+        log = sb.getService(this, LoggingService.class, null);
+        alarmService = sb.getService(this, AlarmService.class, null);
+        wp = sb.getService(this, WhitePagesService.class, null);
+        topologyService = sb.getService(this, AgentTopologyService.class, null);
     }
     
-    public void start() {
+    @Override
+   public void start() {
          String files = getParameter("frame-set-files",
                                              "org/cougaar/core/qos/frame/topology/cougaar-topology-protos.xml");
         String name = getParameter("frame-set","societyTopology");
@@ -406,8 +407,7 @@ extends ParameterizedPlugin {
             // Create Frameset
             ServiceBroker sb = getServiceBroker();
             BlackboardService bbs = getBlackboardService();
-            FrameSetService fss = (FrameSetService)
-            sb.getService(this, FrameSetService.class, null);
+            FrameSetService fss = sb.getService(this, FrameSetService.class, null);
             frameSet = fss.loadFrameSet(name, xml_filenames, sb, bbs);
             // TODO remove Test Frames
 //            addHost("test");
@@ -441,24 +441,40 @@ extends ParameterizedPlugin {
     
     
     private static final UnaryPredicate agentPredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             return (o instanceof Agent);
         }
     }; 
     
     private static final UnaryPredicate nodePredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             return (o instanceof Node);
         }
     }; 
     
     private static final UnaryPredicate hostPredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             return (o instanceof Host);
         }
     }; 
       
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
         //JAZ can't directly monitor indcators, because slot changes do not propagate to childern
         //indicatorSubscription = (IncrementalSubscription) blackboard.subscribe(indicatorPredicate);
         agentSubscription = (IncrementalSubscription) blackboard.subscribe(agentPredicate);
@@ -467,7 +483,8 @@ extends ParameterizedPlugin {
         }
 
 
-    protected void execute() {
+    @Override
+   protected void execute() {
         // Process all the Frame.set changes. this has to be done for any frameset
         frameSet.processQueue();
 

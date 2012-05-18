@@ -66,7 +66,8 @@ public class TrivialDataFeed extends SimpleQueueingDataFeed {
         }
     }
 
-    protected Runnable makeNotifier() {
+    @Override
+   protected Runnable makeNotifier() {
         return new Notifier();
     }
 
@@ -82,7 +83,8 @@ public class TrivialDataFeed extends SimpleQueueingDataFeed {
         sb.releaseService(this, ThreadService.class, threadService);
     }
 
-    protected void dispatch() {
+    @Override
+   protected void dispatch() {
         thread.start();
     }
 

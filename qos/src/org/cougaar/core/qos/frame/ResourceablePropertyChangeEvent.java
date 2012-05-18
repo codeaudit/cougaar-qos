@@ -33,7 +33,12 @@ import java.beans.PropertyChangeEvent;
  *
  */
 public class ResourceablePropertyChangeEvent extends PropertyChangeEvent {
-    public ResourceablePropertyChangeEvent (Object source, String propertyName, Object oldValue, Object newValue) {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+   public ResourceablePropertyChangeEvent (Object source, String propertyName, Object oldValue, Object newValue) {
 	super(source, propertyName, oldValue, newValue);
     }
     

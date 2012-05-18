@@ -129,7 +129,8 @@ public class RSSMetricsServiceImpl extends QosComponent
     public RSSMetricsServiceImpl() {
     }
 
-    public void load() {
+    @Override
+   public void load() {
         super.load();
 
         ServiceBroker sb = getServiceBroker();

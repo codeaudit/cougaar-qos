@@ -186,7 +186,11 @@ public class SlotAggregation {
     }
     
     private class FramePredicate implements UnaryPredicate {
-	private final String attribute = otherRole + "-prototype";
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   private final String attribute = otherRole + "-prototype";
 	private Class relatedFrameClass;
 	
 	public boolean execute(Object o) {
@@ -205,7 +209,11 @@ public class SlotAggregation {
     }
     
     private class RelationPredicate implements UnaryPredicate {
-	private Class relationshipClass;
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   private Class relationshipClass;
 	
 	public boolean execute(Object o) {
 	    if (!(o instanceof DataFrame)) return false;

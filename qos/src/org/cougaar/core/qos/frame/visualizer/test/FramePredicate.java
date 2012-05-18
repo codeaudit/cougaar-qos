@@ -62,7 +62,8 @@ public class FramePredicate {
         return false;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "<Predicate: kind='"+kind+"' name='"+name+"'>";// frameset="+frameset+">";
 
     }

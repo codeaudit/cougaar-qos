@@ -15,7 +15,13 @@ import org.cougaar.core.util.UID;
 
 public class MsgOutIndicator
     extends MsgIndicator {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -39,12 +45,14 @@ public class MsgOutIndicator
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "msgOutIndicator";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getWatchSlot__AsObject();
@@ -93,7 +101,8 @@ public class MsgOutIndicator
     }
 
 
-    protected Object getLocalValue(String __slot) {
+    @Override
+   protected Object getLocalValue(String __slot) {
        String __key = __slot.intern();
        if ("watchSlot" == __key)
             return getWatchSlot__AsObject();
@@ -102,7 +111,8 @@ public class MsgOutIndicator
     }
 
 
-    protected void setLocalValue(String __slot,
+    @Override
+   protected void setLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("watchSlot" == __key)
@@ -112,7 +122,8 @@ public class MsgOutIndicator
     }
 
 
-    protected void initializeLocalValue(String __slot,
+    @Override
+   protected void initializeLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("watchSlot" == __key)
@@ -122,7 +133,8 @@ public class MsgOutIndicator
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("watchSlot");
     }
@@ -146,7 +158,8 @@ public class MsgOutIndicator
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("watchSlot", slotMetaData__WatchSlot());
     }

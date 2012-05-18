@@ -26,15 +26,15 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.cougaar.qos.qrs.DataValue;
 import org.cougaar.qos.qrs.Logging;
 import org.cougaar.util.log.Logger;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 public class ProcessStats extends SysStatHandler {
     private static final String CommandPrefix = "/bin/ps -o pcpu,pmem,rss,time -p ";
@@ -59,7 +59,8 @@ public class ProcessStats extends SysStatHandler {
                 + "CPUTIME";
     }
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         cpu_key = makePCPUKey(host, pid);
         mem_key = makePMEMKey(host, pid);
         rsz_key = makeRSZKey(host, pid);
@@ -123,7 +124,8 @@ public class ProcessStats extends SysStatHandler {
 
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         Logger logger = Logging.getLogger(ProcessStats.class);
         String line = null;
         try {

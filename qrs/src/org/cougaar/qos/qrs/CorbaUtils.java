@@ -28,21 +28,6 @@
 
 package org.cougaar.qos.qrs;
 
-import org.cougaar.util.log.Logger;
-import org.omg.PortableServer.POA;
-import org.omg.PortableServer.POAHelper;
-import org.omg.CORBA.ORB;
-import org.omg.CosNaming.NameComponent;
-import org.omg.CosNaming.NamingContext;
-import org.omg.CosNaming.NamingContextHelper;
-import org.omg.CosNaming.NamingContextExt;
-import org.omg.CosNaming.NamingContextExtHelper;
-import org.omg.CosNaming.NamingContextPackage.AlreadyBound;
-import org.omg.CosNaming.NamingContextPackage.CannotProceed;
-import org.omg.CosNaming.NamingContextPackage.InvalidName;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
-import org.omg.PortableServer.Servant;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -52,6 +37,21 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Properties;
+
+import org.cougaar.util.log.Logger;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContext;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CosNaming.NamingContextHelper;
+import org.omg.CosNaming.NamingContextPackage.AlreadyBound;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.omg.CosNaming.NamingContextPackage.InvalidName;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+import org.omg.PortableServer.Servant;
 
 public class CorbaUtils {
 

@@ -33,11 +33,13 @@ import org.cougaar.qos.qrs.DataValue;
 public class CPUCount extends SysStatHandler {
     private String key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         key = "Host" + KEY_SEPR + host + KEY_SEPR + "CPU" + KEY_SEPR + "count";
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         int cpuCount = Runtime.getRuntime().availableProcessors();
         map.put(key, new DataValue(cpuCount, SECOND_MEAS_CREDIBILITY, "", PROVENANCE));
     }

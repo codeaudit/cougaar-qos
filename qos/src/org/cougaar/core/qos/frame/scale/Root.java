@@ -15,7 +15,13 @@ import org.cougaar.core.util.UID;
 
 public class Root
     extends Thing {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -44,12 +50,14 @@ public class Root
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "root";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getRootSlotFloat__AsObject();
@@ -227,7 +235,8 @@ public class Root
     }
 
 
-    protected Object getLocalValue(String __slot) {
+    @Override
+   protected Object getLocalValue(String __slot) {
        String __key = __slot.intern();
        if ("rootSlotFloat" == __key)
             return getRootSlotFloat__AsObject();
@@ -242,7 +251,8 @@ public class Root
     }
 
 
-    protected void setLocalValue(String __slot,
+    @Override
+   protected void setLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("rootSlotFloat" == __key)
@@ -258,7 +268,8 @@ public class Root
     }
 
 
-    protected void initializeLocalValue(String __slot,
+    @Override
+   protected void initializeLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("rootSlotFloat" == __key)
@@ -274,7 +285,8 @@ public class Root
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("rootSlotFloat");
         slots.add("avgLevel1");
@@ -354,7 +366,8 @@ public class Root
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("rootSlotFloat", slotMetaData__RootSlotFloat());
         map.put("avgLevel1", slotMetaData__AvgLevel1());

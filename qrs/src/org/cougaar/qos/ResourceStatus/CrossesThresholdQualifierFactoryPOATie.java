@@ -28,7 +28,8 @@ public class CrossesThresholdQualifierFactoryPOATie extends CrossesThresholdQual
   public void _delegate (org.cougaar.qos.ResourceStatus.CrossesThresholdQualifierFactoryOperations delegate ) {
       this._impl = delegate;
   }
-  public org.omg.PortableServer.POA _default_POA() {
+  @Override
+public org.omg.PortableServer.POA _default_POA() {
       if(_poa != null) {
           return _poa;
       }

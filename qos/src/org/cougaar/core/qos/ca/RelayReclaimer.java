@@ -42,8 +42,7 @@ class RelayReclaimer
 
     RelayReclaimer(ServiceBroker sb)
     {
-	log = (LoggingService)
-	    sb.getService(this, LoggingService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
     }
 
 

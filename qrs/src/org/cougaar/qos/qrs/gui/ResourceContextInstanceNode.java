@@ -42,7 +42,8 @@ public class ResourceContextInstanceNode extends VectorTreeNode {
         this.context = context;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         StringBuffer buf = new StringBuffer();
         Object[] parameters = context.getParameters();
         for (Object element : parameters) {

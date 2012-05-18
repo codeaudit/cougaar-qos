@@ -1,6 +1,10 @@
 package org.cougaar.core.qos.frame.visualizer;
 
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +28,8 @@ public class ContainerLabelRenderer extends LabelRenderer {
         super(rendererName, xoff, yoff, font, paint);
     }
 
-    public void drawLabel(Graphics2D g2, ShapeGraphic shapeGraphic) {
+    @Override
+   public void drawLabel(Graphics2D g2, ShapeGraphic shapeGraphic) {
         if (shapeGraphic == null || shapeGraphic.getLabel()==null)
             return;
         Shape shape = shapeGraphic.getShape();

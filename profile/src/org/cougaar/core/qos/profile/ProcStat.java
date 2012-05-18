@@ -1,20 +1,11 @@
 package org.cougaar.core.qos.profile;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.cougaar.core.service.LoggingService;
 
 /**
  * This component profiles system activity from "/proc/stat".
@@ -86,7 +77,8 @@ public class ProcStat extends ProfilerBase {
     return m;
   }
   private Map logs = new HashMap();
-  public void run() {
+  @Override
+public void run() {
     logStat();
   }
   private void logStat() {
@@ -160,10 +152,9 @@ public class ProcStat extends ProfilerBase {
     synchronized (logs) {
       log = (LoggingService) logs.get(key);
       if (log == null) {
-        log = (LoggingService)
-          sb.getService(
-              "org.cougaar.core.qos.profile.proc.stat."+key,
-              LoggingService.class, null);
+        log = sb.getService(
+           "org.cougaar.core.qos.profile.proc.stat."+key,
+           LoggingService.class, null);
         logs.put(key, log);
         if (header) {
           log.shout(getHeader(key));

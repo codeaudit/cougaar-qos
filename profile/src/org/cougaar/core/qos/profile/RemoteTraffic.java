@@ -1,20 +1,15 @@
 package org.cougaar.core.qos.profile;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.cougaar.core.mts.AgentStatusService;
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.mts.MulticastMessageAddress;
+import org.cougaar.core.service.LoggingService;
 
 /**
  * This component profiles the message traffic (message count and
@@ -54,7 +49,8 @@ public class RemoteTraffic extends ProfilerBase {
   public AgentStatusService as;
   public Object dqms;
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
     findServiceLater(
         "as",
@@ -63,7 +59,8 @@ public class RemoteTraffic extends ProfilerBase {
         "dqms",
         "org.cougaar.mts.base.DestinationQueueMonitorService");
   }
-  public void run() {
+  @Override
+public void run() {
     logTraffic();
   }
 
@@ -88,12 +85,11 @@ public class RemoteTraffic extends ProfilerBase {
       if (log == null) {
         String as = addr.getAddress().replace('.', '_');
         String key = "tr_"+as;
-        log = (LoggingService)
-          sb.getService(
-              ("org.cougaar.core.qos.profile.remote_traffic."+
-               key),
-              LoggingService.class,
-              null);
+        log = sb.getService(
+           ("org.cougaar.core.qos.profile.remote_traffic."+
+            key),
+           LoggingService.class,
+           null);
         logs.put(addr, log);
         if (header) {
           log.shout(HEADER);

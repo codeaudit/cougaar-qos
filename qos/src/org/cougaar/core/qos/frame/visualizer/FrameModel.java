@@ -547,7 +547,8 @@ public class FrameModel {
     }
     */
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "FrameModel("+internalid+"):  frameset='"+getFrameSetName()+"' has "+allFrames.size()+" frames, "+dataFrames.size()+" data frames";
     }
 }

@@ -94,7 +94,8 @@ abstract public class QueryFacet
     abstract protected boolean acceptFact(Object fact);
 
 
-    public AttributeBasedAddress makeABA(String communityName)
+    @Override
+   public AttributeBasedAddress makeABA(String communityName)
     {
 	return 
 	    AttributeBasedAddress.getAttributeBasedAddress(communityName, 
@@ -106,13 +107,15 @@ abstract public class QueryFacet
 
 
 
-    public void setupSubscriptions(BlackboardService blackboard) 
+    @Override
+   public void setupSubscriptions(BlackboardService blackboard) 
     {
 	responseSub = (IncrementalSubscription)
 	    blackboard.subscribe(ResponsePred);
     }
 
-    public void execute(BlackboardService blackboard)
+    @Override
+   public void execute(BlackboardService blackboard)
     {
 	if (responseSub == null /* || !responseSub.hasChanged() */) return;
 
@@ -156,7 +159,8 @@ abstract public class QueryFacet
 
 
     // Fact processing
-    public void processFactBase(BlackboardService blackboard)
+    @Override
+   public void processFactBase(BlackboardService blackboard)
     {
 	if (!factsHaveChanged()) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {
@@ -217,7 +221,8 @@ abstract public class QueryFacet
     }
 
 
-    protected Receptacle makeReceptacle()
+    @Override
+   protected Receptacle makeReceptacle()
     {
 	return new QueryReceptacleImpl();
     }
@@ -253,7 +258,12 @@ abstract public class QueryFacet
 
     
     private UnaryPredicate ResponsePred = new UnaryPredicate() {
-	    public boolean execute(Object o) {
+	    /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
 		if (o instanceof ResponseRelayImpl) {
 		    Object fact = ((Relay.Source) o).getContent();
 		    return acceptFact(fact);

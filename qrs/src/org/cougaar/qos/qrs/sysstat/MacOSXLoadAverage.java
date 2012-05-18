@@ -36,7 +36,8 @@ public class MacOSXLoadAverage extends SunOSLoadAverage {
      * 
      * XXX: Remove this override once the bean works properly in osx.
      */
-    public Double getLoadAvgFromOS() {
+    @Override
+   public Double getLoadAvgFromOS() {
         return null;
     }
 }

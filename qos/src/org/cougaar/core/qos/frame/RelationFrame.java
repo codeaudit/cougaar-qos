@@ -37,7 +37,11 @@ import org.cougaar.core.util.UID;
 abstract public class RelationFrame
 extends DataFrame {
 
-    // This is only here to suppress useless warnings when the
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   // This is only here to suppress useless warnings when the
     // frameset fails to find one of the relations two operands.
     private transient long failed_lookup_time;
 
@@ -73,7 +77,8 @@ extends DataFrame {
 
     // Path dependencies.
 
-    void notifyPathDependents(String slot) {
+    @Override
+   void notifyPathDependents(String slot) {
 	notifyAllPathDependents();
     }
 
@@ -88,7 +93,8 @@ extends DataFrame {
 	return frameSet.getRelationshipChild(this);
     }
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
 	super.collectSlotValues(__props);
 	Object __value;
 	__value = getParentPrototype();
@@ -111,7 +117,8 @@ extends DataFrame {
 	map.put(name, __desc);
     }
 
-    protected void collectSlotDescriptions(Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(Map<String,SlotDescription> map) {
 	super.collectSlotDescriptions(map);
 	makeMetaDescription("parent-prototype", getParentPrototype(), map);
 	makeMetaDescription("parent-slot", getParentSlot(), map);

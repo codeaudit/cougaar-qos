@@ -42,7 +42,8 @@ public class MethodDS extends ResourceContext {
 
     private static final String METHOD_NAME = "MethodName";
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("ReplySizeMean")) {
             return new ReplySizeMean();
         } else if (kind.equals("ReplyInstPerByteMean")) {
@@ -59,7 +60,8 @@ public class MethodDS extends ResourceContext {
     /**
      * The parameters should contain one string, the name of the method
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("MethodDS: wrong number of parameters");
         } else {
@@ -77,7 +79,8 @@ public class MethodDS extends ResourceContext {
 
         abstract DataValue defaultValue();
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             String className = (String) context.getValue("ClassName");
             String methodName = (String) context.getValue("MethodName");
@@ -89,7 +92,8 @@ public class MethodDS extends ResourceContext {
             registerDependency(dependency, "Formula");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue computedValue = values.get("Formula");
             DataValue defaultValue = defaultValue();
             return DataValue.mostCredible(computedValue, defaultValue);
@@ -98,41 +102,49 @@ public class MethodDS extends ResourceContext {
     }
 
     public static class ReplySizeMean extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "reply" + KEY_SEPR + "size" + KEY_SEPR + "mean";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0);
         }
     }
 
     public static class ReplyInstPerByteMean extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "reply" + KEY_SEPR + "instPerByte" + KEY_SEPR + "mean";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0);
         }
     }
 
     public static class RequestSizeMean extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "request" + KEY_SEPR + "size" + KEY_SEPR + "mean";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0);
         }
     }
 
     public static class RequestInstPerByteMean extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "request" + KEY_SEPR + "instPerByte" + KEY_SEPR + "mean";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0);
         }
     }

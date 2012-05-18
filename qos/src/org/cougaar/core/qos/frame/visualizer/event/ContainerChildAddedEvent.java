@@ -14,7 +14,11 @@ import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
  */
 
 public class ContainerChildAddedEvent extends ChangeEvent {
-    ShapeContainer container;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   ShapeContainer container;
     ShapeGraphic newChild;
 
 

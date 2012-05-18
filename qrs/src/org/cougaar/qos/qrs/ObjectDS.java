@@ -51,7 +51,8 @@ public class ObjectDS extends DeflectingContext {
 
     public static final String IMPLEMENTATION_DEF = "implementationDef";
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("RemoteLoadAverage")) {
             return new RemoteLoadAverage();
         } else {
@@ -65,7 +66,8 @@ public class ObjectDS extends DeflectingContext {
      * for both CORBA and RMI. The interface is in the CORBA reference and the
      * (stub of the) implemention is in the RMI reference.
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 3) {
             throw new ParameterError("ObjectDS: wrong number of parameters");
         } else {
@@ -93,14 +95,16 @@ public class ObjectDS extends DeflectingContext {
      **************************************************************************/
     public static class RemoteLoadAverage extends DataFormula {
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             Object raw = context.getValue("calls");
             ResourceContext remote = (ResourceContext) raw;
             registerDependency(remote, "LoadAverage");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             return values.get("LoadAverage");
         }
     }

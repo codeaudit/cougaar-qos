@@ -16,7 +16,13 @@ import org.cougaar.core.util.UID;
 
 public class Host
     extends Thing {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -44,12 +50,14 @@ public class Host
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "host";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getLoadAverage__AsObject();
@@ -214,7 +222,8 @@ public class Host
     }
 
 
-    protected Object getLocalValue(String __slot) {
+    @Override
+   protected Object getLocalValue(String __slot) {
        String __key = __slot.intern();
        if ("loadAverage" == __key)
             return getLoadAverage__AsObject();
@@ -231,7 +240,8 @@ public class Host
     }
 
 
-    protected void setLocalValue(String __slot,
+    @Override
+   protected void setLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("status" == __key)
@@ -241,7 +251,8 @@ public class Host
     }
 
 
-    protected void initializeLocalValue(String __slot,
+    @Override
+   protected void initializeLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("loadAverage" == __key)
@@ -259,7 +270,8 @@ public class Host
     }
 
 
-    protected void postInitialize() {
+    @Override
+   protected void postInitialize() {
         super.postInitialize();
         java.util.Observer __observer;
         __observer = new java.util.Observer() {
@@ -301,7 +313,8 @@ public class Host
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("loadAverage");
         slots.add("jips");
@@ -397,7 +410,8 @@ public class Host
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("loadAverage", slotMetaData__LoadAverage());
         map.put("jips", slotMetaData__Jips());

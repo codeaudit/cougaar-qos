@@ -35,7 +35,13 @@ import org.cougaar.core.util.UID;
 final public class QueryRelayImpl
     extends SimplestRelayImpl
 {
-    QueryRelayImpl(UID uid,
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   QueryRelayImpl(UID uid,
 		   MessageAddress source, 
 		   MessageAddress target,
 		   Object query)
@@ -44,7 +50,8 @@ final public class QueryRelayImpl
     }
 
 
-    Relay.TargetFactory makeFactory(MessageAddress target)
+    @Override
+   Relay.TargetFactory makeFactory(MessageAddress target)
     {
 	return new QueryRelayImplFactory(target);
     }
@@ -52,7 +59,11 @@ final public class QueryRelayImpl
 
     private static class QueryRelayImplFactory 
 	implements Relay.TargetFactory, Serializable {
-	public QueryRelayImplFactory(MessageAddress target) {
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   public QueryRelayImplFactory(MessageAddress target) {
 	}
 	public Relay.Target create(
 				   UID uid, MessageAddress source, Object content,

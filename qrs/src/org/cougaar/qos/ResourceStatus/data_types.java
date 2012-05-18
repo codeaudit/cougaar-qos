@@ -12,7 +12,11 @@ package org.cougaar.qos.ResourceStatus;
 // a data_value (DataValue).
 public class data_types implements org.omg.CORBA.portable.IDLEntity
 {
-  private        int __value;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+private        int __value;
   private static int __size = 3;
   private static org.cougaar.qos.ResourceStatus.data_types[] __array = new org.cougaar.qos.ResourceStatus.data_types [__size];
 

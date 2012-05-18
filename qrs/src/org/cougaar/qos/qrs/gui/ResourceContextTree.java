@@ -38,7 +38,11 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 public class ResourceContextTree extends JTree implements TreeSelectionListener {
-    private final Renderer renderer;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private final Renderer renderer;
     
     public ResourceContextTree(ResourceContextTreeModel model) {
         super(model);
@@ -62,7 +66,11 @@ public class ResourceContextTree extends JTree implements TreeSelectionListener 
     }
 
     private static class Renderer extends DefaultTreeCellRenderer {
-        private static final Color SELECTED_COLOR = Color.red;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      private static final Color SELECTED_COLOR = Color.red;
         private static final Color ANCESTOR_COLOR = new Color(205, 160, 121);
         private DataTreeNode selectedNode;
         
@@ -70,7 +78,8 @@ public class ResourceContextTree extends JTree implements TreeSelectionListener 
             this.selectedNode = node;
         }
         
-        public Component getTreeCellRendererComponent(JTree tree,
+        @Override
+      public Component getTreeCellRendererComponent(JTree tree,
                                                       Object object,
                                                       boolean set,
                                                       boolean expanded,

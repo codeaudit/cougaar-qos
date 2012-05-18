@@ -45,6 +45,7 @@ public class IpFlowDS extends ResourceContext {
                 return new IpFlowDS(parameters, parent);
             }
 
+            @Override
             public Object identifyParameters(String[] parameters) {
                 if (parameters == null || parameters.length != 2) {
                     return null;
@@ -70,11 +71,13 @@ public class IpFlowDS extends ResourceContext {
     private static final String DESTINATION = "destination";
 
     // IpFlow ResourceContexts can be the first element in a path
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         return root;
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("CapacityMax")) {
             return new CapacityMax();
         } else if (kind.equals("CapacityUnused")) {
@@ -88,7 +91,8 @@ public class IpFlowDS extends ResourceContext {
      * The parameters should contain two strings, the source and destination ip
      * of the flow.
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         // should be two strings (ip addresses)
         if (parameters == null || parameters.length != 2) {
             throw new ParameterError("IpFlowDS ...");
@@ -118,7 +122,8 @@ public class IpFlowDS extends ResourceContext {
         super(parameters, parent);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         String src = (String) getValue(SOURCE);
         String dst = (String) getValue(DESTINATION);
         return "<IpFlowDS " + src + ", " + dst + ">";
@@ -132,7 +137,8 @@ public class IpFlowDS extends ResourceContext {
 
         abstract String getSiteFormula();
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             logger = Logging.getLogger(IpFlowDS.class);
             String source = (String) context.getValue(SOURCE);
@@ -181,7 +187,8 @@ public class IpFlowDS extends ResourceContext {
 
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             // ipflow should be dominate when credibility is the same
 
             this.values[2] = values.get("Formula");
@@ -201,11 +208,13 @@ public class IpFlowDS extends ResourceContext {
 
     public static class CapacityMax extends Formula {
 
-        String getSiteFormula() {
+        @Override
+      String getSiteFormula() {
             return "CapacityMax";
         }
 
-        String getKey() {
+        @Override
+      String getKey() {
             return "Capacity" + KEY_SEPR + "Max";
         }
 
@@ -213,11 +222,13 @@ public class IpFlowDS extends ResourceContext {
 
     public static class CapacityUnused extends Formula {
 
-        String getSiteFormula() {
+        @Override
+      String getSiteFormula() {
             return "CapacityUnused";
         }
 
-        String getKey() {
+        @Override
+      String getKey() {
             return "Capacity" + KEY_SEPR + "Unused";
         }
 

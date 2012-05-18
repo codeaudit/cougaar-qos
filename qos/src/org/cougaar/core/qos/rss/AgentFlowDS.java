@@ -48,6 +48,7 @@ public class AgentFlowDS extends CougaarDS {
                 return new AgentFlowDS(parameters, parent);
             }
 
+            @Override
             public Object identifyParameters(String[] parameters) {
                 if (parameters == null || parameters.length != 1) {
                     return null;
@@ -68,7 +69,8 @@ public class AgentFlowDS extends CougaarDS {
         super(parameters, parent);
     }
 
-    protected boolean useParentPath() {
+    @Override
+   protected boolean useParentPath() {
         return false;
     }
 
@@ -78,12 +80,14 @@ public class AgentFlowDS extends CougaarDS {
     // cost
     // The Flow Layering needs new Modeling primitives TBD later.
     // JAZ Standalone for now
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         return root;
     }
 
     // Two Parameter which are Agent Names
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         String source = null;
         String destination = null;
         if (parameters == null || parameters.length != 2) {
@@ -104,7 +108,8 @@ public class AgentFlowDS extends CougaarDS {
         }
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals(Constants.MSG_RATE) || kind.equals(Constants.BYTE_RATE)) {
             return new DecayingHistoryFormula(historyPrefix, kind);
         } else {

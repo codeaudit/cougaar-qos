@@ -18,7 +18,8 @@ public class ContainsPredicate extends FramePredicate {
         this.parent = parent;
     }
 
-    public boolean execute(Object o) {
+    @Override
+   public boolean execute(Object o) {
         Frame f;
 
         if (o instanceof Frame) {
@@ -32,7 +33,8 @@ public class ContainsPredicate extends FramePredicate {
         return false;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "<ContainsPredicate: kind='"+kind+"' name='"+name+"'>";// frameset="+frameset+">";
     }
 }

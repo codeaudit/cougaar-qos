@@ -32,7 +32,8 @@ public class ShapeContainer extends ShapeGraphic {
         this("","");
     }
 
-    public boolean isContainer() {
+    @Override
+   public boolean isContainer() {
         return true;
     }
 
@@ -44,7 +45,8 @@ public class ShapeContainer extends ShapeGraphic {
         //insertContainers = new HashMap();
     }
 
-    public void reshape(double tx, double ty, double w, double h) {
+    @Override
+   public void reshape(double tx, double ty, double w, double h) {
         super.reshape(tx,ty,w,h);
         layoutChildren();
     }
@@ -67,7 +69,8 @@ public class ShapeContainer extends ShapeGraphic {
         }
     }
 
-    public ShapeGraphic find(double mx, double my) {
+    @Override
+   public ShapeGraphic find(double mx, double my) {
         if (!contains(mx, my))
             return null;
         ShapeGraphic sh, result;
@@ -81,7 +84,8 @@ public class ShapeContainer extends ShapeGraphic {
     }
 
 
-    public ShapeGraphic find(org.cougaar.core.qos.frame.Frame f) {
+    @Override
+   public ShapeGraphic find(org.cougaar.core.qos.frame.Frame f) {
         if (f!=null) {
             if (frame != null && f == frame)
             //if (frame != null && id != null && id.equals((String) f.getValue("name")))
@@ -107,12 +111,14 @@ public class ShapeContainer extends ShapeGraphic {
     }
 
 
-    public void draw(Graphics2D g2) {
+    @Override
+   public void draw(Graphics2D g2) {
         super.draw(g2);
         if (children.size() > 0)
             drawChildren(g2);
     }
-    public void drawLabel(Graphics2D g2) {
+    @Override
+   public void drawLabel(Graphics2D g2) {
         super.drawLabel(g2);
         if (children.size() > 0)
             drawChildrenLabels(g2);
@@ -266,7 +272,8 @@ public class ShapeContainer extends ShapeGraphic {
     }
 
 
-    public void update(FrameModel frameModel,
+    @Override
+   public void update(FrameModel frameModel,
                         HashSet addedDataFrames, HashSet removedDataFrames,
                         HashSet addedRelations) {
     //public void setFrameHelper(FrameModel frameModel) {
@@ -286,7 +293,8 @@ public class ShapeContainer extends ShapeGraphic {
 
     // clone thyself and assign the given frame
     // make a deep copy
-    public ShapeGraphic createInstance(org.cougaar.core.qos.frame.Frame frame, FrameModel fmodel) {
+    @Override
+   public ShapeGraphic createInstance(org.cougaar.core.qos.frame.Frame frame, FrameModel fmodel) {
         try {
             ShapeContainer cloned = (ShapeContainer) this.clone();
             cloned.frameModel = fmodel;

@@ -34,7 +34,11 @@ import org.cougaar.core.service.ThreadService;
  * To change this template use File | Settings | File Templates.
  */
 public class DisplayWindow extends JFrame { //implements ChangeListener  {
-    Display display;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   Display display;
     ContainerTreeView containerView;
     
     // This view can't handle relation cycles, so remove it for now
@@ -67,8 +71,11 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         String title = w.getTitle();
         Dimension d = w.getSize();
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {System.exit(0);}
+            @Override
             public void windowDeiconified(WindowEvent e) {  /*display.startClock(); display.animating.start();*/ }
+            @Override
             public void windowIconified(WindowEvent e) {
                 /* if (display.animating != null) {
                 display.animating.stop();
@@ -101,7 +108,11 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
 
 
     class FrameSnapshotView extends JPanel {
-        // FrameTreeView frameTreeView;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      // FrameTreeView frameTreeView;
         ContainerTreeView containerView;
         JLabel htmlView;
         JRadioButton frameTree, containerTree;
@@ -149,6 +160,10 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         }
 
         class RefreshAction extends AbstractAction {
+            /**
+          * 
+          */
+         private static final long serialVersionUID = 1L;
             public RefreshAction() {
                 super("Refresh");
             }
@@ -158,7 +173,11 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
         }
 
         class ContainerTreeAction extends AbstractAction {
-           public ContainerTreeAction() {
+           /**
+          * 
+          */
+         private static final long serialVersionUID = 1L;
+         public ContainerTreeAction() {
                super("View Tree");
            }
            public void actionPerformed(ActionEvent e) {
@@ -166,7 +185,11 @@ public class DisplayWindow extends JFrame { //implements ChangeListener  {
            }
         }
         class FrameTreeAction extends AbstractAction {
-           public FrameTreeAction() {
+           /**
+          * 
+          */
+         private static final long serialVersionUID = 1L;
+         public FrameTreeAction() {
                super("Frame Tree");
            }
            public void actionPerformed(ActionEvent e) {

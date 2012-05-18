@@ -32,7 +32,8 @@ public class TimerQueueingDataFeed extends SimpleQueueingDataFeed {
     public TimerQueueingDataFeed() {
     }
 
-    protected void dispatch() {
+    @Override
+   protected void dispatch() {
         Runnable task = new Runnable() {
             public void run() {
                 getNotifier().run();

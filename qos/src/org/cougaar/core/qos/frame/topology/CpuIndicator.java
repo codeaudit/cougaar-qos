@@ -15,7 +15,13 @@ import org.cougaar.core.util.UID;
 
 public class CpuIndicator
     extends Indicator {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -49,12 +55,14 @@ public class CpuIndicator
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "cpuIndicator";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getCalmThreshold__AsObject();
@@ -318,7 +326,8 @@ public class CpuIndicator
     }
 
 
-    protected Object getLocalValue(String __slot) {
+    @Override
+   protected Object getLocalValue(String __slot) {
        String __key = __slot.intern();
        if ("calmThreshold" == __key)
             return getCalmThreshold__AsObject();
@@ -337,7 +346,8 @@ public class CpuIndicator
     }
 
 
-    protected void setLocalValue(String __slot,
+    @Override
+   protected void setLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("calmThreshold" == __key)
@@ -357,7 +367,8 @@ public class CpuIndicator
     }
 
 
-    protected void initializeLocalValue(String __slot,
+    @Override
+   protected void initializeLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("calmThreshold" == __key)
@@ -377,7 +388,8 @@ public class CpuIndicator
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("calmThreshold");
         slots.add("idleThreshold");
@@ -496,7 +508,8 @@ public class CpuIndicator
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("calmThreshold", slotMetaData__CalmThreshold());
         map.put("idleThreshold", slotMetaData__IdleThreshold());

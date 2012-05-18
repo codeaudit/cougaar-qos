@@ -1,17 +1,23 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeSelectionModel;
-import javax.swing.tree.TreePath;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import java.awt.*;
-import java.awt.event.MouseListener;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
+import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +28,11 @@ import java.awt.event.MouseEvent;
  */
 
 public abstract class TreeView extends JPanel implements TreeSelectionListener {
-    protected JTree tree;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   protected JTree tree;
     protected Component otherComponent;
     protected DefaultMutableTreeNode root;
     //private static String lineStyle = "Angled";//"Horizontal";  //"Angled" (the default), "Horizontal", and "None".
@@ -62,7 +72,8 @@ public abstract class TreeView extends JPanel implements TreeSelectionListener {
 
 
         MouseListener ml = new MouseAdapter() {
-             public void mousePressed(MouseEvent e) {
+             @Override
+            public void mousePressed(MouseEvent e) {
                  int selRow = tree.getRowForLocation(e.getX(), e.getY());
                  TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
                  if(selRow != -1) {

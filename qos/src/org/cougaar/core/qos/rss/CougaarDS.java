@@ -42,7 +42,8 @@ abstract class CougaarDS extends ResourceContext {
         super(parameters, parent);
     }
 
-    protected void postInitialize() {
+    @Override
+   protected void postInitialize() {
         super.postInitialize();
         logger = Logging.getLogger(getClass().getName());
         if (logger.isDebugEnabled()) {
@@ -51,7 +52,8 @@ abstract class CougaarDS extends ResourceContext {
         }
     }
 
-    protected void delete() {
+    @Override
+   protected void delete() {
         if (logger.isDebugEnabled()) {
             logger.debug("Deleting " + this);
         }

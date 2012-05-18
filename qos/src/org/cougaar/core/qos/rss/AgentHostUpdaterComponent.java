@@ -60,7 +60,8 @@ public final class AgentHostUpdaterComponent extends QosComponent implements Ser
     private AgentHostUpdaterImpl updater;
     private Schedulable schedulable;
 
-    public void load() {
+    @Override
+   public void load() {
         super.load();
         provideService(getServiceBroker());
     }

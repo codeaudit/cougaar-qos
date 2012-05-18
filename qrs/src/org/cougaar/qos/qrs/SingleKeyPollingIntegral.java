@@ -36,14 +36,16 @@ package org.cougaar.qos.qrs;
 abstract class SingleKeyPollingIntegral extends PollingIntegral {
     abstract protected String getKey();
 
-    protected void configureDependencies() {
+    @Override
+   protected void configureDependencies() {
         String key = getKey();
         String[] parameters = {key};
         ResourceContext dependency = RSS.instance().resolveSpec("Integrater", parameters);
         registerDependency(dependency, "Formula");
     }
 
-    protected DataValue computeValueFromDependencies(Values values) {
+    @Override
+   protected DataValue computeValueFromDependencies(Values values) {
         return values.get("Formula");
     }
 

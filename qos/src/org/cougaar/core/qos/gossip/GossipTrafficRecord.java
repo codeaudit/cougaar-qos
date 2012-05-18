@@ -57,7 +57,8 @@ public class GossipTrafficRecord
     }
     
 
-    public String toString() {
+    @Override
+   public String toString() {
 	StringBuffer buf = new StringBuffer();
 	buf.append("<requests_sent=");
 	buf.append(requests_sent);

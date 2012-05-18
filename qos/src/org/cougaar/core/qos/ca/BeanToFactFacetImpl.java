@@ -26,8 +26,8 @@
 
 package org.cougaar.core.qos.ca;
 
-import java.util.Enumeration;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Iterator;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
@@ -54,8 +54,7 @@ abstract public class BeanToFactFacetImpl
 				  RolePlayer player)
     {
 	super(owner, sb, spec, player);
-	log = (LoggingService)
-           sb.getService(this, LoggingService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
 	initialize(spec);
 	linkPlayer();
     }
@@ -127,7 +126,8 @@ abstract public class BeanToFactFacetImpl
 	}
     }
 
-    public void setupSubscriptions(BlackboardService bbs) 
+    @Override
+   public void setupSubscriptions(BlackboardService bbs) 
     {
 	UnaryPredicate pred = getPredicate();
 	sub = (IncrementalSubscription) bbs.subscribe(pred);
@@ -137,7 +137,8 @@ abstract public class BeanToFactFacetImpl
 	do_execute(bbs);
     }
 
-    public void execute(BlackboardService bbs)
+    @Override
+   public void execute(BlackboardService bbs)
     {
 	do_execute(bbs);
     }

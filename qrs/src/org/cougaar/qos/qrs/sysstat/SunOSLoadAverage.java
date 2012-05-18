@@ -46,13 +46,15 @@ public class SunOSLoadAverage extends SysStatHandler {
 
     private String key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         key = "Host" + KEY_SEPR + host + KEY_SEPR + "CPU" + KEY_SEPR + "loadavg";
         // clock_key = "Host" + KEY_SEPR + host +
         // KEY_SEPR + "CPU" + KEY_SEPR + "clockspeed";
     }
     
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         // Use the OperatingSystemMXBean if possible.
         Double load = getLoadAvgFromOS();
         if (load != null) {

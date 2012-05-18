@@ -38,7 +38,11 @@ import org.cougaar.util.log.Logging;
  * To change this template use File | Settings | File Templates.
  */
 public class Display extends AnimatedCanvas implements ChangeListener {
-    public static boolean ENABLE_ANIMATION = false;//true;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   public static boolean ENABLE_ANIMATION = false;//true;
     static String TICK_EVENT_LABEL = "TICK";
     protected int tickNumber;
     Shapes shapes;
@@ -263,7 +267,8 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         reset(d.width, d.height);
     }
 
-    public void reset(int w, int h) {
+    @Override
+   public void reset(int w, int h) {
         super.reset(w,h);
         if (!initialized)
             return;
@@ -271,7 +276,8 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         root.reshape(0d,0d,w, h);
     }
 
-    public void step(int w, int h) {
+    @Override
+   public void step(int w, int h) {
         if (!initialized)
             return;
         //if (log.isDebugEnabled())
@@ -301,7 +307,8 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         //}
     }
 
-    public void render(int w, int h, Graphics2D g2) {
+    @Override
+   public void render(int w, int h, Graphics2D g2) {
         //System.out.println("render");
         if (!initialized)
             return;
@@ -326,7 +333,8 @@ public class Display extends AnimatedCanvas implements ChangeListener {
         return root;
     }
 
-    public ShapeGraphic findShape(double x, double y) {
+    @Override
+   public ShapeGraphic findShape(double x, double y) {
         return root.find(x,y);
     }
 
@@ -380,7 +388,11 @@ public class Display extends AnimatedCanvas implements ChangeListener {
 
 
     class ControlPanel extends Box implements ChangeListener {
-        JSlider animationDelaySlider;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      JSlider animationDelaySlider;
         JCheckBox animationOn;
 
         public ControlPanel() {

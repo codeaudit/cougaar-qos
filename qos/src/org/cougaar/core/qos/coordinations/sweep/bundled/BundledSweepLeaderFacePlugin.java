@@ -65,7 +65,8 @@ public abstract class BundledSweepLeaderFacePlugin
      * At the end of an execute, deal with any pending requests
      * if it's our turn to send.
      */
-    public void execute () {
+    @Override
+   public void execute () {
         super.execute();
         if (somethingToSend() && ourTurnToSendRelay) {
             Bundle pending = new Bundle(pendingAddRequests,
@@ -80,7 +81,8 @@ public abstract class BundledSweepLeaderFacePlugin
         }
     }
         
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
         super.setupSubscriptions();
         UID uid = uids.nextUID();
         sendRelay = new SimpleRelaySource(uid, agentId, followerAgent, ConnectionSetup.LEADER);

@@ -51,17 +51,16 @@ public class TMatrixTracePlugin
     }
   
     // Component
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 	
 	ServiceBroker sb = getServiceBroker();
 	
-	logging = (LoggingService)
-            sb.getService(this, LoggingService.class, null);
+	logging = sb.getService(this, LoggingService.class, null);
 	
 	// TrafficMatrix accessor service
-	agentFlowService = (CommunityTrafficMatrixService)
-	    sb.getService(this, CommunityTrafficMatrixService.class, null);
+	agentFlowService = sb.getService(this, CommunityTrafficMatrixService.class, null);
 	if (agentFlowService == null) {
 	    if (logging.isErrorEnabled()) {
 		logging.error("Can't find CommunityTrafficMatrixService. This plugin must be loaded at Low priority");
@@ -69,8 +68,7 @@ public class TMatrixTracePlugin
 	    return;
 	}
 	
-	ThreadService threadService = (ThreadService)
-	    sb.getService(this, ThreadService.class, null);
+	ThreadService threadService = sb.getService(this, ThreadService.class, null);
 	schedulable = threadService.getThread(this, this, "TMatrixTracePlugin");
 	schedulable.schedule(5000, BASE_PERIOD*1000);
 	sb.releaseService(this, ThreadService.class, threadService);
@@ -112,9 +110,11 @@ public class TMatrixTracePlugin
     }
     
     // Cougaar Plugin requirement methods
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
     }
     
-    protected void execute() {
+    @Override
+   protected void execute() {
     }
 }

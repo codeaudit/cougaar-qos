@@ -55,15 +55,22 @@ abstract public class FrameToFactFacetImpl
 	super(owner, sb, spec, player);
     }
 
-    protected void initialize(ConnectionSpec spec)
+    @Override
+   protected void initialize(ConnectionSpec spec)
     {
 	this.frameset_name = spec.ca_parameters.getProperty("frame-set");
     }
 
-    protected UnaryPredicate getPredicate()
+    @Override
+   protected UnaryPredicate getPredicate()
     {
 	return new UnaryPredicate() {
-	    public boolean execute(Object o) {
+	    /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
 		return (o instanceof DataFrame) &&
 		    ((Frame) o).getFrameSet().getName().equals(frameset_name);
 	    }

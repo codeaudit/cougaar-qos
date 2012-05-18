@@ -50,11 +50,13 @@ public class SiteFlowDS extends ResourceContext {
 
     // Can be the first element in a path. They have no parent or
     // context other than the root.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         return root;
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("CapacityMax")) {
             return new CapacityMax();
         } else if (kind.equals("CapacityUnused")) {
@@ -68,7 +70,8 @@ public class SiteFlowDS extends ResourceContext {
      * The parameters should contain two strings, the source and destination
      * Sites of the flow.
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         // should be two strings (ip addresses)
         if (parameters == null || parameters.length != 2) {
             throw new ParameterError("SiteFlowDS ...");
@@ -85,7 +88,8 @@ public class SiteFlowDS extends ResourceContext {
     abstract static class Formula extends DataFormula implements Constants {
         abstract String getKey();
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
 
             String destination = (String) context.getValue(DESTINATION);
@@ -114,17 +118,20 @@ public class SiteFlowDS extends ResourceContext {
 
         private DataValue[] values;
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             values = new DataValue[3];
             values[0] = new DataValue(10000, DEFAULT_CREDIBILITY);
         }
 
-        String getKey() {
+        @Override
+      String getKey() {
             return "Capacity" + KEY_SEPR + "Max";
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             this.values[1] = values.get("Reverse");
             this.values[2] = values.get("Forward");
             return DataValue.maxCredibility(this.values);
@@ -136,18 +143,21 @@ public class SiteFlowDS extends ResourceContext {
 
         private DataValue[] values;
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             values = new DataValue[3];
             // default is the CapacityMax from the same context
             registerDependency(context, "CapacityMax");
         }
 
-        String getKey() {
+        @Override
+      String getKey() {
             return "Capacity" + KEY_SEPR + "Unused";
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             this.values[0] = values.get("CapacityMax");
             this.values[1] = values.get("Reverse");
             this.values[2] = values.get("Forward");

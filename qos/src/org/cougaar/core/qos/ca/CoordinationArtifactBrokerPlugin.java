@@ -57,7 +57,8 @@ public class CoordinationArtifactBrokerPlugin
     private CoordinationArtifactBroker impl;
     private LoggingService log;
 
-    public void load()
+    @Override
+   public void load()
     {
 	super.load();
 
@@ -66,11 +67,11 @@ public class CoordinationArtifactBrokerPlugin
 	impl = new Impl(sb);
 	sb.addService(CoordinationArtifactBroker.class, this);
 
-	log = (LoggingService)
-           sb.getService(this, LoggingService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
     }
 
-    public void start()
+    @Override
+   public void start()
     {
 	super.start();
 	localProviders = new ArrayList();
@@ -117,11 +118,13 @@ public class CoordinationArtifactBrokerPlugin
     }
 
     // plugin
-    protected void execute()
+    @Override
+   protected void execute()
     {
     }
 
-    protected void setupSubscriptions() 
+    @Override
+   protected void setupSubscriptions() 
     {
     }
 
@@ -191,8 +194,7 @@ public class CoordinationArtifactBrokerPlugin
 
 	Impl(ServiceBroker sb)
 	{
-	    tsvc = (ThreadService)
-		sb.getService(this, ThreadService.class, null);
+	    tsvc = sb.getService(this, ThreadService.class, null);
 	    pendingRequests = new ArrayList();
 	    pendingProvides = new ArrayList();
 	    providers = new ArrayList();

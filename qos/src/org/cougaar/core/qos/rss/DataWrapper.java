@@ -33,13 +33,18 @@ import org.cougaar.qos.qrs.DataValue;
  * This class wraps RSS DataValues in the {@link Metric} API.
  */
 public class DataWrapper implements Metric, java.io.Serializable {
-    private final DataValue data;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private final DataValue data;
 
     public DataWrapper(DataValue data) {
         this.data = data;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return data.toString();
     }
 

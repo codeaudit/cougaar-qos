@@ -44,7 +44,12 @@ import org.cougaar.util.log.Logging;
  */
 abstract public class Frame implements UniqueObject, Cloneable,
 	VariableEvaluator, NotPersistable {
-    private final UID uid;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+   private final UID uid;
 
     protected transient FrameSet frameSet;
 
@@ -155,12 +160,14 @@ abstract public class Frame implements UniqueObject, Cloneable,
     /**
          * Frames are equal iff they have the same UID
          */
-    public boolean equals(Object o) {
+    @Override
+   public boolean equals(Object o) {
 	return ((o == this) || ((o instanceof Frame) && uid
 		.equals(((Frame) o).uid)));
     }
 
-    public int hashCode() {
+    @Override
+   public int hashCode() {
 	return uid.hashCode();
     }
 
@@ -170,7 +177,12 @@ abstract public class Frame implements UniqueObject, Cloneable,
          * {@link FrameViewerServlet}).
          */
     public static class VisibleProperties extends Properties {
-	VisibleProperties() {
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+   VisibleProperties() {
 	    super();
 	}
 
@@ -190,7 +202,12 @@ abstract public class Frame implements UniqueObject, Cloneable,
          * to the Blackboard.
          */
     public static class Change implements OverrideChangeReport {
-	private final String slot;
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+   private final String slot;
 
 	private final Object value;
 
@@ -202,7 +219,8 @@ abstract public class Frame implements UniqueObject, Cloneable,
 	    this.frame_uid = frame_uid;
 	}
 
-	public String toString() {
+	@Override
+   public String toString() {
 	    return "[" + frame_uid + " " + slot + "->" + value + "]";
 	}
 
@@ -219,13 +237,15 @@ abstract public class Frame implements UniqueObject, Cloneable,
 	}
 
 	// Object
-	public boolean equals(Object o) {
+	@Override
+   public boolean equals(Object o) {
 	    return ((o == this) || ((o instanceof Change)
 		    && slot.equals((((Change) o).slot)) && frame_uid
 		    .equals((((Change) o).frame_uid))));
 	}
 
-	public int hashCode() {
+	@Override
+   public int hashCode() {
 	    return slot.hashCode() ^ frame_uid.hashCode();
 	}
     }

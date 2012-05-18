@@ -1,6 +1,6 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * Created by IntelliJ IDEA.

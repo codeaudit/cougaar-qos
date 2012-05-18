@@ -55,6 +55,7 @@ public class AgentDS extends CougaarDS {
                 return new AgentDS(parameters, parent);
             }
 
+            @Override
             public Object identifyParameters(String[] parameters) {
                 if (parameters == null || parameters.length != 1) {
                     return null;
@@ -74,7 +75,8 @@ public class AgentDS extends CougaarDS {
         super(parameters, parent);
     }
 
-    protected boolean useParentPath() {
+    @Override
+   protected boolean useParentPath() {
         return false;
     }
 
@@ -85,7 +87,8 @@ public class AgentDS extends CougaarDS {
     // Node DataScopes can be the first element in a path. They must
     // find or make the corresponding HostDS and return that as the
     // preferred parent.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         String agentname = (String) getSymbolValue(AGENTNAME);
         String nodename = null;
         ServiceBroker sb = (ServiceBroker) root.getProperty("ServiceBroker");
@@ -121,7 +124,8 @@ public class AgentDS extends CougaarDS {
         return parent;
     }
 
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("AgentDS: wrong number of parameters");
         }
@@ -135,7 +139,8 @@ public class AgentDS extends CougaarDS {
         }
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("LastHeard")) {
             return new LastHeard();
         } else if (kind.equals("LastSpoke")) {
@@ -167,7 +172,8 @@ public class AgentDS extends CougaarDS {
             return new DataValue(0);
         }
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             String agentName = (String) context.getValue(AGENTNAME);
             String key = "Agent" + KEY_SEPR + agentName + KEY_SEPR + getKey();
@@ -184,7 +190,8 @@ public class AgentDS extends CougaarDS {
             registerDependency(dependency, "Formula");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue computedValue = values.get("Formula");
             DataValue defaultValue = defaultValue();
             return DataValue.mostCredible(computedValue, defaultValue);
@@ -195,7 +202,8 @@ public class AgentDS extends CougaarDS {
     abstract static class MonotonicLongFormula extends Formula {
         int granularity = 1000;
 
-        protected DataValue doCalculation(DataFormula.Values vals) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values vals) {
             DataValue newValue = vals.get("Formula");
             DataValue cachedValue = getCachedValue();
             long longNew = newValue.getLongValue();
@@ -216,7 +224,8 @@ public class AgentDS extends CougaarDS {
             return new DataValue(0);
         }
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
 
             DataFormula baseFormula = context.getFormula(getKey(), null);
@@ -233,7 +242,8 @@ public class AgentDS extends CougaarDS {
             registerDependency(alarm, "Alarm");
         }
 
-        protected DataValue doCalculation(DataFormula.Values vals) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values vals) {
             DataValue formulaDV = vals.get("Formula");
             DataValue alarmDV = vals.get("Alarm");
             if (formulaDV == null || alarmDV == null) {
@@ -254,19 +264,22 @@ public class AgentDS extends CougaarDS {
     }
 
     static class LastHeard extends AlarmFormula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "HeardTime";
         }
     }
 
     static class LastSpoke extends AlarmFormula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "SpokeTime";
         }
     }
 
     static class LastSpokeError extends AlarmFormula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "SpokeErrorTime";
         }
     }
@@ -278,25 +291,29 @@ public class AgentDS extends CougaarDS {
     // ordering between threads, so an old thread could publish a
     // HeardTime that is actually before the current HeardTime
     static class HeardTime extends MonotonicLongFormula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "HeardTime";
         }
     }
 
     static class SpokeTime extends MonotonicLongFormula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "SpokeTime";
         }
     }
 
     static class SpokeErrorTime extends MonotonicLongFormula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "SpokeErrorTime";
         }
     }
 
     static class PersistSizeLast extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return Constants.PERSIST_SIZE_LAST;
         }
     }

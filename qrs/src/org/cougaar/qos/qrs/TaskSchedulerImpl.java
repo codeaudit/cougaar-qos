@@ -41,7 +41,8 @@ class TaskSchedulerImpl extends Timer implements TaskScheduler {
             this.body = body;
         }
 
-        public void run() {
+        @Override
+      public void run() {
             try {
                 body.run();
             } catch (Throwable t) {
@@ -86,7 +87,8 @@ class TaskSchedulerImpl extends Timer implements TaskScheduler {
         }
     }
 
-    public void cancel() {
+    @Override
+   public void cancel() {
         try {
             throw new RuntimeException();
         } catch (Exception ex) {

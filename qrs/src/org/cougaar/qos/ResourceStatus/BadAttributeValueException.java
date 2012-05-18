@@ -10,7 +10,11 @@ package org.cougaar.qos.ResourceStatus;
 
 public final class BadAttributeValueException extends org.omg.CORBA.UserException
 {
-  public String attribute_name = null;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+public String attribute_name = null;
 
   public BadAttributeValueException ()
   {

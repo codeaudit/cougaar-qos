@@ -10,7 +10,11 @@ package org.cougaar.qos.ResourceStatus;
 
 public final class NoSuchMethodException extends org.omg.CORBA.UserException
 {
-  public String method_name = null;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+public String method_name = null;
 
   public NoSuchMethodException ()
   {

@@ -295,9 +295,10 @@ public abstract class ResourceStatusServicePOA extends org.omg.PortableServer.Se
   private static String[] __ids = {
     "IDL:org/cougaar/qos/ResourceStatus/ResourceStatusService:1.0"};
 
-  public String[] _all_interfaces (org.omg.PortableServer.POA poa, byte[] objectId)
+  @Override
+public String[] _all_interfaces (org.omg.PortableServer.POA poa, byte[] objectId)
   {
-    return (String[])__ids.clone ();
+    return __ids.clone ();
   }
 
   public ResourceStatusService _this() 

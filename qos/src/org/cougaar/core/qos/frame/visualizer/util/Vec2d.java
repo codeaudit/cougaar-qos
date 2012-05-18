@@ -110,7 +110,8 @@ public class Vec2d {
 	y = a.y - b.y;
     }
     
-    public String toString() {
+    @Override
+   public String toString() {
 	return "Vec2d["+x+", "+y+"]";
     }
 }

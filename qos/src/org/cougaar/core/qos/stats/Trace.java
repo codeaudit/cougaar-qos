@@ -5,7 +5,11 @@ import org.cougaar.util.log.Logging;
 
 public class Trace implements Statistic {
 	
-	private transient final Logger log = Logging.getLogger(getClass().getName());
+	/**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private transient final Logger log = Logging.getLogger(getClass().getName());
 	private final String name;
 	private long startTime;
 	private long endTime;
@@ -47,7 +51,8 @@ public class Trace implements Statistic {
 		return getName();
 	}
 	
-	public String toString(){
+	@Override
+   public String toString(){
 		return "<Trace: " + getSummaryString() + ">";
 		
 	}
@@ -56,7 +61,8 @@ public class Trace implements Statistic {
 		return StatisticKind.TRACE;
 	}
 	
-	public Trace clone() throws CloneNotSupportedException {
+	@Override
+   public Trace clone() throws CloneNotSupportedException {
         return (Trace) super.clone();
     }
 

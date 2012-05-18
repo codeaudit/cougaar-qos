@@ -81,7 +81,8 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
         return doCalculation(dependencyValues);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return pretty_name;
     }
 
@@ -392,7 +393,12 @@ abstract public class DataFormula implements DataValueChangedCallbackListener, C
     }
     
     public static class Values extends HashMap<String,DataValue> {
-        public DataValue get(String key) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public DataValue get(String key) {
             return super.get(key);
         }
 

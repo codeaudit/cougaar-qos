@@ -1,20 +1,11 @@
 package org.cougaar.core.qos.profile;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.cougaar.core.mts.MessageStatistics;
+import org.cougaar.core.service.MessageStatisticsService;
 
 /**
  * This component profiles the aggregate message traffic of
@@ -60,13 +51,15 @@ public class NodeTraffic extends ProfilerBase {
 
   public MessageStatisticsService mss;
 
-  public void load() {
+  @Override
+public void load() {
     super.load();
     findServiceLater(
         "mss",
         "org.cougaar.core.service.MessageStatisticsService");
   }
-  public void run() {
+  @Override
+public void run() {
     log("org.cougaar.core.qos.profile.node_traffic.nt",
         HEADER, getNodeTraffic());
   }

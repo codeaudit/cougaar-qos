@@ -40,13 +40,15 @@ public class XPMemory extends SysStatHandler {
 
     private String free_key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
 	free_key =
             "Host" + KEY_SEPR + host + KEY_SEPR + "Memory" + KEY_SEPR + "Physical" + KEY_SEPR
                     + "Free";
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         Logger logger = org.cougaar.qos.qrs.Logging.getLogger(XPLoadAverage.class);
         String line = null;
         try {

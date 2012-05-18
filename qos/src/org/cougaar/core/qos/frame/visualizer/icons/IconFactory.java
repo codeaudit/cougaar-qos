@@ -1,8 +1,10 @@
 package org.cougaar.core.qos.frame.visualizer.icons;
 
-import javax.swing.*;
-import java.util.HashMap;
 import java.net.URL;
+import java.util.HashMap;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 /**
  * Created by IntelliJ IDEA.

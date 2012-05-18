@@ -10,7 +10,11 @@ package org.cougaar.qos.ResourceStatus;
 
 public final class ResourceNode implements org.omg.CORBA.portable.IDLEntity
 {
-  public String kind = null;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+public String kind = null;
   public String parameters[] = null;
 
   public ResourceNode ()

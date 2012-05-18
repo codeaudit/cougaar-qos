@@ -1,20 +1,11 @@
 package org.cougaar.core.qos.profile;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.cougaar.core.service.LoggingService;
 
 /**
  * This component profiles the agent traffic matrix for all
@@ -42,13 +33,15 @@ public class TrafficMatrix extends ProfilerBase {
   private static final String ALIGN = "0, 0";
   private final Map logs = new HashMap();
   public Object tms;
-  public void load() {
+  @Override
+public void load() {
     super.load();
     findServiceLater(
         "tms",
         TMS_CLASS_NAME);
   }
-  public void run() {
+  @Override
+public void run() {
     logMatrix();
   }
   private void logMatrix() {
@@ -103,10 +96,9 @@ public class TrafficMatrix extends ProfilerBase {
         String os = orig.toString().replace('.', '_');
         String ts = target.toString().replace('.', '_');
         String key = "tm_"+os+"__to__"+ts;
-        log = (LoggingService)
-          sb.getService(
-              "org.cougaar.core.qos.profile.traffic_matrix."+key,
-              LoggingService.class, null);
+        log = sb.getService(
+           "org.cougaar.core.qos.profile.traffic_matrix."+key,
+           LoggingService.class, null);
         m.put(target, log);
         if (header) {
           log.shout(HEADER);

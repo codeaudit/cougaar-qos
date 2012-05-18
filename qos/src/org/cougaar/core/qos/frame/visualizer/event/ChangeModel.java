@@ -4,6 +4,7 @@ package org.cougaar.core.qos.frame.visualizer.event;
 
 import java.io.Serializable;
 import java.util.Vector;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -14,7 +15,11 @@ import javax.swing.event.ChangeListener;
  */
 public class ChangeModel implements Serializable {
 
-    protected Vector      listeners;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   protected Vector      listeners;
     private   ChangeEvent defaultChangeEvent;
     private   boolean     enabled;
     private   boolean debug = false;

@@ -1,6 +1,7 @@
 package org.cougaar.core.qos.profile;
 
 import java.util.Map;
+
 import org.cougaar.core.component.Service;
 
 /**

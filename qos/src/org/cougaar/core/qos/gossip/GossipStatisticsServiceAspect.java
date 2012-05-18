@@ -58,7 +58,8 @@ final public class GossipStatisticsServiceAspect
     {
     }
 
-    public void load() {
+    @Override
+   public void load() {
 	super.load();
 
 	stats = new GossipTrafficRecord();
@@ -66,8 +67,7 @@ final public class GossipStatisticsServiceAspect
 
 	ServiceBroker sb = getServiceBroker();
 
-	NodeControlService ncs = (NodeControlService)
-	    sb.getService(this, NodeControlService.class, null);
+	NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
 
 	ServiceBroker rootsb = ncs.getRootServiceBroker();
 	sb.releaseService(this, NodeControlService.class, null);
@@ -77,7 +77,8 @@ final public class GossipStatisticsServiceAspect
 	
     }
 
-    public Object getReverseDelegate(Object delegatee, Class type) 
+    @Override
+   public Object getReverseDelegate(Object delegatee, Class type) 
     {
 	if (type == MessageDeliverer.class) {
 	    return new DelivererDelegate((MessageDeliverer) delegatee);
@@ -86,7 +87,8 @@ final public class GossipStatisticsServiceAspect
 	}
     }
 
-    public Object getDelegate(Object delegatee, Class type) 
+    @Override
+   public Object getDelegate(Object delegatee, Class type) 
     {
 	if (type == DestinationLink.class) {
 	    // RPC Links only!
@@ -162,7 +164,8 @@ final public class GossipStatisticsServiceAspect
 	    super(delegatee);
 	}
 
-	public MessageAttributes forwardMessage(AttributedMessage message) 
+	@Override
+   public MessageAttributes forwardMessage(AttributedMessage message) 
 	    throws UnregisteredNameException, 
 		   NameLookupException, 
 		   CommFailureException,
@@ -192,7 +195,8 @@ final public class GossipStatisticsServiceAspect
 	}
 
 
-	public MessageAttributes deliverMessage(AttributedMessage message,
+	@Override
+   public MessageAttributes deliverMessage(AttributedMessage message,
 						MessageAddress dest)
 	    throws MisdeliveredMessageException
 	{

@@ -42,7 +42,11 @@ import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
  * To change this template use File | Settings | File Templates.
  */
 public class ContainerTreeView extends ExplorerView implements ChangeListener {
-    FrameModel frameModel;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   FrameModel frameModel;
     FrameTableModel frameTableModel;
     ShapeGraphicTableModel shapeModel;
     ShapeTableCellRenderer cellRenderer;
@@ -91,7 +95,8 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
         return root;
     }
 
-    public Component createOtherComponent() {
+    @Override
+   public Component createOtherComponent() {
         super.createOtherComponent();
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(editTable, BorderLayout.CENTER);
@@ -124,7 +129,11 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
     }
 
     class ShowHidePrototypes extends AbstractAction {
-        public ShowHidePrototypes() {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      public ShowHidePrototypes() {
             super((showPrototypes ? "Hide Protoypes" : "Show Prototypes"));
         }
         public void actionPerformed(ActionEvent e) {
@@ -135,7 +144,11 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
     }
 
     class RefreshAction extends AbstractAction {
-        public RefreshAction() {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      public RefreshAction() {
             super("Refresh Tree");
         }
         public void actionPerformed(ActionEvent e) {
@@ -191,7 +204,8 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
 
     }
 
-    protected void displayShapeGraphicInTable(ShapeGraphic g) {
+    @Override
+   protected void displayShapeGraphicInTable(ShapeGraphic g) {
         shapeModel.clear();
         shapeModel.set(g);
         editTable.setDefaultRenderer(Object.class, cellRenderer);
@@ -200,7 +214,8 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
         legend.setVisible(false);
     }
 
-    protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
+    @Override
+   protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
         frameTableModel.clear();
         frameTableModel.set(frame);
         editTable.setDefaultRenderer(Object.class, frameCellRenderer);
@@ -305,7 +320,11 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
    }
 
     private class ContainerRenderer extends DefaultTreeCellRenderer {
-        Icon containerIcon;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      Icon containerIcon;
         Icon componentIcon;
         Icon prototypeIcon;
         Icon frameIcon;
@@ -319,7 +338,8 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
             this.frameIcon = frameIcon;
         }
 
-        public Component getTreeCellRendererComponent(
+        @Override
+      public Component getTreeCellRendererComponent(
                 JTree tree,
                 Object value,
                 boolean sel,
@@ -351,7 +371,11 @@ public class ContainerTreeView extends ExplorerView implements ChangeListener {
 
 
     class ShapeTableCellRenderer extends JLabel implements TableCellRenderer {
-        Border unselectedBorder = null;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      Border unselectedBorder = null;
         Border selectedBorder   = null;
         boolean isBordered = true;
         ShapeGraphicTableModel shapeModel;

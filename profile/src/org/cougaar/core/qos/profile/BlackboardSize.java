@@ -1,19 +1,13 @@
 package org.cougaar.core.qos.profile;
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.component.ServiceProvider;
+import org.cougaar.core.node.NodeControlService;
+import org.cougaar.core.service.LoggingService;
 
 /**
  * This component profiles the per-agent blackboard size and
@@ -45,17 +39,18 @@ public class BlackboardSize extends ProfilerBase {
   private ServiceProvider sp;
   private Map logs = new HashMap();
   private Map clients = new HashMap();
-  public void load() {
+  @Override
+public void load() {
     super.load();
-    NodeControlService ncs = (NodeControlService)
-      sb.getService(this, NodeControlService.class, null);
+    NodeControlService ncs = sb.getService(this, NodeControlService.class, null);
     rootsb = ncs.getRootServiceBroker();
     sb.releaseService(this, NodeControlService.class, ncs);
 
     sp = new BlackboardSizeSP();
     rootsb.addService(BlackboardSizeService.class, sp);
   }
-  public void run() {
+  @Override
+public void run() {
     logBB();
   }
   private void logBB() {
@@ -95,10 +90,9 @@ public class BlackboardSize extends ProfilerBase {
       if (log == null) {
         String sn = name.replace('.', '_');
         String key = sn+"__"+id;
-        log = (LoggingService)
-          sb.getService(
-              "org.cougaar.core.qos.profile.bb.bb_"+key,
-              LoggingService.class, null);
+        log = sb.getService(
+           "org.cougaar.core.qos.profile.bb.bb_"+key,
+           LoggingService.class, null);
         m.put(id, log);
         if (header) {
           log.shout(HEADER);

@@ -16,7 +16,11 @@ import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
  * To change this template use File | Settings | File Templates.
  */
 public class ShapeGraphicNode extends DefaultMutableTreeNode {
-    ShapeGraphic graphic;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   ShapeGraphic graphic;
     HashSet cachedChildren;
 
     public ShapeGraphicNode() {
@@ -37,7 +41,8 @@ public class ShapeGraphicNode extends DefaultMutableTreeNode {
             parent.add(this);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
 	    return (graphic != null ? graphic.getId() : "");
     }
 
@@ -50,27 +55,32 @@ public class ShapeGraphicNode extends DefaultMutableTreeNode {
         return (cachedChildren.contains(child));
     }
 
-    public void insert(MutableTreeNode child, int index) {
+    @Override
+   public void insert(MutableTreeNode child, int index) {
         cachedChildren.add(child);
         super.insert(child, index);
     }
 
-    public void add(MutableTreeNode newChild) {
+    @Override
+   public void add(MutableTreeNode newChild) {
         cachedChildren.add(newChild);
         super.add(newChild);
     }
 
-    public void remove(int childIndex) {
+    @Override
+   public void remove(int childIndex) {
         TreeNode child = getChildAt(childIndex);
         cachedChildren.remove(child);
         super.remove(childIndex);
     }
-    public void remove(MutableTreeNode aChild) {
+    @Override
+   public void remove(MutableTreeNode aChild) {
         cachedChildren.remove(aChild);
         super.remove(aChild);
     }
 
-    public void removeAllChildren() {
+    @Override
+   public void removeAllChildren() {
         cachedChildren.clear();
         super.removeAllChildren();
     }

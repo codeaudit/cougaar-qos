@@ -34,7 +34,11 @@ import java.util.Iterator;
  */
 class Gossip implements Serializable
 {
-    private HashMap map = new HashMap();
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private HashMap map = new HashMap();
     
     Iterator iterator() {
 	return map.entrySet().iterator();

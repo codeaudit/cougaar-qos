@@ -62,7 +62,8 @@ public class RSSMetricsUpdateServiceImpl extends QosComponent implements Metrics
     public RSSMetricsUpdateServiceImpl() {
     }
 
-    public void load() {
+    @Override
+   public void load() {
         super.load();
 
         ServiceBroker sb = getServiceBroker();

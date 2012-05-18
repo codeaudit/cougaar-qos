@@ -26,8 +26,8 @@
 
 package org.cougaar.qos.qrs.sysstat;
 
-import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.Map;
 
 import org.cougaar.qos.qrs.DataValue;
@@ -37,7 +37,8 @@ public class LinuxLoadAverage extends SysStatHandler {
     private BufferedReader br;
     private String key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         key = "Host" + KEY_SEPR + host + KEY_SEPR + "CPU" + KEY_SEPR + "loadavg";
     }
 
@@ -48,7 +49,8 @@ public class LinuxLoadAverage extends SysStatHandler {
         }
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         // Use the OperatingSystemMXBean if possible.
         Double load = getLoadAvgFromOS();
         if (load != null) {

@@ -40,11 +40,13 @@ public class XPLoadAverage extends SysStatHandler {
 
     private String key;
 
-    public void initialize(String host, int pid) {
+    @Override
+   public void initialize(String host, int pid) {
         key = "Host" + KEY_SEPR + host + KEY_SEPR + "CPU" + KEY_SEPR + "loadavg";
     }
 
-    public void getData(Map<String, DataValue> map) {
+    @Override
+   public void getData(Map<String, DataValue> map) {
         Logger logger = org.cougaar.qos.qrs.Logging.getLogger(XPLoadAverage.class);
         String line = null;
         try {

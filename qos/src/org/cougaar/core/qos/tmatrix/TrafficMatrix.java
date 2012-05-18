@@ -43,7 +43,11 @@ import org.cougaar.util.log.Logging;
 public class TrafficMatrix implements Serializable
 	       
 {
-    private HashMap outermatrix; 
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private HashMap outermatrix; 
 
     /*
      * Inner class defining a TrafficRecord - there are two records per agent-pair in 
@@ -54,7 +58,11 @@ public class TrafficMatrix implements Serializable
 	extends DecayingHistory.SnapShot 
 	implements Serializable 
     {
-	public double msgCount;
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   public double msgCount;
 	public double byteCount;
 	
 	public TrafficRecord() {
@@ -75,7 +83,8 @@ public class TrafficMatrix implements Serializable
 	    return byteCount;
 	}
 	
-	public String toString() {
+	@Override
+   public String toString() {
 	    return "Traffic Record: msg="+msgCount+" bytes="+byteCount;
 	}
 
@@ -402,7 +411,8 @@ public class TrafficMatrix implements Serializable
 	}
         
     
-    public String toString() {
+    @Override
+   public String toString() {
 	return prettyString("");
     }
     public String toPrettyString() {

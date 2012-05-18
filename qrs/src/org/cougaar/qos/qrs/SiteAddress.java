@@ -88,7 +88,8 @@ public class SiteAddress {
     	return contains(bytesToLongAddress(addr.getAddress()));
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return ((net & 0xff000000) >> 24) + "." + ((net & 0x00ff0000) >> 16) + "."
                 + ((net & 0x0000ff00) >> 8) + "." + (net & 0x000000ff) + "/" + maskToPrefixLength(mask);
     }

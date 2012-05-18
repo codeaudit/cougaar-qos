@@ -28,6 +28,8 @@
 
 package org.cougaar.qos.qrs;
 
+import java.util.Iterator;
+
 import org.cougaar.util.log.Logger;
 import org.omg.CosNaming.Binding;
 import org.omg.CosNaming.BindingHolder;
@@ -38,8 +40,6 @@ import org.omg.CosNaming.BindingType;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContext;
 import org.omg.CosNaming.NamingContextHelper;
-
-import java.util.Iterator;
 
 public class NSIterator implements Iterator<Object> {
     Logger logger;
@@ -55,7 +55,12 @@ public class NSIterator implements Iterator<Object> {
     String current_name, next_name;
 
     public static class NameServerException extends Exception {
-        NameServerException(Exception cause) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      NameServerException(Exception cause) {
             super(cause);
         }
     }

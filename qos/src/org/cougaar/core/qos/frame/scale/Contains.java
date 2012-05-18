@@ -14,7 +14,13 @@ import org.cougaar.core.util.UID;
 
 public class Contains
     extends Relationship {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -36,12 +42,14 @@ public class Contains
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "contains";
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
     }
 }

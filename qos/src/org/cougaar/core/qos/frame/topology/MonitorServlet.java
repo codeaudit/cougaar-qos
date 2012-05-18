@@ -45,7 +45,11 @@ import org.cougaar.util.Sortings;
 public class MonitorServlet extends MetricsServlet 
 {
 
-    FrameSetService fss; 
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   FrameSetService fss; 
     ServiceBroker sb;
     private LoggingService log;
     private String frameSetName;
@@ -59,11 +63,13 @@ public class MonitorServlet extends MetricsServlet
     }
 
     /** @return a default path if a plugin parameter is not specified */
-    public String getPath() {
+    @Override
+   public String getPath() {
 	return "/metrics/society/monitor";
     }
 
-    public String getTitle () {
+    @Override
+   public String getTitle () {
 	return "Society Monitor";
     }
     
@@ -71,7 +77,8 @@ public class MonitorServlet extends MetricsServlet
     /** 
      * This method is called whenever the browser loads our URL. 
      * */
-    public void printPage(HttpServletRequest request, PrintWriter out){
+    @Override
+   public void printPage(HttpServletRequest request, PrintWriter out){
 	// Begin our HTML page response
 	//response.setContentType("text/html");
 	//PrintWriter out = response.getWriter();
@@ -84,8 +91,7 @@ public class MonitorServlet extends MetricsServlet
     private FrameSet fs;
     private FrameSet findOrMakeFrameSet() {
 	if (fs != null) return fs;
-	fss = (FrameSetService)
-	sb.getService(this, FrameSetService.class, null);
+	fss = sb.getService(this, FrameSetService.class, null);
 	if (fss == null && log.isWarnEnabled()) {
 	    log.warn("Unable to obtain FrameSetService");
 	}
@@ -102,7 +108,8 @@ public class MonitorServlet extends MetricsServlet
 	    return x_name.compareTo(y_name);
 	}
 
-	public boolean equals(Object thing) 
+	@Override
+   public boolean equals(Object thing) 
 	{
 	    return thing == this;
 	}

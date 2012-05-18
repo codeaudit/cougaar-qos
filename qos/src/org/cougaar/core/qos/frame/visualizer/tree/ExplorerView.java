@@ -13,7 +13,11 @@ import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
  * To change this template use File | Settings | File Templates.
  */
 public class ExplorerView extends TreeView {
-    protected JTable editTable;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   protected JTable editTable;
 
 
     public ExplorerView() {
@@ -21,12 +25,14 @@ public class ExplorerView extends TreeView {
         init();
     }
 
-    protected Component createOtherComponent() {
+    @Override
+   protected Component createOtherComponent() {
         editTable = new JTable();
         return editTable;
     }
 
     /** TreeSelectionListener interface. */
+   @Override
    protected void treeSelected(Object data) {
         if (data instanceof ShapeGraphic) {
             ShapeGraphic graphic = (ShapeGraphic) data;
@@ -36,9 +42,11 @@ public class ExplorerView extends TreeView {
         }
     }
 
-    protected void displayShapeGraphicInTable(ShapeGraphic g) {
+    @Override
+   protected void displayShapeGraphicInTable(ShapeGraphic g) {
     }
 
-    protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
+    @Override
+   protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
     }
 }

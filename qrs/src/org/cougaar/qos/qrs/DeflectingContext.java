@@ -43,7 +43,8 @@ abstract public class DeflectingContext extends ResourceContext {
         this.deflector = deflector;
     }
 
-    protected Object nextLookup(String symbol, String[] args, boolean resolve) {
+    @Override
+   protected Object nextLookup(String symbol, String[] args, boolean resolve) {
         if (deflector != null) {
             Object value = deflector.lookupSymbol(symbol, args, resolve);
             if (value != null) {

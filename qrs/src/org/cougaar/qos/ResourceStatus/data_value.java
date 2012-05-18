@@ -10,7 +10,11 @@ package org.cougaar.qos.ResourceStatus;
 
 public final class data_value implements org.omg.CORBA.portable.IDLEntity
 {
-  private double ___d_value;
+  /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+private double ___d_value;
   private String ___s_value;
   private boolean ___b_value;
   private org.cougaar.qos.ResourceStatus.data_types __discriminator;

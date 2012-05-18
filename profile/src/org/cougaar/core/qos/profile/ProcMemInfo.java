@@ -1,20 +1,9 @@
 package org.cougaar.core.qos.profile;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This component profiles system memory usage from "/proc/meminfo".
@@ -38,7 +27,8 @@ public class ProcMemInfo extends ProfilerBase {
   };
   private static final String HEADER = toHeader(FIELDS);
 
-  public void run() {
+  @Override
+public void run() {
     log("org.cougaar.core.qos.profile.proc.meminfo",
         HEADER, getMemInfo());
   }

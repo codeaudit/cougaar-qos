@@ -35,7 +35,13 @@ import org.cougaar.core.util.UID;
 final public class ResponseRelayImpl
     extends SimplestRelayImpl
 {
-    ResponseRelayImpl(UID uid,
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   ResponseRelayImpl(UID uid,
 		      MessageAddress source, 
 		      MessageAddress target,
 		      Object query)
@@ -43,7 +49,8 @@ final public class ResponseRelayImpl
 	super(uid, source, target, query);
     }
 
-    Relay.TargetFactory makeFactory(MessageAddress target)
+    @Override
+   Relay.TargetFactory makeFactory(MessageAddress target)
     {
 	return new ResponseRelayImplFactory(target);
     }
@@ -51,7 +58,11 @@ final public class ResponseRelayImpl
 
     private static class ResponseRelayImplFactory 
 	implements Relay.TargetFactory, Serializable {
-	public ResponseRelayImplFactory(MessageAddress target) {
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   public ResponseRelayImplFactory(MessageAddress target) {
 	}
 	public Relay.Target create(
 				   UID uid, MessageAddress source, Object content,

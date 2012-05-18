@@ -50,7 +50,8 @@ public class GossipIntegraterDS extends IntegraterDS {
 		    return new GossipIntegraterDS(parameters, parent);
 		}
 
-		public Object identifyParameters(String[] parameters) 
+		@Override
+      public Object identifyParameters(String[] parameters) 
 		{
 		    if (parameters == null || parameters.length != 1) 
 			return null;
@@ -68,7 +69,8 @@ public class GossipIntegraterDS extends IntegraterDS {
     }
 
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
 	if (kind.equals("GossipFormula")) {
 	    return new GossipFormula();
 	} else {

@@ -42,11 +42,13 @@ public class AlarmDS extends ResourceContext implements Constants {
 
     // Alarm contexts can be the first element in a path. They have
     // no parent or context other than the root.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         return root;
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("OneSecond")) {
             return new OneSecond();
         } else if (kind.equals("FiveSeconds")) {
@@ -60,7 +62,8 @@ public class AlarmDS extends ResourceContext implements Constants {
         }
     }
 
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 0) {
             throw new ParameterError("AlarmDS: wrong number of parameters");
         }
@@ -85,7 +88,8 @@ public class AlarmDS extends ResourceContext implements Constants {
 
         }
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             String[] args = getArgs();
             if (args != null && args.length > 0) {
@@ -106,7 +110,8 @@ public class AlarmDS extends ResourceContext implements Constants {
 
         }
 
-        void contextDeleted() {
+        @Override
+      void contextDeleted() {
             synchronized (task_lock) {
                 if (task != null) {
                     RSSUtils.unschedule(task);
@@ -116,26 +121,30 @@ public class AlarmDS extends ResourceContext implements Constants {
             super.contextDeleted();
         }
 
-        protected DataValue doCalculation(Values vals) {
+        @Override
+      protected DataValue doCalculation(Values vals) {
             return getCachedValue();
         }
 
     }
 
     public static class OneSecond extends AlarmFormula {
-        long getPeriod() {
+        @Override
+      long getPeriod() {
             return 1000;
         }
     }
 
     public static class FiveSeconds extends AlarmFormula {
-        long getPeriod() {
+        @Override
+      long getPeriod() {
             return 5000;
         }
     }
 
     public static class FifteenSeconds extends AlarmFormula {
-        long getPeriod() {
+        @Override
+      long getPeriod() {
             return 15000;
         }
     }

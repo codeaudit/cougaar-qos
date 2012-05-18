@@ -23,24 +23,25 @@
 package org.cougaar.core.qos.ca;
 
 
-import org.cougaar.util.UnaryPredicate;
-import org.cougaar.util.log.Logger;
-import org.cougaar.util.log.Logging;
-import org.cougaar.core.mts.MessageAddress;
-import org.cougaar.core.service.community.Community;
-import org.cougaar.core.service.community.CommunityResponse;
-import org.cougaar.core.service.community.CommunityResponseListener;
-import org.cougaar.core.service.community.CommunityService;
-import org.cougaar.core.service.community.CommunityChangeListener;
-import org.cougaar.core.service.community.CommunityChangeEvent;
-import org.cougaar.core.service.community.Entity;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
+
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.service.community.Community;
+import org.cougaar.core.service.community.CommunityChangeEvent;
+import org.cougaar.core.service.community.CommunityChangeListener;
+import org.cougaar.core.service.community.CommunityResponse;
+import org.cougaar.core.service.community.CommunityResponseListener;
+import org.cougaar.core.service.community.CommunityService;
+import org.cougaar.core.service.community.Entity;
+import org.cougaar.util.UnaryPredicate;
+import org.cougaar.util.log.Logger;
+import org.cougaar.util.log.Logging;
 
 /**
  * This utility class helps simplify Community lookup.  For now it
@@ -201,7 +202,8 @@ abstract public class CommunityFinder
 	    go();
 	}
 
-	public void postQuery() {
+	@Override
+   public void postQuery() {
 	    if (logger.isDebugEnabled())
 		    logger.debug("Posted Manager Subscription filter="+
 				 filter);
@@ -233,7 +235,8 @@ abstract public class CommunityFinder
 	    go();
 	}
 
-	public void postQuery() {
+	@Override
+   public void postQuery() {
 	    if (logger.isDebugEnabled())
 		    logger.debug("Posted Member Subscription filter="+
 				 filter);
@@ -291,7 +294,11 @@ abstract public class CommunityFinder
 
     private static class MemberHasRoleP implements UnaryPredicate
     {
-	String entity_name;
+	/**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+   String entity_name;
 	String role;
 	MemberHasRoleP(String entity_name, String role)
 	{

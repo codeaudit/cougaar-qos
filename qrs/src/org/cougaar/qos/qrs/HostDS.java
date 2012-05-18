@@ -45,6 +45,7 @@ public class HostDS extends ResourceContext implements Constants {
                 return new HostDS(parameters, parent);
             }
 
+            @Override
             public Object identifyParameters(String[] parameters) {
                 if (parameters == null || parameters.length != 1) {
                     return null;
@@ -67,11 +68,13 @@ public class HostDS extends ResourceContext implements Constants {
 
     // Host ResourceContexts can be the first element in a path. They have
     // no parent or context other than the root.
-    protected ResourceContext preferredParent(RSS root) {
+    @Override
+   protected ResourceContext preferredParent(RSS root) {
         return root;
     }
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("PrimaryIpAddress")) {
             return new PrimaryIpAddress();
         } else if (kind.equals("PollingLoadAverage")) {
@@ -117,7 +120,8 @@ public class HostDS extends ResourceContext implements Constants {
      * The parameters should contain one string, the address of the host being
      * monitored.
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("HostDS: wrong number of parameters");
         } else {
@@ -142,7 +146,8 @@ public class HostDS extends ResourceContext implements Constants {
         super(parameters, parent);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         String ipAddr = (String) getValue(IPADDRESS);
         return "<HostDS " + ipAddr + ">";
     }
@@ -156,7 +161,8 @@ public class HostDS extends ResourceContext implements Constants {
     }
 
     public class PrimaryIpAddress extends DataFormula {
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             // no dependencies, just ask our scope
             return getIpAddressValue();
         }
@@ -169,7 +175,8 @@ public class HostDS extends ResourceContext implements Constants {
 
         abstract DataValue defaultValue();
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             String ipAddr = (String) context.getValue(IPADDRESS);
             // Canonicalize ipAddr here
@@ -179,7 +186,8 @@ public class HostDS extends ResourceContext implements Constants {
             registerDependency(dependency, "Formula");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue defaultValue = defaultValue();
             DataValue computedValue = values.get("Formula");
             return DataValue.mostCredible(computedValue, defaultValue);
@@ -189,7 +197,8 @@ public class HostDS extends ResourceContext implements Constants {
 
     public static class PollingLoadAverage extends SingleKeyPollingIntegral {
 
-        protected String getKey() {
+        @Override
+      protected String getKey() {
             String ipAddr = (String) getContext().getValue(IPADDRESS);
             return "Host" + KEY_SEPR + ipAddr + KEY_SEPR + "CPU" + KEY_SEPR + "loadavg";
             // return "CPU" + KEY_SEPR + "loadavg" ;
@@ -197,7 +206,8 @@ public class HostDS extends ResourceContext implements Constants {
 
         private static final String[] DefaultArgs = {"60000"}; // 1 min
 
-        protected boolean hasArgs(String[] args) {
+        @Override
+      protected boolean hasArgs(String[] args) {
             if (args == null || args.length == 0) {
                 return super.hasArgs(DefaultArgs);
             } else {
@@ -205,7 +215,8 @@ public class HostDS extends ResourceContext implements Constants {
             }
         }
 
-        protected void setArgs(String[] args) {
+        @Override
+      protected void setArgs(String[] args) {
             if (args == null || args.length == 0) {
                 super.setArgs(DefaultArgs);
             } else {
@@ -220,135 +231,161 @@ public class HostDS extends ResourceContext implements Constants {
     }
 
     public static class LoadAverage extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "CPU" + KEY_SEPR + "loadavg";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0.01);
         }
     }
 
     public static class BogoMips extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "CPU" + KEY_SEPR + "bogomips";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(400);
         }
     }
 
     public static class Jips extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "CPU" + KEY_SEPR + "Jips";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(10.0E6);
         }
     }
 
     public static class Cache extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "CPU" + KEY_SEPR + "cache";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0);
         }
     }
 
     public static class Count extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "CPU" + KEY_SEPR + "count";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(1);
         }
     }
 
     public static class FreeMemory extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "Memory" + KEY_SEPR + "Physical" + KEY_SEPR + "Free";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(64000);
         }
     }
 
     public static class TotalMemory extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "Memory" + KEY_SEPR + "Physical" + KEY_SEPR + "Total";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(128000);
         }
     }
 
     public static class MemoryUtilization extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "Memory" + KEY_SEPR + "Physical" + KEY_SEPR + "Utilization";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0.0);
         }
     }
 
     public static class TcpInUse extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "Network" + KEY_SEPR + "TCP" + KEY_SEPR + "sockets" + KEY_SEPR + "inuse";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0);
         }
     }
 
     public static class UdpInUse extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "Network" + KEY_SEPR + "UDP" + KEY_SEPR + "sockets" + KEY_SEPR + "inuse";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(0);
         }
     }
 
     public static class MeanTimeBetweenFailure extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "CPU" + KEY_SEPR + "MeanTimeBetweenFailure";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(8760.0, DEFAULT_CREDIBILITY, "hours", "LinuxLiterature");
         }
     }
 
     public static class ClockSpeed extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "CPU" + KEY_SEPR + "clockspeed";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue(100.0, NO_CREDIBILITY, "MHz", "Random");
         }
     }
 
     public static class EffectiveMJips extends DataFormula {
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             registerDependency(context, "LoadAverage");
             registerDependency(context, "Jips");
             registerDependency(context, "Count");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             double lavg = values.doubleValue("LoadAverage");
             double mjips = values.doubleValue("Jips") / 1.0E6;
             double cpus = values.doubleValue("Count");
@@ -382,7 +419,8 @@ public class HostDS extends ResourceContext implements Constants {
 
         private static final DataValue defaultValue = new DataValue(false, DEFAULT_CREDIBILITY);
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             // The IP address of this Host
             String remoteIpAddr = (String) context.getValue(IPADDRESS);
@@ -399,7 +437,8 @@ public class HostDS extends ResourceContext implements Constants {
             registerDependency(hops, "Formula");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue hops = values.get("Formula");
             if (hops.getCredibility() >= DEFAULT_CREDIBILITY) {
                 if (hops.getDoubleValue() >= 0.0) {
@@ -421,24 +460,28 @@ public class HostDS extends ResourceContext implements Constants {
     }
 
     public static class RawGPS extends Formula {
-        String getKey() {
+        @Override
+      String getKey() {
             return "GPS";
         }
 
-        DataValue defaultValue() {
+        @Override
+      DataValue defaultValue() {
             return new DataValue("none", NO_CREDIBILITY);
         }
     }
 
     public static class Position extends DataFormula {
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             registerDependency(context, "RawGPS");
             registerDependency(context, "IsReachable");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             DataValue rawGPS = values.get("RawGPS");
             DataValue isReachable = values.get("IsReachable");
 

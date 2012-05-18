@@ -43,7 +43,8 @@ public class ResourceContextClassNode extends VectorTreeNode {
         this.context = context;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return context_class;
     }
 

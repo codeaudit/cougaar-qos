@@ -33,7 +33,12 @@ import org.cougaar.core.util.UniqueObject;
  * Envelopes are the data type passed around by the coordination
  */
 public class Envelope implements Serializable {
-    enum Operation {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+   enum Operation {
         ADD,
         CHANGE,
         REMOVE

@@ -246,12 +246,14 @@ class SetRenderer extends TriggerAction {
         shapeRendererName = shRendererName;
         shapeRenderer=r;
     }
-    public void execute(ShapeGraphic shapeGraphic) {
+    @Override
+   public void execute(ShapeGraphic shapeGraphic) {
         if(shapeGraphic !=null && shapeRenderer != null)
             shapeGraphic.setRenderer(shapeRenderer);
     }
 
-    public String toXML() {
+    @Override
+   public String toXML() {
         return "<trigger value=\""+slotName+"\" action=\"setrenderer\" name=\""+shapeRendererName+"\"/>";
     }
 }
@@ -265,11 +267,13 @@ class SetLabelRenderer extends TriggerAction {
         this.labelRendererName = lblRendererName;
         this.labelRenderer = lblr;
     }
-    public void execute(ShapeGraphic shapeGraphic) {
+    @Override
+   public void execute(ShapeGraphic shapeGraphic) {
         if (shapeGraphic != null && labelRenderer != null)
             shapeGraphic.setLabelRenderer(labelRenderer);
     }
-    public String toXML() {
+    @Override
+   public String toXML() {
         return "<trigger value=\""+slotName+"\" action=\"setlabelrenderer\" name=\""+labelRendererName+"\"/>";
     }
 }
@@ -283,13 +287,15 @@ class SetShape extends TriggerAction {
         this.shapeName = shName;
         this.shape=shape;
     }
-    public void execute(ShapeGraphic shapeGraphic) {
+    @Override
+   public void execute(ShapeGraphic shapeGraphic) {
         if (shapeGraphic != null) {
             shapeGraphic.setShapePrototype(shape);
             shapeGraphic.createShape();
         }
     }
-    public String toXML() {
+    @Override
+   public String toXML() {
         return "<trigger value=\""+slotName+"\" action=\"setshape\" shape=\""+shapeName+"\"/>";
     }
 }

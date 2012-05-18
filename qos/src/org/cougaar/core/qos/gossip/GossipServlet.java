@@ -39,19 +39,24 @@ public class GossipServlet
     extends ServletFrameset
 {
 
-    private GossipStatisticsService statisticsService;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   private GossipStatisticsService statisticsService;
 
     public GossipServlet(ServiceBroker sb) {
 	super(sb);
-	statisticsService = (GossipStatisticsService)
-	    sb.getService(this, GossipStatisticsService.class, null);
+	statisticsService = sb.getService(this, GossipStatisticsService.class, null);
     }
 
-    public String getPath() {
+    @Override
+   public String getPath() {
 	return "/metrics/gossip";
     }
 
-    public String getTitle() {
+    @Override
+   public String getTitle() {
 	return getNodeID() + " Gossip Statistics";
     }
 
@@ -65,7 +70,8 @@ public class GossipServlet
 	out.print("</b></td>");
 	out.print("</b></tr>");
     }
-    public void printPage(HttpServletRequest request,
+    @Override
+   public void printPage(HttpServletRequest request,
 			  PrintWriter out)
     {
 // 	String reset_string = request.getParameter("reset");

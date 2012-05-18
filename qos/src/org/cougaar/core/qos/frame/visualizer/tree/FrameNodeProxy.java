@@ -15,74 +15,94 @@ import javax.swing.tree.TreeNode;
  */
 // this class a big hack to be able to have multiple instances of the *same* node in the tree
 public class FrameNodeProxy extends FrameNode {
-        FrameNode node;
+        /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+      FrameNode node;
 
         public FrameNodeProxy(FrameNode node) {
             super( node.getFrame());
             this.node = node;
         }
 
-        public boolean isRelationNode() {
+        @Override
+      public boolean isRelationNode() {
             return node.isRelationNode();
         }
 
-        public String getRelationshipName() {
+        @Override
+      public String getRelationshipName() {
             return node.getRelationshipName();
         }
 
-        public String toString() {
+        @Override
+      public String toString() {
              return node.toString();
         }
 
-        public void addRelationshipNode(DefaultTreeModel treeModel,FrameNode rnode) {
+        @Override
+      public void addRelationshipNode(DefaultTreeModel treeModel,FrameNode rnode) {
             node.addRelationshipNode(treeModel, rnode);
         }
 
-        public FrameNode getRelationshipNode(String relationship) {
+        @Override
+      public FrameNode getRelationshipNode(String relationship) {
             return node.getRelationshipNode(relationship);
         }
 
-        public org.cougaar.core.qos.frame.Frame getFrame() {
+        @Override
+      public org.cougaar.core.qos.frame.Frame getFrame() {
             return node.getFrame();
         }
 
-        public void insert(MutableTreeNode newChild, int childIndex) {
+        @Override
+      public void insert(MutableTreeNode newChild, int childIndex) {
             node.insert(newChild, childIndex);
         }
 
-        public void remove(int childIndex) {
+        @Override
+      public void remove(int childIndex) {
             node.remove(childIndex);
         }
 
-        public void setParent(MutableTreeNode newParent) {
+        @Override
+      public void setParent(MutableTreeNode newParent) {
            parent = newParent;
         }
 
+         @Override
          public TreeNode getParent() {
             return parent;
          }
 
-        public TreeNode getChildAt(int index) {
+        @Override
+      public TreeNode getChildAt(int index) {
             return node.getChildAt(index);
         }
 
-       public int getChildCount() {
+       @Override
+      public int getChildCount() {
             return node.getChildCount();
        }
 
-       public int getIndex(TreeNode aChild) {
+       @Override
+      public int getIndex(TreeNode aChild) {
             return node.getIndex(aChild);
        }
 
-       public Enumeration children() {
+       @Override
+      public Enumeration children() {
             return node.children();
        }
 
-       public void setAllowsChildren(boolean allows) {
+       @Override
+      public void setAllowsChildren(boolean allows) {
            node.setAllowsChildren(allows);
        }
 
-       public boolean getAllowsChildren() {
+       @Override
+      public boolean getAllowsChildren() {
             return node.getAllowsChildren();
        }
         /*
@@ -102,15 +122,18 @@ public class FrameNodeProxy extends FrameNode {
        }  */
 
 
-       public void remove(MutableTreeNode aChild) {
+       @Override
+      public void remove(MutableTreeNode aChild) {
            node.remove(aChild);
        }
 
-       public void removeAllChildren() {
+       @Override
+      public void removeAllChildren() {
             node.removeAllChildren();
        }
 
-       public void add(MutableTreeNode newChild) {
+       @Override
+      public void add(MutableTreeNode newChild) {
            node.add(newChild);
        }
 

@@ -58,7 +58,8 @@ public class DataFormulaNode extends VectorTreeNode {
         dependsOn.updateChildren(model);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         DataValue value = formula.query();
         // String name = formula.getName();
         // String[] args = formula.getArgs();
@@ -85,7 +86,8 @@ public class DataFormulaNode extends VectorTreeNode {
             super(DataFormulaNode.this, null);
         }
 
-        public String toString() {
+        @Override
+      public String toString() {
             return "Subscribers";
         }
 
@@ -109,7 +111,8 @@ public class DataFormulaNode extends VectorTreeNode {
             super(DataFormulaNode.this, null);
         }
 
-        public String toString() {
+        @Override
+      public String toString() {
             return "Depends On";
         }
 

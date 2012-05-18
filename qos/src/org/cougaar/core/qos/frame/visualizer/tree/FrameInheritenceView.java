@@ -23,7 +23,11 @@ import org.cougaar.core.qos.frame.visualizer.icons.IconFactory;
  * To change this template use File | Settings | File Templates.
  */
 public class FrameInheritenceView extends ExplorerView {
-    FrameTableModel frameModel;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   FrameTableModel frameModel;
     FrameModel frameAppModel;
 
     public FrameInheritenceView() {
@@ -37,10 +41,12 @@ public class FrameInheritenceView extends ExplorerView {
         tree.setModel(new DefaultTreeModel(root));
     }
 
-    protected void displayShapeGraphicInTable(ShapeGraphic g) {
+    @Override
+   protected void displayShapeGraphicInTable(ShapeGraphic g) {
     }
 
-    protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
+    @Override
+   protected void displayFrameInTable(org.cougaar.core.qos.frame.Frame frame) {
         frameModel.clear();
         frameModel.set(frame);
         editTable.setModel(frameModel);
@@ -79,7 +85,11 @@ public class FrameInheritenceView extends ExplorerView {
 
 
     private class FrameRenderer extends DefaultTreeCellRenderer {
-        Icon frameIcon;
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+      Icon frameIcon;
         Icon prototypeIcon;
 
         public FrameRenderer(Icon frameIcon, Icon prototypeIcon) {
@@ -88,7 +98,8 @@ public class FrameInheritenceView extends ExplorerView {
             this.prototypeIcon = prototypeIcon;
         }
 
-        public Component getTreeCellRendererComponent(
+        @Override
+      public Component getTreeCellRendererComponent(
                                                     JTree tree,
                                                     Object value,
                                                     boolean sel,

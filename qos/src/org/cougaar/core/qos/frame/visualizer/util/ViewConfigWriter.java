@@ -57,7 +57,8 @@ public class ViewConfigWriter {
 
    class SpecAFormatWriter extends SpecFormatWriter {
 
-        public boolean write(DisplayWindow window, PrintWriter w, int indentation, int offset) {
+        @Override
+      public boolean write(DisplayWindow window, PrintWriter w, int indentation, int offset) {
             //<window title="SiteA Viewer" w="800" h="700">
             Dimension d=window.getSize();
             write(w, indentation, "<window title=\""+window.getTitle()+"\" w=\""+d.width+"\" h=\""+d.height+"\"");

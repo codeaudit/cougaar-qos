@@ -25,8 +25,8 @@
  */
 package org.cougaar.qos.qrs.gui;
 
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 
 class LeafNode implements DataTreeNode {
     private final TreeNode parent;
@@ -37,7 +37,8 @@ class LeafNode implements DataTreeNode {
         this.datum = datum;
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return datum.toString();
     }
 

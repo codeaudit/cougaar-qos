@@ -13,7 +13,11 @@ import javax.swing.event.ChangeEvent;
  * To change this template use File | Settings | File Templates.
  */
 public class TickEvent extends ChangeEvent {
-    int tickNumber;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   int tickNumber;
     String label;
     Collection transitions;
 
@@ -32,7 +36,8 @@ public class TickEvent extends ChangeEvent {
     public int getTickNumber() { return tickNumber; }
     public String getLabel() { return label; }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "TickEvent ["+tickNumber+", "+label+" #transitions="+transitions.size()+"]";
     }
 

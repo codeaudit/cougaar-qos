@@ -4,8 +4,8 @@ import java.awt.Dimension;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -19,7 +19,11 @@ import javax.swing.table.TableColumnModel;
  */
 
 public abstract class TBLModel extends AbstractTableModel {
-    JTable table;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   JTable table;
     String columnNames[] = null;
     int    columnWidths[]= null;
 
@@ -37,7 +41,8 @@ public abstract class TBLModel extends AbstractTableModel {
     columnWidths= colWidths;
   }
 
-  public String getColumnName(int col) {
+  @Override
+public String getColumnName(int col) {
     if (col > -1 && col < columnNames.length)
       return columnNames[col];
     return "";
@@ -50,9 +55,12 @@ public abstract class TBLModel extends AbstractTableModel {
   public abstract void clear();
   public abstract int getRowCount();
   public abstract Object getValueAt(int row, int col);
-  public abstract Class getColumnClass(int col);
-  public abstract boolean isCellEditable(int row, int col);
-  public abstract void setValueAt(Object value, int row, int col);
+  @Override
+public abstract Class getColumnClass(int col);
+  @Override
+public abstract boolean isCellEditable(int row, int col);
+  @Override
+public abstract void setValueAt(Object value, int row, int col);
 
   public void setupColumns(JTable table) {
     //Utils.p("setupColumns");
@@ -60,7 +68,7 @@ public abstract class TBLModel extends AbstractTableModel {
     TableColumn col;
     int i, w, colCount = cm.getColumnCount();
     DefaultCellEditor editor = new DefaultCellEditor(new JCheckBox());
-    ((JCheckBox)editor.getComponent()).setHorizontalAlignment(JLabel.CENTER);
+    ((JCheckBox)editor.getComponent()).setHorizontalAlignment(SwingConstants.CENTER);
     for (i=0; i < colCount; i++) {
       col = cm.getColumn(i);
       if (columnWidths != null) {

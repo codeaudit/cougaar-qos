@@ -45,17 +45,20 @@ abstract public class SleeperFacet
 	super(owner, sb, spec, player);
     }
 
-    public void setupSubscriptions(BlackboardService blackboard)
+    @Override
+   public void setupSubscriptions(BlackboardService blackboard)
     {
     }
 
-    public void execute(BlackboardService blackboard)
+    @Override
+   public void execute(BlackboardService blackboard)
     {
     }
 
     protected abstract void processFactAssertion(Object fact);
 
-    public void processFactBase(BlackboardService blackboard)
+    @Override
+   public void processFactBase(BlackboardService blackboard)
     {
 	if (!factsHaveChanged()) return;
 	for (FactRevision frev=nextFact(); frev != null; frev=nextFact()) {

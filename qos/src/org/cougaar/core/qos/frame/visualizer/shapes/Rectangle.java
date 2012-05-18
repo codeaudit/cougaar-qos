@@ -8,7 +8,11 @@ package org.cougaar.core.qos.frame.visualizer.shapes;
  * To change this template use File | Settings | File Templates.
  */
 public class Rectangle extends java.awt.geom.Rectangle2D.Double {
-    public Rectangle() {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   public Rectangle() {
         super();
     }
     public Rectangle(double x, double y, double w, double h) {

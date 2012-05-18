@@ -12,7 +12,11 @@ import javax.swing.event.ChangeEvent;
  * To change this template use File | Settings | File Templates.
  */
 public class AddedFramesEvent extends ChangeEvent {
-    HashSet newDataFrames, newRelationFrames;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   HashSet newDataFrames, newRelationFrames;
 
 
     public AddedFramesEvent(Object source, HashSet newDataFrames, HashSet newRelationFrames) {

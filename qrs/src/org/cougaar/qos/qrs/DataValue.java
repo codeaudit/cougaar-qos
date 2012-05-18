@@ -38,6 +38,11 @@ import org.cougaar.util.log.Logger;
  */
 public class DataValue implements Constants, java.io.Serializable {
     /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+   /**
      * Standard instance of a value without any specific credibility. This may
      * move into the Constants interface later.
      */
@@ -170,7 +175,8 @@ public class DataValue implements Constants, java.io.Serializable {
         return new DataValue(value, new_credibility, units, provenance, timestamp, halflife);
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
         return "<" + value + ":" + credibility + ">";
     }
 

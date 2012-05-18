@@ -33,10 +33,10 @@ import java.util.Set;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.qos.frame.Frame;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
-import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
@@ -45,7 +45,12 @@ public class WatcherPlugin extends ParameterizedPlugin
 implements FrameSetService.Callback, PropertyChangeListener {
     
     private final UnaryPredicate relationPredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             if (!(o instanceof Relationship)) return false;
             Relationship rel = (Relationship) o;
             return rel.getFrameSet() == frameset;
@@ -53,7 +58,12 @@ implements FrameSetService.Callback, PropertyChangeListener {
     };
     
     private final UnaryPredicate thingPredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             if (!(o instanceof Thing)) return false;
             Thing thing = (Thing) o;
             return thing.getFrameSet() == frameset;
@@ -61,7 +71,12 @@ implements FrameSetService.Callback, PropertyChangeListener {
     };
     
     private final UnaryPredicate rootPredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             if (!(o instanceof Root)) return false;
             Thing thing = (Thing) o;
             return thing.getFrameSet() == frameset;
@@ -80,11 +95,12 @@ implements FrameSetService.Callback, PropertyChangeListener {
     private long pathChangeCount;
     
 
-    public void start() {
+    @Override
+   public void start() {
 	String frameSetName = getParameter("frame-set");
 	ServiceBroker sb = getServiceBroker();
-	log = (LoggingService) sb.getService(this, LoggingService.class, null);
-	FrameSetService fss = (FrameSetService) sb.getService(this, FrameSetService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
+	FrameSetService fss = sb.getService(this, FrameSetService.class, null);
 	if (fss == null) {
 	    log.error("Couldn't find FrameSetService");
 	} else {
@@ -93,7 +109,8 @@ implements FrameSetService.Callback, PropertyChangeListener {
 	super.start();
     }
     
-    protected void execute() {
+    @Override
+   protected void execute() {
 	Collection added = tsub.getAddedCollection();
 	for (Object a : added) {
 	    ((Thing) a).addPropertyChangeListener(this);
@@ -150,7 +167,8 @@ implements FrameSetService.Callback, PropertyChangeListener {
 	
     }
 
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
 	BlackboardService bbs = getBlackboardService();
 	rsub = (IncrementalSubscription) bbs.subscribe(relationPredicate);
 	tsub = (IncrementalSubscription) bbs.subscribe(thingPredicate);

@@ -11,7 +11,11 @@ import org.cougaar.core.qos.frame.visualizer.ShapeGraphic;
  */
 
 public class ShapeGraphicTableModel extends TBLModel {
-    ShapeGraphic graphic;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   ShapeGraphic graphic;
 
 
 
@@ -29,34 +33,42 @@ public class ShapeGraphicTableModel extends TBLModel {
     fireTableStructureChanged();
   }
 
-  public void clear() {
+  @Override
+public void clear() {
     graphic = null;
     fireTableDataChanged();
   }
 
-  public String getColumnName(int col) {
+  @Override
+public String getColumnName(int col) {
     if (col > -1 && col < columnNames.length)
       return columnNames[col];
     return "";
   }
 
-  public int getColumnCount() { return columnNames.length;}
-  public int getRowCount() { return 0;}
+  @Override
+public int getColumnCount() { return columnNames.length;}
+  @Override
+public int getRowCount() { return 0;}
 
-  public Object getValueAt(int row, int col) {
+  @Override
+public Object getValueAt(int row, int col) {
       return null;
 
   }
 
-  public Class getColumnClass(int col) {
+  @Override
+public Class getColumnClass(int col) {
       return String.class;
   }
 
-  public boolean isCellEditable(int row, int col) {
+  @Override
+public boolean isCellEditable(int row, int col) {
     return false;
   }
 
-  public void setValueAt(Object value, int row, int col) {
+  @Override
+public void setValueAt(Object value, int row, int col) {
   }
 
 }

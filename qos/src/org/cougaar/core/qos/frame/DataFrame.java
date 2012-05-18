@@ -51,7 +51,12 @@ import org.cougaar.util.log.Logging;
  */
 abstract public class DataFrame extends Frame implements PropertyChangeListener {
 
-    public static final String NIL = "NIL";
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+   public static final String NIL = "NIL";
 
     private static Map<String, Map<String, FrameMaker>> FramePackages = new HashMap<String, Map<String, FrameMaker>>();
 
@@ -333,7 +338,8 @@ abstract public class DataFrame extends Frame implements PropertyChangeListener 
          *         means: include slots the prototype tree but not from the
          *         container tree.
          */
-    public Properties getLocalSlots() {
+    @Override
+   public Properties getLocalSlots() {
 	Properties props = new VisibleProperties();
 	collectSlotValues(props);
 	return props;
@@ -363,7 +369,8 @@ abstract public class DataFrame extends Frame implements PropertyChangeListener 
     /**
          * Updates the given slot value.
          */
-    public void setValue(String slot, Object value) {
+    @Override
+   public void setValue(String slot, Object value) {
 	setLocalValue(slot, value);
     }
 
@@ -471,7 +478,8 @@ abstract public class DataFrame extends Frame implements PropertyChangeListener 
     /**
          * @return true iff this frame matches the given prototype
          */
-    public boolean isa(String kind) {
+    @Override
+   public boolean isa(String kind) {
 	if (frameSet == null)
 	    return kind.equals(getKind());
 	return frameSet.descendsFrom(this, kind);
@@ -665,7 +673,8 @@ abstract public class DataFrame extends Frame implements PropertyChangeListener 
 	    props.remove(slot);
     }
 
-    protected Object getInheritedValue(Frame origin, String slot) {
+    @Override
+   protected Object getInheritedValue(Frame origin, String slot) {
 	Object result = super.getInheritedValue(origin, slot);
 	if (result != null)
 	    return result;
@@ -681,7 +690,8 @@ abstract public class DataFrame extends Frame implements PropertyChangeListener 
 	}
     }
 
-    Object getValue(Frame origin, String slot) {
+    @Override
+   Object getValue(Frame origin, String slot) {
 	Object result = getLocalValue(slot);
 	if (result != null)
 	    return result;
@@ -800,7 +810,8 @@ abstract public class DataFrame extends Frame implements PropertyChangeListener 
 	return getUID().toString();
     }
 
-    public String toString() {
+    @Override
+   public String toString() {
 	return "<" + getPrototype().getName() + " " + displayString() + ">";
     }
 

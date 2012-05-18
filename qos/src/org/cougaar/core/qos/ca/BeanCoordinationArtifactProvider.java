@@ -75,7 +75,8 @@ abstract public class BeanCoordinationArtifactProvider
 	}
 
 
-	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
+	@Override
+   protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
 	{
 	    ServiceBroker sb = getServiceBroker();
 	    if (spec.role.equals(ConsumerRole)) {

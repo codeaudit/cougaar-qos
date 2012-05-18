@@ -56,7 +56,8 @@ abstract class PollingIntegral extends DataFormula {
 
     protected abstract DataValue computeValueFromDependencies(Values values);
 
-    protected void setArgs(String[] args) {
+    @Override
+   protected void setArgs(String[] args) {
         if (args == null || args.length == 0) {
             throw new RuntimeException("No period supplied to PollingIntegral");
         }
@@ -64,7 +65,8 @@ abstract class PollingIntegral extends DataFormula {
         this.period = Integer.parseInt(args[0]);
     }
 
-    protected void initialize(ResourceContext context) {
+    @Override
+   protected void initialize(ResourceContext context) {
         super.initialize(context);
         lastTime = 0;
         configureDependencies();
@@ -79,13 +81,15 @@ abstract class PollingIntegral extends DataFormula {
     // integral, via newValue(). Only the poller alters the actual
     // formula value.
     // 
-    protected DataValue doCalculation(Values values) {
+    @Override
+   protected DataValue doCalculation(Values values) {
         return computeValueFromDependencies(values);
     }
 
     // Some value I depend on has changed. Backward chain, but don't
     // notify listeners!
-    public void dataValueChanged(DataFormula changedFormula) {
+    @Override
+   public void dataValueChanged(DataFormula changedFormula) {
         if (changedFormula == alarm) {
             pollUpdate();
         } else {
@@ -95,7 +99,8 @@ abstract class PollingIntegral extends DataFormula {
     }
 
     // No forward-chaining here, just use the cache
-    public DataValue blockingQuery() {
+    @Override
+   public DataValue blockingQuery() {
         return getCachedValue();
     }
 

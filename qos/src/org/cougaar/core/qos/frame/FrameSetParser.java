@@ -144,7 +144,8 @@ public class FrameSetParser
     }
 
 
-    public void startElement(String uri, String local, String name, 
+    @Override
+   public void startElement(String uri, String local, String name, 
 			     Attributes attrs) {
 	try {
 	    if (name.equals("frameset")) {
@@ -180,7 +181,8 @@ public class FrameSetParser
 	}
     }
 
-    public void endElement(String uri, String local, String name) {
+    @Override
+   public void endElement(String uri, String local, String name) {
 	try {
 	    if (name.equals("frameset")) {
 		endFrameset();
@@ -210,7 +212,8 @@ public class FrameSetParser
 	}
     }
 
-    public void characters(char buf[], int offset, int length) {
+    @Override
+   public void characters(char buf[], int offset, int length) {
 	// no-op
     }
 

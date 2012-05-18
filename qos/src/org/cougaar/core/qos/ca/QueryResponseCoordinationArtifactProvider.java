@@ -96,7 +96,8 @@ abstract public class QueryResponseCoordinationArtifactProvider
 
 
    
-	protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
+	@Override
+   protected Facet makeFacet(ConnectionSpec spec, RolePlayer player)
 	{
 	    ServiceBroker sb = getServiceBroker();
 	    if (spec.role.equals(RequestorRole))

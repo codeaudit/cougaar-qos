@@ -46,7 +46,8 @@ public class MvaDS extends ResourceContext implements Constants {
 
     private static final String MODELTYPE = "modelType";
 
-    protected DataFormula instantiateFormula(String kind) {
+    @Override
+   protected DataFormula instantiateFormula(String kind) {
         if (kind.equals("CpuLatencyMean")) {
             return new CpuLatencyMean();
         } else {
@@ -58,7 +59,8 @@ public class MvaDS extends ResourceContext implements Constants {
      * The parameters should contain one string, the type of model, in this case
      * MVA
      */
-    protected void verifyParameters(String[] parameters) throws ParameterError {
+    @Override
+   protected void verifyParameters(String[] parameters) throws ParameterError {
         if (parameters == null || parameters.length != 1) {
             throw new ParameterError("MvaDS: wrong number of parameters");
         } else {
@@ -75,7 +77,8 @@ public class MvaDS extends ResourceContext implements Constants {
 
     public static class CpuLatencyMean extends DataFormula {
 
-        protected void initialize(ResourceContext context) {
+        @Override
+      protected void initialize(ResourceContext context) {
             super.initialize(context);
             registerDependency(context, "EffectiveMJips");
             registerDependency(context, "ReplySizeMean");
@@ -84,7 +87,8 @@ public class MvaDS extends ResourceContext implements Constants {
             registerDependency(context, "RequestInstPerByteMean");
         }
 
-        protected DataValue doCalculation(DataFormula.Values values) {
+        @Override
+      protected DataValue doCalculation(DataFormula.Values values) {
             // JAZ Need to make credibility a function of componant data's
             // credibility
             double credibility = values.minCredibility();

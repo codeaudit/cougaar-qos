@@ -1,12 +1,16 @@
 package org.cougaar.core.qos.frame.visualizer.tree;
 
-import org.cougaar.core.qos.frame.PrototypeFrame;
-
-import javax.swing.tree.*;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+
+import org.cougaar.core.qos.frame.PrototypeFrame;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,7 +20,11 @@ import java.util.HashSet;
  * To change this template use File | Settings | File Templates.
  */
 public class FrameNode extends DefaultMutableTreeNode {
-    org.cougaar.core.qos.frame.Frame frame;
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+   org.cougaar.core.qos.frame.Frame frame;
     HashMap relationshipNodes;
     String relationship;
     String label;
@@ -69,7 +77,8 @@ public class FrameNode extends DefaultMutableTreeNode {
     public void setLabel(String label) {
         this.label = label;
     }
-    public String toString() {
+    @Override
+   public String toString() {
         return label;
     }
 
@@ -96,27 +105,32 @@ public class FrameNode extends DefaultMutableTreeNode {
     }
 
 
-    public void insert(MutableTreeNode child, int index) {
+    @Override
+   public void insert(MutableTreeNode child, int index) {
         cachedChildren.add(child);
         super.insert(child, index);
     }
     
-    public void add(MutableTreeNode newChild) {
+    @Override
+   public void add(MutableTreeNode newChild) {
         cachedChildren.add(newChild);
         super.add(newChild);
     }
 
-    public void remove(int childIndex) {
+    @Override
+   public void remove(int childIndex) {
         TreeNode child = getChildAt(childIndex);
         cachedChildren.remove(child);
         super.remove(childIndex);
     }
-    public void remove(MutableTreeNode aChild) {
+    @Override
+   public void remove(MutableTreeNode aChild) {
         cachedChildren.remove(aChild);
         super.remove(aChild);
     }
 
-    public void removeAllChildren() {
+    @Override
+   public void removeAllChildren() {
         cachedChildren.clear();
         super.removeAllChildren();
     }

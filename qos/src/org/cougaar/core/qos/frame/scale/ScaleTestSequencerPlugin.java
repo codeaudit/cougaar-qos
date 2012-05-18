@@ -30,9 +30,9 @@ import java.util.Enumeration;
 
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.component.ServiceBroker;
+import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.qos.frame.FrameSet;
 import org.cougaar.core.qos.frame.FrameSetService;
-import org.cougaar.core.plugin.ParameterizedPlugin;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.service.LoggingService;
 import org.cougaar.util.UnaryPredicate;
@@ -44,18 +44,24 @@ public class ScaleTestSequencerPlugin extends ParameterizedPlugin implements Fra
     private IncrementalSubscription sub;
     
     private final UnaryPredicate rootPredicate = new UnaryPredicate() {
-        public boolean execute(Object o) {
+        /**
+       * 
+       */
+      private static final long serialVersionUID = 1L;
+
+      public boolean execute(Object o) {
             if (!(o instanceof Root)) return false;
             Root thing = (Root) o;
             return thing.getFrameSet() == frameset;
         }
     };
     
-    public void start() {
+    @Override
+   public void start() {
 	String frameSetName = getParameter("frame-set");
 	ServiceBroker sb = getServiceBroker();
-	log = (LoggingService) sb.getService(this, LoggingService.class, null);
-	FrameSetService fss = (FrameSetService) sb.getService(this, FrameSetService.class, null);
+	log = sb.getService(this, LoggingService.class, null);
+	FrameSetService fss = sb.getService(this, FrameSetService.class, null);
 	if (fss == null) {
 	    log.error("Couldn't find FrameSetService");
 	} else {
@@ -64,7 +70,8 @@ public class ScaleTestSequencerPlugin extends ParameterizedPlugin implements Fra
 	super.start();
     }
     
-    protected void execute() {
+    @Override
+   protected void execute() {
 	if (sub.hasChanged()) {
 	    Enumeration e;
 	    
@@ -80,7 +87,8 @@ public class ScaleTestSequencerPlugin extends ParameterizedPlugin implements Fra
 	}
     }
 
-    protected void setupSubscriptions() {
+    @Override
+   protected void setupSubscriptions() {
 	BlackboardService bbs = getBlackboardService();
 	sub = (IncrementalSubscription) bbs.subscribe(rootPredicate);
     }

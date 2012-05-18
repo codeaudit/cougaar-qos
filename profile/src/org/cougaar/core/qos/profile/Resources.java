@@ -1,20 +1,11 @@
 package org.cougaar.core.qos.profile;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-import org.cougaar.core.agent.*;
-import org.cougaar.core.component.*;
-import org.cougaar.core.mts.*;
-import org.cougaar.core.node.*;
-import org.cougaar.core.qos.metrics.*;
-import org.cougaar.core.service.*;
-import org.cougaar.core.service.wp.*;
-import org.cougaar.core.thread.*;
-import org.cougaar.core.wp.resolver.*;
-import org.cougaar.util.*;
+import java.text.DecimalFormat;
+
+import org.cougaar.core.mts.MessageAddress;
+import org.cougaar.core.node.NodeIdentificationService;
+import org.cougaar.core.qos.metrics.Metric;
+import org.cougaar.core.qos.metrics.MetricsService;
 
 /**
  * This component profiles the {@link MetricsService}'s
@@ -53,16 +44,16 @@ public class Resources extends ProfilerBase {
 
   private MetricsService ms;
   private MessageAddress nodeId;
-  public void load() {
+  @Override
+public void load() {
     super.load();
-    ms = (MetricsService)
-      sb.getService(this, MetricsService.class, null);
-    NodeIdentificationService nis = (NodeIdentificationService)
-      sb.getService(this, NodeIdentificationService.class, null);
+    ms = sb.getService(this, MetricsService.class, null);
+    NodeIdentificationService nis = sb.getService(this, NodeIdentificationService.class, null);
     nodeId = nis.getMessageAddress();
     sb.releaseService(this, NodeIdentificationService.class, nis);
   }
-  public void run() {
+  @Override
+public void run() {
     log("org.cougaar.core.qos.profile.resources",
         HEADER, getResources());
   }

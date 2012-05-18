@@ -16,7 +16,13 @@ import org.cougaar.core.util.UID;
 
 public class Indicator
     extends Thing {
-    static {
+    /**
+    * 
+    */
+   private static final long serialVersionUID = 1L;
+
+
+   static {
         org.cougaar.core.qos.frame.FrameMaker __fm = 
             new org.cougaar.core.qos.frame.FrameMaker() {
                 public DataFrame makeFrame(FrameSet frameSet, UID uid) {
@@ -40,12 +46,14 @@ public class Indicator
     }
 
 
-    public String getKind() {
+    @Override
+   public String getKind() {
         return "indicator";
     }
 
 
-    protected void collectSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectSlotValues(java.util.Properties __props) {
         super.collectSlotValues(__props);
         Object __value;
         __value = getStatus__AsObject();
@@ -53,7 +61,8 @@ public class Indicator
     }
 
 
-    protected void collectContainerSlotValues(java.util.Properties __props) {
+    @Override
+   protected void collectContainerSlotValues(java.util.Properties __props) {
         super.collectContainerSlotValues(__props);
         Object __value;
         __value = getBytesIn__AsObject();
@@ -412,7 +421,8 @@ public class Indicator
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new) {
+    @Override
+   protected void fireContainerChanges(DataFrame __raw_old, DataFrame __raw_new) {
         if (!(__raw_old instanceof Agent)) {
             getLogger().warn("Container of " +this+ " is not a Agent: " + __raw_old);
             return;
@@ -519,7 +529,8 @@ public class Indicator
     }
 
 
-    protected void fireContainerChanges(DataFrame __raw) {
+    @Override
+   protected void fireContainerChanges(DataFrame __raw) {
         if (!(__raw instanceof Agent)) {
             getLogger().warn("Container of " +this+ " is not a Agent: " + __raw);
             return;
@@ -581,7 +592,8 @@ public class Indicator
     }
 
 
-    protected Object getLocalValue(String __slot) {
+    @Override
+   protected Object getLocalValue(String __slot) {
        String __key = __slot.intern();
        if ("bytesIn" == __key)
             return getBytesIn__AsObject();
@@ -618,7 +630,8 @@ public class Indicator
     }
 
 
-    protected void setLocalValue(String __slot,
+    @Override
+   protected void setLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("status" == __key)
@@ -628,7 +641,8 @@ public class Indicator
     }
 
 
-    protected void initializeLocalValue(String __slot,
+    @Override
+   protected void initializeLocalValue(String __slot,
                                  Object __value) {
        String __key = __slot.intern();
        if ("status" == __key)
@@ -638,7 +652,8 @@ public class Indicator
     }
 
 
-    protected void collectSlotNames(java.util.Set<String> slots) {
+    @Override
+   protected void collectSlotNames(java.util.Set<String> slots) {
         super.collectSlotNames(slots);
         slots.add("status");
         slots.add("bytesIn");
@@ -818,7 +833,8 @@ public class Indicator
     }
 
 
-    protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
+    @Override
+   protected void collectSlotDescriptions(java.util.Map<String,SlotDescription> map) {
         super.collectSlotDescriptions(map);
         map.put("status", slotMetaData__Status());
         map.put("bytesIn", slotMetaData__BytesIn());

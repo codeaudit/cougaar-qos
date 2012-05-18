@@ -7,9 +7,9 @@ import java.util.Properties;
 import org.cougaar.bootstrap.XMLReaderUtils;
 import org.cougaar.util.log.Logging;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.SAXParseException;
 
 
 public abstract class XMLParser extends DefaultHandler {
@@ -43,12 +43,15 @@ public abstract class XMLParser extends DefaultHandler {
         return;
     }
 
-    public abstract void startElement(String uri, String local, String name, Attributes attrs);
-    public abstract void endElement(String uri, String local, String name);
+    @Override
+   public abstract void startElement(String uri, String local, String name, Attributes attrs);
+    @Override
+   public abstract void endElement(String uri, String local, String name);
 
 
     // Not using this yet
-    public void characters(char buf[], int offset, int length){
+    @Override
+   public void characters(char buf[], int offset, int length){
     }
 
 }
