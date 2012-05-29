@@ -108,18 +108,15 @@ implements BlackboardClient
 
   public void unload() {
     if (agentIdService != null) {
-      serviceBroker.releaseService(
-          this, AgentIdentificationService.class, agentIdService);
+      releaseService(this, AgentIdentificationService.class, agentIdService);
       agentIdService = null;
     }
     if (uidService != null) {
-      serviceBroker.releaseService(
-          this, UIDService.class, uidService);
+      releaseService(this, UIDService.class, uidService);
       uidService = null;
     }
     if (blackboard != null) {
-      serviceBroker.releaseService(
-          this, BlackboardService.class, blackboard);
+      releaseService(this, BlackboardService.class, blackboard);
       blackboard = null;
     }
     super.unload();

@@ -78,8 +78,7 @@ protected String getPath() {
   @Override
 public void load() {
     super.load();
-    fss = getServiceBroker().getService(
-       this, FrameSetService.class, null);
+    fss = getService(this, FrameSetService.class, null);
     if (fss == null && log.isWarnEnabled()) {
       log.warn("Unable to obtain FrameSetService");
     }
