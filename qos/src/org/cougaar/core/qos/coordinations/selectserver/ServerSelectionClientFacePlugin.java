@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.cougaar.core.agent.service.alarm.Alarm;
+import org.cougaar.core.blackboard.ChangeReport;
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.coordinations.Face;
@@ -87,7 +88,7 @@ implements ServerSelection.Matcher<Face<ServerSelection.EventType>> {
     @Cougaar.Execute(on=Subscribe.ModType.CHANGE, when="isRequest")
     public void executeChangedServerRelay(UniqueObject object,
                                           IncrementalSubscription sub) {
-        Set<?> changeReports = sub.getChangeReports(object);
+        Set<ChangeReport> changeReports = sub.getChangeReports(object);
         Envelope env = new Envelope(object, Envelope.Operation.CHANGE, changeReports);
         forwardRequest(env, 1);
     }

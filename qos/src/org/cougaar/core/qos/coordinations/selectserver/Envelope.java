@@ -26,6 +26,7 @@ package org.cougaar.core.qos.coordinations.selectserver;
 import java.io.Serializable;
 import java.util.Set;
 
+import org.cougaar.core.blackboard.ChangeReport;
 import org.cougaar.core.service.BlackboardService;
 import org.cougaar.core.util.UniqueObject;
 
@@ -46,13 +47,13 @@ public class Envelope implements Serializable {
     
     private final UniqueObject contents;
     private final Operation operation;
-    private final Set<?> changeReports;
+    private final Set<ChangeReport> changeReports;
     
     public Envelope(UniqueObject object, Operation op) {
         this(object, op, null);
     }
     
-    public Envelope(UniqueObject object, Operation op, Set<?> changeReports) {
+    public Envelope(UniqueObject object, Operation op, Set<ChangeReport> changeReports) {
         this.contents = object;
         this.operation = op;
         this.changeReports = changeReports;

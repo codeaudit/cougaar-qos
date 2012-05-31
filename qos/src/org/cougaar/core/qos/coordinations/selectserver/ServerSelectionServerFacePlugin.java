@@ -25,6 +25,7 @@ package org.cougaar.core.qos.coordinations.selectserver;
 
 import java.util.Set;
 
+import org.cougaar.core.blackboard.ChangeReport;
 import org.cougaar.core.blackboard.IncrementalSubscription;
 import org.cougaar.core.mts.MessageAddress;
 import org.cougaar.core.qos.coordinations.Face;
@@ -85,7 +86,7 @@ abstract public class ServerSelectionServerFacePlugin extends FacePlugin<ServerS
     
     @Cougaar.Execute(on=Subscribe.ModType.CHANGE, when="isResponse")
     public void executeChangedServerRelay(UniqueObject object, IncrementalSubscription sub) {
-        Set<?> changeReports = sub.getChangeReports(object);
+        Set<ChangeReport> changeReports = sub.getChangeReports(object);
         Envelope env = new Envelope(object, Envelope.Operation.CHANGE, changeReports);
         ensureServerRelay(env);
     }

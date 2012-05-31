@@ -43,6 +43,7 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.Set;
 
+import org.cougaar.core.blackboard.ChangeReport;
 import org.cougaar.core.component.ServiceBroker;
 import org.cougaar.core.qos.metrics.Metric;
 import org.cougaar.core.qos.metrics.MetricsService;
@@ -104,10 +105,7 @@ public class SingleInheritanceFrameSet
     public class RelationLock extends Object {};  
     public class PendingRelationships extends HashSet<RelationFrame> {
 
-      /**
-       * 
-       */
-      private static final long serialVersionUID = 1L;};
+    private static final long serialVersionUID = 1L;};
     public class Containers extends  HashMap<DataFrame,DataFrame> {
 
       /**
@@ -1056,8 +1054,9 @@ public class SingleInheritanceFrameSet
 	}
     }
 
-    private static class Change extends ChangeQueueEntry {
-	Object change;
+    private static class Change extends ChangeQueueEntry implements ChangeReport {
+    private static final long serialVersionUID = 1L;
+   Object change;
 	Change(UniqueObject object, Object change) {
 	    super(object);
 	    this.change = change;
@@ -1095,8 +1094,8 @@ public class SingleInheritanceFrameSet
 		    log.debug("about to publish " + change);
 		if (change instanceof Change) {
 		    Change chng = (Change) change;
-		    List<Object> changes_list = new ArrayList<Object>(1);
-		    changes_list.add(chng.change);
+		    List<ChangeReport> changes_list = new ArrayList<ChangeReport>(1);
+		    changes_list.add(chng);
 		    if (log.isDebugEnabled())
 			log.debug("Publish change " + chng.change);
 		    bbs.publishChange(chng.object, changes_list);
@@ -1119,8 +1118,8 @@ public class SingleInheritanceFrameSet
 		ChangeQueueEntry change = change_queue.get(i);
 		if (change instanceof Change) {
 		    Change chng = (Change) change;
-		    List<Object> changes_list = new ArrayList<Object>(1);
-		    changes_list.add(chng.change);
+		    List<ChangeReport> changes_list = new ArrayList<ChangeReport>(1);
+		    changes_list.add(chng);
 		    bbs.publishChange(chng.object, changes_list);
 		} else  if (change instanceof Add) {
 		    Add add = (Add) change;
