@@ -127,7 +127,7 @@ abstract public class SysStatHandler implements Constants {
         }
 
         if (handler == null) {
-            throw new NoSysStatHandler("No handler for " + kind + " on platform " + name);
+            throw new NoSysStatHandler("Note: platform " + name + " does not support java access to " + kind + " statistics");
         }
 
         handler.initialize(host, pid);
